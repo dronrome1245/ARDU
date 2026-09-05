@@ -38,10 +38,15 @@ hardware:
     flashing_method_verified: false
   max9814:
     available: true
-    role: microphone_with_agc
+    role: primary_microphone_with_agc
+  max4466:
+    available: true
+    role: reserve_microphone_manual_gain
   ds3231:
     available: true
     role: rtc_for_dawn_alarm
+    battery_installed: "CR2032"
+    battery_charge_path_verified: false
   hc05:
     available: true
     role: bluetooth_fallback
@@ -52,6 +57,8 @@ hardware:
     available: true
     model: "S-30-5"
     rating: "5V 6A 30W"
+    label_physically_confirmed: true
+    output_verified: false
     final_load_margin_verified: false
   regulator_3v3:
     available: true
@@ -62,8 +69,23 @@ hardware:
     probable_available: true
     probable_capacitance_uf: 1000
     voltage_verified: false
+  passive_confirmed:
+    electrolytic_1uf_count: 10
+    electrolytic_100uf_count: 3
+    resistor_1k5_count: 10
+    resistor_4k7_count: 10
+    diode_1n4148_count: 10
+    transistor_bc548_count: 10
+  uart_level_shift_candidate:
+    method: resistor_divider
+    top_resistor: "1.5k"
+    bottom_resistor: "3.0k = 1.5k + 1.5k series"
+    verified_with_multimeter: false
   breadboard:
     available: true
+  dupont_wires:
+    visible_in_photos: true
+    types_and_count_confirmed: false
   lcd_16x2:
     available: true
     model: "MELT MT-16S2H"
@@ -96,7 +118,7 @@ architecture:
 progress:
   repository_initialized_percent: 100
   canonical_project_memory_percent: 100
-  hardware_inventory_percent: 55
+  hardware_inventory_percent: 70
   architecture_documented_percent: 80
   wifi_hardware_verified_percent: 0
   uart_gateway_verified_percent: 0
@@ -112,7 +134,10 @@ critical_blockers:
   - "Есть конфликт старой распиновки A0/A3 и D6/D12"
   - "Не зафиксировано фактическое количество светодиодов круглой лампы"
   - "Не выбран режим Wi-Fi: SoftAP или Station"
-  - "Не подтверждены номиналы требуемых резисторов и конденсаторов"
+  - "Не подтвержден резистор 220–470 Ом для DATA WS2812B"
+  - "Не подтвержден номинал 100 нФ"
+  - "Не подтверждено рабочее напряжение электролита около 1000 мкФ"
+  - "Не проверена цепь резервной батареи DS3231 с установленной CR2032"
 
 next_milestone:
   name: inventory_and_compatibility_closed
