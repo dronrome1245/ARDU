@@ -1,0 +1,20 @@
+id,type,path,status,source_or_owner,purpose
+A-001,repository,README.md,active,ARDU,Общее описание проекта
+A-002,governance,AGENTS.md,active,ARDU,Правила для ИИ-агентов
+A-003,status,01_СТАТУС_ПРОЕКТА.md,active,ARDU,Текущее состояние
+A-004,handoff,02_СЛЕДУЮЩИЙ_ШАГ.md,active,ARDU,Следующая итерация
+A-005,state,03_СОСТОЯНИЕ_ПРОЕКТА.yaml,active,ARDU,Машиночитаемое состояние
+A-006,roadmap,00_Управление_проектом/ДОРОЖНАЯ_КАРТА.md,active,ARDU,Этапы разработки
+A-007,backlog,00_Управление_проектом/БЭКЛОГ_ЗАДАЧ.md,active,ARDU,Рабочие задачи
+A-008,requirements,01_Контур_продукта/ФУНКЦИОНАЛЬНЫЕ_ТРЕБОВАНИЯ.md,active,ARDU,Функциональный контракт
+A-009,architecture,02_Архитектура_и_решения/АРХИТЕКТУРА_СИСТЕМЫ.md,active,ARDU,Системная архитектура
+A-010,adr,02_Архитектура_и_решения/ADR/ADR-001-РАЗДЕЛЕНИЕ-NANO-ESP8266.md,active,ARDU,Решение Nano плюс ESP8266
+A-011,interface,06_Интерфейс_управления/ПРОТОКОЛ_КОМАНД.md,active,ARDU,Контракт приложения и прошивки
+A-012,external_source,https://github.com/AlexGyver/ColorMusic,reference,AlexGyver,База алгоритмов светомузыки
+A-013,external_source,https://alexgyver.ru/colormusic/,reference,AlexGyver,Описание схем и режимов ColorMusic
+A-014,external_source,https://alexgyver.ru/dawn-clock/,reference,AlexGyver,Идея будильника-рассвета
+A-015,input,Распиновка.docx,source,user_upload,Накопленные варианты подключения
+A-016,input,Промпт на объединение скетча.docx,source,user_upload,Требования Bluetooth-версии
+A-017,input,Команды для блютуза.txt,source,user_upload,Короткий протокол команд
+A-018,input,Ответ по калибровке.txt,source,user_upload,Проработка калибровки микрофона
+A-019,input,Схема-Модель.pdf,source,user_upload,Графическая схема прежнего макета
