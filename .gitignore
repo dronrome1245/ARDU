@@ -1,0 +1,29 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Python / Kivy
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# PlatformIO / embedded builds
+.pio/
+.pioenvs/
+.piolibdeps/
+build/
+*.elf
+*.hex
+*.bin
+*.map
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
