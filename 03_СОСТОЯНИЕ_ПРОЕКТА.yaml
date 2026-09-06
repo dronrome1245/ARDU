@@ -1,122 +1,118 @@
 project:
   name: ARDU
-  description: "Круглая потолочная лампа со светомузыкой, микрофоном, будильником-рассветом и управлением через мобильное приложение"
+  description: "Два синхронных круглых потолочных WS2812B-светильника со светомузыкой, рассветом и Wi-Fi приложением"
   initialized: "2026-09-05"
-  phase: compatibility_and_measurements
+  phase: dual_fixture_power_and_measurements
   repository: "dronrome1245/ARDU"
-
-canonical_context:
-  ai_entrypoint: "00_AI_START_HERE.md"
-  status: "STATUS.md"
-  decisions: "DECISIONS.md"
-  history: "HISTORY.md"
-  sources: "SOURCES.md"
-  bom: "02_КОМПОНЕНТЫ_BOM.md"
-  inventory: "02_Наши_детали/ИНВЕНТАРЬ.md"
 
 constraints:
   minimize_new_hardware_purchase: true
-  target_control: wifi_mobile_app
-  audio_source: room_microphone
-  led_type: WS2812B
-  inventory_before_purchase: true
   inventory_closed: true
+  main_room_light_separate: true
+  round_fixture_white_light_used: false
+  second_wall_switch_hard_power_cut: true
+  alarm_requires_wall_switch_on: true
+  target_control: wifi_mobile_app
+  network_cloud_required: false
 
 hardware:
   arduino_nano:
     available: true
-    confirmed_units_min: 2
-    proposed_role: realtime_controller
+    role: realtime_controller
   esp8266:
     available: true
-    marking: "ESP8266MOD AI-THINKER"
-    proposed_role: wifi_gateway
-    power_verified: false
+    role: wifi_gateway
+    adapter_vcc_volts: 3.3
+    five_volts_on_vcc_forbidden: true
     flashing_method_verified: false
   max9814:
     available: true
-    role: primary_microphone_with_agc
+    role: primary_microphone
   max4466:
     available: true
-    role: reserve_microphone_manual_gain
+    role: reserve_microphone
   ds3231:
     available: true
-    role: rtc_for_dawn_alarm
-    battery_installed: "CR2032"
-    battery_charge_path_verified: false
-  hc05:
-    available: true
-    role: bluetooth_fallback
+    battery: CR2032
+    charging_path_present: true
+    required_modification: "remove resistor 201 before normal 5V use"
   ws2812b:
-    available: true
-    led_count_confirmed: false
-    physical_layout_confirmed: false
-  psu_5v:
-    available: true
-    model: "S-30-5"
-    rating: "5V 6A 30W"
-    output_verified: false
-    final_load_margin_verified: false
+    density_led_per_m_estimate: 60.7
+    ring_path_cm: 71.5
+    target_led_per_fixture: 43
+    fixture_count: 2
+    target_total_led: 86
+    total_strip_length_required_m: 1.43
+    total_strip_length_available_confirmed: false
+  psu:
+    model: S-30-5
+    output_nominal: "5V 6A 30W"
+    output_measured: false
+    led_current_limit_target_ma: 4500
   regulator_3v3:
+    model: YP-8 AMS1117-3.3
+    output_measured: false
+    wifi_load_tested: false
+  capacitor_100uf:
     available: true
-    model: "YP-8 AMS1117-3.3"
-    output_verified: false
-    load_test_verified: false
-  bulk_capacitor:
-    probable_available: true
-    probable_capacitance_uf: 1000
-    voltage_verified: false
-  data_resistor_220_470:
+    voltage_rating_v: 10
+  capacitor_1000uf:
+    available_probable: true
+    voltage_rating_confirmed: false
+    count_confirmed: false
+  capacitor_disc_103:
+    available: true
+    capacitance_nf: 10
+  data_resistor_330:
+    required_count: 2
     confirmed_available: false
-  decoupling_cap_100nf:
-    confirmed_available: false
-  uart_level_shift_candidate:
-    method: resistor_divider
-    top_resistor: "1.5k"
-    bottom_resistor: "3.0k = 1.5k + 1.5k series"
-    verified_with_multimeter: false
 
 architecture:
-  command_path:
-    - mobile_app
-    - wifi
-    - esp8266
-    - uart
-    - arduino_nano
-    - led_audio_rtc
-  preserve_existing_command_semantics: true
-  migrate_audio_processing_to_esp8266_now: false
-  white_light_role_confirmed: false
-  wifi_mode_confirmed: false
-  network_transport_confirmed: false
-  nano_pinout_confirmed: false
+  wifi_primary_mode: station
+  wifi_fallback_mode: softap
+  network_api_v1: http_local
+  mobile_app: rewrite_from_scratch
+  old_bluetooth_protocol_compatibility_required: false
+  one_controller_for_both_fixtures: true
+  separate_data_lines: true
+  nano_pinout:
+    esp_uart_rx: D0
+    esp_uart_tx: D1
+    ws2812_a: D6
+    ws2812_b: D7
+    max9814_out: A0
+    ds3231_sda: A4
+    ds3231_scl: A5
+
+power_topology:
+  mains_path: "second switch -> one S-30-5"
+  low_voltage_branches: 2
+  desired_rule: "230V only up to PSU; 5V/GND/DATA to fixture bodies where possible"
+  final_wiring_route_confirmed: false
+  psu_location_confirmed: false
 
 progress:
-  repository_initialized_percent: 100
-  canonical_project_memory_percent: 100
   hardware_inventory_percent: 100
-  compatibility_checks_percent: 0
-  architecture_documented_percent: 80
+  functional_architecture_percent: 95
+  dual_fixture_geometry_percent: 80
+  mains_low_voltage_layout_percent: 30
+  electrical_measurements_percent: 0
   wifi_hardware_verified_percent: 0
   uart_gateway_verified_percent: 0
-  mobile_app_wifi_migration_percent: 0
-  integrated_lamp_test_percent: 0
+  mobile_app_percent: 0
 
-current_focus: "Уточнить роль штатного света и Wi-Fi, затем выполнить электрические измерения и сформировать окончательный минимальный BOM"
+current_focus: "Confirm strip total length, ceiling wiring, PSU location and multimeter; then measure S-30-5 and YP-8"
 
 critical_blockers:
-  - "Не определена роль WS2812B относительно штатного белого света лампы"
-  - "Не подтверждены геометрия трассы и фактическое количество LED"
-  - "Не проверены питание и способ прошивки ESP8266MOD"
-  - "YP-8 AMS1117-3.3 не проверен мультиметром и под нагрузкой"
-  - "Не подтвержден резистор 220–470 Ом для DATA WS2812B"
-  - "Не подтвержден номинал 100 нФ"
-  - "Не подтверждено рабочее напряжение электролита около 1000 мкФ"
-  - "Не проверена цепь резервной батареи DS3231 с установленной CR2032"
-  - "Не выбран финальный режим Wi-Fi"
-  - "Не определен актуальный исходный код приложения и сетевой транспорт"
-  - "Не зафиксирована окончательная распиновка Nano"
+  - "Total WS2812B length >=1.43m not confirmed"
+  - "Distance and wiring topology between two ceiling fixtures not known"
+  - "Safe physical location for common S-30-5 not confirmed"
+  - "S-30-5 output not measured"
+  - "YP-8 output and Wi-Fi load behavior not measured"
+  - "ESP8266 flashing method not yet proven"
+  - "1000uF count/rating not fully confirmed"
+  - "330 ohm data resistors not confirmed in inventory"
 
 next_milestone:
-  name: compatibility_and_bom_closed
-  success_condition: "Определена функция штатного света, проверены питание/уровни/пассивы/геометрия, утверждены Wi-Fi и pinout, сформирован минимальный список закупки"
+  name: final_power_bom_and_wifi_bench_ready
+  success_condition: "Ceiling low-voltage layout and PSU placement fixed, power measurements passed, final BOM approved, ESP8266 ready for first flash and UART bench test"
