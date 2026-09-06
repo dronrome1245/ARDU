@@ -2,7 +2,7 @@ project:
   name: ARDU
   description: "Два синхронных круглых потолочных WS2812B-светильника со светомузыкой, рассветом и Wi-Fi приложением"
   initialized: "2026-09-05"
-  phase: dual_fixture_power_and_measurements
+  phase: app_model_done_power_bench_next
   repository: "dronrome1245/ARDU"
 
 constraints:
@@ -43,7 +43,8 @@ hardware:
     fixture_count: 2
     target_total_led: 86
     total_strip_length_required_m: 1.43
-    total_strip_length_available_confirmed: false
+    total_strip_length_available_m: 5.0
+    total_strip_length_available_confirmed: true
   psu:
     model: S-30-5
     output_nominal: "5V 6A 30W"
@@ -72,7 +73,9 @@ architecture:
   wifi_fallback_mode: softap
   network_api_v1: http_local
   mobile_app: rewrite_from_scratch
-  old_bluetooth_protocol_compatibility_required: false
+  legacy_app_analyzed: true
+  legacy_app_name: LumpV3.1
+  legacy_protocol_external_compatibility_required: false
   one_controller_for_both_fixtures: true
   separate_data_lines: true
   nano_pinout:
@@ -84,6 +87,35 @@ architecture:
     ds3231_sda: A4
     ds3231_scl: A5
 
+modes:
+  music:
+    - M01_vu_gradient
+    - M02_vu_rainbow
+    - M03_5_band
+    - M04_3_band
+    - M05_1_band_submodes
+    - M06_strobe_manual_only
+    - M08_running_frequencies
+    - M09_spectrum_analyzer
+  ambient:
+    - F01_static_color
+    - F02_smooth_color_change
+    - F03_running_rainbow
+  night:
+    base: "color + saturation + brightness"
+    schedule: later_stage
+  alarm:
+    autonomous: true
+    rtc: DS3231
+    parameters:
+      - enabled
+      - time
+      - fade_minutes
+      - max_brightness
+      - start_color
+      - end_color
+      - stop_active_dawn
+
 power_topology:
   mains_path: "second switch -> one S-30-5"
   low_voltage_branches: 2
@@ -93,18 +125,19 @@ power_topology:
 
 progress:
   hardware_inventory_percent: 100
-  functional_architecture_percent: 95
+  functional_architecture_percent: 100
+  legacy_app_analysis_percent: 100
+  app_functional_model_percent: 90
   dual_fixture_geometry_percent: 80
   mains_low_voltage_layout_percent: 30
   electrical_measurements_percent: 0
   wifi_hardware_verified_percent: 0
   uart_gateway_verified_percent: 0
-  mobile_app_percent: 0
+  mobile_app_implementation_percent: 0
 
-current_focus: "Confirm strip total length, ceiling wiring, PSU location and multimeter; then measure S-30-5 and YP-8"
+current_focus: "Measure YP-8 and S-30-5, confirm ceiling wiring and PSU placement, then approve final BOM and build ESP8266↔Nano bench"
 
 critical_blockers:
-  - "Total WS2812B length >=1.43m not confirmed"
   - "Distance and wiring topology between two ceiling fixtures not known"
   - "Safe physical location for common S-30-5 not confirmed"
   - "S-30-5 output not measured"
@@ -114,5 +147,5 @@ critical_blockers:
   - "330 ohm data resistors not confirmed in inventory"
 
 next_milestone:
-  name: final_power_bom_and_wifi_bench_ready
-  success_condition: "Ceiling low-voltage layout and PSU placement fixed, power measurements passed, final BOM approved, ESP8266 ready for first flash and UART bench test"
+  name: power_bom_and_wifi_bench_ready
+  success_condition: "Power measurements passed, ceiling low-voltage layout and PSU placement fixed, final BOM approved, ESP8266 flashed and UART PING/PONG with Nano works"
