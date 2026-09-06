@@ -2,7 +2,7 @@ project:
   name: ARDU
   description: "Круглая потолочная лампа со светомузыкой, микрофоном, будильником-рассветом и управлением через мобильное приложение"
   initialized: "2026-09-05"
-  phase: hardware_inventory
+  phase: compatibility_and_measurements
   repository: "dronrome1245/ARDU"
 
 canonical_context:
@@ -20,20 +20,17 @@ constraints:
   audio_source: room_microphone
   led_type: WS2812B
   inventory_before_purchase: true
+  inventory_closed: true
 
 hardware:
   arduino_nano:
     available: true
     confirmed_units_min: 2
-    variants:
-      - "ATmega328P Mini-USB"
-      - "ATmega328P-compatible USB-C"
     proposed_role: realtime_controller
   esp8266:
     available: true
     marking: "ESP8266MOD AI-THINKER"
     proposed_role: wifi_gateway
-    bluetooth_builtin: false
     power_verified: false
     flashing_method_verified: false
   max9814:
@@ -53,11 +50,11 @@ hardware:
   ws2812b:
     available: true
     led_count_confirmed: false
+    physical_layout_confirmed: false
   psu_5v:
     available: true
     model: "S-30-5"
     rating: "5V 6A 30W"
-    label_physically_confirmed: true
     output_verified: false
     final_load_margin_verified: false
   regulator_3v3:
@@ -69,40 +66,15 @@ hardware:
     probable_available: true
     probable_capacitance_uf: 1000
     voltage_verified: false
-  passive_confirmed:
-    electrolytic_1uf_count: 10
-    electrolytic_100uf_count: 3
-    resistor_1k5_count: 10
-    resistor_4k7_count: 10
-    diode_1n4148_count: 10
-    transistor_bc548_count: 10
+  data_resistor_220_470:
+    confirmed_available: false
+  decoupling_cap_100nf:
+    confirmed_available: false
   uart_level_shift_candidate:
     method: resistor_divider
     top_resistor: "1.5k"
     bottom_resistor: "3.0k = 1.5k + 1.5k series"
     verified_with_multimeter: false
-  breadboard:
-    available: true
-  dupont_wires:
-    visible_in_photos: true
-    types_and_count_confirmed: false
-  lcd_16x2:
-    available: true
-    model: "MELT MT-16S2H"
-    project_role: optional_bench_diagnostics
-  pcf8574_lcd_backpack:
-    available: true
-    project_role: optional_bench_diagnostics
-  w5500:
-    available: true
-    project_role: not_required
-  hc_sr04:
-    available: true
-    project_role: not_required
-  relay_5v:
-    available: true
-    model: "SRD-05VDC-SL-C module"
-    project_role: not_required
 
 architecture:
   command_path:
@@ -114,31 +86,37 @@ architecture:
     - led_audio_rtc
   preserve_existing_command_semantics: true
   migrate_audio_processing_to_esp8266_now: false
+  white_light_role_confirmed: false
+  wifi_mode_confirmed: false
+  network_transport_confirmed: false
+  nano_pinout_confirmed: false
 
 progress:
   repository_initialized_percent: 100
   canonical_project_memory_percent: 100
-  hardware_inventory_percent: 70
+  hardware_inventory_percent: 100
+  compatibility_checks_percent: 0
   architecture_documented_percent: 80
   wifi_hardware_verified_percent: 0
   uart_gateway_verified_percent: 0
   mobile_app_wifi_migration_percent: 0
   integrated_lamp_test_percent: 0
 
-current_focus: "Продолжить инвентаризацию всех имеющихся компонентов до закупок"
+current_focus: "Уточнить роль штатного света и Wi-Fi, затем выполнить электрические измерения и сформировать окончательный минимальный BOM"
 
 critical_blockers:
-  - "Инвентаризация пассивов, проводов, разъемов и инструмента не завершена"
+  - "Не определена роль WS2812B относительно штатного белого света лампы"
+  - "Не подтверждены геометрия трассы и фактическое количество LED"
+  - "Не проверены питание и способ прошивки ESP8266MOD"
   - "YP-8 AMS1117-3.3 не проверен мультиметром и под нагрузкой"
-  - "Не подтвержден способ прошивки ESP8266MOD"
-  - "Есть конфликт старой распиновки A0/A3 и D6/D12"
-  - "Не зафиксировано фактическое количество светодиодов круглой лампы"
-  - "Не выбран режим Wi-Fi: SoftAP или Station"
   - "Не подтвержден резистор 220–470 Ом для DATA WS2812B"
   - "Не подтвержден номинал 100 нФ"
   - "Не подтверждено рабочее напряжение электролита около 1000 мкФ"
   - "Не проверена цепь резервной батареи DS3231 с установленной CR2032"
+  - "Не выбран финальный режим Wi-Fi"
+  - "Не определен актуальный исходный код приложения и сетевой транспорт"
+  - "Не зафиксирована окончательная распиновка Nano"
 
 next_milestone:
-  name: inventory_and_compatibility_closed
-  success_condition: "Все ключевые имеющиеся компоненты занесены в инвентарь, проверены основные электрические параметры и сформирован минимальный список недостающего"
+  name: compatibility_and_bom_closed
+  success_condition: "Определена функция штатного света, проверены питание/уровни/пассивы/геометрия, утверждены Wi-Fi и pinout, сформирован минимальный список закупки"
