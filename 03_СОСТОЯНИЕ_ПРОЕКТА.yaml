@@ -274,3 +274,11 @@ max9814_mic1s_2026_09_20:
   low_rail_clipping_observed: true
   next_gain_state: GND_50dB
   aref_change_now: false
+
+max9814_gain_gnd_attempt_2026_09_20:
+  result: abnormal_zero_output
+  sample_1: {avg: 0, min: 0, max: 5, p2p: 5, samples: 4993}
+  sample_2: {avg: 0, min: 0, max: 16, p2p: 16, samples: 4992}
+  gain_50db_verified: false
+  likely_issue: wiring_or_wrong_pin
+  next_step: revert_gain_floating_and_retest
