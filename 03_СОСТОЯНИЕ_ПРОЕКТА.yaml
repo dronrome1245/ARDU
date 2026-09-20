@@ -282,3 +282,11 @@ max9814_gain_gnd_attempt_2026_09_20:
   gain_50db_verified: false
   likely_issue: wiring_or_wrong_pin
   next_step: revert_gain_floating_and_retest
+
+max9814_recovery_2026_09_20:
+  gain_state: floating_60dB
+  noisy_sample: {avg: 278, min: 0, max: 508, p2p: 508, samples: 4996}
+  module_and_a0_working: true
+  clipping_low_rail_still_present: true
+  prior_zero_output_tied_to_gain_wiring_attempt: true
+  next_step: verify_physical_gain_pin_before_reconnect
