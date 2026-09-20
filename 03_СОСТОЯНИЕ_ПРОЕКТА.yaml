@@ -212,3 +212,19 @@ fw1_passives_2026_09_20:
   strip_capacitor: 1000uF_6.3V
   strip_capacitor_confirmed: true
   ready_for_single_ring_hardware_test: true
+
+firmware_fw1_hardware_2026_09_20:
+  status: passed
+  status_line: "STATUS FW=FW1 MODE=F01 POWER=ON BRIGHTNESS=32 RGB=32,0,0 LEDS=43 UPTIME_MS=11880"
+  color_commands: OK
+  data_pin: D6
+  data_resistor_ohm: 220
+  strip_capacitor: 1000uF_6.3V
+firmware_fw2:
+  code_path: "04_Прошивка/nano_fw2/nano_fw2.ino"
+  code_prepared: true
+  compile_verified: false
+  hardware_verified: false
+  ring_a_pin: D6
+  ring_b_pin: D7
+  led_count_each: 43
