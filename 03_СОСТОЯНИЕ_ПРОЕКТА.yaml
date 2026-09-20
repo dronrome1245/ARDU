@@ -188,3 +188,11 @@ firmware_fw1:
   ring_a_pin: D6
   led_count_target: 43
   current_limit_ma: 500
+
+firmware_fw1_compile_2026_09_20:
+  status: passed
+  fastled_available: true
+  hardware_test_next: true
+  test_channel: D6
+  test_led_count: 43
+  current_limit_ma: 500
