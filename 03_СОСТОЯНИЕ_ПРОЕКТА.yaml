@@ -307,3 +307,21 @@ max9814_50db_test_2026_09_20:
   strip_noise_detected: false
   clipping_low_rail: true
   next_gain_state: Vdd_40dB
+
+max9814_40db_test_2026_09_20:
+  gain_state: Vdd_40dB
+  quiet: {avg: 250, min: 205, max: 282, p2p: 77, samples: 4997}
+  loud: {avg: 250, min: 0, max: 503, p2p: 503, samples: 4999}
+  fw4_passed: true
+  accepted_for_m01: true
+  negative_rail_clipping_extreme_transient: true
+  revisit_before_fht: true
+firmware_m01:
+  code_path: "04_Прошивка/nano_m01/nano_m01.ino"
+  source_basis: AlexGyver_ColorMusic_v2_10_VU
+  code_prepared: true
+  compile_verified: false
+  hardware_verified: false
+  gain_state: Vdd_40dB
+  calibration_command: CAL
+  diagnostic_command: AUDIO
