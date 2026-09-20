@@ -159,3 +159,17 @@ esp_flash_2026_09_20:
   direct_d0_to_esp_rx: diagnostic_only_unsafe_5v
   divider_1k5_3k: upload_error
   next_test: divider_750R_1k5_at_115200
+
+# firmware handoff 2026-09-20
+firmware_fw0:
+  code_path: "04_Прошивка/nano_fw0/nano_fw0.ino"
+  code_prepared: true
+  hardware_verified: false
+  expected_boot_line: "ARDU NANO FW0 READY"
+  commands:
+    PING: PONG
+    STATUS: "STATUS FW=FW0 ..."
+  next_stage_after_pass: FW1_single_ring_F01
+programmer_level_shift:
+  status: deferred_by_owner
+  direct_5v_to_esp_rx_final_allowed: false
