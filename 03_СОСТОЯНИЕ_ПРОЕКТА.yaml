@@ -356,3 +356,16 @@ fht_library_2026_09_20:
   test_code_adapted: true
   api_transform_call: fht_transform
   samples_macro: FHT_SAMPLES_N
+
+avrfht_first_run_2026_09_20:
+  calf: {dc: 914, quiet_max: 32, spectr_low_pass: 35}
+  freq_result: all_zero
+  accepted_as_valid_physical_result: false
+  conflict_with_previous_dc_about_250: true
+  suspected_cause: dc_calibration_while_adc_prescaler_32
+  code_fix:
+    dc_measure_prescaler: 128
+    discard_initial_conversions: 8
+    fht_prescaler: 32
+    direct_adc_command_added: true
+  next_command: ADC
