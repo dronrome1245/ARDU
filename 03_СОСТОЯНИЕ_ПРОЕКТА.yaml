@@ -325,3 +325,22 @@ firmware_m01:
   gain_state: Vdd_40dB
   calibration_command: CAL
   diagnostic_command: AUDIO
+
+firmware_m01_hardware_2026_09_20:
+  status: passed
+  calibration: {quiet_max: 260, low_pass: 273}
+  audio_snapshot: {peak: 276, level: 2.6, filtered: 17.8, average: 63.4, max_level: 114.2, pairs: 3}
+  visual_music_response_confirmed: true
+firmware_fht_test:
+  code_path: "04_Прошивка/nano_fht_test/nano_fht_test.ino"
+  code_prepared: true
+  compile_verified: false
+  hardware_verified: false
+  fht_n: 64
+  bands:
+    low: "2..5"
+    mid: "6..10"
+    high: "11..31"
+  adc_reference: DEFAULT_5V
+  reason_not_internal_1v1: "MAX9814 direct output has about 1.25V DC offset"
+  commands: [CALF, FREQ, FREQRAW]
