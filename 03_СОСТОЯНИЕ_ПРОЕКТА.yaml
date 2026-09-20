@@ -173,3 +173,18 @@ firmware_fw0:
 programmer_level_shift:
   status: deferred_by_owner
   direct_5v_to_esp_rx_final_allowed: false
+
+firmware_fw0_result_2026_09_20:
+  status: passed
+  nano_variant: mini_usb_atmega328p
+  ide_processor: ATmega328P_Old_Bootloader
+  ping: PONG
+  status_line: "STATUS FW=FW0 POWER=OFF BRIGHTNESS=32 UPTIME_MS=127729"
+firmware_fw1:
+  code_path: "04_Прошивка/nano_fw1/nano_fw1.ino"
+  code_prepared: true
+  compile_verified: false
+  hardware_verified: false
+  ring_a_pin: D6
+  led_count_target: 43
+  current_limit_ma: 500
