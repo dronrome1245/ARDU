@@ -256,3 +256,12 @@ CR2032 относится к серии **Primary Lithium Batteries**. Поэт�
 Подтверждено: `ESP8266EX`, Wi‑Fi feature, crystal `26 MHz`, stub успешно загружен и запущен, flash автоматически определена как `4 MB`. Ошибка возникает уже при записи первого сжатого блока: `Failed to write compressed data to flash after seq 0 (result was C100)`.
 
 В документации/issue esptool код `0xC1` соответствует ошибке checksum полученных данных; типичная первая мера — уменьшить скорость serial upload и исключить шум/плохие соединения UART. Источник: espressif/esptool issue #182 и описание serial protocol esptool.
+
+
+## S-031 — повторная запись на 57600, 2026-09-20
+
+Пользовательский лог Arduino IDE/esptool.py v3.0.
+
+Результат: после ручного reset в bootloader чип `ESP8266EX` и flash `4 MB` успешно определены, stub запущен; запись дошла до `15%`, затем завершилась `Failed to write compressed data to flash after seq 1 (result was C100)`.
+
+Вывод: вход в bootloader исправен; ошибка воспроизводится уже во время передачи/записи и стала возникать позже при меньшей скорости. Следующий диагностический шаг — ещё уменьшить upload speed и отдельно контролировать питание ESP под записью.
