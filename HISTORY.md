@@ -484,3 +484,11 @@
 - В Library Manager найдена только `AvrFHT`.
 - Проверено: AvrFHT — модификация ArduinoFHT с изменённой архитектурой заголовков, поэтому не является прямой заменой `#include <FHT.h>` без правок.
 - Для воспроизводимости с ColorMusic v2.10 выбран оригинальный каталог `libraries/FHT` из `AlexGyver/ColorMusic`.
+
+
+## 2026-09-20 — FHT diagnostic переведён на AvrFHT
+
+- Проверен репозиторий `KobaProduction/AvrFHT`; библиотека заявлена для AVR и основана на ArduinoFHT/Open Music Labs.
+- Подтверждено, что AlexGyver ColorMusic действительно содержит старую FHT в `libraries/FHT`.
+- `nano_fht_test.ino` адаптирован: `FHT_SAMPLES_N=64`, `fht_transform()`, `fht_mag_log()`, программное вычитание DC offset MAX9814.
+- Следующий тест — установка AvrFHT через Library Manager, Verify/Compile и затем `CALF`/`FREQ`.
