@@ -149,3 +149,13 @@ critical_blockers:
 next_milestone:
   name: power_bom_and_wifi_bench_ready
   success_condition: "Power measurements passed, ceiling low-voltage layout and PSU placement fixed, final BOM approved, ESP8266 flashed and UART PING/PONG with Nano works"
+
+# handoff 2026-09-20
+esp_flash_2026_09_20:
+  status: reproducible_100_percent_diagnostic
+  upload_speed: 115200
+  local_capacitor: 100uF_10V
+  boot_entry: gpio0_low_manual_rst_to_gnd_on_connecting
+  direct_d0_to_esp_rx: diagnostic_only_unsafe_5v
+  divider_1k5_3k: upload_error
+  next_test: divider_750R_1k5_at_115200
