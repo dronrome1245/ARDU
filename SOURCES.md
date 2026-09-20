@@ -447,3 +447,21 @@ ARDU M01 использует эти же принципы, но адаптир�
 - визуальная работа M01 подтверждена владельцем.
 
 Эти данные закрывают первый музыкальный режим на физическом кольце и дают фактический порог тишины для текущего MAX9814 40 dB.
+
+
+## S-052 — KobaProduction AvrFHT
+
+Репозиторий: `https://github.com/KobaProduction/AvrFHT`.
+
+`library.properties`: версия `1.1.1`, `architectures=avr`. README описывает AvrFHT как модификацию устаревшей ArduinoFHT/Open Music Labs с изменённой архитектурой и оптимизациями памяти.
+
+API, нужный ARDU:
+- `FHT_SAMPLES_N` задаёт размер выборки;
+- `fht_input[]` сохраняется;
+- отдельные headers `fht_window.h`, `fht_reorder.h`, `fht_mag_log.h`;
+- преобразование вызывается `fht_transform()`;
+- логарифмический результат — `fht_log_out[]`.
+
+## S-053 — AlexGyver ColorMusic содержит старую FHT
+
+Официальный репозиторий `https://github.com/AlexGyver/ColorMusic`, путь `libraries/FHT/` содержит `FHT.h`, reorder/cas/hann tables и examples. Поэтому утверждение «у AlexGyver не было FHT» неверно; она была вложена в репозиторий проекта и не обязана отображаться как отдельная Library Manager библиотека.
