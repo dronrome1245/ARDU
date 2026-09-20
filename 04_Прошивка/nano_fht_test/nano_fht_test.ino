@@ -1,8 +1,10 @@
 #include <Arduino.h>
 
-#define FHT_N 64
-#define LOG_OUT 1
-#include <FHT.h>
+#define FHT_SAMPLES_N 64
+#include <AvrFHT.h>
+#include <fht_window.h>
+#include <fht_reorder.h>
+#include <fht_mag_log.h>
 
 #include <FastLED.h>
 
@@ -35,6 +37,7 @@ char rxBuffer[ArduConfig::RX_BUFFER_SIZE];
 size_t rxLength = 0;
 
 uint8_t spectrumLowPass = 40;
+int16_t micDcOffset = 250;
 
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
@@ -55,14 +58,25 @@ void setFastAdcPrescaler() {
 }
 
 void analyzeAudio() {
-  for (uint8_t i = 0; i < FHT_N; ++i) {
-    fht_input[i] = analogRead(ArduPins::MIC_IN);
+  for (uint8_t i = 0; i < FHT_SAMPLES_N; ++i) {
+    fht_input[i] =
+        static_cast<int16_t>(analogRead(ArduPins::MIC_IN)) - micDcOffset;
   }
 
   fht_window();
   fht_reorder();
-  fht_run();
+  fht_transform();
   fht_mag_log();
+}
+
+void calibrateDcOffset() {
+  uint32_t sum = 0;
+
+  for (uint16_t i = 0; i < 256; ++i) {
+    sum += analogRead(ArduPins::MIC_IN);
+  }
+
+  micDcOffset = static_cast<int16_t>(sum / 256UL);
 }
 
 Bands readBands(bool applyNoiseGate) {
@@ -97,6 +111,8 @@ void calibrateSpectrumNoise() {
   FastLED.clear(true);
   delay(100);
 
+  calibrateDcOffset();
+
   uint8_t quietMax = 0;
 
   for (uint8_t frame = 0; frame < ArduConfig::CALIBRATION_FRAMES; ++frame) {
@@ -116,7 +132,9 @@ void calibrateSpectrumNoise() {
 
   spectrumLowPass = proposed > 255 ? 255 : static_cast<uint8_t>(proposed);
 
-  Serial.print(F("CALF QUIET_MAX="));
+  Serial.print(F("CALF DC="));
+  Serial.print(micDcOffset);
+  Serial.print(F(" QUIET_MAX="));
   Serial.print(quietMax);
   Serial.print(F(" SPECTR_LOW_PASS="));
   Serial.println(spectrumLowPass);
@@ -153,8 +171,10 @@ void printRawFreq() {
 void printStatus() {
   Serial.print(F("STATUS FW=FHTTEST MIC_GAIN=40DB SPECTR_LOW_PASS="));
   Serial.print(spectrumLowPass);
-  Serial.print(F(" FHT_N="));
-  Serial.print(FHT_N);
+  Serial.print(F(" LIB=AvrFHT FHT_N="));
+  Serial.print(FHT_SAMPLES_N);
+  Serial.print(F(" DC="));
+  Serial.print(micDcOffset);
   Serial.print(F(" ADC_REF=DEFAULT UPTIME_MS="));
   Serial.println(millis());
 }
@@ -235,9 +255,10 @@ void setup() {
   );
   FastLED.clear(true);
 
-  // В ColorMusic для другой входной схемы используется внутренняя 1.1 V опора.
-  // В ARDU MAX9814 имеет DC offset около 1.25 V, поэтому оставляем DEFAULT (~5 V)
-  // и не вводим аппаратный клиппинг постоянной составляющей.
+  // В ColorMusic использована старая ArduinoFHT и другая входная схема.
+  // В ARDU применяем AvrFHT и вычитаем DC offset MAX9814 программно.
+  // Опору ADC оставляем DEFAULT (~5 V), потому что физический OUT MAX9814
+  // имеет DC offset около 1.25 V.
   analogReference(DEFAULT);
   setFastAdcPrescaler();
 
