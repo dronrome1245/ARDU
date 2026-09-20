@@ -49,6 +49,13 @@ struct Bands {
   uint8_t peak = 0;
 };
 
+void setDefaultAdcPrescaler() {
+  // Arduino Uno/Nano default: ADC prescaler = 128.
+  sbi(ADCSRA, ADPS2);
+  sbi(ADCSRA, ADPS1);
+  sbi(ADCSRA, ADPS0);
+}
+
 void setFastAdcPrescaler() {
   // Как в ColorMusic v2.10: ADC prescaler = 32.
   // 16 MHz / 32 = 500 kHz ADC clock.
@@ -70,6 +77,16 @@ void analyzeAudio() {
 }
 
 void calibrateDcOffset() {
+  // DC offset измеряем на штатной скорости ADC. На ускоренном ADC
+  // предыдущая версия теста получила неверный DC=914 вместо ~250.
+  setDefaultAdcPrescaler();
+  delayMicroseconds(200);
+
+  // После изменения режима ADC/MUX отбрасываем первые преобразования.
+  for (uint8_t i = 0; i < 8; ++i) {
+    (void)analogRead(ArduPins::MIC_IN);
+  }
+
   uint32_t sum = 0;
 
   for (uint16_t i = 0; i < 256; ++i) {
@@ -77,6 +94,39 @@ void calibrateDcOffset() {
   }
 
   micDcOffset = static_cast<int16_t>(sum / 256UL);
+
+  setFastAdcPrescaler();
+}
+
+void printAdcRaw() {
+  setDefaultAdcPrescaler();
+  delayMicroseconds(200);
+
+  for (uint8_t i = 0; i < 8; ++i) {
+    (void)analogRead(ArduPins::MIC_IN);
+  }
+
+  uint16_t minValue = 1023;
+  uint16_t maxValue = 0;
+  uint32_t sum = 0;
+
+  for (uint16_t i = 0; i < 256; ++i) {
+    const uint16_t sample = analogRead(ArduPins::MIC_IN);
+    if (sample < minValue) minValue = sample;
+    if (sample > maxValue) maxValue = sample;
+    sum += sample;
+  }
+
+  const uint16_t avg = static_cast<uint16_t>(sum / 256UL);
+
+  Serial.print(F("ADC AVG="));
+  Serial.print(avg);
+  Serial.print(F(" MIN="));
+  Serial.print(minValue);
+  Serial.print(F(" MAX="));
+  Serial.println(maxValue);
+
+  setFastAdcPrescaler();
 }
 
 Bands readBands(bool applyNoiseGate) {
@@ -190,6 +240,11 @@ void handleCommand(const char* command) {
     return;
   }
 
+  if (strcmp(command, "ADC") == 0) {
+    printAdcRaw();
+    return;
+  }
+
   if (strcmp(command, "CALF") == 0) {
     calibrateSpectrumNoise();
     return;
@@ -206,7 +261,7 @@ void handleCommand(const char* command) {
   }
 
   if (strcmp(command, "HELP") == 0) {
-    Serial.println(F("CMDS PING STATUS CALF FREQ FREQRAW HELP"));
+    Serial.println(F("CMDS PING STATUS ADC CALF FREQ FREQRAW HELP"));
     return;
   }
 
@@ -260,7 +315,7 @@ void setup() {
   // Опору ADC оставляем DEFAULT (~5 V), потому что физический OUT MAX9814
   // имеет DC offset около 1.25 V.
   analogReference(DEFAULT);
-  setFastAdcPrescaler();
+  calibrateDcOffset();
 
   Serial.println(F("ARDU NANO FHT TEST READY"));
   Serial.println(F("RUN CALF IN QUIET ROOM"));
