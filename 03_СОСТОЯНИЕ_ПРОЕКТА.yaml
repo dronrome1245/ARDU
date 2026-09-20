@@ -205,3 +205,10 @@ ws2812_reference_2026_09_20:
   preferred_data_resistor_ohm: 330
   temporary_1k5_data_resistor_allowed: false
   capacitor_replaces_data_resistor: false
+
+fw1_passives_2026_09_20:
+  data_resistor_ohm: 220
+  data_resistor_confirmed: true
+  strip_capacitor: 1000uF_6.3V
+  strip_capacitor_confirmed: true
+  ready_for_single_ring_hardware_test: true
