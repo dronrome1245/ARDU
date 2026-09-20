@@ -36,9 +36,19 @@ struct MicStats {
   uint32_t samples = 0;
 };
 
+struct MicCapture {
+  bool active = false;
+  unsigned long startedMs = 0;
+  uint16_t minValue = 1023;
+  uint16_t maxValue = 0;
+  uint32_t sum = 0;
+  uint32_t samples = 0;
+};
+
 ArduSettings settings;
 MicStats micCurrent;
 MicStats micLast;
+MicCapture micCapture;
 
 CRGB leds[ArduConfig::LED_COUNT];
 
@@ -90,6 +100,33 @@ void sampleMicrophone() {
   micSum += sample;
   micCurrent.samples++;
 
+  if (micCapture.active) {
+    if (sample < micCapture.minValue) micCapture.minValue = sample;
+    if (sample > micCapture.maxValue) micCapture.maxValue = sample;
+    micCapture.sum += sample;
+    micCapture.samples++;
+
+    if (millis() - micCapture.startedMs >= 1000UL) {
+      const uint16_t avg = micCapture.samples > 0
+          ? static_cast<uint16_t>(micCapture.sum / micCapture.samples)
+          : 0;
+      const uint16_t p2p = micCapture.maxValue - micCapture.minValue;
+
+      Serial.print(F("MIC1S AVG="));
+      Serial.print(avg);
+      Serial.print(F(" MIN="));
+      Serial.print(micCapture.minValue);
+      Serial.print(F(" MAX="));
+      Serial.print(micCapture.maxValue);
+      Serial.print(F(" P2P="));
+      Serial.print(p2p);
+      Serial.print(F(" SAMPLES="));
+      Serial.println(micCapture.samples);
+
+      micCapture.active = false;
+    }
+  }
+
   if (millis() - micWindowStartedMs >= ArduConfig::MIC_WINDOW_MS) {
     if (micCurrent.samples > 0) {
       micCurrent.avgValue = static_cast<uint16_t>(micSum / micCurrent.samples);
@@ -99,6 +136,16 @@ void sampleMicrophone() {
 
     resetMicWindow();
   }
+}
+
+void startMic1sCapture() {
+  micCapture.active = true;
+  micCapture.startedMs = millis();
+  micCapture.minValue = 1023;
+  micCapture.maxValue = 0;
+  micCapture.sum = 0;
+  micCapture.samples = 0;
+  Serial.println(F("MIC1S START"));
 }
 
 void printMic() {
@@ -160,6 +207,15 @@ void handleCommand(char* command) {
 
   if (strcmp(command, "MIC") == 0) {
     printMic();
+    return;
+  }
+
+  if (strcmp(command, "MIC1S") == 0) {
+    if (micCapture.active) {
+      Serial.println(F("ERR MIC_BUSY"));
+      return;
+    }
+    startMic1sCapture();
     return;
   }
 
@@ -230,7 +286,7 @@ void handleCommand(char* command) {
   }
 
   if (strcmp(command, "HELP") == 0) {
-    Serial.println(F("CMDS PING STATUS MIC ON OFF BRIGHT COLOR"));
+    Serial.println(F("CMDS PING STATUS MIC MIC1S ON OFF BRIGHT COLOR"));
     Serial.println(F("FORMAT BRIGHT <n> | COLOR <r> <g> <b>"));
     return;
   }
