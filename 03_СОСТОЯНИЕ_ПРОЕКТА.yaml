@@ -344,3 +344,15 @@ firmware_fht_test:
   adc_reference: DEFAULT_5V
   reason_not_internal_1v1: "MAX9814 direct output has about 1.25V DC offset"
   commands: [CALF, FREQ, FREQRAW]
+
+fht_library_2026_09_20:
+  selected: AvrFHT
+  source: KobaProduction/AvrFHT
+  version_checked: 1.1.1
+  architecture: avr
+  relation: modified_ArduinoFHT_OpenMusicLabs
+  alexgyver_old_fht_present: true
+  alexgyver_path: libraries/FHT
+  test_code_adapted: true
+  api_transform_call: fht_transform
+  samples_macro: FHT_SAMPLES_N
