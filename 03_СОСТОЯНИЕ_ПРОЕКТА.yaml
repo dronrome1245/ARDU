@@ -265,3 +265,12 @@ max9814_measurement_2026_09_20:
   sound_response_confirmed: false
   reason: "50ms rolling snapshot may miss transient sound"
   next_test_command: MIC1S
+
+max9814_mic1s_2026_09_20:
+  gain_state: floating_60dB
+  quiet: {avg: 252, min: 108, max: 417, p2p: 309, samples: 4998}
+  loud: {avg: 307, min: 0, max: 886, p2p: 886, samples: 4995}
+  sound_response_confirmed: true
+  low_rail_clipping_observed: true
+  next_gain_state: GND_50dB
+  aref_change_now: false
