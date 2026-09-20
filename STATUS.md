@@ -152,3 +152,11 @@
 - Загрузка в Nano не завершилась: 10 попыток `not in sync: resp=0x41`, затем `unable to open port COM3 for programmer arduino`.
 - `0x41` соответствует ASCII `A`; с учётом ранее работающего ESP-скетча `ARDU ESP8266 OK` первым проверяется остаточное подключение ESP к D0/D1 Nano. Это пока диагностическая гипотеза, не факт.
 - Следующий тест: полностью отключить ESP от D0/D1, убрать `RESET Nano→GND`, закрыть Serial Monitor и повторить upload без изменения Processor/bootloader.
+
+
+### FW-0 Nano: ESP исключён из причины `resp=0x41`
+
+- Повторный Upload выполнен при полностью отключённых от Nano линиях D0/D1, снятой перемычке `RESET→GND` и закрытом Serial Monitor.
+- Результат не изменился: `not in sync: resp=0x41`.
+- Следовательно, гипотеза о помехе от ESP8266 на UART Nano для этой ошибки исключена.
+- Следующий тест: выбрать `ATmega328P (Old Bootloader)` и повторить Upload на той же Nano/COM3.
