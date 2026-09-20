@@ -298,3 +298,12 @@ max9814_gain_50db_2026_09_20:
   low_rail_clipping: true
   sample_count_anomaly: true
   next_gain_state: Vdd_40dB
+
+max9814_50db_test_2026_09_20:
+  gain_state: GND_50dB
+  quiet: {avg: 250, min: 85, max: 360, p2p: 275, samples: 5000}
+  loud_strip_on: {avg: 260, min: 0, max: 507, p2p: 507, samples_reported: 996}
+  loud_strip_off: {avg: 257, min: 0, max: 506, p2p: 506, samples: 4991}
+  strip_noise_detected: false
+  clipping_low_rail: true
+  next_gain_state: Vdd_40dB
