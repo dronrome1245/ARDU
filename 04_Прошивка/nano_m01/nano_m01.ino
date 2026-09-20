@@ -119,9 +119,10 @@ void renderM01() {
     return;
   }
 
-  const CRGB background = settings.backgroundBrightness > 0
-      ? CHSV(HUE_PURPLE, 255, settings.backgroundBrightness)
-      : CRGB::Black;
+  CRGB background = CRGB::Black;
+  if (settings.backgroundBrightness > 0) {
+    background = CHSV(HUE_PURPLE, 255, settings.backgroundBrightness);
+  }
 
   fill_solid(leds, ArduConfig::LED_COUNT, background);
 
