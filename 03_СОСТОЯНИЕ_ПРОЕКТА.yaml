@@ -228,3 +228,15 @@ firmware_fw2:
   ring_a_pin: D6
   ring_b_pin: D7
   led_count_each: 43
+
+second_ring_policy_2026_09_20:
+  physical_test_deferred: true
+  ring_b_pin: D7
+  behavior: mirror_ring_a_frame
+  independent_logic: false
+  test_after_single_ring_full_setup: true
+  nano_fw2_file_status: future_test_draft
+current_single_ring_focus:
+  ring_pin: D6
+  finish_f01_controls: true
+  next_commands: [OFF, ON, BRIGHT_8, BRIGHT_64, STATUS]
