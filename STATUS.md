@@ -315,3 +315,11 @@
 - В Arduino Library Manager доступна `AvrFHT` (KobaProduction), но текущий тестовый код ARDU использует API исходной `FHT.h`, как ColorMusic v2.10.
 - `AvrFHT` является переработкой старой ArduinoFHT/OpenMusicLabs и меняет структуру заголовков; она не считается drop-in заменой для текущего скетча без адаптации.
 - По решению проекта придерживаться проверенной сборки AlexGyver для FHT-этапа используем точную библиотеку `libraries/FHT` из официального репозитория `AlexGyver/ColorMusic` и устанавливаем её вручную в Arduino libraries.
+
+
+### FHT dependency: переходим на AvrFHT
+
+- Проверен `KobaProduction/AvrFHT` версии `1.1.1`: библиотека предназначена для AVR и является модернизированной версией старой ArduinoFHT/Open Music Labs.
+- Она подходит для Arduino Nano ATmega328P, но API немного отличается от старой FHT: используется `FHT_SAMPLES_N`, модульные headers и `fht_transform()` вместо `fht_run()`.
+- У AlexGyver FHT действительно есть: в официальном репозитории ColorMusic лежит `libraries/FHT/FHT.h` и связанные таблицы. Это старая библиотека, вложенная в проект, поэтому она может не появляться как отдельная библиотека в Library Manager.
+- `04_Прошивка/nano_fht_test/nano_fht_test.ino` переведён на AvrFHT. Для MAX9814 дополнительно введено программное вычитание измеренного DC offset перед FHT; ADC reference остаётся DEFAULT.
