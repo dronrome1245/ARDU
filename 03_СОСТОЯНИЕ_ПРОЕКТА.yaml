@@ -369,3 +369,11 @@ avrfht_first_run_2026_09_20:
     fht_prescaler: 32
     direct_adc_command_added: true
   next_command: ADC
+
+avrfht_second_run_2026_09_20:
+  calf: {dc: 946, quiet_max: 33, spectr_low_pass: 36}
+  freqraw_1: {low: 19, mid: 27, high: 19, peak: 27}
+  freqraw_2: {low: 19, mid: 19, high: 19, peak: 19}
+  accepted_as_valid_spectrum: false
+  next_branch_test: ADC
+  adc_unknown_command_means_old_sketch: true
