@@ -196,3 +196,12 @@ firmware_fw1_compile_2026_09_20:
   test_channel: D6
   test_led_count: 43
   current_limit_ma: 500
+
+ws2812_reference_2026_09_20:
+  source: AlexGyver_ColorMusic_and_WS2812_guide
+  strip_power_capacitor_uf: "1000-2200"
+  strip_power_capacitor_min_voltage_v: 6.3
+  data_series_resistor_ohm: "200-500"
+  preferred_data_resistor_ohm: 330
+  temporary_1k5_data_resistor_allowed: false
+  capacitor_replaces_data_resistor: false
