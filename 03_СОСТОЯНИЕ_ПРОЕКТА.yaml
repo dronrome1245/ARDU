@@ -240,3 +240,19 @@ current_single_ring_focus:
   ring_pin: D6
   finish_f01_controls: true
   next_commands: [OFF, ON, BRIGHT_8, BRIGHT_64, STATUS]
+
+single_ring_f01_complete_2026_09_20:
+  status: passed
+  commands_verified: [OFF, ON, BRIGHT_8, BRIGHT_64, STATUS, COLOR]
+max9814_stage:
+  code_path: "04_Прошивка/nano_mic_test/nano_mic_test.ino"
+  code_prepared: true
+  hardware_verified: false
+  pin: A0
+  wiring:
+    Vdd: Nano_5V
+    GND: Nano_GND
+    Out: A0
+    Gain: floating
+    AR: floating
+  diagnostic_command: MIC
