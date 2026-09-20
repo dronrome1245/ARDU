@@ -256,3 +256,12 @@ max9814_stage:
     Gain: floating
     AR: floating
   diagnostic_command: MIC
+
+max9814_measurement_2026_09_20:
+  sample_1: {avg: 249, min: 61, max: 413, p2p: 352, samples: 251}
+  sample_2: {avg: 252, min: 130, max: 415, p2p: 285, samples: 251}
+  dc_bias_looks_expected: true
+  clipping_observed: false
+  sound_response_confirmed: false
+  reason: "50ms rolling snapshot may miss transient sound"
+  next_test_command: MIC1S
