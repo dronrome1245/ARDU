@@ -593,3 +593,10 @@
 - Сохранены неизменённые `colorMusic_v2.7.ino`, `colorMusic_v2.8.ino`, `colorMusic_v2.9.ino`, `colorMusic_v2.10.ino`.
 - Создан каталог исходных имён прошивок.
 - `nano_fht_test.ino` переведён с AvrFHT на оригинальный API FHT ColorMusic.
+
+
+## 2026-09-21 — устранён конфликт FHT `SCALE` ↔ FastLED
+
+- Оригинальная FHT ColorMusic успешно находилась Arduino IDE, но её глобальный макрос `SCALE` конфликтовал с современным FastLED.
+- `nano_fht_test.ino` получил локальный compatibility shim: `#undef SCALE` после FHT и до FastLED.
+- Vendored `FHT.h` оставлен бит-в-бит без изменений.
