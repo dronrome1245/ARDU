@@ -634,3 +634,13 @@ Compatibility fix сделан в ARDU-скетче, а не в upstream-коп�
 - `FREQRAW LOW=74 MID=82 HIGH=27 PEAK=82`.
 
 Вывод: direct ADC исправен, повторная DC-калибровка согласована с текущим уровнем, оригинальный `max + 3` gate больше не завышен относительно raw-сигнала.
+
+
+## S-073 — gated FREQ после original CALF
+
+Физический стенд 2026-09-21:
+- тишина: три раза `FREQ LOW=0 MID=0 HIGH=0 PEAK=0 LOW_PASS=36`;
+- звук: `FREQ LOW=38 MID=0 HIGH=0 PEAK=38 LOW_PASS=36`;
+- звук: `FREQ LOW=66 MID=0 HIGH=0 PEAK=66 LOW_PASS=36`.
+
+Официальный `colorMusic_v2.10.ino` делит группы так же, как текущий ARDU diagnostic: LOW bins 2..5, MID 6..10, HIGH 11..31.
