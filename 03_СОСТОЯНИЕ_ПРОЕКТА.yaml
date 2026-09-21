@@ -433,3 +433,16 @@ avrfht_valid_run_2026_09_21:
   fw6a_basic_status: hardware_working
   calibration_threshold_may_be_conservative: true
   next_test: gated_FREQ_quiet_and_music
+
+avrfht_gate_issue_2026_09_21:
+  calf_old: {dc: 258, quiet_max: 58, spectr_low_pass: 61}
+  gated_freq_all_zero: true
+  raw_sample: {low: 37, mid: 19, high: 19, peak: 37}
+  cause: gate_above_useful_raw_signal_due_to_absolute_max_calibration
+  calibration_fix:
+    frames: 100
+    statistic: p90_of_frame_peaks
+    add: 3
+    diagnostics: [P50, P90, MAX]
+  code_commit: fe691e0cb13b7b08f4ead0b8c12028180c6e591e
+  next_test: reload_and_run_CALF_then_FREQ
