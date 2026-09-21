@@ -415,3 +415,10 @@ nano_a0_voltage_2026_09_21:
   next_checks:
     - continuity_out_to_a0_wire_power_off
     - resistance_a0_to_gnd_with_out_disconnected_power_off
+
+analog_path_repaired_2026_09_21:
+  fault: bad_out_to_a0_wire_or_contact
+  nano_a0_voltage_after_fix_v: 1.25
+  analog_path_voltage_restored: true
+  next_command: ADC
+  expected_adc_avg: "240..270"
