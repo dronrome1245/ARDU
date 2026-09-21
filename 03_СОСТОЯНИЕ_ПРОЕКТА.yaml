@@ -377,3 +377,13 @@ avrfht_second_run_2026_09_20:
   accepted_as_valid_spectrum: false
   next_branch_test: ADC
   adc_unknown_command_means_old_sketch: true
+
+avrfht_zero_input_2026_09_21:
+  calf: {dc: 0, quiet_max: 19, spectr_low_pass: 22}
+  freqraw_1: {low: 0, mid: 0, high: 0, peak: 0}
+  freqraw_2: {low: 0, mid: 0, high: 0, peak: 0}
+  valid_spectrum: false
+  direct_input_must_be_restored_first: true
+  expected_known_good_adc_avg: about_250
+  first_branch: ADC_command
+  if_zero_next: remove_gain_to_vdd_only_and_repeat_ADC
