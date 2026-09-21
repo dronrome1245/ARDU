@@ -630,3 +630,10 @@
 - `CALF DC=264 QUIET_MAX=33 SPECTR_LOW_PASS=36`.
 - `FREQRAW LOW=74 MID=82 HIGH=27 PEAK=82`.
 - Это первый валидный запуск original FHT + original ColorMusic CALF после исправления A0 и перехода с AvrFHT.
+
+
+## 2026-09-21 — noise gate FHT пройден
+
+- Тишина после CALF=36: три последовательных `FREQ` дали 0/0/0.
+- Звук: зафиксированы `LOW=38` и `LOW=66` выше порога 36.
+- Gate работает. Следующая отдельная проверка — MID/HIGH контролируемыми тонами.
