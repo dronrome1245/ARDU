@@ -493,3 +493,9 @@ original_fht_runtime_2026_09_21:
     calf_algorithm: original_absolute_max_plus_3
     p90_removed: true
   next: reload_then_STATUS_ADC_CALF
+
+previous_dc390_correction_2026_09_21:
+  previous_dc_390_valid: false
+  reason: "MAX9814 Out to Nano A0 wire detached during previous test"
+  startup_timing_fault_confirmed: false
+  next_valid_sequence: [ADC, STATUS, CALF, FREQRAW]
