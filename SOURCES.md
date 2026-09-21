@@ -594,3 +594,10 @@ FireEdition авторства Slenk основана на разработка�
 - каталог точных имён прошивочных папок и файлов.
 
 Это убирает зависимость компиляции музыкального тракта от сторонней AvrFHT и сохраняет исходный API поздней официальной ColorMusic.
+
+
+## S-068 — конфликт legacy FHT SCALE с современным FastLED
+
+Физическая компиляция владельца 2026-09-21 показала, что `FHT.h` из ColorMusic содержит `#define SCALE 1`; современный FastLED использует идентификатор `SCALE` в fixed-point типах и gamma LUT, что даёт серию ошибок `expected unqualified-id before numeric constant`.
+
+Compatibility fix сделан в ARDU-скетче, а не в upstream-копии FHT: после `#include <FHT.h>` выполняется `#undef SCALE`, затем подключается `FastLED.h`.
