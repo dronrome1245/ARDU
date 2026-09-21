@@ -1,10 +1,8 @@
 #include <Arduino.h>
 
-#define FHT_SAMPLES_N 64
-#include <AvrFHT.h>
-#include <fht_window.h>
-#include <fht_reorder.h>
-#include <fht_mag_log.h>
+#define FHT_N 64
+#define LOG_OUT 1
+#include <FHT.h>
 
 #include <FastLED.h>
 
@@ -65,14 +63,14 @@ void setFastAdcPrescaler() {
 }
 
 void analyzeAudio() {
-  for (uint8_t i = 0; i < FHT_SAMPLES_N; ++i) {
+  for (uint8_t i = 0; i < FHT_N; ++i) {
     fht_input[i] =
         static_cast<int16_t>(analogRead(ArduPins::MIC_IN)) - micDcOffset;
   }
 
   fht_window();
   fht_reorder();
-  fht_transform();
+  fht_run();
   fht_mag_log();
 }
 
@@ -258,8 +256,8 @@ void printRawFreq() {
 void printStatus() {
   Serial.print(F("STATUS FW=FHTTEST MIC_GAIN=40DB SPECTR_LOW_PASS="));
   Serial.print(spectrumLowPass);
-  Serial.print(F(" LIB=AvrFHT FHT_N="));
-  Serial.print(FHT_SAMPLES_N);
+  Serial.print(F(" LIB=AlexGyver_FHT FHT_N="));
+  Serial.print(FHT_N);
   Serial.print(F(" DC="));
   Serial.print(micDcOffset);
   Serial.print(F(" ADC_REF=DEFAULT UPTIME_MS="));
@@ -347,8 +345,8 @@ void setup() {
   );
   FastLED.clear(true);
 
-  // В ColorMusic использована старая ArduinoFHT и другая входная схема.
-  // В ARDU применяем AvrFHT и вычитаем DC offset MAX9814 программно.
+  // Используем точную FHT-библиотеку из официального AlexGyver ColorMusic.
+  // В текущем диагностическом ARDU-тракте DC offset MAX9814 пока вычитается программно.
   // Опору ADC оставляем DEFAULT (~5 V), потому что физический OUT MAX9814
   // имеет DC offset около 1.25 V.
   analogReference(DEFAULT);

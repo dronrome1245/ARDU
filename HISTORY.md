@@ -585,3 +585,11 @@
 - Владелец указал придерживаться поздних официальных AlexGyver ColorMusic.
 - FireEdition/technotrasher остаются только референсом.
 - Для конкретной базы сравниваются v2.7/v2.8/v2.10; основной кандидат — v2.10.
+
+
+## 2026-09-21 — сохранена оригинальная FHT AlexGyver и поздние прошивки
+
+- Полная текстовая копия `libraries/FHT/` из официального ColorMusic сохранена в ARDU вместе с примерами и лицензией; upstream pinned на `a3f94de053d431f15282c2f67681b77ab66c30ae`.
+- Сохранены неизменённые `colorMusic_v2.7.ino`, `colorMusic_v2.8.ino`, `colorMusic_v2.9.ino`, `colorMusic_v2.10.ino`.
+- Создан каталог исходных имён прошивок.
+- `nano_fht_test.ino` переведён с AvrFHT на оригинальный API FHT ColorMusic.

@@ -581,3 +581,16 @@ FireEdition авторства Slenk основана на разработка�
 ## S-066 — поздние официальные прошивки ColorMusic в репозитории AlexGyver
 
 Официальный репозиторий `AlexGyver/ColorMusic` содержит текущую папку `firmware/colorMusic_v2.10/` и старые официальные ревизии, включая `colorMusic_v2.7` и `colorMusic_v2.8` в `firmware/Old versions/`. README проекта документирует изменения до v2.7; наличие v2.8/v2.10 подтверждается самим деревом официального репозитория и исходниками.
+
+
+## S-067 — vendored FHT и официальные поздние ColorMusic
+
+Источник: официальный `AlexGyver/ColorMusic`, pinned commit `a3f94de053d431f15282c2f67681b77ab66c30ae`.
+
+В ARDU сохранены:
+- исходная `libraries/FHT/` вместе с примерами;
+- upstream LICENSE;
+- `colorMusic_v2.7.ino`, `colorMusic_v2.8.ino`, `colorMusic_v2.9.ino`, `colorMusic_v2.10.ino`;
+- каталог точных имён прошивочных папок и файлов.
+
+Это убирает зависимость компиляции музыкального тракта от сторонней AvrFHT и сохраняет исходный API поздней официальной ColorMusic.
