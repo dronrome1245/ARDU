@@ -4,6 +4,14 @@
 #define LOG_OUT 1
 #include <FHT.h>
 
+// Старая OpenMusicLabs/AlexGyver FHT оставляет глобальный макрос SCALE.
+// Современный FastLED использует идентификатор SCALE в C++ типах.
+// После разбора FHT.h этот макрос FHT больше не нужен, поэтому снимаем
+// только его, не изменяя vendored оригинальную библиотеку.
+#ifdef SCALE
+#undef SCALE
+#endif
+
 #include <FastLED.h>
 
 namespace ArduPins {
