@@ -644,3 +644,15 @@ Compatibility fix сделан в ARDU-скетче, а не в upstream-коп�
 - звук: `FREQ LOW=66 MID=0 HIGH=0 PEAK=66 LOW_PASS=36`.
 
 Официальный `colorMusic_v2.10.ino` делит группы так же, как текущий ARDU diagnostic: LOW bins 2..5, MID 6..10, HIGH 11..31.
+
+
+## S-074 — A2/A3 в официальной ColorMusic v2.10
+
+Официальный `AlexGyver/ColorMusic`, `firmware/colorMusic_v2.10/colorMusic_v2.10.ino`:
+- `#define SOUND_R A2`;
+- `#define SOUND_L A1`;
+- `#define SOUND_R_FREQ A3` с комментарием «через кондер»;
+- `#define POT_GND A0`;
+- при `MONO=1` основной звуковой канал — `SOUND_R`.
+
+Официальная страница проекта также содержит отдельную схему «С микрофоном» и в перечне деталей конденсатор 10 нФ. Community-обсуждения стандартной гайверовской схемы уточняют связь A2/A3 через 10 нФ, но финальную физическую разводку ARDU следует брать с официальной схемы.
