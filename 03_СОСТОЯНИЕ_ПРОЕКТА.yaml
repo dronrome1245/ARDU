@@ -398,3 +398,11 @@ direct_adc_after_current_fht_2026_09_21:
     - MAX9814_Out_to_GND
   expected_vdd_v: about_5
   expected_out_dc_v: about_1_25
+
+max9814_direct_voltage_2026_09_21:
+  vdd_to_gnd_v: 5.09
+  out_to_gnd_v: 1.24
+  module_power_ok: true
+  dc_offset_ok: true
+  current_fault_location: between_max9814_out_and_nano_a0_or_a0_input
+  next_measurement: Nano_A0_to_Nano_GND
