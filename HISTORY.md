@@ -600,3 +600,9 @@
 - Оригинальная FHT ColorMusic успешно находилась Arduino IDE, но её глобальный макрос `SCALE` конфликтовал с современным FastLED.
 - `nano_fht_test.ino` получил локальный compatibility shim: `#undef SCALE` после FHT и до FastLED.
 - Vendored `FHT.h` оставлен бит-в-бит без изменений.
+
+
+## 2026-09-21 — оригинальная FHT успешно загружена на Nano
+
+- Свежий `nano_fht_test.ino` с оригинальным `FHT.h` AlexGyver и `#undef SCALE` успешно скомпилирован и загружен.
+- Этап совместимости legacy FHT ↔ modern FastLED закрыт.
