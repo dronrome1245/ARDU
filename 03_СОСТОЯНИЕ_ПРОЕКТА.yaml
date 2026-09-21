@@ -406,3 +406,12 @@ max9814_direct_voltage_2026_09_21:
   dc_offset_ok: true
   current_fault_location: between_max9814_out_and_nano_a0_or_a0_input
   next_measurement: Nano_A0_to_Nano_GND
+
+nano_a0_voltage_2026_09_21:
+  max9814_out_v: 1.24
+  nano_a0_v: 0.15
+  direct_path_ok: false
+  likely_fault: wire_contact_or_a0_loading
+  next_checks:
+    - continuity_out_to_a0_wire_power_off
+    - resistance_a0_to_gnd_with_out_disconnected_power_off
