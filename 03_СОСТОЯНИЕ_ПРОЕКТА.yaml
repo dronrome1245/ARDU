@@ -499,3 +499,13 @@ previous_dc390_correction_2026_09_21:
   reason: "MAX9814 Out to Nano A0 wire detached during previous test"
   startup_timing_fault_confirmed: false
   next_valid_sequence: [ADC, STATUS, CALF, FREQRAW]
+
+original_fht_valid_calf_2026_09_21:
+  adc: {avg: 265, min: 259, max: 272}
+  startup_status_dc: 252
+  calf: {dc: 264, quiet_max: 33, spectr_low_pass: 36}
+  raw_sample: {low: 74, mid: 82, high: 27, peak: 82}
+  dc_path_consistent: true
+  original_max_plus_3_gate_reasonable: true
+  gated_behavior_verified: false
+  next_test: FREQ_quiet_then_sound
