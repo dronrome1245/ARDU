@@ -608,3 +608,13 @@ Compatibility fix сделан в ARDU-скетче, а не в upstream-коп�
 Отчёт владельца 2026-09-21: после внесения `#undef SCALE` загрузка `nano_fht_test.ino` успешно завершена на реальной Arduino Nano.
 
 Это подтверждает компиляцию и Upload оригинальной vendored FHT в текущем окружении ARDU.
+
+
+## S-070 — runtime original FHT и рассогласование startup DC
+
+Физический стенд 2026-09-21:
+- `HELP -> CMDS PING STATUS ADC CALF FREQ FREQRAW HELP`;
+- `STATUS FW=FHTTEST MIC_GAIN=40DB SPECTR_LOW_PASS=40 LIB=AlexGyver_FHT FHT_N=64 DC=390 ADC_REF=DEFAULT ...`;
+- `ADC AVG=251 MIN=242 MAX=258`.
+
+Текущий A0 исправен, но startup DC=390 не соответствует установившемуся входу. Для следующего теста добавлена пауза 500 ms; CALF возвращён к оригинальной схеме ColorMusic `max + 3`.
