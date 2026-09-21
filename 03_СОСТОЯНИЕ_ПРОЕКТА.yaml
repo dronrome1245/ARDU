@@ -477,3 +477,19 @@ original_fht_compile_upload_2026_09_21:
   fastled_scale_compat_fix: passed
   upstream_fht_modified: false
   next_runtime_commands: [HELP, STATUS, ADC]
+
+original_fht_runtime_2026_09_21:
+  help_ok: true
+  status_library: AlexGyver_FHT
+  fht_n: 64
+  startup_dc: 390
+  adc_after_start: {avg: 251, min: 242, max: 258}
+  analog_input_ok: true
+  startup_dc_valid: false
+  suspected_reason: early_calibration_before_analog_path_settled
+  code_changes:
+    startup_settle_delay_ms: 500
+    calf_settle_delay_ms: 500
+    calf_algorithm: original_absolute_max_plus_3
+    p90_removed: true
+  next: reload_then_STATUS_ADC_CALF
