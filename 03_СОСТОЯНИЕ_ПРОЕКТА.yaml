@@ -387,3 +387,14 @@ avrfht_zero_input_2026_09_21:
   expected_known_good_adc_avg: about_250
   first_branch: ADC_command
   if_zero_next: remove_gain_to_vdd_only_and_repeat_ADC
+
+direct_adc_after_current_fht_2026_09_21:
+  current_sketch_confirmed_by_help: true
+  adc: {avg: 0, min: 0, max: 13}
+  fht_primary_fault_excluded: true
+  analog_path_fault_present: true
+  next_measurements:
+    - MAX9814_Vdd_to_GND
+    - MAX9814_Out_to_GND
+  expected_vdd_v: about_5
+  expected_out_dc_v: about_1_25
