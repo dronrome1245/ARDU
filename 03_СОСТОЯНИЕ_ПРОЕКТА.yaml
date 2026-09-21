@@ -525,3 +525,13 @@ original_fht_gate_pass_2026_09_21:
   mid_band_verified: false
   high_band_verified: false
   next_test: controlled_tones_2k_4to5k_8k
+
+audio_input_colormusic_v2_10_2026_09_21:
+  decision: use_original_two_input_logic
+  mono_vu_input: A2
+  fht_input: A3
+  fht_input_note: through_original_capacitor_network
+  left_input_A1_used: false
+  diagnostic_A0_final: false
+  reason: minimize_relayout_of_original_v2_10_code
+  next: reproduce_official_microphone_front_end_before_band_tests
