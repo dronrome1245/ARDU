@@ -557,3 +557,22 @@ fht_three_band_a0_pass_2026_09_21:
   three_band_separation_verified: true
   fw6a_diagnostic_status: passed
   final_input_still_planned: A2_VU_plus_A3_FHT
+
+audio_v210_test_prepared_2026_09_21:
+  sketch: "04_Прошивка/nano_audio_v210_test/nano_audio_v210_test.ino"
+  wiring_doc: "04_Прошивка/AUDIO_V210_WIRING.md"
+  vu_pin: A2
+  fht_pin: A3
+  aref: INTERNAL_1V1
+  max9814_gain_db: 40
+  ar: floating
+  coupling_c1:
+    capacitance_uf: 1
+    minimum_voltage_v: 6.3
+    polarity_plus: MAX9814_OUT
+    polarity_minus: A2
+  a2_pull_down_ohm: 9400
+  a2_to_a3_cap_nf: 10
+  compile_verified: false
+  hardware_verified: false
+  next_commands: [STATUS, ADC2, ADC3]
