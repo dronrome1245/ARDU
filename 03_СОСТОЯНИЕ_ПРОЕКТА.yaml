@@ -535,3 +535,25 @@ audio_input_colormusic_v2_10_2026_09_21:
   diagnostic_A0_final: false
   reason: minimize_relayout_of_original_v2_10_code
   next: reproduce_official_microphone_front_end_before_band_tests
+
+fht_three_band_a0_pass_2026_09_21:
+  input: A0_diagnostic_direct_MAX9814
+  low_pass: 36
+  tones:
+    2000Hz:
+      low: [92, 84, 92, 84]
+      mid: 0
+      high: 0
+    5000Hz:
+      low: 0
+      mid: [92, 92, 92, 92]
+      high: 0
+    8000Hz:
+      low: 0
+      mid: 0
+      high: [78, 68, 68, 72]
+  fht_algorithm_verified: true
+  noise_gate_verified: true
+  three_band_separation_verified: true
+  fw6a_diagnostic_status: passed
+  final_input_still_planned: A2_VU_plus_A3_FHT
