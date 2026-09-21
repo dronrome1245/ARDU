@@ -165,70 +165,37 @@ Bands readBands(bool applyNoiseGate) {
 
 void calibrateSpectrumNoise() {
   FastLED.clear(true);
-  delay(100);
+
+  // Как в ColorMusic v2.10: перед измерением шума дать аналоговому тракту
+  // успокоиться, затем измерить порог по абсолютному максимуму + 3.
+  delay(500);
 
   calibrateDcOffset();
 
-  // Для MAX9814 абсолютный максимум за всю калибровку оказался слишком
-  // чувствителен к одиночным выбросам: при обычном фоне PEAK≈19 он давал
-  // QUIET_MAX≈58..61 и полностью закрывал полезный сигнал.
-  //
-  // Сохраняем идею ColorMusic "порог шума + запас", но вместо абсолютного
-  // максимума берём 90-й процентиль максимумов отдельных FHT-кадров.
-  uint8_t framePeaks[ArduConfig::CALIBRATION_FRAMES];
-  uint8_t absoluteMax = 0;
+  uint8_t quietMax = 0;
 
   for (uint8_t frame = 0; frame < ArduConfig::CALIBRATION_FRAMES; ++frame) {
     analyzeAudio();
 
-    uint8_t frameMax = 0;
     for (uint8_t bin = 2; bin < 32; ++bin) {
-      if (fht_log_out[bin] > frameMax) {
-        frameMax = fht_log_out[bin];
+      if (fht_log_out[bin] > quietMax) {
+        quietMax = fht_log_out[bin];
       }
-    }
-
-    framePeaks[frame] = frameMax;
-    if (frameMax > absoluteMax) {
-      absoluteMax = frameMax;
     }
 
     delay(4);
   }
 
-  // Insertion sort: 100 байт данных, выполняется только по команде CALF.
-  for (uint8_t i = 1; i < ArduConfig::CALIBRATION_FRAMES; ++i) {
-    const uint8_t key = framePeaks[i];
-    int8_t j = static_cast<int8_t>(i) - 1;
-
-    while (j >= 0 && framePeaks[j] > key) {
-      framePeaks[j + 1] = framePeaks[j];
-      --j;
-    }
-    framePeaks[j + 1] = key;
-  }
-
-  const uint8_t p50Index =
-      static_cast<uint8_t>(((ArduConfig::CALIBRATION_FRAMES - 1U) * 50U) / 100U);
-  const uint8_t p90Index =
-      static_cast<uint8_t>(((ArduConfig::CALIBRATION_FRAMES - 1U) * 90U) / 100U);
-
-  const uint8_t p50 = framePeaks[p50Index];
-  const uint8_t p90 = framePeaks[p90Index];
-
   const uint16_t proposed =
-      static_cast<uint16_t>(p90) + ArduConfig::SPECTR_LOW_PASS_ADD;
+      static_cast<uint16_t>(quietMax) + ArduConfig::SPECTR_LOW_PASS_ADD;
 
-  spectrumLowPass = proposed > 255 ? 255 : static_cast<uint8_t>(proposed);
+  spectrumLowPass =
+      proposed > 255 ? 255 : static_cast<uint8_t>(proposed);
 
   Serial.print(F("CALF DC="));
   Serial.print(micDcOffset);
-  Serial.print(F(" P50="));
-  Serial.print(p50);
-  Serial.print(F(" P90="));
-  Serial.print(p90);
-  Serial.print(F(" MAX="));
-  Serial.print(absoluteMax);
+  Serial.print(F(" QUIET_MAX="));
+  Serial.print(quietMax);
   Serial.print(F(" SPECTR_LOW_PASS="));
   Serial.println(spectrumLowPass);
 }
@@ -358,6 +325,11 @@ void setup() {
   // Опору ADC оставляем DEFAULT (~5 V), потому что физический OUT MAX9814
   // имеет DC offset около 1.25 V.
   analogReference(DEFAULT);
+
+  // На текущем диагностическом прямом входе MAX9814 стартовый DC может
+  // ещё стабилизироваться сразу после reset/upload. Даём тот же 500 ms
+  // интервал, который ColorMusic использует перед ручной калибровкой.
+  delay(500);
   calibrateDcOffset();
 
   Serial.println(F("ARDU NANO FHT TEST READY"));
