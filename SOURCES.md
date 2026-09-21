@@ -576,3 +576,8 @@ Community thread: `https://community.alexgyver.ru/threads/cvetomuzyka-na-arduino
 FireEdition авторства Slenk основана на разработках technotrasher и имеет собственную линейку (2.0, 2.4, 2.5, 2.5.1, 2.6, 2.7, 3.1). Поддерживает MIC/LINE и отдельные `SOUND_R_MIC` / `SOUND_R_MIC_FREQ` входы.
 
 В обсуждении исходного проекта technotrasher 28.12.2020 указал план использовать MAX4466 по совету Diman. В FireEdition-потоке пользователь подтвердил наличие MAX4466; Diman отметил отсутствие AGC у MAX4466, регулируемый больший выходной диапазон и рекомендовал отличающуюся от MAX9814 обвязку. Это относится к community-модификациям и не является официальной версией AlexGyver.
+
+
+## S-066 — поздние официальные прошивки ColorMusic в репозитории AlexGyver
+
+Официальный репозиторий `AlexGyver/ColorMusic` содержит текущую папку `firmware/colorMusic_v2.10/` и старые официальные ревизии, включая `colorMusic_v2.7` и `colorMusic_v2.8` в `firmware/Old versions/`. README проекта документирует изменения до v2.7; наличие v2.8/v2.10 подтверждается самим деревом официального репозитория и исходниками.
