@@ -462,3 +462,10 @@ color_music_upstream_vendor_2026_09_21:
     api: [FHT_N, FHT_h, fht_run, fht_mag_log]
     avrfht_primary: false
     compile_verified_after_switch: false
+
+fht_fastled_compat_2026_09_21:
+  problem: "legacy FHT global macro SCALE conflicts with modern FastLED identifiers"
+  upstream_fht_modified: false
+  sketch_fix: "undef SCALE after FHT.h before FastLED.h"
+  verify_after_fix: pending
+  grpc_invalid_utf8_note: "secondary until C++ compile error is gone"
