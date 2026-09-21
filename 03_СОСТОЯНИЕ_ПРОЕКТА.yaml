@@ -509,3 +509,19 @@ original_fht_valid_calf_2026_09_21:
   original_max_plus_3_gate_reasonable: true
   gated_behavior_verified: false
   next_test: FREQ_quiet_then_sound
+
+original_fht_gate_pass_2026_09_21:
+  low_pass: 36
+  quiet_samples:
+    - {low: 0, mid: 0, high: 0, peak: 0}
+    - {low: 0, mid: 0, high: 0, peak: 0}
+    - {low: 0, mid: 0, high: 0, peak: 0}
+  sound_samples:
+    - {low: 38, mid: 0, high: 0, peak: 38}
+    - {low: 0, mid: 0, high: 0, peak: 0}
+    - {low: 66, mid: 0, high: 0, peak: 66}
+  noise_gate_verified: true
+  band_mapping_matches_colormusic_v2_10: true
+  mid_band_verified: false
+  high_band_verified: false
+  next_test: controlled_tones_2k_4to5k_8k
