@@ -91,6 +91,29 @@ void analyzeAudio() {
   fht_mag_log();
 }
 
+void analyzeAudioZeroMeanDiagnostic() {
+  // Diagnostic only: remove the per-frame DC mean before FHT.
+  // The normal FREQ/FREQRAW path remains identical to ColorMusic v2.10.
+  int32_t sum = 0;
+
+  for (uint8_t i = 0; i < FHT_N; ++i) {
+    const int16_t sample = analogRead(ArduPins::FHT_IN);
+    fht_input[i] = sample;
+    sum += sample;
+  }
+
+  const int16_t mean = static_cast<int16_t>(sum / FHT_N);
+
+  for (uint8_t i = 0; i < FHT_N; ++i) {
+    fht_input[i] -= mean;
+  }
+
+  fht_window();
+  fht_reorder();
+  fht_run();
+  fht_mag_log();
+}
+
 void printAdcRaw(uint8_t pin, const __FlashStringHelper* label) {
   setDefaultAdcPrescaler();
   delayMicroseconds(200);
@@ -120,6 +143,33 @@ void printAdcRaw(uint8_t pin, const __FlashStringHelper* label) {
   setFastAdcPrescaler();
 }
 
+void printAdcRawFast(uint8_t pin, const __FlashStringHelper* label) {
+  setFastAdcPrescaler();
+  delayMicroseconds(200);
+  discardAdcReads(pin);
+
+  uint16_t minValue = 1023;
+  uint16_t maxValue = 0;
+  uint32_t sum = 0;
+
+  for (uint16_t i = 0; i < 256; ++i) {
+    const uint16_t sample = analogRead(pin);
+    if (sample < minValue) minValue = sample;
+    if (sample > maxValue) maxValue = sample;
+    sum += sample;
+  }
+
+  const uint16_t avg = static_cast<uint16_t>(sum / 256UL);
+
+  Serial.print(label);
+  Serial.print(F(" AVG="));
+  Serial.print(avg);
+  Serial.print(F(" MIN="));
+  Serial.print(minValue);
+  Serial.print(F(" MAX="));
+  Serial.println(maxValue);
+}
+
 Bands readBands(bool applyNoiseGate) {
   analyzeAudio();
 
@@ -131,6 +181,30 @@ Bands readBands(bool applyNoiseGate) {
     if (applyNoiseGate && value < spectrumLowPass) {
       value = 0;
     }
+
+    if (value > bands.peak) {
+      bands.peak = value;
+    }
+
+    if (i >= ArduConfig::LOW_BIN_FIRST && i <= ArduConfig::LOW_BIN_LAST) {
+      if (value > bands.low) bands.low = value;
+    } else if (i >= ArduConfig::MID_BIN_FIRST && i <= ArduConfig::MID_BIN_LAST) {
+      if (value > bands.mid) bands.mid = value;
+    } else if (i >= ArduConfig::HIGH_BIN_FIRST && i <= ArduConfig::HIGH_BIN_LAST) {
+      if (value > bands.high) bands.high = value;
+    }
+  }
+
+  return bands;
+}
+
+Bands readBandsZeroMeanDiagnostic() {
+  analyzeAudioZeroMeanDiagnostic();
+
+  Bands bands;
+
+  for (uint8_t i = 2; i < 32; ++i) {
+    const uint8_t value = fht_log_out[i];
 
     if (value > bands.peak) {
       bands.peak = value;
@@ -209,8 +283,21 @@ void printRawFreq() {
   Serial.println(bands.peak);
 }
 
+void printRawFreqZeroMeanDiagnostic() {
+  const Bands bands = readBandsZeroMeanDiagnostic();
+
+  Serial.print(F("FREQRAWZ LOW="));
+  Serial.print(bands.low);
+  Serial.print(F(" MID="));
+  Serial.print(bands.mid);
+  Serial.print(F(" HIGH="));
+  Serial.print(bands.high);
+  Serial.print(F(" PEAK="));
+  Serial.println(bands.peak);
+}
+
 void printStatus() {
-  Serial.print(F("STATUS FW=FHTV210 MIC_GAIN=40DB VU_PIN=A2 FHT_PIN=A3 A0=POT_GND_LOW A0=POT_GND_LOW"));
+  Serial.print(F("STATUS FW=FHTV210 MIC_GAIN=40DB VU_PIN=A2 FHT_PIN=A3 A0=POT_GND_LOW"));
   Serial.print(F(" SPECTR_LOW_PASS="));
   Serial.print(spectrumLowPass);
   Serial.print(F(" LIB=AlexGyver_FHT FHT_N="));
@@ -240,6 +327,11 @@ void handleCommand(const char* command) {
     return;
   }
 
+  if (strcmp(command, "ADC3FAST") == 0) {
+    printAdcRawFast(ArduPins::FHT_IN, F("ADC3FAST"));
+    return;
+  }
+
   if (strcmp(command, "CALF") == 0) {
     calibrateSpectrumNoise();
     return;
@@ -255,8 +347,13 @@ void handleCommand(const char* command) {
     return;
   }
 
+  if (strcmp(command, "FREQRAWZ") == 0) {
+    printRawFreqZeroMeanDiagnostic();
+    return;
+  }
+
   if (strcmp(command, "HELP") == 0) {
-    Serial.println(F("CMDS PING STATUS ADC2 ADC3 CALF FREQ FREQRAW HELP"));
+    Serial.println(F("CMDS PING STATUS ADC2 ADC3 ADC3FAST CALF FREQ FREQRAW FREQRAWZ HELP"));
     return;
   }
 
