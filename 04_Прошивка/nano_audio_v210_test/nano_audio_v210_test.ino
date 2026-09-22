@@ -210,7 +210,7 @@ void printRawFreq() {
 }
 
 void printStatus() {
-  Serial.print(F("STATUS FW=FHTV210 MIC_GAIN=40DB VU_PIN=A2 FHT_PIN=A3 A0=POT_GND_LOW"));
+  Serial.print(F("STATUS FW=FHTV210 MIC_GAIN=40DB VU_PIN=A2 FHT_PIN=A3 A0=POT_GND_LOW A0=POT_GND_LOW"));
   Serial.print(F(" SPECTR_LOW_PASS="));
   Serial.print(spectrumLowPass);
   Serial.print(F(" LIB=AlexGyver_FHT FHT_N="));
