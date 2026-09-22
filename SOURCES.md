@@ -721,3 +721,13 @@ Compatibility fix сделан в ARDU-скетче, а не в upstream-коп�
 - `CALF QUIET_MAX=37 SPECTR_LOW_PASS=40`.
 
 Это подтверждает, что на финальной A2/A3-разводке original ColorMusic calibration `max + 3` формирует рабочий порог 40. Проверка фактического подавления тишины выполняется отдельной командой `FREQ`.
+
+
+## S-081 — gated FREQ в тишине на финальном A3
+
+Данные владельца 2026-09-22 после `CALF QUIET_MAX=37 SPECTR_LOW_PASS=40`:
+- `FREQ LOW=0 MID=0 HIGH=0 PEAK=0 LOW_PASS=40`;
+- `FREQ LOW=0 MID=0 HIGH=0 PEAK=0 LOW_PASS=40`;
+- `FREQ LOW=0 MID=0 HIGH=0 PEAK=0 LOW_PASS=40`.
+
+Следствие: spectrum noise gate на финальной A3-разводке стабильно подавляет тишину. Следующий аппаратный критерий — контролируемые тоны 2 / 5 / 8 кГц.
