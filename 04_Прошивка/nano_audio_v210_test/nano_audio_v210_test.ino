@@ -21,6 +21,7 @@ constexpr uint8_t RING_B = 7;
 // SOUND_R_FREQ -> A3 (frequency input through 10 nF from A2)
 constexpr uint8_t VU_IN = A2;
 constexpr uint8_t FHT_IN = A3;
+constexpr uint8_t POT_GND = A0;  // original ColorMusic convenience ground for optional AREF pot
 }
 
 namespace ArduConfig {
@@ -209,7 +210,7 @@ void printRawFreq() {
 }
 
 void printStatus() {
-  Serial.print(F("STATUS FW=FHTV210 MIC_GAIN=40DB VU_PIN=A2 FHT_PIN=A3"));
+  Serial.print(F("STATUS FW=FHTV210 MIC_GAIN=40DB VU_PIN=A2 FHT_PIN=A3 A0=POT_GND_LOW"));
   Serial.print(F(" SPECTR_LOW_PASS="));
   Serial.print(spectrumLowPass);
   Serial.print(F(" LIB=AlexGyver_FHT FHT_N="));
@@ -291,6 +292,11 @@ void setup() {
 
   pinMode(ArduPins::RING_B, OUTPUT);
   digitalWrite(ArduPins::RING_B, LOW);
+
+  // ColorMusic v2.10 always drives POT_GND (A0) LOW for the optional
+  // AREF potentiometer. With POTENT=0 nothing is connected to A0 externally.
+  pinMode(ArduPins::POT_GND, OUTPUT);
+  digitalWrite(ArduPins::POT_GND, LOW);
 
   FastLED.addLeds<WS2812B, ArduPins::RING_A, GRB>(
       leds,
