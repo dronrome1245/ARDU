@@ -758,3 +758,13 @@ Compatibility fix сделан в ARDU-скетче, а не в upstream-коп�
 - `ADC3 AVG=853 MIN=839 MAX=905`.
 
 Тихий baseline ранее: A2 `105..154`, A3 `726..779`. Тон увеличивает размах A2 с 49 до 124 и A3 с 53 до 66 ADC counts. Следовательно, сигнал проходит до обоих входов; нулевой gated FHT нельзя объяснить полным обрывом ветви A3.
+
+
+## S-085 — raw FHT одинаков для 2/5/8 кГц на A3
+
+Данные владельца 2026-09-22:
+- 2 кГц: `FREQRAW LOW=37 MID=19 HIGH=19 PEAK=37`;
+- 5 кГц: `FREQRAW LOW=37 MID=19 HIGH=19 PEAK=37`;
+- 8 кГц: `FREQRAW LOW=37 MID=19 HIGH=19 PEAK=37`.
+
+Кодовая сверка показала: прежний успешно проверенный `nano_fht_test` вычисляет `micDcOffset` и перед FHT использует `analogRead(...) - micDcOffset`. Текущий `nano_audio_v210_test` намеренно следует v2.10 и подаёт raw A3 без программного DC subtraction. Для локализации добавлены `ADC3FAST` и `FREQRAWZ`.
