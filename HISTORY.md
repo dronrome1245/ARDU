@@ -680,3 +680,10 @@
 - `STATUS` подтвердил original FHT, `FHT_N=64` и `ADC_REF=INTERNAL_1V1`.
 - Тишина: `ADC2 AVG=123 MIN=105 MAX=154`; `ADC3 AVG=745 MIN=726 MAX=779`.
 - Оба ADC-канала живые и не насыщены; следующий тест — штатный `CALF` в тишине и gated `FREQ`.
+
+
+## 2026-09-22 — CALF на A3 дал штатный порог
+
+- Тишина: `QUIET_MAX=37`.
+- Итоговый spectrum gate: `SPECTR_LOW_PASS=40`.
+- Формула `max + 3` отработала как в ColorMusic; следующий шаг — gated `FREQ` в тишине.
