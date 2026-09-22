@@ -170,6 +170,26 @@ void printAdcRawFast(uint8_t pin, const __FlashStringHelper* label) {
   Serial.println(maxValue);
 }
 
+void printAdcFastTrace(uint8_t pin, const __FlashStringHelper* label) {
+  // Diagnostic: show the first conversions at prescaler=32 without
+  // discarding reads. Useful for detecting charge-up of an AC-coupled,
+  // weakly biased ADC input.
+  setDefaultAdcPrescaler();
+  (void)analogRead(pin);
+  delayMicroseconds(500);
+
+  setFastAdcPrescaler();
+
+  Serial.print(label);
+  Serial.print(F(" SAMPLES="));
+  for (uint8_t i = 0; i < 16; ++i) {
+    const uint16_t sample = analogRead(pin);
+    if (i > 0) Serial.print(',');
+    Serial.print(sample);
+  }
+  Serial.println();
+}
+
 Bands readBands(bool applyNoiseGate) {
   analyzeAudio();
 
@@ -327,8 +347,18 @@ void handleCommand(const char* command) {
     return;
   }
 
+  if (strcmp(command, "ADC2FAST") == 0) {
+    printAdcRawFast(ArduPins::VU_IN, F("ADC2FAST"));
+    return;
+  }
+
   if (strcmp(command, "ADC3FAST") == 0) {
     printAdcRawFast(ArduPins::FHT_IN, F("ADC3FAST"));
+    return;
+  }
+
+  if (strcmp(command, "ADC3TRACE") == 0) {
+    printAdcFastTrace(ArduPins::FHT_IN, F("ADC3TRACE"));
     return;
   }
 
@@ -353,7 +383,7 @@ void handleCommand(const char* command) {
   }
 
   if (strcmp(command, "HELP") == 0) {
-    Serial.println(F("CMDS PING STATUS ADC2 ADC3 ADC3FAST CALF FREQ FREQRAW FREQRAWZ HELP"));
+    Serial.println(F("CMDS PING STATUS ADC2 ADC3 ADC2FAST ADC3FAST ADC3TRACE CALF FREQ FREQRAW FREQRAWZ HELP"));
     return;
   }
 
