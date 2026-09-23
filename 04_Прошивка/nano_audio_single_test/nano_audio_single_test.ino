@@ -75,6 +75,14 @@ void calibrateDcOffset() {
   setFastAdcPrescaler();
 }
 
+void printCalDc() {
+  delay(500);
+  calibrateDcOffset();
+
+  Serial.print(F("CALDC DC="));
+  Serial.println(micDcOffset);
+}
+
 void printAdc() {
   setDefaultAdcPrescaler();
   delayMicroseconds(200);
@@ -264,6 +272,10 @@ void handleCommand(const char* command) {
     printAdc();
     return;
   }
+  if (strcmp(command, "CALDC") == 0) {
+    printCalDc();
+    return;
+  }
   if (strcmp(command, "CALV") == 0) {
     calibrateVuNoise();
     return;
@@ -285,7 +297,7 @@ void handleCommand(const char* command) {
     return;
   }
   if (strcmp(command, "HELP") == 0) {
-    Serial.println(F("CMDS PING STATUS ADC CALV VU CALF FREQRAW FREQ HELP"));
+    Serial.println(F("CMDS PING STATUS ADC CALDC CALV VU CALF FREQRAW FREQ HELP"));
     return;
   }
 
