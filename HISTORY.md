@@ -814,3 +814,9 @@
 - `CALF DC=234 QUIET_MAX=33 SPECTR_LOW_PASS=36`.
 - DC согласован с текущим ADC≈237; прежний startup DC=467 признан стартовым выбросом.
 - Следующий шаг — gated FREQ в тишине и регрессия 2/5/8 kHz.
+## 2026-09-24 — D-040: 2 кГц снова подтверждён на финальном A0/40 dB
+
+- После обнаружения ошибочного подключения MAX9814 Out к D0 вместо A0 восстановлена схема `Out→A0`.
+- На старой проверенной `nano_fht_test.ino`, при `Gain→Vdd` = 40 dB и `AR` floating: `CALF DC=249 QUIET_MAX=32 SPECTR_LOW_PASS=35`.
+- На тоне около 2 кГц: `ADC AVG=251 MIN=92 MAX=407`; `FREQRAW LOW=89 MID=24 HIGH=19`, затем `LOW=80 MID=24 HIGH=19`; gated `FREQ LOW=89 MID=0 HIGH=0 PEAK=89 LOW_PASS=35`.
+- **ФАКТ:** диапазон LOW на 2 кГц подтверждён чисто; следующий тест — 5 кГц → MID, затем 8 кГц → HIGH.
