@@ -108,7 +108,8 @@
 2. Не устанавливать C1/103/A2/A3 и не подключать внешний AREF.
 3. Verify/Upload `04_Прошивка/nano_audio_single_test/nano_audio_single_test.ino` для `ATmega328P (Old Bootloader)`.
 4. В тишине выполнить `STATUS → ADC → CALV → VU → CALF → FREQ`.
-5. Затем повторить 2/5/8 kHz через `FREQ`; после pass переносить единый audio frontend в основной набор M01/M02/M03/M04/M05/M08/M09.
+5. 2 кГц на финальном A0/40 dB уже пройден: `FREQ LOW=89 MID=0 HIGH=0 PEAK=89 LOW_PASS=35`.
+6. Следующий тест: 5 кГц → MID, затем 8 кГц → HIGH; после pass переносить единый audio frontend в основной набор M01/M02/M03/M04/M05/M08/M09.
 
 ## Следующая контрольная точка
 
