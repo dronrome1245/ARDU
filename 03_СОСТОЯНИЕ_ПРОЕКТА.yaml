@@ -135,7 +135,7 @@ progress:
   uart_gateway_verified_percent: 0
   mobile_app_implementation_percent: 0
 
-current_focus: "Measure YP-8 and S-30-5, confirm ceiling wiring and PSU placement, then approve final BOM and build ESP8266↔Nano bench"
+current_focus: "Verify/compile nano_m03, then upload and hardware-test M03 five-stripe frequency mode on one D6 ring"
 
 critical_blockers:
   - "Distance and wiring topology between two ceiling fixtures not known"
@@ -576,3 +576,33 @@ audio_v210_test_prepared_2026_09_21:
   compile_verified: false
   hardware_verified: false
   next_commands: [STATUS, ADC2, ADC3]
+
+
+audio_single_input_d040_2026_09_24:
+  status: passed_on_hardware
+  final_input: A0
+  microphone: MAX9814
+  gain_db: 40
+  ar: floating
+  adc_reference: DEFAULT
+  dc_subtraction: software
+  fht_library: original_AlexGyver_ColorMusic
+  fht_n: 64
+  bins: {low: "2..5", mid: "6..10", high: "11..31"}
+  three_band_classification_verified: true
+  supersedes_audio_v210_a2_a3_as_final_path: true
+
+firmware_m03_2026_09_24:
+  code_path: "04_Прошивка/nano_m03/nano_m03.ino"
+  mode_id: M03
+  name: five_stripes
+  ring_a_pin: D6
+  ring_b_pin: D7_low_unconnected
+  led_count: 43
+  current_limit_ma: 500
+  source_algorithm: AlexGyver_ColorMusic_v2_10
+  code_prepared: true
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_compile
