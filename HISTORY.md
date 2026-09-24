@@ -892,3 +892,13 @@
 - **ФАКТ:** compile/upload M03 считаются пройденными.
 - **НЕ ПРОВЕРЕНО:** runtime `STATUS/ADC/CALF/BANDS` и визуальная реакция пяти зон на LOW/MID/HIGH.
 - Следующий минимальный тест: в тишине `STATUS → ADC → CALF → BANDS`.
+
+
+## 2026-09-24 — M03 runtime baseline пройден
+
+- После загрузки M03: `STATUS FW=M03 ... DC=450 ... CAL=NO`; startup DC признан невалидным до калибровки.
+- Прямой вход: `ADC AVG=249 MIN=237 MAX=263 P2P=26`.
+- В тишине: `CALF DC=256 QUIET_MAX=33 SPECTR_LOW_PASS=36`, что согласуется с прямым ADC.
+- После CALF: `BANDS LOW=0 MID=0 HIGH=0 LP=36 BR=6,6,6 FLASH=0,0,0`.
+- **ФАКТ:** M03 runtime baseline, A0/FHT, калибровка тишины и отсутствие ложных вспышек пройдены.
+- Следующий критерий: 2 кГц → LOW и визуально центральная красная зона; затем 4–5 кГц → MID и 8 кГц → HIGH.
