@@ -820,3 +820,12 @@
 - На старой проверенной `nano_fht_test.ino`, при `Gain→Vdd` = 40 dB и `AR` floating: `CALF DC=249 QUIET_MAX=32 SPECTR_LOW_PASS=35`.
 - На тоне около 2 кГц: `ADC AVG=251 MIN=92 MAX=407`; `FREQRAW LOW=89 MID=24 HIGH=19`, затем `LOW=80 MID=24 HIGH=19`; gated `FREQ LOW=89 MID=0 HIGH=0 PEAK=89 LOW_PASS=35`.
 - **ФАКТ:** диапазон LOW на 2 кГц подтверждён чисто; следующий тест — 5 кГц → MID, затем 8 кГц → HIGH.
+
+
+## 2026-09-24 — D-040: 5 кГц подтверждён как MID
+
+- После тихой калибровки: `CALF DC=274 QUIET_MAX=33 SPECTR_LOW_PASS=36`.
+- На тоне около 5 кГц: `FREQRAW LOW=19 MID=49 HIGH=19`, затем `LOW=19 MID=48 HIGH=19`; отдельный кадр дал `LOW=41 MID=50 HIGH=35`.
+- Gated: `FREQ LOW=0 MID=68 HIGH=41 PEAK=68 LOW_PASS=36`.
+- **ФАКТ:** 5 кГц корректно классифицируется как MID, но в одном gated-кадре остаётся заметная HIGH-составляющая; тест считается PASS по доминирующему диапазону, не как идеальная изоляция.
+- Следующий тест — 8 кГц → HIGH.
