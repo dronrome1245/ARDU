@@ -109,7 +109,7 @@
 3. Verify/Upload `04_Прошивка/nano_audio_single_test/nano_audio_single_test.ino` для `ATmega328P (Old Bootloader)`.
 4. В тишине выполнить `STATUS → ADC → CALV → VU → CALF → FREQ`.
 5. 2 кГц на финальном A0/40 dB уже пройден: `FREQ LOW=89 MID=0 HIGH=0 PEAK=89 LOW_PASS=35`.
-6. 5 кГц пройден по доминирующему диапазону: `FREQ LOW=0 MID=68 HIGH=41 PEAK=68 LOW_PASS=36`; есть заметная HIGH-утечка, но MID доминирует. Следующий тест: 8 кГц → HIGH; после pass переносить единый audio frontend в основной набор M01/M02/M03/M04/M05/M08/M09.
+6. 5 кГц пройден по доминирующему диапазону. На 8 кГц raw максимум находится в HIGH (`24..27`), но ниже `LOW_PASS=36`, поэтому gated FREQ=0. Следующий тест: ADC-размах на 8 кГц; затем решить, проблема в уровне источника или FHT.
 
 ## Следующая контрольная точка
 
