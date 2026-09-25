@@ -182,6 +182,9 @@ firmware_fw0_result_2026_09_20:
   status_line: "STATUS FW=FW0 POWER=OFF BRIGHTNESS=32 UPTIME_MS=127729"
 firmware_fw1:
   code_path: "04_Прошивка/nano_fw1/nano_fw1.ino"
+  revision: 2
+  startup_expected: "ARDU NANO M05 R2 READY"
+  status_revision_expected: 2
   code_prepared: true
   compile_verified: false
   hardware_verified: false
@@ -671,7 +674,7 @@ firmware_m04_result_2026_09_25:
   band_classification: {2000Hz: LOW, 5000Hz: MID, 8000Hz: HIGH}
 
 firmware_m05_2026_09_25:
-  code_path: "04_Прошивка/nano_m05/nano_m05.ino"
+  code_path: "04_Прошивка/nano_m05_r2/nano_m05_r2.ino"
   mode_id: M05
   name: one_strip_selected_frequency_group
   submodes: [THREE, LOW, MID, HIGH]
@@ -684,3 +687,10 @@ firmware_m05_2026_09_25:
   upload_verified: false
   hardware_verified: false
   next: verify_compile
+
+
+firmware_revision_policy_2026_09_25:
+  active: true
+  rule: "Any code fix after owner handoff/testing increments Rn"
+  mode_id_stable: true
+  revision_visible_in_filename_startup_status: true
