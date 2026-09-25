@@ -634,8 +634,8 @@ firmware_m04_2026_09_25:
   led_distribution_43: {HIGH: 14, MID: 14, LOW: 15}
   background_default: 0
   code_prepared: true
-  compile_verified: false
-  upload_verified: false
+  compile_verified: true
+  upload_verified: true
   hardware_verified: false
   next: verify_compile
 
@@ -694,3 +694,10 @@ firmware_revision_policy_2026_09_25:
   rule: "Any code fix after owner handoff/testing increments Rn"
   mode_id_stable: true
   revision_visible_in_filename_startup_status: true
+
+
+firmware_m05_r2_upload_2026_09_25:
+  compile: passed
+  upload: passed
+  runtime_verified: false
+  next: startup_and_status_rev2
