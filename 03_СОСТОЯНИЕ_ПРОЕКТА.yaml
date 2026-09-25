@@ -135,7 +135,7 @@ progress:
   uart_gateway_verified_percent: 0
   mobile_app_implementation_percent: 0
 
-current_focus: "Verify/compile nano_m04, then upload and hardware-test M04 three-stripe frequency mode on one D6 ring"
+current_focus: "Verify/compile nano_m05, then upload and hardware-test M05 one-strip frequency submodes on one D6 ring"
 
 critical_blockers:
   - "Distance and wiring topology between two ceiling fixtures not known"
@@ -662,3 +662,25 @@ firmware_m04_band_classification_2026_09_25:
   tones: {2000Hz: LOW, 5000Hz: MID, 8000Hz: HIGH}
   steady_tone_visual_fade_expected: true
   final_m04_test: real_music_three_zones_and_silence_off
+
+
+firmware_m04_result_2026_09_25:
+  status: passed_on_hardware
+  three_zones_real_music: true
+  silence_fully_off: true
+  band_classification: {2000Hz: LOW, 5000Hz: MID, 8000Hz: HIGH}
+
+firmware_m05_2026_09_25:
+  code_path: "04_Прошивка/nano_m05/nano_m05.ino"
+  mode_id: M05
+  name: one_strip_selected_frequency_group
+  submodes: [THREE, LOW, MID, HIGH]
+  default_submode: THREE
+  three_priority: [HIGH, MID, LOW]
+  background_default: 0
+  frontend_reused_from_m04: true
+  code_prepared: true
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_compile
