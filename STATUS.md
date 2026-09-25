@@ -153,7 +153,8 @@
 47. Код исправлен: внутренние значения переименованы в `LOW_ONLY / MID_ONLY / HIGH_ONLY`; внешние команды остаются `SUBMODE LOW/MID/HIGH`.
 48. Повторная попытка компиляции снова показала старую ошибку `Submode::LOW` на строке 72, при этом актуальный файл в GitHub уже содержит `LOW_ONLY/MID_ONLY/HIGH_ONLY`.
 49. **ФАКТ:** Arduino IDE компилирует старую несохранённую временную копию из `.arduinoIDE-unsaved.../sketch_sep25a.ino`, а не обновлённый `04_Прошивка/nano_m05_r2/nano_m05_r2.ino`.
-50. Следующий шаг — закрыть старый unsaved sketch и открыть/скопировать актуальный M05, убедившись, что строки enum содержат `LOW_ONLY/MID_ONLY/HIGH_ONLY`, затем повторить Verify.
+50. M05 R2 **COMPILE + UPLOAD PASSED 2026-09-25** на фактической Nano.
+51. Следующий критерий — runtime-подтверждение именно R2: открыть Serial Monitor 115200/Newline, ожидать `ARDU NANO M05 R2 READY`, затем отправить `STATUS`; норма — `FW=M05 REV=2 MODE=M05 ... SUBMODE=THREE BACKGROUND=0`.
 
 ## Следующая контрольная точка
 
