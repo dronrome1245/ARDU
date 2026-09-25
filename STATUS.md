@@ -154,7 +154,9 @@
 48. Повторная попытка компиляции снова показала старую ошибку `Submode::LOW` на строке 72, при этом актуальный файл в GitHub уже содержит `LOW_ONLY/MID_ONLY/HIGH_ONLY`.
 49. **ФАКТ:** Arduino IDE компилирует старую несохранённую временную копию из `.arduinoIDE-unsaved.../sketch_sep25a.ino`, а не обновлённый `04_Прошивка/nano_m05_r2/nano_m05_r2.ino`.
 50. M05 R2 **COMPILE + UPLOAD PASSED 2026-09-25** на фактической Nano.
-51. Следующий критерий — runtime-подтверждение именно R2: открыть Serial Monitor 115200/Newline, ожидать `ARDU NANO M05 R2 READY`, затем отправить `STATUS`; норма — `FW=M05 REV=2 MODE=M05 ... SUBMODE=THREE BACKGROUND=0`.
+51. Runtime M05 R2 **ПОДТВЕРЖДЁН 2026-09-25**: `ARDU NANO M05 R2 READY`; `STATUS FW=M05 REV=2 MODE=M05 POWER=ON BRIGHTNESS=64 BACKGROUND=0 SUBMODE=THREE MIC=MAX9814 MIC_PIN=A0 MIC_GAIN=40DB AR=FLOAT ADC_REF=DEFAULT DC=250 SPECTR_LOW_PASS=40 CAL=NO LEDS=43 FHT_N=64`.
+52. **ФАКТ:** на Nano запущена именно ревизия R2; стартовый DC=250 согласуется с рабочим MAX9814/A0.
+53. Следующий минимальный тест — `ADC` в тишине.
 
 ## Следующая контрольная точка
 
