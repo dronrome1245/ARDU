@@ -726,3 +726,14 @@ firmware_m05_r2_adc_fault_2026_09_25:
     - MAX9814_Vdd_to_GND
     - MAX9814_Out_to_GND
     - Nano_A0_to_Nano_GND
+
+
+m05_r2_out_a0_fault_2026_09_25:
+  max9814_vdd_v: 5.08
+  max9814_out_v: 1.25
+  nano_a0_v: 0.16
+  max9814_power_ok: true
+  max9814_bias_ok: true
+  out_to_a0_path_ok: false
+  likely_fault: wire_contact_or_a0_loading
+  calf_allowed: false
