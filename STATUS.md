@@ -131,7 +131,10 @@
 25. Создан `04_Прошивка/nano_m04/nano_m04.ino`: тот же проверенный A0/FHT/noise-gate тракт, но отрисовка по оригинальной логике ColorMusic v2.10 — первая треть HIGH, средняя треть MID, последняя треть LOW.
 26. После подтверждённого владельцем полного гашения в тишине код M03 и новый M04 используют `DEFAULT_BACKGROUND=0`; фон остаётся регулируемым командой `BACKGROUND <0..255>`.
 27. **НЕ ПРОВЕРЕНО:** M04 ещё не компилировался/не загружался на физическую Nano.
-28. Следующий критерий — Verify/Compile `nano_m04.ino` для `Arduino Nano → ATmega328P (Old Bootloader)`, затем Upload. После старта ожидать `ARDU NANO M04 READY` и `STATUS FW=M04 MODE=M04 ... BACKGROUND=0`.
+28. M04 **COMPILE + UPLOAD PASSED 2026-09-25** на фактической Nano (`ATmega328P (Old Bootloader)`).
+29. Стартовый runtime подтверждён: `ARDU NANO M04 READY`; `STATUS FW=M04 MODE=M04 POWER=ON BRIGHTNESS=64 BACKGROUND=0 MIC=MAX9814 MIC_PIN=A0 MIC_GAIN=40DB AR=FLOAT ADC_REF=DEFAULT DC=250 SPECTR_LOW_PASS=40 CAL=NO LEDS=43 FHT_N=64`.
+30. **ФАКТ:** стартовый DC=250 согласуется с ранее рабочим MAX9814/A0, но CAL ещё не выполнен.
+31. Следующий минимальный тест — команда `ADC`. Если AVG остаётся примерно около 240–260 и нет насыщения, затем выполнить `CALF` в тишине.
 
 ## Следующая контрольная точка
 
