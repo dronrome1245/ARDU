@@ -1044,3 +1044,12 @@
 - После подтверждённого владельцем поведения «тишина = полностью погашено» `DEFAULT_BACKGROUND` в M03 изменён с 6 на 0; M04 сразу создан с default 0. Команда `BACKGROUND <0..255>` остаётся доступной.
 - **НЕ ПРОВЕРЕНО:** compile/upload/runtime M04 на физической Nano.
 - Следующий шаг: Verify/Compile M04, затем Upload и `STATUS`.
+
+
+## 2026-09-25 — M04 compile/upload и startup пройдены
+
+- `nano_m04.ino` успешно скомпилирован и загружен на фактическую Arduino Nano с `ATmega328P (Old Bootloader)`.
+- После старта получено `ARDU NANO M04 READY`.
+- Стартовый STATUS: `FW=M04 MODE=M04 POWER=ON BRIGHTNESS=64 BACKGROUND=0 MIC=MAX9814 MIC_PIN=A0 MIC_GAIN=40DB AR=FLOAT ADC_REF=DEFAULT DC=250 SPECTR_LOW_PASS=40 CAL=NO LEDS=43 FHT_N=64`.
+- **ФАКТ:** новый M04 запускается корректно и сохраняет проверенный A0/MAX9814 frontend; фоновая яркость по умолчанию = 0.
+- Следующий минимальный шаг: `ADC`, затем только при нормальном A0 — `CALF` в тишине.
