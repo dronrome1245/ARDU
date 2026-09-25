@@ -655,3 +655,10 @@ firmware_m04_calf_2026_09_25:
   quiet_false_flashes: false
   keyboard_click_response: true
   next: controlled_2_5_8_kHz_three_zone_test
+
+
+firmware_m04_band_classification_2026_09_25:
+  status: passed
+  tones: {2000Hz: LOW, 5000Hz: MID, 8000Hz: HIGH}
+  steady_tone_visual_fade_expected: true
+  final_m04_test: real_music_three_zones_and_silence_off
