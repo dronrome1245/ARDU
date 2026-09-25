@@ -713,3 +713,16 @@ firmware_m05_r2_runtime_2026_09_25:
   dc: 250
   calf_done: false
   next: ADC_quiet
+
+
+firmware_m05_r2_adc_fault_2026_09_25:
+  startup_dc: 250
+  later_adc: {avg: 10, min: 6, max: 28, p2p: 22}
+  valid: false
+  adc_code_diff_vs_m04: none_detected
+  calf_allowed: false
+  next_measurements:
+    - repeated_ADC_with_ring_OFF
+    - MAX9814_Vdd_to_GND
+    - MAX9814_Out_to_GND
+    - Nano_A0_to_Nano_GND
