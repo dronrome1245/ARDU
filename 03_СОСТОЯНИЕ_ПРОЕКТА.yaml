@@ -135,7 +135,7 @@ progress:
   uart_gateway_verified_percent: 0
   mobile_app_implementation_percent: 0
 
-current_focus: "Verify/compile nano_m03, then upload and hardware-test M03 five-stripe frequency mode on one D6 ring"
+current_focus: "Verify/compile nano_m04, then upload and hardware-test M04 three-stripe frequency mode on one D6 ring"
 
 critical_blockers:
   - "Distance and wiring topology between two ceiling fixtures not known"
@@ -601,6 +601,32 @@ firmware_m03_2026_09_24:
   led_count: 43
   current_limit_ma: 500
   source_algorithm: AlexGyver_ColorMusic_v2_10
+  code_prepared: true
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_compile
+
+
+firmware_m03_result_2026_09_25:
+  status: passed_on_hardware
+  ring_pin: D6
+  led_count: 43
+  common_ground_verified: true
+  background_default: 0
+  silence_fully_off: true
+  bands_verified: {2000Hz: LOW, 5000Hz: MID, 8000Hz: HIGH}
+  real_music_visual_test: passed
+
+firmware_m04_2026_09_25:
+  code_path: "04_Прошивка/nano_m04/nano_m04.ino"
+  mode_id: M04
+  name: three_stripes
+  source_algorithm: AlexGyver_ColorMusic_v2_10
+  frontend_reused_from_m03: true
+  layout: "first third HIGH, middle third MID, final third LOW"
+  led_distribution_43: {HIGH: 14, MID: 14, LOW: 15}
+  background_default: 0
   code_prepared: true
   compile_verified: false
   upload_verified: false
