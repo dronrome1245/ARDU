@@ -701,3 +701,15 @@ firmware_m05_r2_upload_2026_09_25:
   upload: passed
   runtime_verified: false
   next: startup_and_status_rev2
+
+
+firmware_m05_r2_runtime_2026_09_25:
+  startup: "ARDU NANO M05 R2 READY"
+  status_verified: true
+  fw: M05
+  rev: 2
+  submode: THREE
+  background: 0
+  dc: 250
+  calf_done: false
+  next: ADC_quiet
