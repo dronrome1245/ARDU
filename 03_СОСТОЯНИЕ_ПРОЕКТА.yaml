@@ -645,3 +645,13 @@ firmware_m04_adc_2026_09_25:
   saturation: false
   baseline_valid: true
   next: CALF_quiet
+
+
+firmware_m04_calf_2026_09_25:
+  dc: 251
+  quiet_max: 43
+  spectr_low_pass: 46
+  valid: true
+  quiet_false_flashes: false
+  keyboard_click_response: true
+  next: controlled_2_5_8_kHz_three_zone_test
