@@ -156,7 +156,11 @@
 50. M05 R2 **COMPILE + UPLOAD PASSED 2026-09-25** на фактической Nano.
 51. Runtime M05 R2 **ПОДТВЕРЖДЁН 2026-09-25**: `ARDU NANO M05 R2 READY`; `STATUS FW=M05 REV=2 MODE=M05 POWER=ON BRIGHTNESS=64 BACKGROUND=0 SUBMODE=THREE MIC=MAX9814 MIC_PIN=A0 MIC_GAIN=40DB AR=FLOAT ADC_REF=DEFAULT DC=250 SPECTR_LOW_PASS=40 CAL=NO LEDS=43 FHT_N=64`.
 52. **ФАКТ:** на Nano запущена именно ревизия R2; стартовый DC=250 согласуется с рабочим MAX9814/A0.
-53. Следующий минимальный тест — `ADC` в тишине.
+53. M05 R2 `ADC` в тишине дал `AVG=10 MIN=6 MAX=28 P2P=22` — **НЕВАЛИДНО** для рабочего MAX9814/A0.
+54. **ФАКТ ПО КОДУ:** `calibrateDcOffset()`, `analyzeAudio()`, `printAdc()` и ADC setup в M05 R2 идентичны уже пройденному M04; программная регрессия в этих функциях не обнаружена.
+55. **ФАКТ:** startup M05 R2 перед этим показал `DC=250`, то есть A0 был нормален при старте, а затем физический уровень упал.
+56. `CALF` не выполнять до восстановления A0.
+57. Следующая диагностика одним блоком: `OFF` → 2×`ADC`; затем мультиметром измерить `MAX9814 Vdd→GND`, `MAX9814 Out→GND`, `Nano A0→Nano GND`. Норма: Vdd≈5 V, Out≈A0≈1.2–1.3 V.
 
 ## Следующая контрольная точка
 
