@@ -38,7 +38,7 @@ constexpr unsigned long SERIAL_BAUD = 115200UL;
 constexpr uint16_t LED_COUNT = 43;
 constexpr uint16_t MAX_MILLIAMPS = 500;
 constexpr uint8_t DEFAULT_BRIGHTNESS = 64;
-constexpr uint8_t DEFAULT_BACKGROUND = 6;
+constexpr uint8_t DEFAULT_BACKGROUND = 0;
 
 constexpr uint8_t LOW_BIN_FIRST = 2;
 constexpr uint8_t LOW_BIN_LAST = 5;
