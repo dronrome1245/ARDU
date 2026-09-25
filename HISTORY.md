@@ -1140,3 +1140,14 @@
 - STATUS: `FW=M05 REV=2 MODE=M05 POWER=ON BRIGHTNESS=64 BACKGROUND=0 SUBMODE=THREE MIC=MAX9814 MIC_PIN=A0 MIC_GAIN=40DB AR=FLOAT ADC_REF=DEFAULT DC=250 SPECTR_LOW_PASS=40 CAL=NO LEDS=43 FHT_N=64`.
 - **ФАКТ:** на физической Nano запущена именно M05 R2.
 - Следующий шаг: `ADC` в тишине.
+
+
+## 2026-09-25 — M05 R2 A0 внезапно упал после нормального startup
+
+- После startup `DC=250` команда `ADC` дала `AVG=10 MIN=6 MAX=28 P2P=22`.
+- **ФАКТ:** это невалидный уровень для рабочего MAX9814/A0.
+- Сверены M04 и M05 R2: `calibrateDcOffset()`, `analyzeAudio()`, `printAdc()`, ADC reference/prescaler setup идентичны.
+- **ФАКТ:** явной программной регрессии в ADC frontend M05 R2 нет.
+- Поскольку при startup `DC=250` был нормальным, а затем `ADC≈10`, вероятнее физический intermittent path/power/contact, но причина ещё не подтверждена.
+- `CALF` запрещён до восстановления нормального A0.
+- Следующий диагностический блок: `OFF` + повторные `ADC`; затем измерить MAX9814 Vdd, MAX9814 Out и Nano A0 относительно соответствующего GND.
