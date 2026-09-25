@@ -69,9 +69,9 @@ enum BandIndex : uint8_t {
 
 enum class Submode : uint8_t {
   THREE,
-  LOW,
-  MID,
-  HIGH
+  LOW_ONLY,
+  MID_ONLY,
+  HIGH_ONLY
 };
 
 struct Bands {
@@ -283,9 +283,9 @@ void updateFrequencyState(const Bands& bands) {
 const __FlashStringHelper* submodeName() {
   switch (settings.submode) {
     case Submode::THREE: return F("THREE");
-    case Submode::LOW:   return F("LOW");
-    case Submode::MID:   return F("MID");
-    case Submode::HIGH:  return F("HIGH");
+    case Submode::LOW_ONLY:  return F("LOW");
+    case Submode::MID_ONLY:  return F("MID");
+    case Submode::HIGH_ONLY: return F("HIGH");
   }
   return F("UNKNOWN");
 }
@@ -337,21 +337,21 @@ void renderM05() {
       }
       break;
 
-    case Submode::LOW:
+    case Submode::LOW_ONLY:
       if (bandFlash[BAND_LOW]) {
         showBand(BAND_LOW);
         active = true;
       }
       break;
 
-    case Submode::MID:
+    case Submode::MID_ONLY:
       if (bandFlash[BAND_MID]) {
         showBand(BAND_MID);
         active = true;
       }
       break;
 
-    case Submode::HIGH:
+    case Submode::HIGH_ONLY:
       if (bandFlash[BAND_HIGH]) {
         showBand(BAND_HIGH);
         active = true;
@@ -523,11 +523,11 @@ void handleCommand(char* command) {
     if (strcmp(value, "THREE") == 0) {
       settings.submode = Submode::THREE;
     } else if (strcmp(value, "LOW") == 0) {
-      settings.submode = Submode::LOW;
+      settings.submode = Submode::LOW_ONLY;
     } else if (strcmp(value, "MID") == 0) {
-      settings.submode = Submode::MID;
+      settings.submode = Submode::MID_ONLY;
     } else if (strcmp(value, "HIGH") == 0) {
-      settings.submode = Submode::HIGH;
+      settings.submode = Submode::HIGH_ONLY;
     } else {
       Serial.println(F("ERR BAD_SUBMODE"));
       return;
