@@ -635,3 +635,13 @@ firmware_m04_2026_09_25:
   upload_verified: false
   hardware_verified: false
   next: verify_compile
+
+
+firmware_m04_adc_2026_09_25:
+  avg: 249
+  min: 243
+  max: 256
+  p2p: 13
+  saturation: false
+  baseline_valid: true
+  next: CALF_quiet
