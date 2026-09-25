@@ -1132,3 +1132,11 @@
 - Владелец подтвердил успешную компиляцию и загрузку `04_Прошивка/nano_m05_r2/nano_m05_r2.ino` на фактическую Nano.
 - **ФАКТ:** M05 R2 прошёл compile + upload.
 - Runtime ещё не подтверждён; следующий критерий — startup `ARDU NANO M05 R2 READY` и `STATUS FW=M05 REV=2`.
+
+
+## 2026-09-25 — M05 R2 runtime подтверждён
+
+- Startup: `ARDU NANO M05 R2 READY`.
+- STATUS: `FW=M05 REV=2 MODE=M05 POWER=ON BRIGHTNESS=64 BACKGROUND=0 SUBMODE=THREE MIC=MAX9814 MIC_PIN=A0 MIC_GAIN=40DB AR=FLOAT ADC_REF=DEFAULT DC=250 SPECTR_LOW_PASS=40 CAL=NO LEDS=43 FHT_N=64`.
+- **ФАКТ:** на физической Nano запущена именно M05 R2.
+- Следующий шаг: `ADC` в тишине.
