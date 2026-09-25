@@ -602,10 +602,13 @@ firmware_m03_2026_09_24:
   current_limit_ma: 500
   source_algorithm: AlexGyver_ColorMusic_v2_10
   code_prepared: true
-  compile_verified: false
-  upload_verified: false
+  compile_verified: true
+  upload_verified: true
   hardware_verified: false
-  next: verify_compile
+  startup_status_verified: true
+  startup_dc: 250
+  background_default: 0
+  next: ADC_then_CALF
 
 
 firmware_m03_result_2026_09_25:
