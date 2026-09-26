@@ -1248,3 +1248,17 @@
 - Добавлена команда `SPEC` для печати 20 текущих peak-hold значений и `MAXF`.
 - Для 43 LED выполнена симметричная odd-count adaptation с одним центральным LED.
 - R4 transport fix и R3 DC guard перенесены без изменения.
+
+
+## 2026-09-26 — M09 R1 полностью пройден; FW-6 закрыт; создан F02 R1
+
+- M09 ADC: `251 / 231..274 / P2P 43`.
+- CALF: `DC=251 QUIET_MAX=42 LP=45`.
+- `SPEC` меняется по музыке, визуальный анализатор работает адекватно.
+- `HUESTART/HUESTEP` подтверждены визуально и возвращены к defaults 0/5.
+- Active-effect Serial regression пройден без ошибок; uptime монотонно растёт.
+- **ФАКТ:** M09 R1 hardware pass.
+- **ФАКТ:** весь FW-6 frequency layer закрыт на одном D6-кольце.
+- Создан `04_Прошивка/nano_f02_r1/nano_f02_r1.ino`.
+- F02 R1: ColorMusic light_mode=1, `HUE=0`, `SAT=255`, `SPEED_MS=100`, brightness 64; UART fix перенесён.
+- Следующий критерий: Verify/Upload F02 R1 и визуальная проверка плавной смены цвета/скорости/насыщенности.
