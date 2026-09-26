@@ -361,6 +361,27 @@
 - Расписание ночника в R1 не входит: по функциональной модели это дополнительная функция после базового ночника.
 - **НЕ ПРОВЕРЕНО:** compile/upload/runtime NIGHT R1.
 
+### 2026-09-26 — NIGHT R1 заменён NIGHT R2 с расписанием
+
+- По решению владельца расписание ночника включено в текущий FW-9, поэтому отдельный аппаратный pass NIGHT R1 больше не требуется.
+- **РЕШЕНИЕ:** NIGHT R1 остаётся исторической первой ревизией, но до аппаратного теста заменён NIGHT R2.
+- Создан `04_Прошивка/nano_night_r2/nano_night_r2.ino` и `04_Прошивка/NIGHT_R2_TEST.md`.
+- NIGHT R2 содержит весь базовый ночник: постоянный HSV, HUE/SAT/BRIGHT, manual ON/OFF, EEPROM persistence.
+- Добавлен DS3231 schedule:
+  - default `SCHEDULE=OFF`;
+  - сохранённые default времена `22:00 → 07:00`;
+  - переход через полночь поддерживается;
+  - интервал трактуется как `[ON, OFF)`;
+  - `SCHEDULE ON` немедленно применяет текущее состояние по RTC;
+  - schedule transitions не пишут EEPROM, POWER вычисляется из RTC;
+  - ручные `ON/OFF` отключают schedule и переводят NIGHT в manual control;
+  - HUE/SAT/BRIGHT не отключают schedule;
+  - при enabled schedule и невалидном RTC fail-safe POWER=OFF.
+- STATUS добавляет `CONTROL`, `MANUAL_POWER`, `SCHEDULE`, `SCHED_ON`, `SCHED_OFF`, `WINDOW`, `RTC_PRESENT/VALID`, `TIME`.
+- Команды: `SCHEDULESET HH:MM HH:MM`, `SCHEDULE ON/OFF`, `TIME`.
+- EEPROM NIGHT R2 остаётся на base 64, но имеет новую magic/version; непроверенные R1-настройки не мигрируются.
+- **НЕ ПРОВЕРЕНО:** compile/upload/runtime NIGHT R2.
+
 ## Следующая контрольная точка
 
 **Питание измерено, потолочная разводка определена, окончательный BOM утверждён, ESP8266 прошивается и устойчиво обменивается командами с Nano; одно кольцо управляется по Wi‑Fi.**
