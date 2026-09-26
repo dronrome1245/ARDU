@@ -975,3 +975,31 @@ firmware_rtc_r1_2026_09_26:
   rtc_present_verified: false
   retention_verified: false
   next: remove_201_then_verify_upload_rtc_test
+
+
+rtc_r1_result_2026_09_26:
+  status: passed_on_hardware
+  i2c_address: "0x68"
+  present: true
+  time_running: true
+  temperature_c: 29.50
+  set_time_passed: true
+  osf_after_set: 0
+  lost_power_after_set: false
+  resistor_201_removed: owner_confirmed
+  battery_retention: owner_confirmed
+
+firmware_alarm_r1_2026_09_26:
+  code_path: "04_Прошивка/nano_alarm_r1/nano_alarm_r1.ino"
+  test_doc: "04_Прошивка/ALARM_R1_TEST.md"
+  revision: 1
+  rtc: DS3231
+  led_dawn_enabled: false
+  storage: "ATmega328P internal EEPROM"
+  persisted: [enabled, hour, minute, last_trigger_date]
+  storage_guard: [magic, version, checksum]
+  event: "EVENT ALARM_TRIGGER"
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_persistence_daily_trigger
