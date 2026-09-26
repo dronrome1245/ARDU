@@ -109,7 +109,10 @@
   "hue":32,
   "saturation":255,
   "brightness":80,
-  "speed":30
+  "speed":30,
+  "rainbow_step":0.5,
+  "auto_cycle":false,
+  "auto_period_s":10
 }
 ```
 
