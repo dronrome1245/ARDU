@@ -1328,3 +1328,14 @@
   - STOP and HOLD states;
   - persistent fade/max brightness/start hue/end hue.
 - Active dawn reset recovery намеренно отложен на следующую итерацию.
+
+
+## 2026-09-26 — DAWN R1 пройден; создан DAWN R2
+
+- Владелец подтвердил DAWN R1 визуально и функционально.
+- **ФАКТ:** manual accelerated dawn, parameter changes, STOP и alarm-start работают.
+- Создан `nano_dawn_r2` с RTC-based reset recovery.
+- R2 сохраняет runtime только на START/COMPLETE/STOP; прогресс после reset восстанавливается по DS3231, без частых EEPROM writes.
+- Runtime source: ALARM/MANUAL/TEST.
+- Добавлены `RUNTIME_SAVED`, `RECOVERED` и `EVENT DAWN_RECOVER`.
+- Создан `DAWN_R2_TEST.md`.
