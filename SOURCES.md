@@ -902,3 +902,13 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 - FastLED Wiki: Performance and Timing — для AVR (Uno/Nano/Mega) `FASTLED_ALLOW_INTERRUPTS=0` по умолчанию; при clockless WS2812 прерывания отключаются на весь кадр, что может мешать hardware Serial и другим interrupt-driven перифериям.
 - Источник: https://github.com/FastLED/FastLED/wiki/Performance-and-Timing
 - Использование в ARDU: объяснение периодических повреждённых Serial-команд при активном `FastLED.show()`; финальный UART требует устойчивого протокола/ACK-retry.
+
+
+## FastLED AVR — interrupt policy
+
+- FastLED current AVR platform README states `FASTLED_ALLOW_INTERRUPTS` defaults to `0` on AVR and may be forced to `1` with tighter timing constraints.
+- FastLED config documents `FASTLED_INTERRUPT_RETRY_COUNT` with default retry count 2 for frames disrupted by long interrupts.
+- Sources:
+  - https://github.com/FastLED/FastLED/blob/master/src/platforms/avr/README.md
+  - https://github.com/FastLED/FastLED/blob/master/src/fastled_config.h
+- ARDU use: M05 R4 transport experiment enabling interrupts during WS2812B output, followed by hardware regression for both UART reliability and LED signal integrity.
