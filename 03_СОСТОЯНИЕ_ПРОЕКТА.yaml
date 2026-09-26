@@ -748,3 +748,24 @@ firmware_m05_r2_adc_recovered_2026_09_26:
   saturation: false
   previous_out_a0_fault_currently_present: false
   next: CALF_and_all_submodes
+
+
+firmware_m05_r2_reset_invalid_dc_2026_09_26:
+  status: invalid_test_state
+  before_reset: {submode: THREE, dc: 255, spectr_low_pass: 68, cal: true, uptime_ms: 710801}
+  after_reset_first_seen: {submode: LOW, dc: 1000, spectr_low_pass: 40, cal: true, uptime_ms: 120349}
+  reset_proven_by_uptime_drop: true
+  reset_cause: unknown
+  submode_results_after_reset_valid: false
+
+firmware_m05_r3_2026_09_26:
+  code_path: "04_Прошивка/nano_m05_r3/nano_m05_r3.ino"
+  mode_id: M05
+  revision: 3
+  invalid_dc_guard: {min: 120, max: 400}
+  invalid_calf_behavior: "ERR CALF_BAD_DC; CAL remains NO"
+  status_has_dc_ok: true
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_then_status_adc_calf_status
