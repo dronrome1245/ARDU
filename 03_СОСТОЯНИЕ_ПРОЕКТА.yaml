@@ -836,3 +836,34 @@ firmware_m08_r1_2026_09_26:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_adc_calf_visual_speed
+
+
+firmware_m08_r1_result_2026_09_26:
+  status: passed_on_hardware
+  submodes: [THREE, LOW, MID, HIGH]
+  speed_values_verified_ms: [5, 20, 50, 11]
+  dc: 250
+  dc_ok: true
+  spectr_low_pass: 36
+  cal: true
+  active_ring_uart_errors: 0
+  visual_behavior: passed
+
+firmware_m09_r1_2026_09_26:
+  code_path: "04_Прошивка/nano_m09_r1/nano_m09_r1.ino"
+  mode_id: M09
+  revision: 1
+  name: spectrum_analyzer
+  displayed_bins: 20
+  fht_bin_first: 2
+  hue_start_default: 0
+  hue_step_default: 5
+  light_smooth: 2
+  odd_43_led_center_adaptation: true
+  diagnostic_command: SPEC
+  inherited_uart_fix: {fastled_allow_interrupts: true, serial_rx_guard_ms: 5}
+  inherited_dc_guard: true
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_adc_calf_visual_spec
