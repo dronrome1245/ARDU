@@ -344,6 +344,23 @@
 - Alarm daily-trigger lock из ALARM R1 сохраняется, поэтому reset внутри alarm-dawn не должен создавать второй `ALARM_TRIGGER`.
 - **НЕ ПРОВЕРЕНО:** compile/upload/runtime DAWN R2.
 
+### 2026-09-26 — DAWN R2 пройден; FW-8 закрыт; подготовлен NIGHT R1
+
+- DAWN R2 alarm path подтверждён: `21:19:00 ALARM_TRIGGER → DAWN_START 60 s → DAWN_COMPLETE`.
+- TEST recovery подтверждён: после reset на 19-й секунде получено `EVENT DAWN_RECOVER PHASE=RUNNING SOURCE=TEST ELAPSED_S=19 REMAINING_S=11`; рассвет завершился по исходной шкале времени.
+- HOLD/STOP persistence подтверждены: после STOP состояние `IDLE` сохраняется через reset.
+- Alarm recovery подтверждён: после reset на 19-й секунде alarm-dawn восстановился как `SOURCE=ALARM ... REMAINING_S=41`, без повторного `ALARM_TRIGGER`, затем завершился штатно.
+- **ФАКТ:** DAWN R2 reset recovery полностью пройден на одном D6-кольце.
+- **ФАКТ:** этап FW-8 (DS3231 + alarm + dawn + reset recovery) закрыт.
+- Следующий этап по утверждённому порядку — FW-9 «Ночник».
+- Создан `04_Прошивка/nano_night_r1/nano_night_r1.ino` и `04_Прошивка/NIGHT_R1_TEST.md`.
+- NIGHT R1: постоянный HSV, ON/OFF, `HUE/SAT/BRIGHT`, немедленное сохранение во внутреннюю EEPROM и восстановление после reset.
+- Defaults на чистой EEPROM: `POWER=OFF HUE=24 SAT=180 BRIGHTNESS=18`; значения цвета/яркости соответствуют текущему примеру API v1, POWER=OFF выбран как безопасный startup default.
+- EEPROM block NIGHT R1 начинается с offset 64, не пересекается с alarm/dawn test blocks.
+- NIGHT R1 наследует проверенный FastLED/UART fix.
+- Расписание ночника в R1 не входит: по функциональной модели это дополнительная функция после базового ночника.
+- **НЕ ПРОВЕРЕНО:** compile/upload/runtime NIGHT R1.
+
 ## Следующая контрольная точка
 
 **Питание измерено, потолочная разводка определена, окончательный BOM утверждён, ESP8266 прошивается и устойчиво обменивается командами с Nano; одно кольцо управляется по Wi‑Fi.**
