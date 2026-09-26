@@ -1339,3 +1339,18 @@
 - Runtime source: ALARM/MANUAL/TEST.
 - Добавлены `RUNTIME_SAVED`, `RECOVERED` и `EVENT DAWN_RECOVER`.
 - Создан `DAWN_R2_TEST.md`.
+
+
+## 2026-09-26 — DAWN R2 пройден; FW-8 закрыт; создан NIGHT R1
+
+- TEST recovery: reset at ~19 s → `RUNNING / REMAINING_S=11` → complete on original 30-s timeline.
+- HOLD and STOP persistence passed.
+- ALARM recovery: reset during 60-s alarm dawn → `SOURCE=ALARM ELAPSED_S=19 REMAINING_S=41`; duplicate alarm trigger absent.
+- **ФАКТ:** DAWN R2 hardware pass and FW-8 complete.
+- Создан `nano_night_r1`:
+  - constant HSV;
+  - default OFF / HUE 24 / SAT 180 / brightness 18;
+  - EEPROM persistence at offset 64;
+  - restore ON/OFF and visual settings after reset;
+  - FastLED/UART fix inherited.
+- Schedule intentionally deferred.
