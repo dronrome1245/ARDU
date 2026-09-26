@@ -137,8 +137,6 @@ void printStatus() {
   Serial.print(settings.speed);
   Serial.print(F(" STEP10="));
   Serial.print(settings.step10);
-  Serial.print(F(" STEP_X10="));
-  Serial.print(settings.step10);
   Serial.print(F(" FRAME_MS="));
   Serial.print(ArduConfig::RAINBOW_INTERVAL_MS);
   Serial.print(F(" LEDS="));
