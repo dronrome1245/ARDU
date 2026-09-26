@@ -948,3 +948,30 @@ firmware_ambient_r1_2026_09_26:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_manual_auto_cycle
+
+
+ambient_r1_result_2026_09_26:
+  status: passed_on_hardware
+  effects: [F01, F02, F03]
+  manual_effect_select: passed
+  next_prev: passed
+  auto_cycle: passed
+  fw7_closed: true
+
+firmware_rtc_r1_2026_09_26:
+  code_path: "04_Прошивка/nano_rtc_r1/nano_rtc_r1.ino"
+  wiring_doc: "04_Прошивка/RTC_DS3231_WIRING.md"
+  revision: 1
+  device: DS3231
+  i2c_address: "0x68"
+  pins: {sda: A4, scl: A5}
+  external_library_required: false
+  commands: [STATUS, TIME, TEMP, SET, CLEAROSF]
+  charge_resistor_201_removed_verified: false
+  cr2032_installed: true
+  hardware_power_allowed_with_cr2032: false
+  compile_verified: false
+  upload_verified: false
+  rtc_present_verified: false
+  retention_verified: false
+  next: remove_201_then_verify_upload_rtc_test
