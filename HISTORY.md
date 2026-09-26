@@ -1312,3 +1312,19 @@
 - **ФАКТ:** RTC R1 hardware pass.
 - Создан `nano_alarm_r1`: ежедневный trigger без LED dawn, persistent alarm settings во внутренней EEPROM Nano.
 - EEPROM format: magic/version/checksum + enabled + HH:MM + last-trigger date.
+
+
+## 2026-09-26 — ALARM R1 пройден; создан DAWN R1
+
+- Alarm settings пережили reset Nano: `20:50 / ON / SAVED=YES`.
+- Ежедневный trigger: `EVENT ALARM_TRIGGER RTC=2026-09-26 20:50:00`.
+- Повтор в `20:50:07` произошёл только после явной команды `ALARM CLEARLAST`, которая предназначена именно для снятия daily-trigger lock при повторных тестах.
+- **ФАКТ:** ALARM R1 hardware pass.
+- Создан `nano_dawn_r1`:
+  - D6/43 WS2812B;
+  - FastLED IRQ + RX guard;
+  - manual accelerated `DAWN TEST`;
+  - alarm-triggered real-duration dawn;
+  - STOP and HOLD states;
+  - persistent fade/max brightness/start hue/end hue.
+- Active dawn reset recovery намеренно отложен на следующую итерацию.
