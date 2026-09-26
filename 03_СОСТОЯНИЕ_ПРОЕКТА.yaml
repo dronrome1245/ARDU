@@ -867,3 +867,32 @@ firmware_m09_r1_2026_09_26:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_adc_calf_visual_spec
+
+
+firmware_m09_r1_result_2026_09_26:
+  status: passed_on_hardware
+  adc: {avg: 251, min: 231, max: 274, p2p: 43}
+  calf: {dc: 251, quiet_max: 42, spectr_low_pass: 45}
+  spec_dynamic_on_music: true
+  hue_start_test: 80
+  hue_step_test: 12
+  defaults_restored: {hue_start: 0, hue_step: 5}
+  active_ring_uart_errors: 0
+  visual_behavior: passed
+
+fw6_result_2026_09_26:
+  status: passed_on_one_ring
+  modes: [M03, M04, M05, M08, M09]
+
+firmware_f02_r1_2026_09_26:
+  code_path: "04_Прошивка/nano_f02_r1/nano_f02_r1.ino"
+  mode_id: F02
+  revision: 1
+  name: smooth_color_cycle
+  defaults: {brightness: 64, hue: 0, saturation: 255, speed_ms: 100}
+  commands: [HUE, SAT, SPEED, BRIGHT, ON, OFF]
+  inherited_uart_fix: {fastled_allow_interrupts: true, serial_rx_guard_ms: 5}
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_visual_parameters
