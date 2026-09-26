@@ -921,3 +921,30 @@ firmware_f03_r1_2026_09_26:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_visual_speed_step
+
+
+firmware_f03_r1_result_2026_09_26:
+  status: passed_on_hardware
+  visual_behavior: passed
+  speed_control: passed
+  spatial_step_control: passed
+  hue_control: passed
+
+firmware_ambient_r1_2026_09_26:
+  code_path: "04_Прошивка/nano_ambient_r1/nano_ambient_r1.ino"
+  revision: 1
+  mode: AMBIENT
+  effects: [F01, F02, F03]
+  default_effect: F01
+  manual_navigation: [EFFECT, NEXT, PREV]
+  auto_cycle:
+    default_enabled: false
+    default_period_s: 10
+    period_range_s: "1..255"
+    sequence: [F01, F02, F03]
+    manual_selection_resets_timer: true
+  inherited_uart_fix: {fastled_allow_interrupts: true, serial_rx_guard_ms: 5}
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_manual_auto_cycle
