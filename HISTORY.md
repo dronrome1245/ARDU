@@ -1202,3 +1202,20 @@
 - По документации FastLED на AVR clockless WS2812 вывод блокирует прерывания на время кадра; это может приводить к потере UART-байтов.
 - **ПРЕДПОЛОЖЕНИЕ:** предыдущие `ERR UNKNOWN_COMMAND` были следствием повреждённой строки команды из-за UART/FastLED timing collision.
 - Код пока не менять: сначала воспроизводимый ON/OFF A/B-тест; для финального UART предусмотреть ACK/retry.
+
+
+## 2026-09-26 — M05 visual logic passed; UART errors reproduce only with active ring; R4 created
+
+- Visual M05 submodes `LOW/MID/HIGH/THREE` confirmed correct by owner.
+- With ring active, repeated Serial commands reproducibly produce `ERR UNKNOWN_COMMAND` / `ERR BAD_SUBMODE`.
+- With `POWER=OFF`, six consecutive `ADC` commands completed successfully.
+- Final R3 STATUS remained valid: `DC=249 DC_OK=YES LP=36 CAL=YES`, uptime increased normally.
+- This isolates remaining defect to Serial/FastLED coexistence rather than M05 frequency logic.
+- FastLED AVR docs: `FASTLED_ALLOW_INTERRUPTS` defaults to 0 on AVR and can be forced to 1 before including `FastLED.h`.
+- Created `04_Прошивка/nano_m05_r4/nano_m05_r4.ino`:
+  - `REV=4`;
+  - `FASTLED_ALLOW_INTERRUPTS=1`;
+  - `SERIAL_RX_GUARD_MS=5`;
+  - main render skips starting a new `FastLED.show()` while Serial bytes are arriving;
+  - STATUS exposes `FASTLED_IRQ=ON RX_GUARD_MS=5`.
+- Hardware regression required: commands while ring continuously lit + LED visual stability.
