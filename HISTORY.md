@@ -1276,3 +1276,15 @@
 - F03 R1 повторяет ColorMusic running rainbow: frame interval 30 ms, default hue shift 1 за frame, spatial step 0.5 hue/LED.
 - Тестовый Serial interface: `SPEED 1..20`; `STEP10 5..100` хранит spatial step ×10.
 - FastLED/UART fix перенесён.
+
+
+## 2026-09-26 — F03 R1 пройден; создан AMBIENT R1
+
+- Владелец подтвердил визуальную работу F03 R1 и всех запрошенных параметров.
+- **ФАКТ:** F03 R1 hardware pass.
+- Создан `04_Прошивка/nano_ambient_r1/nano_ambient_r1.ino`.
+- Контроллер объединяет F01/F02/F03 и добавляет ручные `EFFECT/NEXT/PREV`.
+- Добавлен автоперебор `AUTO ON/OFF` с `PERIOD 1..255` секунд; default 10 s, AUTO=OFF.
+- При ручной смене эффекта auto timer начинается заново.
+- Параметры эффектов хранятся отдельно, чтобы возврат к эффекту восстанавливал его последнее состояние.
+- FastLED/UART fix перенесён.
