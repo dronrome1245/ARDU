@@ -1037,3 +1037,28 @@ firmware_dawn_r1_2026_09_26:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_manual_test_then_alarm_trigger
+
+
+dawn_r1_result_2026_09_26:
+  status: passed_on_hardware
+  visual_trajectory: passed
+  parameter_regression: passed
+  dawn_stop: passed
+  alarm_triggered_dawn: passed
+
+firmware_dawn_r2_2026_09_26:
+  code_path: "04_Прошивка/nano_dawn_r2/nano_dawn_r2.ino"
+  test_doc: "04_Прошивка/DAWN_R2_TEST.md"
+  revision: 2
+  alarm_time_semantics: dawn_start
+  recovery_clock: DS3231
+  runtime_storage:
+    eeprom_base: 32
+    writes_only_on: [START, COMPLETE, STOP]
+    persisted: [phase, source, start_rtc_seconds, duration_seconds]
+  recovery_sources: [ALARM, MANUAL, TEST]
+  status_fields: [SOURCE, RUNTIME_SAVED, RECOVERED]
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: active_dawn_reset_recovery_test
