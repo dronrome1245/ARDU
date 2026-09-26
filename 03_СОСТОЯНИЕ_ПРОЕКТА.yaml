@@ -1003,3 +1003,37 @@ firmware_alarm_r1_2026_09_26:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_persistence_daily_trigger
+
+
+alarm_r1_result_2026_09_26:
+  status: passed_on_hardware
+  persisted_after_reset: true
+  alarm_time_tested: "20:50"
+  first_trigger: "2026-09-26 20:50:00"
+  duplicate_without_clearlast: false
+  clearlast_retrigger_same_minute_expected: true
+
+firmware_dawn_r1_2026_09_26:
+  code_path: "04_Прошивка/nano_dawn_r1/nano_dawn_r1.ino"
+  test_doc: "04_Прошивка/DAWN_R1_TEST.md"
+  revision: 1
+  default_settings:
+    fade_minutes: 30
+    max_brightness: 120
+    start_hue: 8
+    end_hue: 32
+  trajectory:
+    brightness: linear
+    hue: shortest_hsv_arc
+    completion_state: HOLD
+  manual_test_seconds_range: "5..120"
+  alarm_trigger_starts_dawn: true
+  dawn_stop_supported: true
+  alarm_eeprom_backward_compatible: true
+  dawn_eeprom_block_base: 16
+  inherited_uart_fix: true
+  active_dawn_reset_recovery: false
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_manual_test_then_alarm_trigger
