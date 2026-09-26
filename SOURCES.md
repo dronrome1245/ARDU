@@ -895,3 +895,10 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 - `CALF DC=234 QUIET_MAX=33 SPECTR_LOW_PASS=36`.
 
 Перед этим `ADC AVG=237 MIN=225 MAX=250`. Следовательно, повторная DC-калибровка согласована с физическим входом, а spectrum gate вернулся к ранее успешно проверенному значению 36.
+
+
+## FastLED — AVR interrupt blackout при WS2812
+
+- FastLED Wiki: Performance and Timing — для AVR (Uno/Nano/Mega) `FASTLED_ALLOW_INTERRUPTS=0` по умолчанию; при clockless WS2812 прерывания отключаются на весь кадр, что может мешать hardware Serial и другим interrupt-driven перифериям.
+- Источник: https://github.com/FastLED/FastLED/wiki/Performance-and-Timing
+- Использование в ARDU: объяснение периодических повреждённых Serial-команд при активном `FastLED.show()`; финальный UART требует устойчивого протокола/ACK-retry.
