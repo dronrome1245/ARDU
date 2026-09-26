@@ -1262,3 +1262,17 @@
 - Создан `04_Прошивка/nano_f02_r1/nano_f02_r1.ino`.
 - F02 R1: ColorMusic light_mode=1, `HUE=0`, `SAT=255`, `SPEED_MS=100`, brightness 64; UART fix перенесён.
 - Следующий критерий: Verify/Upload F02 R1 и визуальная проверка плавной смены цвета/скорости/насыщенности.
+
+
+## 2026-09-26 — F02 R1 полностью пройден; создан F03 R1
+
+- F02 визуально подтверждён.
+- `SPEED 20` ускоряет цикл, `SPEED 200` замедляет; возврат 100 подтверждён.
+- `SAT 80` / `SAT 255` визуально работают.
+- `HUE 96` меняет текущую точку цикла; далее HUE продолжает двигаться.
+- Active-effect STATUS burst прошёл без Serial errors; uptime растёт.
+- **ФАКТ:** F02 R1 hardware pass.
+- Создан `04_Прошивка/nano_f03_r1/nano_f03_r1.ino`.
+- F03 R1 повторяет ColorMusic running rainbow: frame interval 30 ms, default hue shift 1 за frame, spatial step 0.5 hue/LED.
+- Тестовый Serial interface: `SPEED 1..20`; `STEP10 5..100` хранит spatial step ×10.
+- FastLED/UART fix перенесён.
