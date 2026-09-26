@@ -784,3 +784,25 @@ firmware_m05_r3_guard_test_2026_09_26:
   submode_commands_passed: [THREE, LOW, MID, HIGH, THREE]
   guard_hardware_verified: true
   analog_path_stability_pending: true
+
+
+firmware_m05_r3_visual_uart_result_2026_09_26:
+  visual_submodes_passed: [THREE, LOW, MID, HIGH]
+  active_ring_serial_errors_reproduced: true
+  power_off_serial_burst_clean: true
+  final_r3_status: {dc: 249, dc_ok: true, spectr_low_pass: 36, cal: true, uptime_ms: 3152824}
+  reset_during_final_visual_series: false
+  remaining_fault: FastLED_UART_coexistence
+
+firmware_m05_r4_2026_09_26:
+  code_path: "04_Прошивка/nano_m05_r4/nano_m05_r4.ino"
+  mode_id: M05
+  revision: 4
+  fastled_allow_interrupts: true
+  serial_rx_guard_ms: 5
+  status_fields: [FASTLED_IRQ, RX_GUARD_MS]
+  compile_verified: false
+  upload_verified: false
+  uart_stress_verified: false
+  led_visual_regression_verified: false
+  next: verify_upload_then_active_ring_uart_stress
