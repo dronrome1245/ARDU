@@ -330,6 +330,20 @@
 - **ОГРАНИЧЕНИЕ R1:** восстановление прогресса активного рассвета после reset ещё не реализовано; это следующий слой после визуального/trigger pass.
 - **НЕ ПРОВЕРЕНО:** compile/upload/runtime DAWN R1.
 
+### 2026-09-26 — DAWN R1 пройден; подготовлен DAWN R2 reset recovery
+
+- Владелец подтвердил DAWN R1 полностью и визуально: ускоренный рассвет, параметры, STOP и запуск от alarm работают.
+- **ФАКТ:** DAWN R1 hardware pass.
+- Семантика текущей v1 сохранена: `ALARM_TIME` — момент запуска рассвета; `FADE_MIN` задаёт длительность после этого момента.
+- Создан `04_Прошивка/nano_dawn_r2/nano_dawn_r2.ino` и `04_Прошивка/DAWN_R2_TEST.md`.
+- R2 добавляет reset recovery без периодических записей EEPROM: на START сохраняются RTC start + duration + source; после reset прогресс вычисляется по DS3231.
+- Runtime EEPROM пишется только на переходах `START / COMPLETE(HOLD) / STOP(IDLE)`.
+- Поддерживается recovery для `TEST`, `MANUAL` и `ALARM`.
+- STATUS R2 добавляет `SOURCE`, `RUNTIME_SAVED`, `RECOVERED`.
+- Ожидаемое событие при восстановлении активного рассвета: `EVENT DAWN_RECOVER PHASE=RUNNING ...`.
+- Alarm daily-trigger lock из ALARM R1 сохраняется, поэтому reset внутри alarm-dawn не должен создавать второй `ALARM_TRIGGER`.
+- **НЕ ПРОВЕРЕНО:** compile/upload/runtime DAWN R2.
+
 ## Следующая контрольная точка
 
 **Питание измерено, потолочная разводка определена, окончательный BOM утверждён, ESP8266 прошивается и устойчиво обменивается командами с Nano; одно кольцо управляется по Wi‑Fi.**
