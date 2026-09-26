@@ -1097,3 +1097,39 @@ firmware_night_r1_2026_09_26:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_visual_and_persistence
+
+
+firmware_night_r1_2026_09_26:
+  status: superseded_before_hardware_test
+  superseded_by: NIGHT_R2
+
+firmware_night_r2_2026_09_26:
+  code_path: "04_Прошивка/nano_night_r2/nano_night_r2.ino"
+  test_doc: "04_Прошивка/NIGHT_R2_TEST.md"
+  revision: 2
+  mode: NIGHT
+  defaults:
+    manual_power: false
+    hue: 24
+    saturation: 180
+    brightness: 18
+    schedule_enabled: false
+    schedule_on: "22:00"
+    schedule_off: "07:00"
+  schedule:
+    rtc: DS3231
+    supports_overnight: true
+    interval_semantics: "[on, off)"
+    manual_on_off_disables_schedule: true
+    visual_changes_keep_schedule: true
+    invalid_rtc_fail_safe_power: false
+    transition_eeprom_writes: false
+  storage:
+    eeprom_base: 64
+    version: 2
+    persisted: [manual_power, hue, saturation, brightness, schedule_enabled, schedule_on, schedule_off]
+  inherited_uart_fix: true
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_manual_schedule_persistence
