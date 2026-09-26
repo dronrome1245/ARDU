@@ -1062,3 +1062,38 @@ firmware_dawn_r2_2026_09_26:
   upload_verified: false
   hardware_verified: false
   next: active_dawn_reset_recovery_test
+
+
+dawn_r2_result_2026_09_26:
+  status: passed_on_hardware
+  test_recovery_running: passed
+  recovered_test_elapsed_s: 19
+  recovered_test_remaining_s: 11
+  hold_persistence: passed
+  stop_persistence: passed
+  alarm_recovery_running: passed
+  recovered_alarm_elapsed_s: 19
+  recovered_alarm_remaining_s: 41
+  duplicate_alarm_after_reset: false
+  fw8_closed: true
+
+firmware_night_r1_2026_09_26:
+  code_path: "04_Прошивка/nano_night_r1/nano_night_r1.ino"
+  test_doc: "04_Прошивка/NIGHT_R1_TEST.md"
+  revision: 1
+  mode: NIGHT
+  defaults:
+    power: false
+    hue: 24
+    saturation: 180
+    brightness: 18
+  storage:
+    eeprom_base: 64
+    persisted: [power, hue, saturation, brightness]
+    guard: [magic, version, checksum]
+  schedule_enabled: false
+  inherited_uart_fix: true
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_visual_and_persistence
