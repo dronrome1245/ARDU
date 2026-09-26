@@ -1354,3 +1354,14 @@
   - restore ON/OFF and visual settings after reset;
   - FastLED/UART fix inherited.
 - Schedule intentionally deferred.
+
+
+## 2026-09-26 — по решению владельца NIGHT R1 заменён NIGHT R2 до hardware pass
+
+- Отдельный NIGHT R1 hardware test не выполнялся.
+- Создан `nano_night_r2`: базовый persistent nightlight + DS3231 schedule.
+- Default schedule disabled; default times 22:00→07:00.
+- Overnight interval supported with `[ON, OFF)` semantics.
+- Manual ON/OFF disables schedule; visual parameter changes do not.
+- Schedule transitions derive effective power from RTC without EEPROM writes.
+- RTC-invalid fail-safe while schedule enabled = light OFF.
