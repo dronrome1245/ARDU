@@ -1219,3 +1219,18 @@
   - main render skips starting a new `FastLED.show()` while Serial bytes are arriving;
   - STATUS exposes `FASTLED_IRQ=ON RX_GUARD_MS=5`.
 - Hardware regression required: commands while ring continuously lit + LED visual stability.
+
+
+## 2026-09-26 — M05 R4 полностью пройден; создан M08 R1
+
+- При активно светящемся кольце UART stress-test R4 пройден без единого `UNKNOWN_COMMAND`/ `BAD_SUBMODE`.
+- Владелец подтвердил визуальную стабильность WS2812B.
+- **ФАКТ:** комбинация `FASTLED_ALLOW_INTERRUPTS=1` + RX guard 5 ms решила воспроизводимую проблему Serial/FastLED на текущем Nano/43 LED стенде.
+- M05 R4 считается полностью пройденным на железе.
+- Создан `04_Прошивка/nano_m08_r1/nano_m08_r1.ino`.
+- M08 основан на оригинальном ColorMusic v2.10 running frequencies (mode 8 / internal case 7): активный цвет рождается в середине и двигается к краям.
+- ARDU adaptation for 43 odd LEDs: один центральный pixel index 21; trail сдвигается от центра к обоим концам DATA-цепочки.
+- Подрежимы: `THREE/LOW/MID/HIGH`; `THREE` priority = HIGH→MID→LOW.
+- Параметр `SPEED 1..255` задаёт интервал шага в ms; default 11.
+- M08 R1 наследует проверенный R4 UART transport fix и R3 DC/CALF guard.
+- **НЕ ПРОВЕРЕНО:** compile/upload/runtime M08 R1.
