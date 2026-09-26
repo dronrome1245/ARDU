@@ -806,3 +806,33 @@ firmware_m05_r4_2026_09_26:
   uart_stress_verified: false
   led_visual_regression_verified: false
   next: verify_upload_then_active_ring_uart_stress
+
+
+firmware_m05_r4_result_2026_09_26:
+  status: passed_on_hardware
+  visual_submodes: passed
+  active_ring_uart_stress: passed
+  unknown_command_errors: 0
+  bad_submode_errors: 0
+  led_visual_artifacts: false
+  transport_baseline:
+    fastled_allow_interrupts: true
+    serial_rx_guard_ms: 5
+
+firmware_m08_r1_2026_09_26:
+  code_path: "04_Прошивка/nano_m08_r1/nano_m08_r1.ino"
+  mode_id: M08
+  revision: 1
+  name: running_frequencies
+  submodes: [THREE, LOW, MID, HIGH]
+  default_submode: THREE
+  running_speed_ms_default: 11
+  running_speed_range_ms: "1..255"
+  odd_43_led_center_index: 21
+  direction: center_to_both_data_chain_ends
+  inherited_uart_fix: {fastled_allow_interrupts: true, serial_rx_guard_ms: 5}
+  inherited_dc_guard: true
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_adc_calf_visual_speed
