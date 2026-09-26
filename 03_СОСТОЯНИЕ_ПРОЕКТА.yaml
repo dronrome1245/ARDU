@@ -769,3 +769,18 @@ firmware_m05_r3_2026_09_26:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_then_status_adc_calf_status
+
+
+firmware_m05_r3_guard_test_2026_09_26:
+  startup_dc: 249
+  adc: {avg: 250, min: 223, max: 288, p2p: 65}
+  rejected_calf_dc: [26, 25]
+  accepted_calf:
+    - {dc: 250, quiet_max: 42, spectr_low_pass: 45}
+    - {dc: 250, quiet_max: 33, spectr_low_pass: 36}
+    - {dc: 251, quiet_max: 33, spectr_low_pass: 36}
+  final_status: {dc: 251, dc_ok: true, cal: true, spectr_low_pass: 36}
+  reset_during_series: false
+  submode_commands_passed: [THREE, LOW, MID, HIGH, THREE]
+  guard_hardware_verified: true
+  analog_path_stability_pending: true
