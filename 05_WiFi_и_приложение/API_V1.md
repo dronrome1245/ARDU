@@ -125,7 +125,10 @@
   "enabled":true,
   "hue":24,
   "saturation":180,
-  "brightness":18
+  "brightness":18,
+  "schedule_enabled":true,
+  "schedule_on":"22:00",
+  "schedule_off":"07:00"
 }
 ```
 
