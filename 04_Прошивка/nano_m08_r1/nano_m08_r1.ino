@@ -25,7 +25,7 @@
 #endif
 
 // AVR/FastLED: keep UART RX interrupts alive while WS2812B data is sent.
-// R4 transport experiment; hardware regression must confirm LED signal remains stable.
+// Proven M05 R4 transport fix carried forward: UART RX remains available during WS2812B output.
 #define FASTLED_ALLOW_INTERRUPTS 1
 #include <FastLED.h>
 
