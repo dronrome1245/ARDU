@@ -737,3 +737,14 @@ m05_r2_out_a0_fault_2026_09_25:
   out_to_a0_path_ok: false
   likely_fault: wire_contact_or_a0_loading
   calf_allowed: false
+
+
+firmware_m05_r2_adc_recovered_2026_09_26:
+  avg: 250
+  min: 241
+  max: 262
+  p2p: 21
+  valid: true
+  saturation: false
+  previous_out_a0_fault_currently_present: false
+  next: CALF_and_all_submodes
