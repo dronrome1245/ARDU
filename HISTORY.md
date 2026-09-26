@@ -1234,3 +1234,17 @@
 - Параметр `SPEED 1..255` задаёт интервал шага в ms; default 11.
 - M08 R1 наследует проверенный R4 UART transport fix и R3 DC/CALF guard.
 - **НЕ ПРОВЕРЕНО:** compile/upload/runtime M08 R1.
+
+
+## 2026-09-26 — M08 R1 полностью пройден; создан M09 R1
+
+- Визуально подтверждены M08 `THREE/LOW/MID/HIGH`.
+- `SPEED 5`, `20`, `50`, возврат `11` работают ожидаемо.
+- Активный UART/FastLED regression пройден: последовательные STATUS без ошибок, uptime растёт.
+- Финальные значения: `DC=250`, `DC_OK=YES`, `LP=36`, `CAL=YES`.
+- **ФАКТ:** M08 R1 закрыт на железе.
+- Создан `04_Прошивка/nano_m09_r1/nano_m09_r1.ino`.
+- M09 основан на ColorMusic v2.10 analyzer case: 20 displayed bins, `HUE_START=0`, `HUE_STEP=5`, `LIGHT_SMOOTH=2`.
+- Добавлена команда `SPEC` для печати 20 текущих peak-hold значений и `MAXF`.
+- Для 43 LED выполнена симметричная odd-count adaptation с одним центральным LED.
+- R4 transport fix и R3 DC guard перенесены без изменения.
