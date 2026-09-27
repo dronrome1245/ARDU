@@ -1259,3 +1259,19 @@
   - EEPROM save/cancel.
 - Для трёх детей рекомендуемый calibration session = 9 successful pairs (по 3 на каждого).
 - Следующий шаг: Verify/Upload R3 CAL и выполнить family calibration test.
+
+
+### 2026-09-27 — clap calibration deferred; FW-10 CORE R1 created
+
+- **РЕШЕНИЕ владельца:** семейную clap calibration выполнять позже через приложение.
+- До calibration default: `double clap / TRSH=70 / TIMEOUT=500 ms`.
+- Создан первый общий интеграционный sketch:
+  `04_Прошивка/nano_fw10_core_r1/nano_fw10_core_r1.ino`.
+- Создан полный test plan:
+  `04_Прошивка/FW10_CORE_R1_TEST.md`.
+- CORE R1 объединяет: 44-LED L01, clap, DS3231, Alarm/Dawn R2, Night R2, EEPROM blocks и reset/power-on policy.
+- Старые 43-LED sketches не изменены.
+- R1 намеренно оставляет D7 LOW и current limit=500 mA для безопасного one-ring integration test.
+- Ambient/Music пока не включены; они добавляются после CORE pass отдельными интеграционными слоями.
+- **НЕ ПРОВЕРЕНО:** compile/upload FW-10 CORE R1.
+- Следующий практический шаг: Verify/Upload CORE R1; если compile fails — остановиться и исправить до hardware tests.
