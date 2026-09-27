@@ -27,3 +27,7 @@ build/
 *.log
 *.tmp
 *.bak
+
+
+# Local ARDU Wi-Fi credentials
+05_WiFi_и_приложение/esp8266_http_bridge_r1/wifi_secrets.h
