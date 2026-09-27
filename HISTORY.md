@@ -1573,3 +1573,12 @@
 - Root cause was Arduino .ino generated prototypes appearing before those local type declarations.
 - Moved both persistence structs into the common top-level type section; behavior unchanged.
 - No other custom type is used before declaration in the current file.
+
+
+## 2026-09-27 — FW10 CORE R1 compile passed
+
+- After Arduino prototype-order fix, FW10 CORE R1 compiles successfully.
+- Flash usage: 26014/30720 bytes (84%).
+- Global SRAM: 1316/2048 bytes (64%), 732 bytes reported available for locals/stack.
+- Memory budget becomes an explicit constraint before integrating FHT/music layers.
+- Owner has Android Studio available for later mobile-app implementation.
