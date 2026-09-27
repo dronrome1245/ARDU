@@ -673,27 +673,48 @@ void saveLight() {
 
 // -------------------- EEPROM: Clap/Core --------------------
 
+struct ClapPersist {
+  uint16_t magic;
+  uint8_t version;
+  uint16_t threshold;
+  uint16_t timeoutMs;
+  uint8_t sum;
+};
+
+uint8_t clapChecksum(const ClapPersist& d) {
+  const uint8_t* p=reinterpret_cast<const uint8_t*>(&d);
+  uint8_t s=0xA7;
+  for(size_t i=0;i<sizeof(ClapPersist)-1;++i){
+    s=static_cast<uint8_t>((s<<1)|(s>>7)); s^=p[i];
+  }
+  return s;
+}
+
 void loadClap() {
-  uint8_t b[8];
-  for(uint8_t i=0;i<8;++i) b[i]=EEPROM.read(Cfg::CLAP_BASE+i);
-  const uint16_t magic=static_cast<uint16_t>(b[0])|(static_cast<uint16_t>(b[1])<<8);
-  const uint16_t tr=static_cast<uint16_t>(b[3])|(static_cast<uint16_t>(b[4])<<8);
-  const uint16_t to=static_cast<uint16_t>(b[5])|(static_cast<uint16_t>(b[6])<<8);
-  const bool ok=magic==Cfg::CLAP_MAGIC && b[2]==Cfg::CLAP_VER &&
-      EEPROM.read(Cfg::CLAP_BASE+8)==checksum(b,8) &&
-      tr>=20 && tr<=300 && to>=250 && to<=1200;
+  ClapPersist d;
+  EEPROM.get(Cfg::CLAP_BASE,d);
+  const bool ok=d.magic==Cfg::CLAP_MAGIC && d.version==Cfg::CLAP_VER &&
+      d.threshold>=20 && d.threshold<=300 &&
+      d.timeoutMs>=250 && d.timeoutMs<=1200 &&
+      d.sum==clapChecksum(d);
   if(!ok){ clapCfg=ClapSettings(); return; }
-  clapCfg.threshold=tr; clapCfg.timeoutMs=to; clapCfg.storageValid=true; clapCfg.dirty=false;
+  clapCfg.threshold=d.threshold;
+  clapCfg.timeoutMs=d.timeoutMs;
+  clapCfg.storageValid=true;
+  clapCfg.dirty=false;
 }
 
 void saveClap() {
-  uint8_t b[8];
-  b[0]=Cfg::CLAP_MAGIC&0xFF; b[1]=Cfg::CLAP_MAGIC>>8; b[2]=Cfg::CLAP_VER;
-  b[3]=clapCfg.threshold&0xFF; b[4]=clapCfg.threshold>>8;
-  b[5]=clapCfg.timeoutMs&0xFF; b[6]=clapCfg.timeoutMs>>8; b[7]=0;
-  for(uint8_t i=0;i<8;++i) EEPROM.update(Cfg::CLAP_BASE+i,b[i]);
-  EEPROM.update(Cfg::CLAP_BASE+8,checksum(b,8));
-  clapCfg.storageValid=true; clapCfg.dirty=false;
+  ClapPersist d;
+  d.magic=Cfg::CLAP_MAGIC;
+  d.version=Cfg::CLAP_VER;
+  d.threshold=clapCfg.threshold;
+  d.timeoutMs=clapCfg.timeoutMs;
+  d.sum=0;
+  d.sum=clapChecksum(d);
+  EEPROM.put(Cfg::CLAP_BASE,d);
+  clapCfg.storageValid=true;
+  clapCfg.dirty=false;
 }
 
 void loadCore() {
