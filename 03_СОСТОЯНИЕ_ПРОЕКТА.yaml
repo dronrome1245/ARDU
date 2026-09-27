@@ -1603,3 +1603,31 @@ fw10_core_r1_night_block_2026_09_27:
   manual_override_disables_schedule: passed
   owner_confirmed: true
   next: dawn_recovery_alarm_regression
+
+
+integration_regression_strategy_2026_09_27:
+  owner_decision: true
+  repeat_manual_core_regression_before_app: false
+  final_regression_via_android_app: true
+  app_platform: Android_Studio
+  app_language: Kotlin
+  transport_smoke_before_app_required: true
+
+esp8266_http_bridge_r1_2026_09_27:
+  code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r1/esp8266_http_bridge_r1.ino"
+  secrets_example: "05_WiFi_и_приложение/esp8266_http_bridge_r1/wifi_secrets.example.h"
+  test_doc: "05_WiFi_и_приложение/ESP8266_HTTP_BRIDGE_R1_TEST.md"
+  wifi_mode: station_only
+  cloud_required: false
+  uart_baud: 115200
+  endpoints:
+    - GET_api_ping
+    - GET_api_status
+    - GET_api_time
+    - POST_api_dev_nano
+    - GET_api_events
+  compile_verified: false
+  upload_verified: false
+  wifi_verified: false
+  nano_transport_verified: false
+  next: compile_upload_transport_smoke
