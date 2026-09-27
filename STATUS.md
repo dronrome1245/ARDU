@@ -1390,3 +1390,12 @@
   - ESP RST idle = 3.25 V.
 - Питание, ground path и boot strap GPIO0/RST проходят pre-upload gate.
 - Следующий шаг: загрузка ESP8266 HTTP BRIDGE R1 по подтверждённой manual-reset procedure.
+
+
+### 2026-09-27 — ESP8266 HTTP BRIDGE R1 upload passed
+
+- **ФАКТ:** физическая загрузка `esp8266_http_bridge_r1.ino` успешно завершена.
+- Esptool: ESP8266EX, crystal 26 MHz, flash auto-detected 4 MB.
+- Written: 328512 bytes (237168 compressed), 100%.
+- `Hash of data verified`.
+- Следующий шаг: перевести ESP из flash mode в normal boot, собрать рабочий Nano↔ESP UART с level divider и выполнить HTTP smoke test.
