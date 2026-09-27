@@ -1631,3 +1631,18 @@ esp8266_http_bridge_r1_2026_09_27:
   wifi_verified: false
   nano_transport_verified: false
   next: compile_upload_transport_smoke
+
+
+esp8266_http_bridge_r1_compile_result_2026_09_27:
+  compile_verified: true
+  ram_used_bytes: 30808
+  ram_total_bytes: 80192
+  ram_percent: 38
+  iram_total_used_bytes: 60223
+  iram_total_bytes: 65536
+  iram_percent: 91
+  iram_code_bytes: 27455
+  flash_used_bytes: 294372
+  flash_total_bytes: 1048576
+  flash_percent: 28
+  next: upload_physical_esp_then_http_uart_smoke
