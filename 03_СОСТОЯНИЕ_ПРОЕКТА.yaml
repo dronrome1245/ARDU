@@ -1173,14 +1173,17 @@ m02_r1_plan_2026_09_27:
   inherited_uart_fix: true
   compile_verified: true
   upload_verified: true
-  hardware_verified: false
+  hardware_verified: true
+  calibration: passed_owner_report
+  uart_stress: passed_owner_report
   visual_behavior: passed_owner_report
+  result: passed_on_hardware
   background_visible_threshold_observed:
     global_brightness: 64
     approximately_raw_background: 35
     below_threshold: visually_off
   persistence_in_test_sketch: false
-  next: complete_serial_cal_uart_evidence_then_close_m02
+  next: closed
 
 
 ordinary_light_requirements_2026_09_27:
@@ -1227,3 +1230,25 @@ settings_persistence_v1_2026_09_27:
   persist_every_slider_step: false
   final_value_requires_persistent_ack: true
   full_firmware_regression_requires_power_cycle_restore: true
+
+
+m06_r1_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_m06_r1/nano_m06_r1.ino"
+  test_doc: "04_Прошивка/M06_R1_TEST.md"
+  revision: 1
+  mode: M06
+  manual_only: true
+  startup_power: false
+  frequency10_range: "5..30"
+  frequency_hz_range: "0.5..3.0"
+  default_frequency_hz: 1.0
+  duty_percent: 20
+  brightness_range_r1: "1..128"
+  max_session_ms: 15000
+  auto_stop: true
+  immediate_off: true
+  inherited_uart_fix: true
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_full_m06_r1_test
