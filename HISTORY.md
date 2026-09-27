@@ -1539,3 +1539,12 @@
 - Пропущенные хлопки показали rawMax rises порядка 85..87, сильный распознанный — порядка 244.
 - Default GyverLib threshold 150 остаётся слишком высоким для части хлопков на текущем MAX9814.
 - Следующий обратимый test без новой прошивки: `TRSH 80`.
+
+
+## 2026-09-27 — Gyver R2 TRSH=80 partial double-clap pass
+
+- Single clap sensitivity improved at threshold 80, with extra single false positives.
+- Single-clap test produced 14 single sequences and 0 double sequences.
+- Double-clap test produced at least 4 confirmed DOUBLE_CLAP events but owner reports roughly every-other-pair reliability.
+- Successful detected pair gaps were about 141..291 ms.
+- Next reversible tuning step: threshold 70 only; keep timeout 500 ms fixed.
