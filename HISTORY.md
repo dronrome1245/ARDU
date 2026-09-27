@@ -1460,3 +1460,13 @@
 - Владелец подтвердил успешную загрузку `04_Прошивка/nano_l01_r2/nano_l01_r2.ino` на физическую Nano.
 - Compile/Verify + Upload L01 R2 пройдены.
 - Следующий gate: полный Kelvin/RGB/persistence hardware test, включая SAVE→reset и SAVE→полное снятие/возврат питания.
+
+
+## 2026-09-27 — L01 R2 passed; ring changed to 44 LED
+
+- Владелец подтвердил, что весь L01 R2 test прошёл.
+- Kelvin presets, custom RGB, brightness, SAVE/LOAD, reset restore и full power-cycle persistence подтверждены.
+- Владелец увеличил физическое кольцо до 44 WS2812B.
+- Владелец сообщил, что R2 2700 K недостаточно тёплый; желаемый 2700 K визуально соответствует прежнему R2 2200 K.
+- Создан L01 R3: LED_COUNT=44; 2700 K mapping = RGB 255,170,87.
+- До общей прошивки требуется адаптация всех 43-LED geometry assumptions.
