@@ -1497,3 +1497,52 @@ clap_gyver_r3_cal_plan_2026_09_27:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_multi_user_calibration
+
+
+clap_default_profile_2026_09_27:
+  owner_accepted_for_pre_app_use: true
+  gesture: double_clap
+  derivative_threshold: 70
+  sequence_timeout_ms: 500
+  family_calibration_deferred_to_app: true
+
+fw10_core_r1_2026_09_27:
+  code_path: "04_Прошивка/nano_fw10_core_r1/nano_fw10_core_r1.ino"
+  test_doc: "04_Прошивка/FW10_CORE_R1_TEST.md"
+  revision: 1
+  led_count: 44
+  physical_ring_outputs:
+    D6: active
+    D7: held_low
+  current_limit_ma: 500
+  integrated:
+    - L01
+    - clap_double
+    - DS3231
+    - alarm
+    - dawn_recovery
+    - night_schedule
+    - reset_power_policy
+  excluded_until_next_layers:
+    - second_ring_D7
+    - ambient
+    - music
+    - app_clap_calibration
+  eeprom_map:
+    alarm_base: 0
+    dawn_settings_base: 16
+    dawn_runtime_base: 32
+    night_base: 64
+    light_base: 128
+    clap_base: 192
+    core_base: 224
+  clap_defaults: {threshold: 70, timeout_ms: 500, gesture: double}
+  cold_boot_policy:
+    unfinished_dawn_running: recover
+    stale_dawn_hold: clear_and_L01
+    otherwise: L01
+  warm_reset_policy: restore_last_mode_or_dawn_runtime
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_compile_then_upload
