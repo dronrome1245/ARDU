@@ -1227,3 +1227,13 @@
 - Поэтому `TRSH=150` выше амплитуды derivative части обычных хлопков MAX9814.
 - TRACE поле `DER` часто показывает 0, потому что печатается реже, чем 10 ms detector tick; rawMax transition используется как наблюдаемая оценка короткого derivative.
 - **Следующий test:** runtime `TRSH 80`, затем single/double clap reliability и false-positive tests. Прошивку пока не менять.
+
+
+### 2026-09-27 — Gyver R2 at TRSH=80: singles sensitive, double partially reliable
+
+- **ФАКТ:** при runtime `TRSH=80` одиночный clap распознаётся заметно лучше.
+- В single-clap run: `STATS SINGLE_EVENTS=14 SEQUENCES=14 DOUBLE_EVENTS=0`; владелец отмечает ложные одиночные срабатывания.
+- Ключевой положительный факт: лишние одиночные события в этом run не собрались в ложный `DOUBLE_CLAP`.
+- В double-clap run подтверждены минимум 4 `EVENT DOUBLE_CLAP`; владелец оценивает надёжность двойного хлопка примерно «через раз».
+- Успешные пары по timestamps имели интервалы примерно 291 ms, 291 ms, 151 ms и 141 ms.
+- **Следующий минимальный test без новой прошивки:** `TRSH 70`, `TIMEOUT=500` оставить без изменения; проверить 10 double-clap pairs и затем false DOUBLE_CLAP на тишине/речи/музыке.
