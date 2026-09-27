@@ -1399,3 +1399,11 @@
 - Written: 328512 bytes (237168 compressed), 100%.
 - `Hash of data verified`.
 - Следующий шаг: перевести ESP из flash mode в normal boot, собрать рабочий Nano↔ESP UART с level divider и выполнить HTTP smoke test.
+
+
+### 2026-09-27 — ESP8266 HTTP/Wi-Fi smoke passed
+
+- **ФАКТ:** `GET /api/ping` успешно отвечает с физического ESP8266 HTTP BRIDGE R1.
+- Ответ: `ok=true`, device=`ARDU-ESP8266`, fw=`HTTP_BRIDGE_R1`, `wifi_connected=true`, IP=`192.168.0.4`, RSSI=`-55 dBm`.
+- Wi-Fi Station + local HTTP server считаются пройденными.
+- Следующий gate: UART ESP↔Nano через `GET /api/status` и raw `POST /api/dev/nano` body=`PING`.
