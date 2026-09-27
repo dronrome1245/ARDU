@@ -1565,3 +1565,11 @@
 - EEPROM map kept compatible: Alarm 0, Dawn 16/32, Night 64, L01 128, Clap 192; new core state starts at 224.
 - Added reset policy: active unfinished Dawn recovers even after cold interruption; stale HOLD yields to L01 on cold power-on; warm reset restores prior mode.
 - Created `FW10_CORE_R1_TEST.md`.
+
+
+## 2026-09-27 — FW10 CORE R1 Arduino prototype ordering fix
+
+- Owner reported compile errors for `LightPersist` and `ClapPersist`.
+- Root cause was Arduino .ino generated prototypes appearing before those local type declarations.
+- Moved both persistence structs into the common top-level type section; behavior unchanged.
+- No other custom type is used before declaration in the current file.
