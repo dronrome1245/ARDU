@@ -1217,3 +1217,13 @@
 - **ФАКТ:** subsequent ADC: `AVG=250 MIN=159 MAX=385 P2P=226`; saturation отсутствует.
 - Startup ADC regression R1 (`DC=1019`) исправлен.
 - Следующий gate — фактическое распознавание одиночного clap при TRSH=150; если нет EVENT CLAP, снять TRACE на 3 хлопках.
+
+
+### 2026-09-27 — CLAP GYVER R2 works, threshold 150 too high
+
+- **ФАКТ:** Gyver derivative/state-machine algorithm распознаёт реальные хлопки на ARDU.
+- При `TRSH=150` распознавание нестабильно: владелец описывает примерно «через раз».
+- В TRACE два пропущенных хлопка имели rawMax rise примерно `267→354` и `265→350` (около +87/+85), а распознанный сильный хлопок `~270→514` (около +244).
+- Поэтому `TRSH=150` выше амплитуды derivative части обычных хлопков MAX9814.
+- TRACE поле `DER` часто показывает 0, потому что печатается реже, чем 10 ms detector tick; rawMax transition используется как наблюдаемая оценка короткого derivative.
+- **Следующий test:** runtime `TRSH 80`, затем single/double clap reliability и false-positive tests. Прошивку пока не менять.
