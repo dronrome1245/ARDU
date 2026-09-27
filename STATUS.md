@@ -1161,3 +1161,13 @@
 - Не понижать threshold вслепую: мышь/дверь уже являются ложными импульсами для single-peak detector.
 - Создан `nano_clap_diag_r2`: raw `CAPTURE` без threshold, отдельные MAX_P2P/MAX_DEV/MAX_AVG_SHIFT, shorter blocks и dual-threshold event detector.
 - Следующий критерий — сравнить CAPTURE для silence/click/3×clap/speech/music.
+
+
+### 2026-09-27 — CLAP DIAG R2: max-based calibration rejected
+
+- **ФАКТ:** `CALCLAP DC=249 QUIET_AVG_P2P=17 QUIET_MAX_P2P=366 QUIET_AVG_DEV=15 QUIET_MAX_DEV=204 THRESH_P2P=732 THRESH_DEV=408`.
+- **ФАКТ:** средний quiet baseline мал (`17/15`), но редкие выбросы сильно поднимают absolute max; формула на основе quiet maximum делает threshold непригодно высоким.
+- **ФАКТ:** R2 STATUS: DC_OK=YES, CAL=YES, BLOCK_N=16.
+- **ФАКТ:** присланные CAPTURE maxima находятся примерно в диапазоне P2P 318..507 / DEV 172..269; несколько измерений практически доходят до одинакового ограниченного диапазона MAX9814.
+- **РЕШЕНИЕ ДЛЯ СЛЕДУЮЩЕГО ТЕСТА:** не использовать текущий auto-calculated threshold; вручную поставить `THRESH 180 120` и проверить event capture на хлопках/тишине/речи/музыке.
+- Следующая ревизия calibration должна использовать устойчивый baseline (average/percentile/exceedance), а не абсолютный максимум окна.
