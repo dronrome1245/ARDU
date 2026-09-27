@@ -1310,7 +1310,32 @@ l01_r3_plan_2026_09_27:
   preset_2700_rgb: [255, 170, 87]
   preset_2700_visual_reference: "same as L01 R2 KELVIN 2200"
   persistence_structure_changed: false
+  compile_verified: true
+  upload_verified: true
+  hardware_verified: true
+  result: passed_on_hardware
+  next: closed
+
+
+historical_sketch_policy_2026_09_27:
+  owner_decision: true
+  old_43_led_test_sketches_immutable: true
+  migrate_old_revisions_to_44: false
+  integrated_firmware_led_count: 44
+  integrated_visual_regression_required: [M01, M02, M03, M04, M08, M09]
+
+clap_diag_r1_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_clap_diag_r1/nano_clap_diag_r1.ino"
+  test_doc: "04_Прошивка/CLAP_DIAG_R1_TEST.md"
+  revision: 1
+  frontend: "MAX9814 Out->A0, 40dB, AR floating, DEFAULT AREF"
+  led_control: false
+  quiet_calibration: true
+  threshold_adjustable: true
+  event_fields: [P2P, PEAK_DEV, AVG, GAP_MS]
+  false_positive_tests: [speech, music, household_impulses]
+  final_gesture: hardware_data_pending
   compile_verified: false
   upload_verified: false
   hardware_verified: false
-  next: verify_upload_44_led_warm2700_persistence
+  next: verify_upload_characterize_claps
