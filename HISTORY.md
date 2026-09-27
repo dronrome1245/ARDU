@@ -1611,3 +1611,11 @@
 - ESP HTTP/UART bridge R1 compiles successfully for the project ESP8266 configuration.
 - Memory: RAM 38%, IRAM 91%, flash 28%.
 - Next step is physical upload and transport smoke test.
+
+
+## 2026-09-27 — ESP8266 pre-upload voltages passed
+
+- Measured before flashing HTTP bridge R1: S-30-5 5.01 V, YP-8 IN 5.01 V, YP-8 OUT 3.32 V, ESP VCC 3.24 V.
+- Ground drop YP-8 GND→ESP GND = 0.00 V.
+- GPIO0 in bootloader-low = 0.06 V; RST idle = 3.25 V.
+- Power and boot-pin voltage gate passed.
