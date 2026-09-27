@@ -94,7 +94,6 @@ modes:
     - M03_5_band
     - M04_3_band
     - M05_1_band_submodes
-    - M06_strobe_manual_only
     - M08_running_frequencies
     - M09_spectrum_analyzer
   ambient:
@@ -1144,7 +1143,6 @@ implementation_order_2026_09_27:
   owner_decision: true
   sequence:
     - m02_r1_hardware_pass
-    - m06_r1_hardware_pass
     - l01_and_clap_hardware_pass
     - full_nano_firmware_integration
     - full_nano_regression
@@ -1204,7 +1202,7 @@ ordinary_light_requirements_2026_09_27:
     app_enable_disable: true
     recognition_pattern: hardware_test_pending
     false_trigger_test_required: [music, speech, household_impulses]
-  implementation_position: after_m06_before_full_nano
+  implementation_position: after_m02_before_full_nano
 
 app_rtc_display_2026_09_27:
   owner_decision: true
@@ -1232,23 +1230,29 @@ settings_persistence_v1_2026_09_27:
   full_firmware_regression_requires_power_cycle_restore: true
 
 
-m06_r1_plan_2026_09_27:
-  code_path: "04_Прошивка/nano_m06_r1/nano_m06_r1.ino"
-  test_doc: "04_Прошивка/M06_R1_TEST.md"
+m06_r1_retired_2026_09_27:
+  status: passed_on_hardware_then_removed_by_owner
+  mode_id_retired: M06
+  active_firmware_file_present: false
+  active_test_file_present: false
+  included_in_final_firmware: false
+  included_in_app: false
+
+l01_r1_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_l01_r1/nano_l01_r1.ino"
+  test_doc: "04_Прошивка/L01_R1_TEST.md"
   revision: 1
-  mode: M06
-  manual_only: true
-  startup_power: false
-  frequency10_range: "5..30"
-  frequency_hz_range: "0.5..3.0"
-  default_frequency_hz: 1.0
-  duty_percent: 20
-  brightness_range_r1: "1..128"
-  max_session_ms: 15000
-  auto_stop: true
-  immediate_off: true
+  mode: L01
+  data_pin: D6
+  leds: 43
+  white_rgb: [255, 255, 255]
+  startup_power: true
+  default_brightness: 64
+  single_ring_current_limit_ma: 500
+  clap_in_r1: false
+  persistence_in_r1: false
   inherited_uart_fix: true
   compile_verified: false
   upload_verified: false
   hardware_verified: false
-  next: verify_upload_full_m06_r1_test
+  next: verify_upload_full_l01_r1_test
