@@ -228,3 +228,35 @@
 - модель первичной настройки Wi‑Fi;
 - нужно ли автообнаружение устройства в LAN;
 - точный JSON-формат полного набора сохранённых настроек и version/schema migration; базовый принцип persistence уже зафиксирован в `04_Прошивка/PERSISTENCE_V1.md`.
+
+
+### Clap calibration
+
+Предварительный HTTP mapping к Nano calibration state machine:
+
+- `POST /api/light/clap/calibration/start`
+
+Пример:
+```json
+{"pairs":9}
+```
+
+- `POST /api/light/clap/calibration/sample` — открыть одно окно для double-clap sample;
+- `POST /api/light/clap/calibration/finish` — вычислить и временно применить suggested threshold;
+- `POST /api/light/clap/calibration/save` — persist после пользовательского теста;
+- `POST /api/light/clap/calibration/cancel` — вернуть предыдущую сохранённую настройку;
+- `GET /api/light/clap/calibration` — progress/state/result.
+
+Пример status:
+```json
+{
+  "active": true,
+  "target_pairs": 9,
+  "good_pairs": 5,
+  "quiet_p99_derivative": 18,
+  "suggested_threshold": null,
+  "saved": true
+}
+```
+
+ESP не рассчитывает threshold: он только маршрутизирует команды и состояние Nano.
