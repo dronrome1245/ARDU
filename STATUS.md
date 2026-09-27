@@ -1314,3 +1314,10 @@
 - **ФАКТ:** warm reset differentiation с RAM-cookie работает даже при очищенном bootloader-ом MCUSR.
 - **БЛОКЕР:** `RTC_VALID=NO`; до Night schedule / Alarm / Dawn recovery продолжать integration regression нельзя.
 - Следующий шаг: локализовать RTC (presence / OSF / read) до остальных CORE tests.
+
+
+### 2026-09-27 — FW-10 CORE R1 RTC gate passed
+
+- **ФАКТ:** после установки/проверки RTC владелец подтвердил, что FW-10 CORE R1 показывает корректный RTC и блокер `RTC_VALID=NO` снят.
+- Можно продолжать integration regression.
+- Следующий блок: L01 EEPROM regression + clap toggle + warm Reset vs cold power-on.
