@@ -929,3 +929,20 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 - Владелец подтвердил полный L01 R2 test.
 - Визуально preset R2 2700 K оказался недостаточно тёплым; желаемый 2700 K соответствует внешнему виду прежнего R2 KELVIN 2200.
 - Для L01 R3 принят 2700 K -> RGB 255,170,87 как пользовательская визуальная калибровка конкретного ARDU.
+
+
+## 2026-09-27 — AlexGyver Clap / VolAnalyzer / GyverLamp2
+
+Проверены исходники:
+- `https://github.com/GyverLibs/Clap` — official GyverLibs Clap library;
+- `https://github.com/GyverLibs/VolAnalyzer` — amplitude analyzer;
+- `https://github.com/AlexGyver/GyverLamp2/blob/master/firmware/GyverLamp2/analog.ino`;
+- `https://github.com/AlexGyver/GyverLamp2/blob/master/firmware/GyverLamp2/Clap.h`;
+- `https://github.com/AlexGyver/GyverLamp2/blob/master/firmware/GyverLamp2/VolAnalyzer.h`.
+
+Практически важное:
+- GyverLamp2: `clap.setTimeout(500)`, `clap.setTrsh(250)`;
+- `clap.tick(vol.getRawMax())`;
+- переключение состояния по `clap.hasClaps(2)`.
+- Clap state machine анализирует derivative, а не абсолютную амплитуду.
+- README текущей Clap предупреждает о несовместимости с актуальной VolAnalyzer, поэтому ARDU diagnostic не смешивает несогласованные версии библиотек.
