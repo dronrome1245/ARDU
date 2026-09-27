@@ -1333,3 +1333,16 @@
   - настоящий cold power-cycle включает L01 с сохранённым profile.
 - D-058 в CORE R1 считается подтверждённым на текущем one-ring стенде.
 - Следующий блок regression: Night manual + Night schedule.
+
+
+### 2026-09-27 — FW-10 CORE R1 Night block passed
+
+- **ФАКТ:** владелец подтвердил успешный integrated Night regression в FW-10 CORE R1.
+- Пройдены:
+  - manual ON/OFF;
+  - HUE/SAT/BRIGHT;
+  - schedule ON/OFF;
+  - [ON, OFF) transitions;
+  - schedule persistence through Reset;
+  - manual NIGHT ON override disables schedule.
+- Следующий и последний CORE R1 functional block: Dawn renderer/recovery + Alarm trigger.
