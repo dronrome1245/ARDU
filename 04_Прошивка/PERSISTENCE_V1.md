@@ -24,7 +24,7 @@ Nano является источником истины по пользоват�
 Минимально:
 
 - глобальные ограничения/пользовательские параметры;
-- L01: color mode (Kelvin/RGB), Kelvin/custom RGB, brightness, clap enabled и будущие параметры clap detector после hardware pass;
+- L01: color mode (Kelvin/RGB), Kelvin/custom RGB, brightness, clap enabled, calibrated clap derivative threshold и clap sequence timeout;
 - M01: brightness/background/smoothing и применимые параметры VU;
 - M02: brightness/background/smoothing/rainbow speed;
 - M03/M04: brightness/background/smoothing/sensitivity/noise settings;
