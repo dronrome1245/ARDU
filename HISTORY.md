@@ -1589,3 +1589,10 @@
 - Owner confirmed integrated ordinary light behavior works.
 - L01 persistence, double-clap control, warm Reset restore, and cold power-on -> L01 all passed together in FW10 CORE R1.
 - Next integration block is Night manual/schedule.
+
+
+## 2026-09-27 — FW10 CORE R1 Night passed
+
+- Owner confirmed Night manual controls and RTC schedule work correctly inside FW10 CORE R1.
+- Reset persistence and manual override behavior also passed.
+- Remaining CORE R1 block: Dawn recovery and Alarm integration.
