@@ -1458,3 +1458,23 @@ clap_gyver_r2_observation_2026_09_27:
   trace_der_field_sampling_note: "50ms TRACE can miss 10ms derivative peak"
   next_threshold_test: 80
   firmware_change_required_for_next_test: false
+
+
+clap_gyver_r2_threshold80_result_2026_09_27:
+  derivative_threshold: 80
+  single_test:
+    single_events: 14
+    sequences: 14
+    double_events: 0
+    owner_reports_false_single_events: true
+  double_test:
+    confirmed_double_events_min: 4
+    owner_reliability: approximately_every_other_pair
+    detected_pair_gaps_ms: [291, 291, 151, 141]
+  interpretation:
+    false_single_is_not_yet_false_switch: true
+    double_reliability_insufficient: true
+  next:
+    derivative_threshold: 70
+    sequence_timeout_ms: 500
+    firmware_change_required: false
