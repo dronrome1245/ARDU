@@ -1133,3 +1133,44 @@ firmware_night_r2_2026_09_26:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_manual_schedule_persistence
+
+
+night_r2_result_2026_09_27:
+  status: passed_on_hardware
+  owner_confirmed_full_test: true
+  fw9_closed: true
+
+implementation_order_2026_09_27:
+  owner_decision: true
+  sequence:
+    - m02_r1_hardware_pass
+    - m06_r1_hardware_pass
+    - full_nano_firmware_integration
+    - full_nano_regression
+    - esp8266_uart_http
+    - mobile_app
+  softap_v1: false
+  home_wifi_only: true
+  internet_required_for_control: false
+  app_after_full_nano_regression: true
+  app_developer_mode_required: true
+  app_mode_settings_required: true
+  app_microphone_calibration_required: true
+
+m02_r1_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_m02_r1/nano_m02_r1.ino"
+  test_doc: "04_Прошивка/M02_R1_TEST.md"
+  revision: 1
+  mode: M02
+  frontend: "MAX9814 Out->A0, 40dB, AR floating, DEFAULT AREF"
+  leds: 43
+  data_pin: D6
+  second_ring_connected: false
+  default_background: 0
+  rainbow_step10_default: 50
+  smooth_percent_default: 30
+  inherited_uart_fix: true
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_adc_cal_visual_uart_regression
