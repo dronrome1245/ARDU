@@ -1470,3 +1470,13 @@
 - Владелец сообщил, что R2 2700 K недостаточно тёплый; желаемый 2700 K визуально соответствует прежнему R2 2200 K.
 - Создан L01 R3: LED_COUNT=44; 2700 K mapping = RGB 255,170,87.
 - До общей прошивки требуется адаптация всех 43-LED geometry assumptions.
+
+
+## 2026-09-27 — L01 R3 passed; clap diagnostic prepared
+
+- Владелец подтвердил успешный полный тест L01 R3 на 44 LED.
+- Новый тёплый mapping 2700 K принят.
+- Владелец решил не менять старые 43-LED скетчи; они сохраняются как исторические hardware-tested revisions.
+- 44 LED будут учтены при сборке общей прошивки и новых слоях.
+- Создан `nano_clap_diag_r1` для MAX9814/A0: quiet calibration, P2P threshold, impulse events, GAP_MS, статистика и false-positive tests.
+- Создан `CLAP_DIAG_R1_TEST.md`.
