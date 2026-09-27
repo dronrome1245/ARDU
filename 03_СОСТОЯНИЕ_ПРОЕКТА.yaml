@@ -1420,3 +1420,31 @@ clap_gyver_r1_plan_2026_09_27:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_double_clap_false_positive_test
+
+
+clap_gyver_r1_result_2026_09_27:
+  status: failed_to_detect_clap_at_gyverlamp2_threshold
+  startup_dc: 1019
+  startup_dc_ok: false
+  later_adc: {avg: 250, min: 181, max: 312, p2p: 131}
+  derivative_threshold: 250
+  clap_detected: false
+  diagnosis:
+    - startup_adc_transient
+    - threshold_250_not_portable_to_ardu_max9814
+
+clap_gyver_r2_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_clap_gyver_r2/nano_clap_gyver_r2.ino"
+  test_doc: "04_Прошивка/CLAP_GYVER_R2_TEST.md"
+  revision: 2
+  derivative_threshold_default: 150
+  sequence_timeout_ms: 500
+  startup_settle_ms: 1200
+  discard_reads: 16
+  command_click_guard_ms: 700
+  derivative_first_sample_priming: true
+  fallback_threshold_after_trace: 100
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_single_then_double_clap
