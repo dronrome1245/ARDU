@@ -1582,3 +1582,10 @@
 - Global SRAM: 1316/2048 bytes (64%), 732 bytes reported available for locals/stack.
 - Memory budget becomes an explicit constraint before integrating FHT/music layers.
 - Owner has Android Studio available for later mobile-app implementation.
+
+
+## 2026-09-27 — FW10 CORE R1 L01/clap/reset/power passed
+
+- Owner confirmed integrated ordinary light behavior works.
+- L01 persistence, double-clap control, warm Reset restore, and cold power-on -> L01 all passed together in FW10 CORE R1.
+- Next integration block is Night manual/schedule.
