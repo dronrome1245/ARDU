@@ -1478,3 +1478,22 @@ clap_gyver_r2_threshold80_result_2026_09_27:
     derivative_threshold: 70
     sequence_timeout_ms: 500
     firmware_change_required: false
+
+
+clap_gyver_r3_cal_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_clap_gyver_r3_cal/nano_clap_gyver_r3_cal.ino"
+  test_doc: "04_Прошивка/CLAP_GYVER_R3_CAL_TEST.md"
+  revision: 3
+  app_ready_calibration: true
+  target_gesture: double_clap
+  calibration_pairs_range: "3..12"
+  recommended_three_user_pairs: 9
+  quiet_metric: p99_derivative
+  clap_distribution_metric: p20_strength
+  suggested_threshold_rule: "max(quiet_p99+10, 70% clap_p20)"
+  apply_before_save: true
+  persistent_storage: ATmega328P_internal_EEPROM
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_multi_user_calibration
