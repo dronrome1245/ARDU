@@ -1523,3 +1523,11 @@
 - Startup DC был ложным 1019, хотя последующий ADC давал AVG=250; startup ADC timing исправляется в новой ревизии.
 - Проверено: GyverLibs/Clap имеет собственный default threshold=150.
 - Создан GYVER R2 с TRSH=150, valid startup DC procedure, baseline priming и command-click guard.
+
+
+## 2026-09-27 — Gyver clap R2 startup fixed
+
+- R2 uploaded and running.
+- Startup DC=252 / DC_OK=YES; later ADC AVG=250, P2P=226.
+- EVENT CLAP_READY confirms command-click ignore window completed.
+- Next test is clap recognition at derivative threshold 150, then TRACE if no clap event.
