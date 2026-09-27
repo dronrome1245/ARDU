@@ -99,11 +99,15 @@
 {
   "enabled": true,
   "brightness": 128,
-  "clap_enabled": true
+  "color_mode": "kelvin",
+  "kelvin": 2700,
+  "rgb": {"r":255,"g":196,"b":137},
+  "clap_enabled": true,
+  "persist_startup_profile": true
 }
 ```
 
-`enabled` включает/выключает L01 программно. `brightness` ограничивается общим лимитом тока Nano. `clap_enabled` включает/выключает локальный хлопковый выключатель.
+`enabled` включает/выключает L01 программно. `brightness` ограничивается общим лимитом тока Nano. `color_mode` = `kelvin` или `rgb`. Для `kelvin` используется приблизительная RGB-имитация температуры; приложение предоставляет presets 2700/4000/6000 и slider. Для `rgb` используется произвольный color picker. `persist_startup_profile=true` означает записать текущий L01 profile как тот, который будет применён после cold power-on. `clap_enabled` включает/выключает локальный хлопковый выключатель.
 
 Точный clap detector остаётся внутренней логикой Nano и не переносится в приложение.
 
