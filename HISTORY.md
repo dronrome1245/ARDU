@@ -1604,3 +1604,10 @@
 - Previous app-after-full-manual-regression order was superseded.
 - Android Studio/Kotlin selected for the new native app.
 - Created ESP8266 HTTP bridge R1 to expose Nano over home Wi-Fi, including Developer raw-command endpoint and async-event polling.
+
+
+## 2026-09-27 — ESP8266 HTTP bridge R1 compiles
+
+- ESP HTTP/UART bridge R1 compiles successfully for the project ESP8266 configuration.
+- Memory: RAM 38%, IRAM 91%, flash 28%.
+- Next step is physical upload and transport smoke test.
