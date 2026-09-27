@@ -1490,3 +1490,12 @@
 - R1 на этом запуске был CAL=NO и детектировал только по P2P.
 - Создан CLAP DIAG R2 с threshold-free CAPTURE на 3 s, отдельным peak deviation от DC и dual P2P/DEV event logic.
 - Цель R2 — сначала измерить форму silence/click/clap/speech/music, затем выбирать single/double clap detector.
+
+
+## 2026-09-27 — CLAP R2 shows outlier-dominated calibration
+
+- Quiet average metrics: P2P=17, DEV=15.
+- Rare quiet-window spikes reached P2P=366 / DEV=204 and inflated automatic thresholds to 732 / 408.
+- CAPTURE maxima supplied by owner: P2P 503/507/505/506/318 and DEV 255/259/257/269/172.
+- Conclusion: absolute max over a 3 s window is not a robust noise baseline; do not tune final detector from it.
+- Next experiment uses R2 manual `THRESH 180 120` with 16-sample blocks before changing firmware again.
