@@ -1531,3 +1531,11 @@
 - Startup DC=252 / DC_OK=YES; later ADC AVG=250, P2P=226.
 - EVENT CLAP_READY confirms command-click ignore window completed.
 - Next test is clap recognition at derivative threshold 150, then TRACE if no clap event.
+
+
+## 2026-09-27 — Gyver R2 recognizes clap; tune derivative threshold
+
+- GYVER R2 успешно распознал часть реальных хлопков.
+- Пропущенные хлопки показали rawMax rises порядка 85..87, сильный распознанный — порядка 244.
+- Default GyverLib threshold 150 остаётся слишком высоким для части хлопков на текущем MAX9814.
+- Следующий обратимый test без новой прошивки: `TRSH 80`.
