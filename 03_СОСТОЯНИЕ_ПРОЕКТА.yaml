@@ -1448,3 +1448,13 @@ clap_gyver_r2_plan_2026_09_27:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_single_then_double_clap
+
+
+clap_gyver_r2_observation_2026_09_27:
+  algorithm_recognizes_real_clap: true
+  threshold_150_reliability: intermittent
+  trace_rawmax_rises_missed_approx: [87, 85]
+  trace_rawmax_rise_detected_approx: 244
+  trace_der_field_sampling_note: "50ms TRACE can miss 10ms derivative peak"
+  next_threshold_test: 80
+  firmware_change_required_for_next_test: false
