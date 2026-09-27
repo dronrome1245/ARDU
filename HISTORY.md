@@ -1619,3 +1619,10 @@
 - Ground drop YP-8 GND→ESP GND = 0.00 V.
 - GPIO0 in bootloader-low = 0.06 V; RST idle = 3.25 V.
 - Power and boot-pin voltage gate passed.
+
+
+## 2026-09-27 — ESP8266 HTTP bridge R1 flashed successfully
+
+- Upload completed to 100% on physical ESP8266EX.
+- Flash 4 MB auto-detected; hash verified.
+- Next is normal boot + working UART + HTTP smoke test.
