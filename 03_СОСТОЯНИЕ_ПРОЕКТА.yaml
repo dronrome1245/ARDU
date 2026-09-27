@@ -1564,3 +1564,15 @@ fw10_core_r1_compile_fix_2026_09_27:
   fix_commit: "7bef2183b1cd78a4532105b48511adb32533830f"
   custom_type_order_scan: passed
   next: repeat_verify
+
+
+fw10_core_r1_startup_2026_09_27:
+  upload_verified: true
+  startup_verified: true
+  mode: L01
+  reset_class: WARM_UNKNOWN
+  mcusr: 0
+  led_count: 44
+  clap_threshold: 70
+  rtc_valid: false
+  blocker: rtc_diagnostics_before_core_regression
