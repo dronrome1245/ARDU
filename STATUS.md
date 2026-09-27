@@ -1376,3 +1376,17 @@
   - IRAM code: 27455 bytes;
   - flash IROM: `294372 / 1048576` = 28%.
 - Compile gate пройден; следующий шаг — Upload на физический ESP8266 по уже подтверждённой manual-boot procedure, затем HTTP/UART smoke test.
+
+
+### 2026-09-27 — ESP8266 pre-upload voltage gate passed
+
+- **ФАКТ:** перед загрузкой HTTP BRIDGE R1 измерено:
+  - S-30-5 output = 5.01 V;
+  - YP-8 input = 5.01 V;
+  - YP-8 output = 3.32 V;
+  - ESP8266 VCC/GND = 3.24 V;
+  - YP-8 GND → ESP GND drop = 0.00 V;
+  - GPIO0→GND in flash mode = 0.06 V;
+  - ESP RST idle = 3.25 V.
+- Питание, ground path и boot strap GPIO0/RST проходят pre-upload gate.
+- Следующий шаг: загрузка ESP8266 HTTP BRIDGE R1 по подтверждённой manual-reset procedure.
