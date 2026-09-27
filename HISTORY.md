@@ -1499,3 +1499,11 @@
 - CAPTURE maxima supplied by owner: P2P 503/507/505/506/318 and DEV 255/259/257/269/172.
 - Conclusion: absolute max over a 3 s window is not a robust noise baseline; do not tune final detector from it.
 - Next experiment uses R2 manual `THRESH 180 120` with 16-sample blocks before changing firmware again.
+
+
+## 2026-09-27 — CLAP DIAG R3 fixes command-click contamination
+
+- The R2 quiet calibration was contaminated by a strong transient consistent with the same mouse-click class already observed in R1.
+- R3 adds 1500 ms settling delay for CALCLAP and arming commands.
+- Thresholds now use quiet averages rather than absolute maxima.
+- Candidate logic requires P2P+DEV and uses 250 ms lockout.
