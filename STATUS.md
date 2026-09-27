@@ -1149,3 +1149,15 @@
 - Общая прошивка обязана отдельно адаптировать M01/M02/M03/M04/M08/M09 под 44 LED и пройти visual regression.
 - Созданы `nano_clap_diag_r1/nano_clap_diag_r1.ino` и `CLAP_DIAG_R1_TEST.md`.
 - **Следующий практический шаг:** Verify/Upload CLAP DIAG R1 и собрать измерения хлопков/ложных срабатываний.
+
+
+### 2026-09-27 — CLAP DIAG R1 не различает хлопок; создан R2
+
+- **ФАКТ:** startup R1: `DC=255 DC_OK=YES CAL=NO THRESH=180`.
+- **ФАКТ:** обычный ADC в присланном тесте: `AVG=264 MIN=246 MAX=281 P2P=35 PEAK_DEV=26`.
+- **ФАКТ:** короткие щелчки мыши генерировали `EVENT IMPULSE_CANDIDATE` с P2P примерно `181..417`.
+- **ФАКТ:** обычные хлопки владельца при том же R1 не генерировали EVENT.
+- **ФАКТ ПО КОДУ:** R1 trigger использовал только `P2P >= threshold`; CALCLAP в присланном запуске не выполнялся (`CAL=NO`).
+- Не понижать threshold вслепую: мышь/дверь уже являются ложными импульсами для single-peak detector.
+- Создан `nano_clap_diag_r2`: raw `CAPTURE` без threshold, отдельные MAX_P2P/MAX_DEV/MAX_AVG_SHIFT, shorter blocks и dual-threshold event detector.
+- Следующий критерий — сравнить CAPTURE для silence/click/3×clap/speech/music.
