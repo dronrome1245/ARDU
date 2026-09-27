@@ -1370,3 +1370,19 @@ clap_diag_r2_plan_2026_09_27:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_raw_capture_comparison
+
+
+clap_diag_r2_observation_2026_09_27:
+  dc: 249
+  dc_ok: true
+  quiet_avg_p2p: 17
+  quiet_max_p2p: 366
+  quiet_avg_dev: 15
+  quiet_max_dev: 204
+  auto_threshold_p2p: 732
+  auto_threshold_dev: 408
+  capture_max_p2p_samples: [503, 507, 505, 506, 318]
+  capture_max_dev_samples: [255, 259, 257, 269, 172]
+  diagnosis: absolute_max_outlier_dominated
+  auto_calibration_accepted: false
+  next_manual_threshold: {p2p: 180, dev: 120}
