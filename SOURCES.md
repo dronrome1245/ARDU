@@ -912,3 +912,11 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
   - https://github.com/FastLED/FastLED/blob/master/src/platforms/avr/README.md
   - https://github.com/FastLED/FastLED/blob/master/src/fastled_config.h
 - ARDU use: M05 R4 transport experiment enabling interrupts during WS2812B output, followed by hardware regression for both UART reliability and LED signal integrity.
+
+
+## 2026-09-27 — W3C WCAG — Three Flashes
+
+- W3C WAI, WCAG 2.2 Understanding SC 2.3.1 / 2.3.2: flashing content guidance uses a threshold of no more than three flashes in any one-second period (or specific flash-threshold analysis for SC 2.3.1).
+- Для ARDU M06 R1 этот материал используется только как консервативный ориентир для firmware cap `≤3 flashes/s`.
+- Не считать это медицинской гарантией, испытанием конкретной лампы или сертификацией аппаратного устройства.
+- Источник: W3C WAI WCAG 2.2, Understanding Three Flashes / Three Flashes or Below Threshold.
