@@ -1252,7 +1252,28 @@ l01_r1_plan_2026_09_27:
   clap_in_r1: false
   persistence_in_r1: false
   inherited_uart_fix: true
+  compile_verified: true
+  upload_verified: true
+  hardware_verified: true
+  result: passed_on_hardware
+  next: closed
+
+
+l01_r2_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_l01_r2/nano_l01_r2.ino"
+  test_doc: "04_Прошивка/L01_R2_TEST.md"
+  revision: 2
+  mode: L01
+  color_modes: [KELVIN, RGB]
+  kelvin_range: "1800..6500"
+  presets_kelvin: [2700, 4000, 6000]
+  custom_rgb: true
+  brightness_range: "0..255"
+  startup_profile_persistent: true
+  storage: ATmega328P_internal_EEPROM
+  commands: [KELVIN, PRESET, RGB, BRIGHT, SAVE, LOAD, ON, OFF, STATUS]
+  clap_in_r2: false
   compile_verified: false
   upload_verified: false
   hardware_verified: false
-  next: verify_upload_full_l01_r1_test
+  next: verify_upload_kelvin_rgb_persistence
