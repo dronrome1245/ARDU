@@ -1273,7 +1273,7 @@ l01_r2_plan_2026_09_27:
   storage: ATmega328P_internal_EEPROM
   commands: [KELVIN, PRESET, RGB, BRIGHT, SAVE, LOAD, ON, OFF, STATUS]
   clap_in_r2: false
-  compile_verified: false
-  upload_verified: false
+  compile_verified: true
+  upload_verified: true
   hardware_verified: false
-  next: verify_upload_kelvin_rgb_persistence
+  next: kelvin_rgb_save_load_full_power_cycle_test
