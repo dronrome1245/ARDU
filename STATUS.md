@@ -1208,3 +1208,12 @@
   - 700 ms command-click guard после CLEAR/TRSH/TIMEOUT.
 - Создан `CLAP_GYVER_R2_TEST.md`.
 - Следующий критерий: hardware test R2; если TRSH=150 не ловит clap, использовать TRACE и только затем пробовать 100.
+
+
+### 2026-09-27 — CLAP GYVER R2 startup gate passed
+
+- **ФАКТ:** R2 startup: `DC=252 DC_OK=YES CLAP_TRSH=150 CLAP_TIMEOUT_MS=500`.
+- **ФАКТ:** command-click guard завершился штатно: `EVENT CLAP_READY`.
+- **ФАКТ:** subsequent ADC: `AVG=250 MIN=159 MAX=385 P2P=226`; saturation отсутствует.
+- Startup ADC regression R1 (`DC=1019`) исправлен.
+- Следующий gate — фактическое распознавание одиночного clap при TRSH=150; если нет EVENT CLAP, снять TRACE на 3 хлопках.
