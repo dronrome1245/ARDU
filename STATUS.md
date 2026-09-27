@@ -1321,3 +1321,15 @@
 - **ФАКТ:** после установки/проверки RTC владелец подтвердил, что FW-10 CORE R1 показывает корректный RTC и блокер `RTC_VALID=NO` снят.
 - Можно продолжать integration regression.
 - Следующий блок: L01 EEPROM regression + clap toggle + warm Reset vs cold power-on.
+
+
+### 2026-09-27 — FW-10 CORE R1 L01/clap/reset/power block passed
+
+- **ФАКТ:** владелец подтвердил успешный интеграционный блок:
+  - L01 profile save/load;
+  - double-clap toggle;
+  - одиночный clap не переключает L01;
+  - service Reset восстанавливает OFF и не имитирует wall switch;
+  - настоящий cold power-cycle включает L01 с сохранённым profile.
+- D-058 в CORE R1 считается подтверждённым на текущем one-ring стенде.
+- Следующий блок regression: Night manual + Night schedule.
