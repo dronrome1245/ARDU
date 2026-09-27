@@ -1365,3 +1365,14 @@
 - Wi-Fi credentials вынесены в ignored local `wifi_secrets.h`; в repo только `wifi_secrets.example.h`.
 - Создан `ESP8266_HTTP_BRIDGE_R1_TEST.md`.
 - Следующий шаг: compile/upload ESP bridge и только минимально подтвердить Wi-Fi/HTTP/Nano transport; затем создавать Android app R1.
+
+
+### 2026-09-27 — ESP8266 HTTP BRIDGE R1 compile passed
+
+- **ФАКТ:** `esp8266_http_bridge_r1.ino` успешно компилируется.
+- Arduino IDE memory report:
+  - RAM globals/statics: `30808 / 80192` = 38%;
+  - IRAM total used: `60223 / 65536` = 91% (включая 32768-byte instruction cache);
+  - IRAM code: 27455 bytes;
+  - flash IROM: `294372 / 1048576` = 28%.
+- Compile gate пройден; следующий шаг — Upload на физический ESP8266 по уже подтверждённой manual-boot procedure, затем HTTP/UART smoke test.
