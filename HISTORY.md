@@ -1480,3 +1480,13 @@
 - 44 LED будут учтены при сборке общей прошивки и новых слоях.
 - Создан `nano_clap_diag_r1` для MAX9814/A0: quiet calibration, P2P threshold, impulse events, GAP_MS, статистика и false-positive tests.
 - Создан `CLAP_DIAG_R1_TEST.md`.
+
+
+## 2026-09-27 — CLAP DIAG R1 misses claps; R2 raw capture created
+
+- R1 MAX9814 frontend валиден: DC=255, обычный ADC P2P=35.
+- Mouse clicks вызвали несколько impulse candidates; P2P событий 181..417.
+- Хлопки не дали EVENT при default THRESH=180.
+- R1 на этом запуске был CAL=NO и детектировал только по P2P.
+- Создан CLAP DIAG R2 с threshold-free CAPTURE на 3 s, отдельным peak deviation от DC и dual P2P/DEV event logic.
+- Цель R2 — сначала измерить форму silence/click/clap/speech/music, затем выбирать single/double clap detector.
