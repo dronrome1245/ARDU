@@ -1174,7 +1174,13 @@ m02_r1_plan_2026_09_27:
   compile_verified: true
   upload_verified: true
   hardware_verified: false
-  next: startup_status_adc_gate
+  visual_behavior: passed_owner_report
+  background_visible_threshold_observed:
+    global_brightness: 64
+    approximately_raw_background: 35
+    below_threshold: visually_off
+  persistence_in_test_sketch: false
+  next: complete_serial_cal_uart_evidence_then_close_m02
 
 
 ordinary_light_requirements_2026_09_27:
@@ -1204,3 +1210,20 @@ app_rtc_display_2026_09_27:
   phone_time_is_not_display_time: true
   phone_time_use: explicit_rtc_sync_only
   api_source: "/api/time"
+
+
+settings_persistence_v1_2026_09_27:
+  owner_decision: true
+  canonical_source: Nano
+  storage_preference: ATmega328P_internal_EEPROM
+  fallback_storage_if_needed: DS3231_AT24C32_by_separate_decision
+  structure_guard: [magic, version, checksum]
+  per_mode_independent_settings: true
+  survives_full_power_loss: true
+  app_local_cache: true
+  app_cache_authoritative: false
+  app_sync_on_connect: [GET_api_status, GET_api_settings]
+  live_preview_in_ram: true
+  persist_every_slider_step: false
+  final_value_requires_persistent_ack: true
+  full_firmware_regression_requires_power_cycle_restore: true
