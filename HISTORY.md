@@ -1507,3 +1507,11 @@
 - R3 adds 1500 ms settling delay for CALCLAP and arming commands.
 - Thresholds now use quiet averages rather than absolute maxima.
 - Candidate logic requires P2P+DEV and uses 250 ms lockout.
+
+
+## 2026-09-27 — inspected AlexGyver Clap and GyverLamp2
+
+- Найдена официальная `GyverLibs/Clap`.
+- Clap определяет clap по последовательности derivative fronts: positive → negative ≤200 ms → return to neutral ≤200 ms.
+- GyverLamp2 передаёт в Clap `VolAnalyzer.getRawMax()`, ставит threshold=250, sequence timeout=500 ms и переключает лампу по двум хлопкам.
+- Создан отдельный ARDU diagnostic с этой архитектурой без управления LED.
