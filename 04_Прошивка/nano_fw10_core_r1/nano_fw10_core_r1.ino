@@ -190,6 +190,24 @@ struct ClapSettings {
   bool dirty = false;
 };
 
+struct LightPersist {
+  uint16_t magic;
+  uint8_t version;
+  uint8_t colorMode;
+  uint8_t brightness;
+  uint16_t kelvin;
+  uint8_t r,g,b;
+  uint8_t sum;
+};
+
+struct ClapPersist {
+  uint16_t magic;
+  uint8_t version;
+  uint16_t threshold;
+  uint16_t timeoutMs;
+  uint8_t sum;
+};
+
 struct CoreState {
   SystemMode lastMode = SystemMode::LIGHT;
   bool clapEnabled = true;
@@ -627,16 +645,6 @@ void loadNight() {
 
 // -------------------- EEPROM: L01 --------------------
 
-struct LightPersist {
-  uint16_t magic;
-  uint8_t version;
-  uint8_t colorMode;
-  uint8_t brightness;
-  uint16_t kelvin;
-  uint8_t r,g,b;
-  uint8_t sum;
-};
-
 uint8_t lightChecksum(const LightPersist& d) {
   const uint8_t* p=reinterpret_cast<const uint8_t*>(&d);
   uint8_t s=0x5A;
@@ -672,14 +680,6 @@ void saveLight() {
 }
 
 // -------------------- EEPROM: Clap/Core --------------------
-
-struct ClapPersist {
-  uint16_t magic;
-  uint8_t version;
-  uint16_t threshold;
-  uint16_t timeoutMs;
-  uint8_t sum;
-};
 
 uint8_t clapChecksum(const ClapPersist& d) {
   const uint8_t* p=reinterpret_cast<const uint8_t*>(&d);
