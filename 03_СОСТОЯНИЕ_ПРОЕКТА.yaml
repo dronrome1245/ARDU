@@ -1646,3 +1646,11 @@ esp8266_http_bridge_r1_compile_result_2026_09_27:
   flash_total_bytes: 1048576
   flash_percent: 28
   next: upload_physical_esp_then_http_uart_smoke
+
+
+esp8266_http_bridge_r1_wifi_smoke_2026_09_27:
+  wifi_verified: true
+  http_ping_verified: true
+  ip: "192.168.0.4"
+  rssi_dbm: -55
+  next: verify_uart_status_and_ping
