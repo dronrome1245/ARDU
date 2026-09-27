@@ -1386,3 +1386,19 @@ clap_diag_r2_observation_2026_09_27:
   diagnosis: absolute_max_outlier_dominated
   auto_calibration_accepted: false
   next_manual_threshold: {p2p: 180, dev: 120}
+
+
+clap_diag_r3_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_clap_diag_r3/nano_clap_diag_r3.ino"
+  test_doc: "04_Прошивка/CLAP_DIAG_R3_TEST.md"
+  revision: 3
+  calibration_delay_ms: 1500
+  delayed_arm_after_clear_ms: 1500
+  threshold_source: quiet_average
+  quiet_max_used_for_threshold: false
+  candidate_logic: "P2P AND DEV"
+  event_lockout_ms: 250
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_false_positive_characterization
