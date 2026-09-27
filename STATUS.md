@@ -1237,3 +1237,10 @@
 - В double-clap run подтверждены минимум 4 `EVENT DOUBLE_CLAP`; владелец оценивает надёжность двойного хлопка примерно «через раз».
 - Успешные пары по timestamps имели интервалы примерно 291 ms, 291 ms, 151 ms и 141 ms.
 - **Следующий минимальный test без новой прошивки:** `TRSH 70`, `TIMEOUT=500` оставить без изменения; проверить 10 double-clap pairs и затем false DOUBLE_CLAP на тишине/речи/музыке.
+
+
+### 2026-09-27 — Gyver clap false-positive run: zero events
+
+- Владелец прислал три последовательных `STATS SINGLE_EVENTS=0 SEQUENCES=0 DOUBLE_EVENTS=0`.
+- Если это запрошенные тесты тишины/речи/музыки при текущем threshold, ложных clap/double-clap событий не наблюдалось.
+- Для фиксации final threshold всё ещё нужен отдельный reliability result: 10 намеренных double-clap pairs при том же runtime threshold.
