@@ -1298,3 +1298,19 @@
 - **РЕШЕНИЕ ДЛЯ ИНТЕГРАЦИИ:** CORE R1 можно загружать и тестировать; перед добавлением Ambient/Music отдельно контролировать flash/SRAM budget.
 - Android Studio доступен у владельца; mobile app после полного Nano regression можно реализовывать как Android Studio/Kotlin project.
 - Следующий шаг: Upload FW-10 CORE R1 и выполнить startup gate из `FW10_CORE_R1_TEST.md`.
+
+
+### 2026-09-27 — FW-10 CORE R1 upload/startup partial pass; RTC invalid
+
+- **ФАКТ:** FW-10 CORE R1 успешно загружен и стартовал на Nano.
+- Startup:
+  - `MODE=L01`;
+  - `RESET=WARM_UNKNOWN MCUSR=0`;
+  - `LEDS=44`;
+  - `RING_A=D6`;
+  - `RING_B=DISCONNECTED_TEST`;
+  - `LIMIT_MA=500`;
+  - `CLAP=ON CLAP_TRSH=70`.
+- **ФАКТ:** warm reset differentiation с RAM-cookie работает даже при очищенном bootloader-ом MCUSR.
+- **БЛОКЕР:** `RTC_VALID=NO`; до Night schedule / Alarm / Dawn recovery продолжать integration regression нельзя.
+- Следующий шаг: локализовать RTC (presence / OSF / read) до остальных CORE tests.
