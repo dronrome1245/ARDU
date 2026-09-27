@@ -1286,3 +1286,15 @@
 - Исправление: `LightPersist` и `ClapPersist` перенесены в верхнюю type section до функций.
 - Дополнительно проверен порядок всех пользовательских типов: более ранних использований до объявления не найдено.
 - Следующий шаг: повторный Verify того же `nano_fw10_core_r1.ino`.
+
+
+### 2026-09-27 — FW-10 CORE R1 compile passed
+
+- **ФАКТ:** повторный Verify `nano_fw10_core_r1.ino` прошёл успешно.
+- Arduino IDE report:
+  - flash: `26014 / 30720 bytes` = 84%;
+  - SRAM globals: `1316 / 2048 bytes` = 64%;
+  - estimated remaining SRAM for stack/locals: 732 bytes.
+- **РЕШЕНИЕ ДЛЯ ИНТЕГРАЦИИ:** CORE R1 можно загружать и тестировать; перед добавлением Ambient/Music отдельно контролировать flash/SRAM budget.
+- Android Studio доступен у владельца; mobile app после полного Nano regression можно реализовывать как Android Studio/Kotlin project.
+- Следующий шаг: Upload FW-10 CORE R1 и выполнить startup gate из `FW10_CORE_R1_TEST.md`.
