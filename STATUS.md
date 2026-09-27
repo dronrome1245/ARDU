@@ -1244,3 +1244,18 @@
 - Владелец прислал три последовательных `STATS SINGLE_EVENTS=0 SEQUENCES=0 DOUBLE_EVENTS=0`.
 - Если это запрошенные тесты тишины/речи/музыки при текущем threshold, ложных clap/double-clap событий не наблюдалось.
 - Для фиксации final threshold всё ещё нужен отдельный reliability result: 10 намеренных double-clap pairs при том же runtime threshold.
+
+
+### 2026-09-27 — family clap calibration R3 prepared
+
+- **ФАКТ:** при runtime threshold≈70 Gyver-style detector дал 8 confirmed DOUBLE_CLAP из 10 намеренных пар; отдельные одиночные false clap встречаются.
+- **РЕШЕНИЕ:** fixed threshold не считать финальным, т.к. устройством будут пользоваться несколько детей с разной силой хлопка.
+- Создан `nano_clap_gyver_r3_cal`:
+  - quiet P99 derivative baseline;
+  - 3..12 prompted double-clap samples;
+  - хранение weak/strong clap strengths;
+  - threshold по lower robust clap distribution + quiet floor;
+  - apply-before-save;
+  - EEPROM save/cancel.
+- Для трёх детей рекомендуемый calibration session = 9 successful pairs (по 3 на каждого).
+- Следующий шаг: Verify/Upload R3 CAL и выполнить family calibration test.
