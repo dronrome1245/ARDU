@@ -1181,3 +1181,15 @@
 - Event candidate now requires BOTH P2P and DEV; lockout increased to 250 ms.
 - Created `nano_clap_diag_r3` and `CLAP_DIAG_R3_TEST.md`.
 - Next: Verify/Upload R3, then clap/silence/speech/music/double-clap characterization.
+
+
+### 2026-09-27 — найден штатный AlexGyver double-clap algorithm
+
+- Проверена `GyverLibs/Clap`: распознавание строится по derivative входного уровня и state machine, а не по абсолютному P2P.
+- Проверена `AlexGyver/GyverLamp2`: `VolAnalyzer.getRawMax() → Clap`, `TRSH=250`, `timeout=500 ms`, управление состоянием только по двум хлопкам.
+- Предыдущие CLAP DIAG R1-R3 считать диагностической веткой, а не final detector.
+- Созданы:
+  - `04_Прошивка/nano_clap_gyver_r1/nano_clap_gyver_r1.ino`;
+  - `04_Прошивка/CLAP_GYVER_R1_TEST.md`;
+  - `04_Прошивка/CLAP_GYVER_REFERENCE.md`.
+- Первый test начинается с точных GyverLamp2 parameters 250/500; если физический clap не ловится, снижать только derivative threshold 250→200→150.
