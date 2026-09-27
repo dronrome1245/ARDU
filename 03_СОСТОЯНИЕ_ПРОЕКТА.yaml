@@ -39,9 +39,9 @@ hardware:
   ws2812b:
     density_led_per_m_estimate: 60.7
     ring_path_cm: 71.5
-    target_led_per_fixture: 43
+    target_led_per_fixture: 44
     fixture_count: 2
-    target_total_led: 86
+    target_total_led: 88
     total_strip_length_required_m: 1.43
     total_strip_length_available_m: 5.0
     total_strip_length_available_confirmed: true
@@ -188,7 +188,7 @@ firmware_fw1:
   compile_verified: false
   hardware_verified: false
   ring_a_pin: D6
-  led_count_target: 43
+  led_count_target: 44
   current_limit_ma: 500
 
 firmware_fw1_compile_2026_09_20:
@@ -1277,3 +1277,40 @@ l01_r2_plan_2026_09_27:
   upload_verified: true
   hardware_verified: false
   next: kelvin_rgb_save_load_full_power_cycle_test
+
+
+led_geometry_2026_09_27:
+  owner_confirmed_physical_led_each: 44
+  total_led_two_rings: 88
+  previous_43_led_tests: historical_valid
+  future_firmware_led_count: 44
+  integration_regression_required:
+    - M01
+    - M02
+    - M03
+    - M04
+    - M08
+    - M09
+
+l01_r2_result_2026_09_27:
+  status: passed_on_hardware
+  kelvin_presets: passed
+  arbitrary_kelvin: passed
+  custom_rgb: passed
+  brightness: passed
+  save_load: passed
+  reset_restore: passed
+  full_power_cycle_restore: passed
+
+l01_r3_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_l01_r3/nano_l01_r3.ino"
+  test_doc: "04_Прошивка/L01_R3_TEST.md"
+  revision: 3
+  led_count: 44
+  preset_2700_rgb: [255, 170, 87]
+  preset_2700_visual_reference: "same as L01 R2 KELVIN 2200"
+  persistence_structure_changed: false
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_44_led_warm2700_persistence
