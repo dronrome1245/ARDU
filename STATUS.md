@@ -1193,3 +1193,18 @@
   - `04_Прошивка/CLAP_GYVER_R1_TEST.md`;
   - `04_Прошивка/CLAP_GYVER_REFERENCE.md`.
 - Первый test начинается с точных GyverLamp2 parameters 250/500; если физический clap не ловится, снижать только derivative threshold 250→200→150.
+
+
+### 2026-09-27 — CLAP GYVER R1 failed at TRSH=250; R2 prepared
+
+- **ФАКТ:** GYVER R1 startup показал ложный `DC=1019 DC_OK=NO`, но позже `ADC AVG=250 MIN=181 MAX=312 P2P=131`; startup DC measurement признан невалидным.
+- **ФАКТ:** при `CLAP_TRSH=250` хлопки не распознавались.
+- **ИСТОЧНИК:** в самой GyverLibs/Clap default derivative threshold = 150; значение 250 — настройка конкретного GyverLamp2.
+- Создан `nano_clap_gyver_r2`:
+  - default `TRSH=150`;
+  - timeout 500 ms;
+  - startup settle 1200 ms + discard reads;
+  - first rawMax primes derivative baseline;
+  - 700 ms command-click guard после CLEAR/TRSH/TIMEOUT.
+- Создан `CLAP_GYVER_R2_TEST.md`.
+- Следующий критерий: hardware test R2; если TRSH=150 не ловит clap, использовать TRACE и только затем пробовать 100.
