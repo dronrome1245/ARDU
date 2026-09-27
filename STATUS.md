@@ -1058,3 +1058,11 @@
 - Создан `04_Прошивка/LIGHT_CLAP_REQUIREMENTS.md`.
 - Обновлены MODEL_IDS, режимы, HTTP API, модель экранов и UART-требования.
 - Порядок до общей прошивки: M02 → M06 → L01/clap → единая Nano-прошивка.
+
+
+### 2026-09-27 — M02 R1 compile/upload passed
+
+- **ФАКТ:** M02 R1 успешно скомпилирован и загружен на физическую Nano.
+- **НЕ ПРОВЕРЕНО:** ADC/DC, CAL, визуальный VU-rainbow, RAINSTEP10, SMOOTH, UART stress и OFF/ON.
+- **Следующий практический шаг:** открыть Serial Monitor 115200 / Newline, подтвердить startup `ARDU NANO M02 R1 READY`, затем выполнить `ADC` и `STATUS`.
+- Если `ADC AVG` вне 120..400 или `DC_OK=NO`, калибровку не выполнять; сначала восстановить MAX9814/A0.
