@@ -77,9 +77,9 @@ struct TempAnchor {
 // Exact perceived CCT depends on the actual LEDs/diffuser and will be tuned later if needed.
 const TempAnchor TEMP_ANCHORS[] = {
   {1800, 255, 147,  41},
-  {2200, 255, 170,  87},
+  {2200, 255, 157,  61},
   {2700, 255, 170,  87},
-  {3000, 255, 214, 170},
+  {3000, 255, 183, 114},
   {4000, 255, 228, 206},
   {5000, 255, 244, 234},
   {6000, 245, 249, 255},
