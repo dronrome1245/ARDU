@@ -1029,3 +1029,26 @@ L01 v1 должен поддерживать:
 - после интеграции выполнить короткий visual regression этих режимов на фактическом 44-LED кольце.
 
 **Причина:** не смешивать исторически подтверждённые тестовые ревизии с новой аппаратной геометрией и не переписывать доказательства предыдущих hardware pass задним числом.
+
+
+---
+
+## D-067 — clap detector строить по GyverLamp2 derivative state machine
+
+**Дата:** 2026-09-27  
+**Статус:** ТЕКУЩЕЕ НАПРАВЛЕНИЕ HARDWARE TEST
+
+После неудачных амплитудных CLAP DIAG R1-R3 проверены исходники AlexGyver `GyverLibs/Clap`, согласованная VolAnalyzer logic и практическая интеграция `AlexGyver/GyverLamp2`.
+
+GyverLamp2 использует:
+- `clap.tick(vol.getRawMax())`;
+- derivative/state-machine Clap вместо абсолютного P2P threshold;
+- `clap.setTrsh(250)`;
+- `clap.setTimeout(500)`;
+- действие лампы только по `clap.hasClaps(2)`.
+
+**Решение для следующего ARDU test:** проверить именно GyverLamp2-style double-clap detector на MAX9814/A0. Не продолжать тюнинг предыдущего P2P/DEV detector как основного пути.
+
+Текущую GyverLibs/Clap не подключать как внешнюю зависимость вслепую: её README указывает несовместимость с актуальной VolAnalyzer. В diagnostic sketch перенесена согласованная пара алгоритмов из GyverLamp2.
+
+Final параметры считаются подтверждёнными только после hardware test ARDU.
