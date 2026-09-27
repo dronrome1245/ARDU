@@ -1066,3 +1066,10 @@
 - **НЕ ПРОВЕРЕНО:** ADC/DC, CAL, визуальный VU-rainbow, RAINSTEP10, SMOOTH, UART stress и OFF/ON.
 - **Следующий практический шаг:** открыть Serial Monitor 115200 / Newline, подтвердить startup `ARDU NANO M02 R1 READY`, затем выполнить `ADC` и `STATUS`.
 - Если `ADC AVG` вне 120..400 или `DC_OK=NO`, калибровку не выполнять; сначала восстановить MAX9814/A0.
+
+
+### 2026-09-27 — M02 R1 ADC gate passed
+
+- **ФАКТ:** `ADC AVG=250 MIN=226 MAX=274 P2P=48`; STATUS `DC=249 DC_OK=YES CAL=NO`.
+- MAX9814/A0 gate пройден; можно выполнять CAL в тишине.
+- В одном STATUS поле ожидаемого `LEDS=43` пришло как `LDS=43`; проверить на UART stress, пока не считать подтверждённой ошибкой.
