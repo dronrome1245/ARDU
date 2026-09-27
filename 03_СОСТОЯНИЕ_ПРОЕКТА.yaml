@@ -1583,3 +1583,13 @@ fw10_core_r1_rtc_gate_2026_09_27:
   owner_confirmed: true
   blocker_cleared: true
   next: l01_clap_reset_power_regression
+
+
+fw10_core_r1_l01_block_2026_09_27:
+  l01_persistence: passed
+  double_clap_toggle: passed
+  single_clap_no_toggle: passed
+  warm_reset_restore_off: passed
+  cold_power_on_l01: passed
+  owner_confirmed: true
+  next: night_manual_schedule_regression
