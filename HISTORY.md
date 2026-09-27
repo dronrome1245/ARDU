@@ -1555,3 +1555,13 @@
 - Владелец потребовал учитывать нескольких детей с разной силой хлопка.
 - Создан CLAP GYVER R3 CAL: guided quiet + multi-user double-clap sampling, suggested threshold, test-before-save, EEPROM persistence.
 - Calibration protocol спроектирован так, чтобы ESP/app позже могли управлять им без raw Developer Mode.
+
+
+## 2026-09-27 — started FW-10 CORE integration
+
+- Owner accepted clap default 70/500 double-clap and deferred family calibration to app stage.
+- Created `nano_fw10_core_r1`.
+- First integration intentionally includes only L01/clap/RTC/Alarm/Dawn/Night on one physical D6 ring with 44 LED and 500 mA test cap.
+- EEPROM map kept compatible: Alarm 0, Dawn 16/32, Night 64, L01 128, Clap 192; new core state starts at 224.
+- Added reset policy: active unfinished Dawn recovers even after cold interruption; stale HOLD yields to L01 on cold power-on; warm reset restores prior mode.
+- Created `FW10_CORE_R1_TEST.md`.
