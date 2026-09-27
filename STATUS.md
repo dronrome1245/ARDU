@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**FW-9 и M02 R1 закрыты на одном D6-кольце. M06 исключён владельцем из проекта. Текущий этап — L01 R1 ordinary light; после него clap diagnostic, затем полная интеграция Nano и regression.**
+**FW-9, M02 R1 и L01 R1 закрыты на одном D6-кольце. M06 исключён владельцем. Текущий этап — L01 R2 Kelvin/RGB + startup persistence; после него clap diagnostic, затем полная интеграция Nano и regression.**
 
 ## Что подтверждено и решено
 
@@ -35,8 +35,11 @@
 
 ### Обычный свет L01
 
-- постоянный белый свет;
+- температурный обычный свет с Kelvin;
+- пресеты 2700 K / 4000 K / 6000 K;
+- произвольный RGB-цвет;
 - регулируемая яркость;
+- сохранённый startup profile L01;
 - ВКЛ/ВЫКЛ из приложения;
 - автоматический L01 ON после холодного power-on от второй клавиши;
 - хлопковый выключатель на MAX9814;
@@ -1105,3 +1108,16 @@
 - Создан `nano_l01_r1`: постоянный RGB-white, startup ON, BRIGHT 0..255, ON/OFF, single-ring current limit 500 mA, FastLED/UART guard.
 - Создан `L01_R1_TEST.md`.
 - В L01 R1 clap и общая EEPROM persistence намеренно отсутствуют; они идут следующими слоями.
+
+
+### 2026-09-27 — L01 R1 passed; L01 R2 Kelvin/RGB persistence prepared
+
+- **ФАКТ:** владелец подтвердил полный hardware pass L01 R1: startup ON, постоянный белый, BRIGHT, ON/OFF, BRIGHT=0 semantics, UART stress и reset behavior.
+- **РЕШЕНИЕ:** L01 расширяется до температурного и цветного ordinary light.
+- Приложение должно иметь пресеты `2700 K / 4000 K / 6000 K`, Kelvin slider и произвольный color picker.
+- Выбранный L01 profile (Kelvin или RGB + brightness) должен сохраняться на Nano.
+- После полного отключения/включения питания cold startup должен включать L01 с последним сохранённым profile.
+- Создан `04_Прошивка/nano_l01_r2/nano_l01_r2.ino`.
+- Создан `04_Прошивка/L01_R2_TEST.md`.
+- R2 использует внутреннюю EEPROM Nano: `SAVE` коммитит profile, `LOAD` восстанавливает.
+- **Следующий практический шаг:** Verify/Upload L01 R2 и выполнить `L01_R2_TEST.md`; после pass перейти к clap diagnostic.
