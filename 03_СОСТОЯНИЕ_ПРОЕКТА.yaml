@@ -1171,10 +1171,10 @@ m02_r1_plan_2026_09_27:
   rainbow_step10_default: 50
   smooth_percent_default: 30
   inherited_uart_fix: true
-  compile_verified: false
-  upload_verified: false
+  compile_verified: true
+  upload_verified: true
   hardware_verified: false
-  next: verify_upload_adc_cal_visual_uart_regression
+  next: startup_status_adc_gate
 
 
 ordinary_light_requirements_2026_09_27:
