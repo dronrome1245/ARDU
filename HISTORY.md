@@ -1596,3 +1596,11 @@
 - Owner confirmed Night manual controls and RTC schedule work correctly inside FW10 CORE R1.
 - Reset persistence and manual override behavior also passed.
 - Remaining CORE R1 block: Dawn recovery and Alarm integration.
+
+
+## 2026-09-27 — moved integration regression to Android app stage
+
+- Owner chose not to repeat already performed Dawn/Alarm manual tests before app development.
+- Previous app-after-full-manual-regression order was superseded.
+- Android Studio/Kotlin selected for the new native app.
+- Created ESP8266 HTTP bridge R1 to expose Nano over home Wi-Fi, including Developer raw-command endpoint and async-event polling.
