@@ -1275,3 +1275,14 @@
 - Ambient/Music пока не включены; они добавляются после CORE pass отдельными интеграционными слоями.
 - **НЕ ПРОВЕРЕНО:** compile/upload FW-10 CORE R1.
 - Следующий практический шаг: Verify/Upload CORE R1; если compile fails — остановиться и исправить до hardware tests.
+
+
+### 2026-09-27 — FW-10 CORE R1 first compile error fixed
+
+- **ФАКТ:** первый Verify FW-10 CORE R1 упал на Arduino auto-prototype preprocessing:
+  - `LightPersist does not name a type`;
+  - `ClapPersist does not name a type`.
+- Причина: структуры были объявлены ниже функций, чьи прототипы Arduino IDE автоматически поднимала вверх.
+- Исправление: `LightPersist` и `ClapPersist` перенесены в верхнюю type section до функций.
+- Дополнительно проверен порядок всех пользовательских типов: более ранних использований до объявления не найдено.
+- Следующий шаг: повторный Verify того же `nano_fw10_core_r1.ino`.
