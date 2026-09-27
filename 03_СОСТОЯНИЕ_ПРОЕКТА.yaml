@@ -1145,6 +1145,7 @@ implementation_order_2026_09_27:
   sequence:
     - m02_r1_hardware_pass
     - m06_r1_hardware_pass
+    - l01_and_clap_hardware_pass
     - full_nano_firmware_integration
     - full_nano_regression
     - esp8266_uart_http
@@ -1174,3 +1175,32 @@ m02_r1_plan_2026_09_27:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_adc_cal_visual_uart_regression
+
+
+ordinary_light_requirements_2026_09_27:
+  owner_decision: true
+  top_level_mode: light
+  stable_id: L01
+  output: "two synchronized WS2812B rings"
+  behavior: constant_white
+  brightness_adjustable: true
+  app_on_off: true
+  cold_power_on_from_230v_switch: light_on
+  service_reset_is_not_power_switch: true
+  current_limit_required: true
+  clap_switch:
+    required: true
+    sensor: MAX9814_A0
+    local_on_nano: true
+    app_enable_disable: true
+    recognition_pattern: hardware_test_pending
+    false_trigger_test_required: [music, speech, household_impulses]
+  implementation_position: after_m06_before_full_nano
+
+app_rtc_display_2026_09_27:
+  owner_decision: true
+  display_on_main_screen: true
+  source_of_truth: DS3231
+  phone_time_is_not_display_time: true
+  phone_time_use: explicit_rtc_sync_only
+  api_source: "/api/time"
