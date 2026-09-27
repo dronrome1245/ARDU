@@ -1398,3 +1398,12 @@
 - Verify/compile и upload M02 R1 считаются пройденными.
 - Hardware functional test ещё не выполнен.
 - Следующий gate: Serial Monitor 115200 → startup/STATUS → `ADC`. К `CAL` переходить только если `ADC AVG` находится в защитном диапазоне 120..400 и STATUS показывает `DC_OK=YES`.
+
+
+## 2026-09-27 — M02 R1 ADC gate passed
+
+- M02 R1 runtime ADC: `AVG=250 MIN=226 MAX=274 P2P=48`.
+- STATUS: `FW=M02 REV=1 MODE=M02 POWER=ON BRIGHTNESS=64 BACKGROUND=0 SMOOTH=30 RAINSTEP10=50 MIC=MAX9814 MIC_PIN=A0 MIC_GAIN=40DB AR=FLOAT ADC_REF=DEFAULT DC=249 DC_OK=YES CAL=NO LOW_PASS=300 ... UPTIME_MS=428374`.
+- **ФАКТ:** MAX9814/A0 находится в валидном диапазоне; saturation отсутствует; DC startup согласуется с ADC AVG.
+- В присланной строке STATUS поле `LEDS=43` визуально пришло как `LDS=43`. Пока считать возможным единичным пропуском байта/копирования, не объявлять UART regression failed; проверить повторными STATUS/AUDIO при активной ленте.
+- Следующий шаг: полный M02 R1 hardware test, начиная с CAL в тишине.
