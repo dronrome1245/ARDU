@@ -26,7 +26,11 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 
-#include "wifi_secrets.h"
+// Fill these two values locally before compiling.
+// Do not commit your real Wi-Fi password to GitHub.
+const char* WIFI_SSID = "Имя_вашей_WiFi";
+const char* WIFI_PASSWORD = "Пароль_вашей_WiFi";
+
 
 namespace ArduConfig {
 constexpr unsigned long NANO_BAUD = 115200UL;
@@ -348,7 +352,7 @@ bool connectWifiBlocking() {
   WiFi.hostname(ArduConfig::HOSTNAME);
   WiFi.setAutoReconnect(true);
 
-  WiFi.begin(ARDU_WIFI_SSID, ARDU_WIFI_PASSWORD);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   const unsigned long start = millis();
 
@@ -387,7 +391,7 @@ void maintainWifi() {
 
   lastWifiRetryMs = now;
   WiFi.disconnect();
-  WiFi.begin(ARDU_WIFI_SSID, ARDU_WIFI_PASSWORD);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 }
 
 void setup() {
