@@ -1365,3 +1365,15 @@
 - Manual ON/OFF disables schedule; visual parameter changes do not.
 - Schedule transitions derive effective power from RTC without EEPROM writes.
 - RTC-invalid fail-safe while schedule enabled = light OFF.
+
+
+## 2026-09-27 — FW-9 закрыт; подготовлен M02 R1
+
+- Владелец подтвердил, что полный тест NIGHT R2 schedule сработал; FW-9 закрыт.
+- Владелец изменил порядок следующей работы: сначала отдельно M02, затем M06, и только после их pass — единая Nano-прошивка.
+- Создан `04_Прошивка/nano_m02_r1/nano_m02_r1.ino`.
+- M02 R1 основан на уже пройденной VU-логике M01 и Rainbow rendering ColorMusic v2.10.
+- Wiring не меняется: MAX9814 Out→A0, Gain→Vdd 40 dB, AR floating, D6 = одно кольцо 43 LED, D7 LOW.
+- В M02 R1 добавлены `ADC`, DC guard 120..400 для CAL, `SMOOTH 5..100`, `RAINSTEP10 5..200`, default BACKGROUND=0 и FastLED/UART guard из M05 R4.
+- Создан `04_Прошивка/M02_R1_TEST.md`.
+- Компиляция, upload и hardware pass M02 R1 пока не выполнены.
