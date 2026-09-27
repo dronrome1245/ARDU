@@ -1515,3 +1515,11 @@
 - Clap определяет clap по последовательности derivative fronts: positive → negative ≤200 ms → return to neutral ≤200 ms.
 - GyverLamp2 передаёт в Clap `VolAnalyzer.getRawMax()`, ставит threshold=250, sequence timeout=500 ms и переключает лампу по двум хлопкам.
 - Создан отдельный ARDU diagnostic с этой архитектурой без управления LED.
+
+
+## 2026-09-27 — Gyver clap R1 threshold mismatch on MAX9814
+
+- GYVER R1 не реагировал на хлопки при GyverLamp2 threshold=250.
+- Startup DC был ложным 1019, хотя последующий ADC давал AVG=250; startup ADC timing исправляется в новой ревизии.
+- Проверено: GyverLibs/Clap имеет собственный default threshold=150.
+- Создан GYVER R2 с TRSH=150, valid startup DC procedure, baseline priming и command-click guard.
