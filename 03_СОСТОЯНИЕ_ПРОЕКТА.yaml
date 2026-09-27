@@ -1593,3 +1593,13 @@ fw10_core_r1_l01_block_2026_09_27:
   cold_power_on_l01: passed
   owner_confirmed: true
   next: night_manual_schedule_regression
+
+
+fw10_core_r1_night_block_2026_09_27:
+  manual_mode: passed
+  visual_settings: passed
+  schedule_transitions: passed
+  schedule_reset_persistence: passed
+  manual_override_disables_schedule: passed
+  owner_confirmed: true
+  next: dawn_recovery_alarm_regression
