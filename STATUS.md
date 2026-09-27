@@ -1346,3 +1346,22 @@
   - schedule persistence through Reset;
   - manual NIGHT ON override disables schedule.
 - Следующий и последний CORE R1 functional block: Dawn renderer/recovery + Alarm trigger.
+
+
+### 2026-09-27 — regression moved to app; ESP HTTP bridge R1 created
+
+- **РЕШЕНИЕ владельца:** повторный ручной Dawn/Alarm/Core regression отложить; выполнять финальный сквозной regression уже через приложение.
+- Android Studio доступен; целевое приложение — native Kotlin.
+- Создан `05_WiFi_и_приложение/esp8266_http_bridge_r1/esp8266_http_bridge_r1.ino`.
+- ESP R1:
+  - Station only;
+  - local HTTP;
+  - `GET /api/ping`;
+  - `GET /api/status`;
+  - `GET /api/time`;
+  - `POST /api/dev/nano` raw Developer command;
+  - `GET /api/events` polling последних async Nano lines;
+  - UART Nano = 115200.
+- Wi-Fi credentials вынесены в ignored local `wifi_secrets.h`; в repo только `wifi_secrets.example.h`.
+- Создан `ESP8266_HTTP_BRIDGE_R1_TEST.md`.
+- Следующий шаг: compile/upload ESP bridge и только минимально подтвердить Wi-Fi/HTTP/Nano transport; затем создавать Android app R1.
