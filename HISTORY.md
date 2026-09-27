@@ -1390,3 +1390,11 @@
 - Создан `04_Прошивка/LIGHT_CLAP_REQUIREMENTS.md`.
 - Обновлены документы режимов, приложения, API, stable IDs и протокола.
 - План перед полной интеграцией расширен: после M02 и M06 отдельно закрыть L01 и clap detector.
+
+
+## 2026-09-27 — M02 R1 compile + upload passed
+
+- Владелец подтвердил успешную загрузку `04_Прошивка/nano_m02_r1/nano_m02_r1.ino` на физическую Arduino Nano.
+- Verify/compile и upload M02 R1 считаются пройденными.
+- Hardware functional test ещё не выполнен.
+- Следующий gate: Serial Monitor 115200 → startup/STATUS → `ADC`. К `CAL` переходить только если `ADC AVG` находится в защитном диапазоне 120..400 и STATUS показывает `DC_OK=YES`.
