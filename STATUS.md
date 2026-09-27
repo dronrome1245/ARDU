@@ -1171,3 +1171,13 @@
 - **ФАКТ:** присланные CAPTURE maxima находятся примерно в диапазоне P2P 318..507 / DEV 172..269; несколько измерений практически доходят до одинакового ограниченного диапазона MAX9814.
 - **РЕШЕНИЕ ДЛЯ СЛЕДУЮЩЕГО ТЕСТА:** не использовать текущий auto-calculated threshold; вручную поставить `THRESH 180 120` и проверить event capture на хлопках/тишине/речи/музыке.
 - Следующая ревизия calibration должна использовать устойчивый baseline (average/percentile/exceedance), а не абсолютный максимум окна.
+
+
+### 2026-09-27 — CLAP DIAG R3 delayed arming prepared
+
+- Root cause confirmed: Serial Monitor mouse click can contaminate immediate calibration/arming.
+- R3 waits 1500 ms before CALCLAP measurement and before arming after CLEAR/ARM ON.
+- R3 derives thresholds from quiet averages; quiet maxima are informational only.
+- Event candidate now requires BOTH P2P and DEV; lockout increased to 250 ms.
+- Created `nano_clap_diag_r3` and `CLAP_DIAG_R3_TEST.md`.
+- Next: Verify/Upload R3, then clap/silence/speech/music/double-clap characterization.
