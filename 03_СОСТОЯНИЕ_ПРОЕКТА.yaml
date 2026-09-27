@@ -1402,3 +1402,21 @@ clap_diag_r3_plan_2026_09_27:
   upload_verified: false
   hardware_verified: false
   next: verify_upload_false_positive_characterization
+
+
+clap_gyver_r1_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_clap_gyver_r1/nano_clap_gyver_r1.ino"
+  test_doc: "04_Прошивка/CLAP_GYVER_R1_TEST.md"
+  reference_doc: "04_Прошивка/CLAP_GYVER_REFERENCE.md"
+  algorithm_source: "AlexGyver GyverLamp2 bundled VolAnalyzer + Clap"
+  signal_to_clap: getRawMax
+  detector: derivative_state_machine
+  derivative_threshold_default: 250
+  sequence_timeout_ms_default: 500
+  target_claps: 2
+  action_in_test: diagnostic_only
+  fallback_thresholds: [200, 150]
+  compile_verified: false
+  upload_verified: false
+  hardware_verified: false
+  next: verify_upload_double_clap_false_positive_test
