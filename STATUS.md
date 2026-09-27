@@ -1121,3 +1121,10 @@
 - Создан `04_Прошивка/L01_R2_TEST.md`.
 - R2 использует внутреннюю EEPROM Nano: `SAVE` коммитит profile, `LOAD` восстанавливает.
 - **Следующий практический шаг:** Verify/Upload L01 R2 и выполнить `L01_R2_TEST.md`; после pass перейти к clap diagnostic.
+
+
+### 2026-09-27 — L01 R2 compile/upload passed
+
+- **ФАКТ:** L01 R2 успешно загружен на физическую Nano.
+- **НЕ ПРОВЕРЕНО:** Kelvin presets/range, arbitrary RGB, brightness, SAVE/LOAD, reset restore и full power-cycle restore.
+- Следующий шаг — полный `L01_R2_TEST.md`.
