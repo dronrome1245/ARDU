@@ -1548,3 +1548,10 @@
 - Double-clap test produced at least 4 confirmed DOUBLE_CLAP events but owner reports roughly every-other-pair reliability.
 - Successful detected pair gaps were about 141..291 ms.
 - Next reversible tuning step: threshold 70 only; keep timeout 500 ms fixed.
+
+
+## 2026-09-27 — created app-ready family clap calibration
+
+- Владелец потребовал учитывать нескольких детей с разной силой хлопка.
+- Создан CLAP GYVER R3 CAL: guided quiet + multi-user double-clap sampling, suggested threshold, test-before-save, EEPROM persistence.
+- Calibration protocol спроектирован так, чтобы ESP/app позже могли управлять им без raw Developer Mode.
