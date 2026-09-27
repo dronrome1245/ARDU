@@ -1542,10 +1542,17 @@ fw10_core_r1_2026_09_27:
     stale_dawn_hold: clear_and_L01
     otherwise: L01
   warm_reset_policy: restore_last_mode_or_dawn_runtime
-  compile_verified: false
+  compile_verified: true
+  compile_flash_bytes: 26014
+  compile_flash_total_bytes: 30720
+  compile_flash_percent: 84
+  compile_global_sram_bytes: 1316
+  compile_sram_total_bytes: 2048
+  compile_global_sram_percent: 64
+  compile_reported_free_sram_bytes: 732
   upload_verified: false
   hardware_verified: false
-  next: verify_compile_then_upload
+  next: upload_and_startup_gate
 
 
 fw10_core_r1_compile_fix_2026_09_27:
