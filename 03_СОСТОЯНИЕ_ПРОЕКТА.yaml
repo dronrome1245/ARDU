@@ -1576,3 +1576,10 @@ fw10_core_r1_startup_2026_09_27:
   clap_threshold: 70
   rtc_valid: false
   blocker: rtc_diagnostics_before_core_regression
+
+
+fw10_core_r1_rtc_gate_2026_09_27:
+  rtc_valid: true
+  owner_confirmed: true
+  blocker_cleared: true
+  next: l01_clap_reset_power_regression
