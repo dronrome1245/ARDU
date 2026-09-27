@@ -1056,9 +1056,11 @@ void toggleLightByClap(){
   if(currentMode==SystemMode::LIGHT){
     currentMode=SystemMode::OFF; saveCore(); prepareOff();
     Serial.println(F("EVENT CLAP_TOGGLE LIGHT=OFF"));
+    resetClapDetector();
   } else if(currentMode==SystemMode::OFF){
     currentMode=SystemMode::LIGHT; saveCore(); prepareLight();
     Serial.println(F("EVENT CLAP_TOGGLE LIGHT=ON"));
+    resetClapDetector();
   }
 }
 
@@ -1079,9 +1081,15 @@ void updateClap(){
 
 void applyMode(SystemMode m,bool persist){
   currentMode=m;
-  if(m==SystemMode::LIGHT)prepareLight();
-  else if(m==SystemMode::NIGHT)(void)reconcileNight(false);
-  else if(m==SystemMode::OFF)prepareOff();
+  if(m==SystemMode::LIGHT){
+    prepareLight();
+    resetClapDetector();
+  } else if(m==SystemMode::NIGHT){
+    (void)reconcileNight(false);
+  } else if(m==SystemMode::OFF){
+    prepareOff();
+    resetClapDetector();
+  }
   if(persist && m!=SystemMode::DAWN)saveCore();
 }
 
@@ -1310,7 +1318,7 @@ void handleDawn(char* a){
 }
 
 void handleCommand(char* cmd){
-  clapIgnoreUntil=millis()+Cfg::CLAP_COMMAND_GUARD_MS;
+  resetClapDetector();
 
   if(strcmp(cmd,"PING")==0){Serial.println(F("PONG"));return;}
   if(strcmp(cmd,"STATUS")==0){printMainStatus();return;}
