@@ -1442,3 +1442,14 @@
 - Созданы `04_Прошивка/nano_l01_r1/nano_l01_r1.ino` и `04_Прошивка/L01_R1_TEST.md`.
 - L01 R1: одно кольцо D6/43 LED, постоянный RGB-white, startup ON, BRIGHT, ON/OFF, 500 mA current limit, UART guard.
 - Следующий критерий — Verify/Upload и hardware pass L01 R1.
+
+
+## 2026-09-27 — L01 R1 passed; L01 R2 created
+
+- Владелец подтвердил, что весь L01 R1 test прошёл.
+- После R1 добавлено новое требование: ordinary light должен иметь регулируемую теплоту и произвольный цвет.
+- Приняты app presets 2700 K / 4000 K / 6000 K + Kelvin slider + color picker.
+- Принято сохранять startup L01 profile на Nano: color mode, Kelvin/RGB и brightness.
+- Создан `nano_l01_r2` с EEPROM persistence.
+- Kelvin mapping для WS2812B помечен как approximate visual mapping, не как измеренная CCT.
+- Следующий hardware test — L01 R2 persistence после reset/power cycle.
