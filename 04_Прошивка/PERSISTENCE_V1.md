@@ -29,7 +29,6 @@ Nano является источником истины по пользоват�
 - M02: brightness/background/smoothing/rainbow speed;
 - M03/M04: brightness/background/smoothing/sensitivity/noise settings;
 - M05: brightness/background/submode/smoothing/sensitivity;
-- M06: brightness/strobe period/frequency/smoothing и safety-limited параметры;
 - M08: brightness/background/submode/speed/sensitivity;
 - M09: brightness/background/HUE_START/HUE_STEP/sensitivity;
 - F01/F02/F03 и AMBIENT auto-cycle/period;
