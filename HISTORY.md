@@ -1453,3 +1453,10 @@
 - Создан `nano_l01_r2` с EEPROM persistence.
 - Kelvin mapping для WS2812B помечен как approximate visual mapping, не как измеренная CCT.
 - Следующий hardware test — L01 R2 persistence после reset/power cycle.
+
+
+## 2026-09-27 — L01 R2 compile + upload passed
+
+- Владелец подтвердил успешную загрузку `04_Прошивка/nano_l01_r2/nano_l01_r2.ino` на физическую Nano.
+- Compile/Verify + Upload L01 R2 пройдены.
+- Следующий gate: полный Kelvin/RGB/persistence hardware test, включая SAVE→reset и SAVE→полное снятие/возврат питания.
