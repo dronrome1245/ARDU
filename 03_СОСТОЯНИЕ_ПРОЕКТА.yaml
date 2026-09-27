@@ -1335,7 +1335,38 @@ clap_diag_r1_plan_2026_09_27:
   event_fields: [P2P, PEAK_DEV, AVG, GAP_MS]
   false_positive_tests: [speech, music, household_impulses]
   final_gesture: hardware_data_pending
+  compile_verified: true
+  upload_verified: true
+  hardware_verified: false
+  result: insufficient_detector
+  observed:
+    startup_dc: 255
+    startup_dc_ok: true
+    calibrated: false
+    default_threshold_p2p: 180
+    adc_avg: 264
+    adc_min: 246
+    adc_max: 281
+    adc_p2p: 35
+    adc_peak_dev: 26
+    mouse_click_event_p2p_min: 181
+    mouse_click_event_p2p_max: 417
+    clap_event_count: 0
+  next: superseded_by_clap_diag_r2
+
+
+clap_diag_r2_plan_2026_09_27:
+  code_path: "04_Прошивка/nano_clap_diag_r2/nano_clap_diag_r2.ino"
+  test_doc: "04_Прошивка/CLAP_DIAG_R2_TEST.md"
+  revision: 2
+  raw_capture_delay_ms: 1000
+  raw_capture_window_ms: 3000
+  raw_capture_threshold_free: true
+  raw_capture_fields: [MAX_P2P, MAX_DEV, MIN, MAX, MAX_AVG_SHIFT, BLOCKS]
+  event_logic: "P2P OR absolute deviation from DC"
+  block_samples: 16
+  capture_cases: [silence, mouse_click, clap_x3, speech, music]
   compile_verified: false
   upload_verified: false
   hardware_verified: false
-  next: verify_upload_characterize_claps
+  next: verify_upload_raw_capture_comparison
