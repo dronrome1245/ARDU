@@ -394,6 +394,21 @@ void maintainWifi() {
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 }
 
+void resyncNanoAfterEspBoot() {
+  // ESP8266 ROM prints boot bytes on TX before the sketch starts.
+  // If Nano is already running, those bytes can leave a partial command
+  // in its line buffer. A clean newline terminates/discards that partial
+  // line before HTTP requests are accepted.
+  Serial.print('\n');
+  Serial.flush();
+  delay(40);
+
+  // Discard Nano's possible ERR UNKNOWN_COMMAND reply to boot garbage.
+  while (Serial.available() > 0) {
+    (void)Serial.read();
+  }
+}
+
 void setup() {
   // UART0 is the Nano transport after normal boot.
   Serial.begin(ArduConfig::NANO_BAUD);
@@ -402,6 +417,10 @@ void setup() {
   delay(250);
 
   (void)connectWifiBlocking();
+
+  // Nano has had enough time to leave its bootloader even on a joint cold start.
+  resyncNanoAfterEspBoot();
+
   startMdnsIfPossible();
   setupHttp();
 }
