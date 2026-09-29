@@ -1687,3 +1687,9 @@
 - После успешного Gradle Sync приложение R1 запущено из Android Studio на физическом Android-телефоне.
 - Build/install/runtime startup прошли без ошибки, приложение открылось.
 - Сетевой app→ESP transport ещё не считается пройденным до подтверждения `Online`, STATUS/TIME и Developer PING/PONG.
+
+## 2026-09-29 — Android app R1 /api/ping passed
+
+- На физическом Android-телефоне приложение R1 показало `Онлайн • HTTP_BRIDGE_R1`.
+- Автоматический `GET /api/ping` из приложения до физического ESP8266 подтверждён.
+- Следующая проверка — raw Nano STATUS, затем DS3231 time и Developer raw PING.
