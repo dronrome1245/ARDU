@@ -1693,3 +1693,9 @@
 - На физическом Android-телефоне приложение R1 показало `Онлайн • HTTP_BRIDGE_R1`.
 - Автоматический `GET /api/ping` из приложения до физического ESP8266 подтверждён.
 - Следующая проверка — raw Nano STATUS, затем DS3231 time и Developer raw PING.
+
+## 2026-09-30 — Android app R1 /api/status passed
+
+- На физическом телефоне app R1 успешно получил raw Nano STATUS через `GET /api/status`.
+- Подтверждены поля: `FW=FW10_CORE`, `REV=1`, `LEDS=44`, `RING_A=D6`, `RING_B=DISCONNECTED_TEST`, `LIMIT_MA=500`, `RTC_VALID=YES`, `CLAP=ON`, `CLAP_TRSH=70`.
+- Следующий app gate: `GET /api/time`, затем Developer raw `PING`.
