@@ -1641,3 +1641,11 @@
 - `STATUS` returned FW10 CORE R1 over HTTP/UART with no timeout.
 - `PING` returned `PONG`.
 - `TIME` returned `ERR RTC_INVALID`, proving command transport is functional while RTC remains invalid.
+
+
+## 2026-09-29 — ESP boot UART framing issue identified
+
+- After an ESP restart, the first HTTP→Nano command once returned `ERR UNKNOWN_COMMAND` even though the JSON command field contained the correct `SET ...`.
+- Root cause is consistent with ESP8266 ROM boot bytes on TX leaving a partial line in Nano's UART parser before the first normal command.
+- HTTP bridge R1 source now sends a clean newline after Wi-Fi startup and drains the resulting stale Nano reply before starting HTTP service.
+- This source change requires a later ESP reflash; current RTC verification can continue on the already-flashed build by simply repeating the first command after ESP restart.
