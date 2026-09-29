@@ -1685,8 +1685,8 @@ android_app_r1_2026_09_29:
   build_verified: true
   physical_phone_run_verified: true
   app_ping_verified: true
-  app_status_verified: false
+  app_status_verified: true
   app_time_verified: false
   app_dev_ping_verified: false
   app_transport_pass: pending
-  next: android_app_r1_status_check
+  next: android_app_r1_time_check
