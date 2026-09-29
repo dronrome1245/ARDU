@@ -13,4 +13,16 @@
     <string name="raw_command_hint">Команда Nano, например PING</string>
     <string name="send">Отправить</string>
     <string name="developer_response">Ответ Nano</string>
+    <string name="light_title">Обычный свет L01</string>
+    <string name="light_api_checking">Проверка L01…</string>
+    <string name="light_api_unavailable">L01 API недоступен — нужен ESP HTTP_BRIDGE_R2</string>
+    <string name="light_on">Включить</string>
+    <string name="light_off">Выключить</string>
+    <string name="light_power_on">Включён</string>
+    <string name="light_power_off">Выключен</string>
+    <string name="light_color_kelvin">%1$d K</string>
+    <string name="light_color_rgb">RGB %1$d,%2$d,%3$d</string>
+    <string name="light_state_format">%1$s • %2$s • яркость %3$d</string>
+    <string name="light_applying">Применение…</string>
+    <string name="light_apply_error">Ошибка L01: %1$s</string>
 </resources>

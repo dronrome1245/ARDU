@@ -18,6 +18,18 @@ data class NanoResponse(
     val timedOut: Boolean
 )
 
+data class LightStatus(
+    val enabled: Boolean,
+    val colorMode: String,
+    val kelvin: Int,
+    val red: Int,
+    val green: Int,
+    val blue: Int,
+    val brightness: Int,
+    val saved: Boolean,
+    val dirty: Boolean
+)
+
 class ArduApiClient {
     private val candidates = listOf(
         "http://ardu.local",
@@ -61,6 +73,60 @@ class ArduApiClient {
     fun time(): NanoResponse =
         getNanoResponse("/api/time")
 
+    fun lightStatus(): LightStatus {
+        val baseUrl = requireBaseUrl()
+        val body = request(
+            baseUrl = baseUrl,
+            path = "/api/light/status",
+            method = "GET",
+            body = null
+        )
+
+        val json = JSONObject(body)
+
+        if (!json.optBoolean("ok", false)) {
+            throw IOException(json.optString("error", "LIGHT_STATUS_FAILED"))
+        }
+
+        val rgb = json.optJSONObject("rgb")
+            ?: throw IOException("LIGHT_STATUS_RGB_MISSING")
+
+        return LightStatus(
+            enabled = json.getBoolean("enabled"),
+            colorMode = json.getString("color_mode"),
+            kelvin = json.getInt("kelvin"),
+            red = rgb.getInt("r"),
+            green = rgb.getInt("g"),
+            blue = rgb.getInt("b"),
+            brightness = json.getInt("brightness"),
+            saved = json.getBoolean("saved"),
+            dirty = json.getBoolean("dirty")
+        )
+    }
+
+    fun setLightEnabled(enabled: Boolean) {
+        val baseUrl = requireBaseUrl()
+        val payload = JSONObject()
+            .put("enabled", enabled)
+            .toString()
+
+        val body = request(
+            baseUrl = baseUrl,
+            path = "/api/light/settings",
+            method = "POST",
+            body = payload,
+            contentType = "application/json; charset=utf-8"
+        )
+
+        val json = JSONObject(body)
+
+        if (!json.optBoolean("ok", false) ||
+            !json.optBoolean("applied", false) ||
+            json.optBoolean("enabled", !enabled) != enabled) {
+            throw IOException(json.optString("error", "LIGHT_APPLY_FAILED"))
+        }
+    }
+
     fun sendNanoCommand(command: String): NanoResponse {
         val clean = command.trim()
 
@@ -74,7 +140,8 @@ class ArduApiClient {
             baseUrl = baseUrl,
             path = "/api/dev/nano",
             method = "POST",
-            body = clean
+            body = clean,
+            contentType = "text/plain; charset=utf-8"
         )
         return parseNano(body)
     }
@@ -122,24 +189,22 @@ class ArduApiClient {
         baseUrl: String,
         path: String,
         method: String,
-        body: String?
+        body: String?,
+        contentType: String = "application/json; charset=utf-8"
     ): String {
         val connection = URL(baseUrl + path).openConnection() as HttpURLConnection
 
         try {
             connection.requestMethod = method
             connection.connectTimeout = 1800
-            connection.readTimeout = 2500
+            connection.readTimeout = 3000
             connection.useCaches = false
             connection.setRequestProperty("Accept", "application/json")
 
             if (body != null) {
                 val bytes = body.toByteArray(StandardCharsets.UTF_8)
                 connection.doOutput = true
-                connection.setRequestProperty(
-                    "Content-Type",
-                    "text/plain; charset=utf-8"
-                )
+                connection.setRequestProperty("Content-Type", contentType)
                 connection.setFixedLengthStreamingMode(bytes.size)
                 connection.outputStream.use { it.write(bytes) }
             }

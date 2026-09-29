@@ -15,3 +15,12 @@
 - исходники: `android_app_r1/`;
 - transport test: `ANDROID_APP_R1_TEST.md`;
 - первый gate: `/api/ping` → `/api/status` → `/api/time` → Developer raw `PING`.
+
+
+## ESP8266 HTTP BRIDGE R2 / L01 stage 1
+
+- код: `esp8266_http_bridge_r2/esp8266_http_bridge_r2.ino`;
+- тест: `ESP8266_HTTP_BRIDGE_R2_TEST.md`;
+- новый semantic API: `GET /api/light/status`, `POST /api/light/settings` (пока только `enabled`);
+- R1 diagnostic endpoints сохранены;
+- R2 включает ранее добавленный startup UART framing fix.

@@ -37,3 +37,5 @@ build/
 .kotlin/
 local.properties
 *.iml
+
+05_WiFi_и_приложение/esp8266_http_bridge_r2/wifi_secrets.h

@@ -1,4 +1,4 @@
-# ARDU Android app R1
+# ARDU Android app — текущая рабочая копия
 
 Первый native Android/Kotlin слой для проверки уже закрытого транспорта ARDU:
 
@@ -40,3 +40,23 @@ R1 сначала пробует локальное имя `ardu.local`, зат�
 3. затем продолжать по D-071 малыми интеграционными слоями.
 
 `/api/events` намеренно оставлен на следующую малую итерацию Developer Mode.
+
+
+## Transport R1 — PASS 2026-09-30
+
+На физическом Android-телефоне пройдены:
+- Gradle Sync;
+- build/install/launch;
+- `/api/ping` → `Онлайн • HTTP_BRIDGE_R1`;
+- `/api/status` → FW10 CORE R1;
+- `/api/time` → растущее время DS3231;
+- Developer `PING` → `PONG`.
+
+## L01 stage 1
+
+Текущая следующая итерация добавляет пользовательский блок обычного света:
+- чтение `GET /api/light/status`;
+- включение/выключение через semantic `POST /api/light/settings`;
+- raw Developer endpoint обычный UI не использует.
+
+Для этого физический ESP должен быть обновлён до `HTTP_BRIDGE_R2`.
