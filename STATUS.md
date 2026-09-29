@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют закрытый минимальный transport gate. Android app R1 запущен на физическом телефоне; `/api/ping` и `/api/status` из приложения пройдены. Текущий gate — `/api/time → Developer PING`; после него — пользовательский экран L01 и regression через приложение по D-071.**
+**FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют закрытый минимальный transport gate. Android app R1 запущен на физическом телефоне; `/api/ping`, `/api/status` и `/api/time` из приложения пройдены. Текущий gate — Developer `PING→PONG`; после него минимальный app transport R1 закрыт и можно переходить к пользовательскому экрану L01 по D-071.**
 
 ## Что подтверждено и решено
 
@@ -1477,3 +1477,9 @@
 - **ФАКТ:** физический Android-телефон через app R1 получил Nano STATUS: `FW=FW10_CORE REV=1 MODE=OFF RESET=WARM_UNKNOWN MCUSR=0 LEDS=44 RING_A=D6 RING_B=DISCONNECTED_TEST LIMIT_MA=500 RTC_VALID=YES TIME=2026-09-30 00:39:56 CLAP=ON CLAP_TRSH=70 UPTIME_MS=83578`.
 - Подтверждён реальный путь `Android app → ESP HTTP /api/status → UART → Nano → ответ обратно`.
 - Следующий gate: отдельное поле времени приложения через `/api/time`, затем Developer `PING→PONG`.
+
+### 2026-09-30 — Android app R1 /api/time passed
+
+- **ФАКТ:** поле `Время ARDU (DS3231)` на физическом телефоне показывает валидное время формата `2026-09-30 00:xx:xx` и оно увеличивается после обновления.
+- **ФАКТ:** `UPTIME_MS` в Nano STATUS также увеличивается между запросами, что подтверждает непрерывную работу Nano во время теста.
+- Следующий и последний gate минимального app transport R1: Developer Mode `PING → PONG`.
