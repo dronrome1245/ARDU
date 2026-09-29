@@ -1699,3 +1699,9 @@
 - На физическом телефоне app R1 успешно получил raw Nano STATUS через `GET /api/status`.
 - Подтверждены поля: `FW=FW10_CORE`, `REV=1`, `LEDS=44`, `RING_A=D6`, `RING_B=DISCONNECTED_TEST`, `LIMIT_MA=500`, `RTC_VALID=YES`, `CLAP=ON`, `CLAP_TRSH=70`.
 - Следующий app gate: `GET /api/time`, затем Developer raw `PING`.
+
+## 2026-09-30 — Android app R1 /api/time passed
+
+- На физическом Android-телефоне app R1 показывает фактическое время DS3231 через `GET /api/time`.
+- После повторного обновления время увеличивается; `UPTIME_MS` Nano также растёт между запросами.
+- Последний transport gate R1: Developer raw `PING` должен вернуть `PONG`.
