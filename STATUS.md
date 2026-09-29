@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют закрытый минимальный transport gate. Android Studio/Kotlin app R1 создан, Gradle Sync пройден. Текущий gate — запуск на физическом Android-телефоне и сквозной app transport pass `/api/ping → /api/status → /api/time → Developer PING`; после него — пользовательский экран L01 и regression через приложение по D-071.**
+**FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют закрытый минимальный transport gate. Android Studio/Kotlin app R1 создан, Gradle Sync пройден, приложение собрано/установлено и открылось на физическом Android-телефоне. Текущий gate — реальный app transport pass `/api/ping → /api/status → /api/time → Developer PING`; после него — пользовательский экран L01 и regression через приложение по D-071.**
 
 ## Что подтверждено и решено
 
@@ -1451,7 +1451,8 @@
 - `/api/events` намеренно отложен на следующую малую Developer Mode итерацию.
 - Добавлен `05_WiFi_и_приложение/ANDROID_APP_R1_TEST.md`.
 - **ФАКТ:** Gradle Sync в Android Studio на Windows успешно пройден 2026-09-29 после разрешения AGP path check для Unicode-пути репозитория.
-- **НЕ ПРОВЕРЕНО ФИЗИЧЕСКИ:** Android build/install на телефоне и реальные HTTP-запросы именно из приложения ещё не пройдены.
+- **ФАКТ:** Android build/install и запуск приложения на физическом телефоне успешно пройдены.
+- **НЕ ПРОВЕРЕНО:** реальные HTTP-запросы именно из приложения к ARDU ещё не подтверждены.
 - Следующий gate: запустить приложение на физическом телефоне и закрыть `ping → status → time → Developer PING/PONG`; после PASS перейти к экрану L01.
 
 ### 2026-09-29 — Android app R1 Gradle Sync passed
@@ -1459,3 +1460,8 @@
 - **ФАКТ:** проект `05_WiFi_и_приложение/android_app_r1` успешно синхронизирован Android Studio.
 - Первый sync blocker был связан с кириллицей в пути `05_WiFi_и_приложение`; исправлен настройкой `android.overridePathCheck=true` в `gradle.properties`.
 - Следующий gate: запуск приложения на физическом Android-телефоне в той же домашней Wi-Fi сети.
+
+### 2026-09-29 — Android app R1 physical launch passed
+
+- **ФАКТ:** приложение R1 успешно собрано, установлено и открылось на физическом Android-телефоне из Android Studio.
+- Следующий gate — подтвердить автоматический `/api/ping` по отображению `Онлайн • HTTP_BRIDGE_R1`, затем STATUS/TIME и Developer `PING→PONG`.
