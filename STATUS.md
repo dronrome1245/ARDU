@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют закрытый минимальный transport gate. Создан исходный Android Studio/Kotlin app R1 для `/api/ping`, `/api/status`, `/api/time` и Developer raw Nano command. Текущий gate — Gradle Sync + запуск на физическом Android-телефоне и сквозной app transport pass; после него — пользовательский экран L01 и regression через приложение по D-071.**
+**FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют закрытый минимальный transport gate. Android Studio/Kotlin app R1 создан, Gradle Sync пройден. Текущий gate — запуск на физическом Android-телефоне и сквозной app transport pass `/api/ping → /api/status → /api/time → Developer PING`; после него — пользовательский экран L01 и regression через приложение по D-071.**
 
 ## Что подтверждено и решено
 
@@ -1450,5 +1450,12 @@
 - Nano остаётся источником истины; обычный UI не показывает IP или UART.
 - `/api/events` намеренно отложен на следующую малую Developer Mode итерацию.
 - Добавлен `05_WiFi_и_приложение/ANDROID_APP_R1_TEST.md`.
-- **НЕ ПРОВЕРЕНО ФИЗИЧЕСКИ:** Gradle Sync, Android build/install и реальные HTTP-запросы именно из приложения на телефоне ещё не пройдены.
-- Следующий gate: открыть проект в Android Studio, запустить на физическом телефоне и закрыть `ping → status → time → Developer PING/PONG`; после PASS перейти к экрану L01.
+- **ФАКТ:** Gradle Sync в Android Studio на Windows успешно пройден 2026-09-29 после разрешения AGP path check для Unicode-пути репозитория.
+- **НЕ ПРОВЕРЕНО ФИЗИЧЕСКИ:** Android build/install на телефоне и реальные HTTP-запросы именно из приложения ещё не пройдены.
+- Следующий gate: запустить приложение на физическом телефоне и закрыть `ping → status → time → Developer PING/PONG`; после PASS перейти к экрану L01.
+
+### 2026-09-29 — Android app R1 Gradle Sync passed
+
+- **ФАКТ:** проект `05_WiFi_и_приложение/android_app_r1` успешно синхронизирован Android Studio.
+- Первый sync blocker был связан с кириллицей в пути `05_WiFi_и_приложение`; исправлен настройкой `android.overridePathCheck=true` в `gradle.properties`.
+- Следующий gate: запуск приложения на физическом Android-телефоне в той же домашней Wi-Fi сети.
