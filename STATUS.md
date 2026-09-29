@@ -1432,3 +1432,12 @@
 - Предыдущий `ERR RTC_WRITE` был связан с физическим соединением RTC после компактной пересборки.
 - Остался финальный read-back gate: `GET /api/time` должен вернуть валидное `TIME ...`.
 - После read-back минимальный ESP/Wi-Fi/UART/RTC transport gate считается закрытым, следующий этап — Android Studio Kotlin app R1.
+
+
+### 2026-09-29 — ESP/Wi-Fi/UART/RTC transport gate closed
+
+- **ФАКТ:** после исправления RTC-провода `SET 2026-09-29 23:39:00` вернул `OK TIME=...`.
+- **ФАКТ:** последующий `GET /api/time` вернул `TIME 2026-09-29 23:41:24` с `timed_out=false`.
+- **ФАКТ:** ранее в том же рабочем стенде подтверждены `/api/ping`, `/api/status` и raw `PING→PONG`.
+- Минимальный gate `Android/PC → Wi-Fi → ESP8266 HTTP → UART → Nano → DS3231 → ответ обратно` закрыт.
+- По D-071 следующий практический этап — Android Studio / Kotlin app R1; повторный ручной общий regression выполняется уже через приложение.
