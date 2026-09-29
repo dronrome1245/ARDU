@@ -1626,3 +1626,11 @@
 - Upload completed to 100% on physical ESP8266EX.
 - Flash 4 MB auto-detected; hash verified.
 - Next is normal boot + working UART + HTTP smoke test.
+
+
+## 2026-09-29 — Nano TX → ESP RX divider voltage verified
+
+- Working UART level divider was rebuilt compactly and checked.
+- Nano TX is ~5 V, ESP RX is ~3.3 V relative to common GND.
+- Measured TX-to-RX drop ~1.65 V, consistent with correct divider operation.
+- Next: re-test HTTP→UART bridge with `/api/status`.
