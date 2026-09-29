@@ -1681,3 +1681,9 @@
 - В `android_app_r1/gradle.properties` добавлен `android.overridePathCheck=true`.
 - После `git pull` владелец повторил Gradle Sync; Sync прошёл успешно.
 - Build/install и физический app→ESP transport test ещё не выполнены.
+
+## 2026-09-29 — Android app R1 physical launch passed
+
+- После успешного Gradle Sync приложение R1 запущено из Android Studio на физическом Android-телефоне.
+- Build/install/runtime startup прошли без ошибки, приложение открылось.
+- Сетевой app→ESP transport ещё не считается пройденным до подтверждения `Online`, STATUS/TIME и Developer PING/PONG.
