@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют закрытый минимальный transport gate. Android Studio/Kotlin app R1 создан, Gradle Sync пройден, приложение собрано/установлено и открылось на физическом Android-телефоне. Текущий gate — реальный app transport pass `/api/ping → /api/status → /api/time → Developer PING`; после него — пользовательский экран L01 и regression через приложение по D-071.**
+**FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют закрытый минимальный transport gate. Android Studio/Kotlin app R1 создан и запущен на физическом Android-телефоне; реальный `/api/ping` из приложения пройден (`Онлайн • HTTP_BRIDGE_R1`). Текущий gate — `/api/status → /api/time → Developer PING`; после него — пользовательский экран L01 и regression через приложение по D-071.**
 
 ## Что подтверждено и решено
 
@@ -1465,3 +1465,9 @@
 
 - **ФАКТ:** приложение R1 успешно собрано, установлено и открылось на физическом Android-телефоне из Android Studio.
 - Следующий gate — подтвердить автоматический `/api/ping` по отображению `Онлайн • HTTP_BRIDGE_R1`, затем STATUS/TIME и Developer `PING→PONG`.
+
+### 2026-09-29 — Android app R1 /api/ping passed
+
+- **ФАКТ:** физический Android-телефон с app R1 показал `Онлайн • HTTP_BRIDGE_R1`.
+- Это подтверждает реальный путь `Android app → home Wi-Fi → ESP8266 HTTP /api/ping`.
+- Следующий gate: проверить отображаемый Nano STATUS, затем DS3231 time и Developer `PING→PONG`.
