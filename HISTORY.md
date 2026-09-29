@@ -1656,3 +1656,10 @@
 - After correcting the RTC wiring, remote `SET 2026-09-29 23:39:00` returned `OK TIME=2026-09-29 23:39:00`.
 - No UART timeout occurred.
 - Final confirmation is a `/api/time` read-back.
+
+
+## 2026-09-29 — transport smoke gate fully passed
+
+- RTC read-back after wiring repair: `TIME 2026-09-29 23:41:24`, `timed_out=false`.
+- Together with verified `/api/ping`, `STATUS`, and `PING→PONG`, this closes the minimum ESP HTTP↔UART↔Nano↔RTC transport smoke test.
+- Next implementation stage: native Android Studio/Kotlin app R1.
