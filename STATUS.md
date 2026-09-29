@@ -1414,3 +1414,13 @@
 - **ФАКТ:** рабочий делитель `Nano D1/TX → 1.5 kΩ → ESP RX`, с нижним плечом `3.0 kΩ` к GND, собран и проверен мультиметром.
 - **ФАКТ:** уровни относительно общей GND соответствуют ожидаемым (~5 V на Nano TX и ~3.3 V на ESP RX); падение между Nano TX и ESP RX около 1.65 V согласуется с делителем.
 - Следующий gate: повторный `GET /api/status` для проверки двунаправленного UART ESP↔Nano.
+
+
+### 2026-09-29 — ESP↔Nano UART transport passed
+
+- **ФАКТ:** после компактной пересборки рабочий UART ESP8266↔Nano проходит end-to-end HTTP test.
+- `GET /api/status` returned Nano `STATUS FW=FW10_CORE REV=1 ...` with `timed_out=false`.
+- raw `PING` through `POST /api/dev/nano` returned `PONG`.
+- `GET /api/time` reaches Nano but returns `ERR RTC_INVALID`.
+- **Вывод:** Wi-Fi + HTTP + both UART directions are working; remaining issue is isolated to RTC validity/wiring/state, not ESP transport.
+- Next: restore/verify DS3231, then Android Studio Kotlin R1 can start on the now-proven transport.
