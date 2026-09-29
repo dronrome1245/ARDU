@@ -1674,3 +1674,10 @@
 - Добавлены Gradle wrapper, Android manifest/network config и `ANDROID_APP_R1_TEST.md`.
 - `/api/events` оставлен на следующую малую итерацию.
 - В текущем AI/runtime нет Android SDK, поэтому Gradle Sync/build/install и физический app transport PASS здесь не объявляются выполненными.
+
+## 2026-09-29 — Android app R1 Gradle Sync passed
+
+- Первый Android Studio sync остановился на AGP path check из-за non-ASCII символов в каталоге `05_WiFi_и_приложение`.
+- В `android_app_r1/gradle.properties` добавлен `android.overridePathCheck=true`.
+- После `git pull` владелец повторил Gradle Sync; Sync прошёл успешно.
+- Build/install и физический app→ESP transport test ещё не выполнены.
