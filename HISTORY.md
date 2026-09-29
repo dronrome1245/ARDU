@@ -1649,3 +1649,10 @@
 - Root cause is consistent with ESP8266 ROM boot bytes on TX leaving a partial line in Nano's UART parser before the first normal command.
 - HTTP bridge R1 source now sends a clean newline after Wi-Fi startup and drains the resulting stale Nano reply before starting HTTP service.
 - This source change requires a later ESP reflash; current RTC verification can continue on the already-flashed build by simply repeating the first command after ESP restart.
+
+
+## 2026-09-29 — RTC write restored
+
+- After correcting the RTC wiring, remote `SET 2026-09-29 23:39:00` returned `OK TIME=2026-09-29 23:39:00`.
+- No UART timeout occurred.
+- Final confirmation is a `/api/time` read-back.
