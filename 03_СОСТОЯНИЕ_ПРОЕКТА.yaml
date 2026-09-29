@@ -1654,3 +1654,15 @@ esp8266_http_bridge_r1_wifi_smoke_2026_09_27:
   ip: "192.168.0.4"
   rssi_dbm: -55
   next: verify_uart_status_and_ping
+
+
+transport_gate_closed_2026_09_29:
+  esp_wifi_http: passed
+  nano_uart_roundtrip: passed
+  ping_pong: passed
+  status: passed
+  rtc_write: passed
+  rtc_readback: passed
+  rtc_readback_value: "2026-09-29 23:41:24"
+  final_regression_via_android_app: true
+  next: android_studio_kotlin_app_r1
