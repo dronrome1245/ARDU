@@ -1705,3 +1705,18 @@
 - На физическом Android-телефоне app R1 показывает фактическое время DS3231 через `GET /api/time`.
 - После повторного обновления время увеличивается; `UPTIME_MS` Nano также растёт между запросами.
 - Последний transport gate R1: Developer raw `PING` должен вернуть `PONG`.
+
+## 2026-09-30 — Android app transport R1 closed
+
+- Developer Mode на физическом телефоне: `PING` → `PONG`.
+- Минимальный app transport R1 теперь полностью закрыт: ping, Nano STATUS, DS3231 time и raw Developer command пройдены через реальное приложение.
+
+## 2026-09-30 — implemented L01 semantic stage 1
+
+- Создан ESP8266 HTTP BRIDGE R2 как новая ревизия после hardware-tested R1.
+- R2 добавляет semantic L01 read `GET /api/light/status` и первый write slice `POST /api/light/settings {"enabled":true|false}`.
+- Semantic status формируется только после запросов Nano `STATUS` + `LIGHT STATUS`; Nano остаётся источником истины.
+- ON/OFF преобразуется в `LIGHT ON` / `LIGHT OFF` и HTTP success возвращается только после ожидаемого ACK Nano.
+- Android current project расширен пользовательским L01 блоком; raw `/api/dev/nano` остаётся только Developer Mode.
+- Добавлен `ESP8266_HTTP_BRIDGE_R2_TEST.md`.
+- R2 compile/upload и physical L01 test ещё не выполнялись.

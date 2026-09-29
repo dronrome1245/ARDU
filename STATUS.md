@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют закрытый минимальный transport gate. Android app R1 запущен на физическом телефоне; `/api/ping`, `/api/status` и `/api/time` из приложения пройдены. Текущий gate — Developer `PING→PONG`; после него минимальный app transport R1 закрыт и можно переходить к пользовательскому экрану L01 по D-071.**
+**Минимальный Android app transport R1 полностью пройден на физическом телефоне (`ping/status/time/Developer PING→PONG`). Следующий слой уже реализован в репозитории: ESP8266 `HTTP_BRIDGE_R2` + пользовательский L01 semantic API/status + ON/OFF в текущем Android-проекте. Текущий gate — compile/upload R2 на физический ESP и сквозной L01 ON/OFF test.**
 
 ## Что подтверждено и решено
 
@@ -1483,3 +1483,19 @@
 - **ФАКТ:** поле `Время ARDU (DS3231)` на физическом телефоне показывает валидное время формата `2026-09-30 00:xx:xx` и оно увеличивается после обновления.
 - **ФАКТ:** `UPTIME_MS` в Nano STATUS также увеличивается между запросами, что подтверждает непрерывную работу Nano во время теста.
 - Следующий и последний gate минимального app transport R1: Developer Mode `PING → PONG`.
+
+### 2026-09-30 — Android app transport R1 fully passed
+
+- **ФАКТ:** Developer Mode на физическом Android-телефоне отправил raw `PING` через `POST /api/dev/nano` и получил `PONG`.
+- Вместе с уже пройденными app `/api/ping`, `/api/status` и `/api/time` это закрывает минимальный Android transport R1.
+- Проверенный путь: `Android app → home Wi-Fi → ESP8266 HTTP_BRIDGE_R1 → UART → Nano FW10 CORE R1 → DS3231/Nano response → app`.
+
+### 2026-09-30 — L01 semantic stage 1 implemented in repository
+
+- **ФАКТ ПО КОДУ:** создана новая ревизия ESP `05_WiFi_и_приложение/esp8266_http_bridge_r2/esp8266_http_bridge_r2.ino`; проверенный R1 не переписан.
+- R2 сохраняет R1 endpoints и startup UART framing fix, добавляет:
+  - `GET /api/light/status`;
+  - `POST /api/light/settings` с первым атомарным payload `{"enabled":true|false}`.
+- Обычный Android UI больше не использует raw Developer endpoint для L01: добавлен блок `Обычный свет L01`, semantic read и кнопки ON/OFF.
+- **НЕ ПРОВЕРЕНО ФИЗИЧЕСКИ:** R2 ещё не компилировался/не загружался на ESP; L01 semantic ON/OFF из приложения ещё не проходил hardware test.
+- Следующий gate: compile/upload HTTP_BRIDGE_R2, получить `HTTP_BRIDGE_R2` в app, затем проверить L01 ON/OFF.

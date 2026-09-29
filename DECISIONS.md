@@ -1139,3 +1139,21 @@ App calibration по D-068 позже может заменить threshold/time
 **Статус:** ДЕЙСТВУЕТ
 
 Мобильное приложение ARDU реализуется как native Android project в Android Studio. Язык — Kotlin. Старый MIT App Inventor остаётся только UX/behavior reference и не является целевой платформой.
+
+---
+
+## D-073 — пользовательский L01 не использует raw Developer endpoint
+
+**Дата:** 2026-09-30  
+**Статус:** ДЕЙСТВУЕТ
+
+Первый пользовательский слой L01 после закрытия Android transport R1 реализуется через semantic HTTP API ESP, а не через `/api/dev/nano`.
+
+Порядок первой итерации:
+1. `GET /api/light/status` читает фактический `STATUS` + `LIGHT STATUS` Nano и формирует пользовательское состояние;
+2. `POST /api/light/settings` в HTTP_BRIDGE_R2 принимает только атомарное поле `enabled` и переводит его в `LIGHT ON/OFF`;
+3. неподдерживаемые поля отклоняются явно, а не игнорируются;
+4. расширение brightness/Kelvin/RGB/persistence выполняется следующими малыми итерациями после аппаратного ON/OFF pass;
+5. raw `/api/dev/nano` остаётся сервисным Developer Mode.
+
+**Причина:** сохранить Nano источником истины, не связывать обычный UI с внутренним UART-протоколом и тестировать интеграцию маленькими обратимыми слоями.
