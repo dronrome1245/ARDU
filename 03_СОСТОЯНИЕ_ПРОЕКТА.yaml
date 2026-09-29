@@ -1681,8 +1681,8 @@ android_app_r1_2026_09_29:
   events_deferred: true
   nano_source_of_truth: true
   normal_ui_shows_ip: false
-  gradle_sync_verified: false
+  gradle_sync_verified: true
   build_verified: false
   physical_phone_run_verified: false
   app_transport_pass: pending
-  next: android_app_r1_physical_transport_pass
+  next: android_app_r1_physical_phone_run
