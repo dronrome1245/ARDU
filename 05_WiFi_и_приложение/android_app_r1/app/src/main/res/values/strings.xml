@@ -15,7 +15,7 @@
     <string name="developer_response">Ответ Nano</string>
     <string name="light_title">Обычный свет L01</string>
     <string name="light_api_checking">Проверка L01…</string>
-    <string name="light_api_unavailable">L01 API недоступен — нужен ESP HTTP_BRIDGE_R2</string>
+    <string name="light_api_unavailable">Не удалось прочитать состояние L01</string>
     <string name="light_on">Включить</string>
     <string name="light_off">Выключить</string>
     <string name="light_power_on">Включён</string>

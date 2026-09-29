@@ -52,11 +52,13 @@ R1 сначала пробует локальное имя `ardu.local`, зат�
 - `/api/time` → растущее время DS3231;
 - Developer `PING` → `PONG`.
 
-## L01 stage 1
+## L01 stage 1 — без перепрошивки ESP
 
-Текущая следующая итерация добавляет пользовательский блок обычного света:
-- чтение `GET /api/light/status`;
-- включение/выключение через semantic `POST /api/light/settings`;
-- raw Developer endpoint обычный UI не использует.
+Физический ESP остаётся на уже проверенном `HTTP_BRIDGE_R1`.
 
-Для этого физический ESP должен быть обновлён до `HTTP_BRIDGE_R2`.
+Обычный пользовательский UI остаётся semantic: пользователь не видит IP/UART/raw-команды. Внутри Android transport layer временно используется существующий `POST /api/dev/nano` как compatibility adapter:
+- read L01: `STATUS` + `LIGHT STATUS`;
+- ON: `LIGHT ON`;
+- OFF: `LIGHT OFF`.
+
+Nano остаётся источником истины. `HTTP_BRIDGE_R2` сохраняется в репозитории как заготовка для будущего пакетного обновления ESP, но сейчас физическая перепрошивка не требуется.

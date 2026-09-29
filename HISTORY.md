@@ -1720,3 +1720,10 @@
 - Android current project расширен пользовательским L01 блоком; raw `/api/dev/nano` остаётся только Developer Mode.
 - Добавлен `ESP8266_HTTP_BRIDGE_R2_TEST.md`.
 - R2 compile/upload и physical L01 test ещё не выполнялись.
+
+## 2026-09-30 — deferred repeated ESP reflashing
+
+- После подготовки HTTP_BRIDGE_R2 владелец указал, что рабочий стенд уже компактно спаян и повторная перепрошивка ESP требует нежелательного вмешательства в монтаж.
+- Текущий L01 stage 1 переведён на Android compatibility adapter поверх уже hardware-tested HTTP_BRIDGE_R1.
+- Android internally sends `LIGHT STATUS`, `LIGHT ON`, `LIGHT OFF` through existing `POST /api/dev/nano`; ordinary UI raw transport details are hidden.
+- HTTP_BRIDGE_R2 source сохранён для будущего пакетного ESP update; физический R2 upload сейчас отложен.

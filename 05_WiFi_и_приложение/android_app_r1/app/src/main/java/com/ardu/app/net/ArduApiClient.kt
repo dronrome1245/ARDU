@@ -74,57 +74,68 @@ class ArduApiClient {
         getNanoResponse("/api/time")
 
     fun lightStatus(): LightStatus {
-        val baseUrl = requireBaseUrl()
-        val body = request(
-            baseUrl = baseUrl,
-            path = "/api/light/status",
-            method = "GET",
-            body = null
-        )
+        // Temporary compatibility adapter for the already-installed
+        // HTTP_BRIDGE_R1. The ordinary UI stays semantic, while this client
+        // translates it to the proven raw Nano transport internally.
+        val systemLine = status().nano
+        val lightLine = sendNanoCommand("LIGHT STATUS").nano
 
-        val json = JSONObject(body)
+        val systemMode = statusToken(systemLine, "MODE=")
+        val colorMode = statusToken(lightLine, "MODE=")
+        val kelvin = statusToken(lightLine, "KELVIN=").toIntOrNull()
+            ?: throw IOException("BAD_LIGHT_KELVIN")
+        val brightness = statusToken(lightLine, "BRIGHTNESS=").toIntOrNull()
+            ?: throw IOException("BAD_LIGHT_BRIGHTNESS")
+        val rgb = statusToken(lightLine, "RGB=")
+            .split(',')
+            .map { it.toIntOrNull() }
 
-        if (!json.optBoolean("ok", false)) {
-            throw IOException(json.optString("error", "LIGHT_STATUS_FAILED"))
+        if (colorMode != "KELVIN" && colorMode != "RGB") {
+            throw IOException("BAD_LIGHT_COLOR_MODE")
         }
 
-        val rgb = json.optJSONObject("rgb")
-            ?: throw IOException("LIGHT_STATUS_RGB_MISSING")
+        if (rgb.size != 3 || rgb.any { it == null }) {
+            throw IOException("BAD_LIGHT_RGB")
+        }
+
+        val saved = statusToken(lightLine, "SAVED=")
+        val dirty = statusToken(lightLine, "DIRTY=")
 
         return LightStatus(
-            enabled = json.getBoolean("enabled"),
-            colorMode = json.getString("color_mode"),
-            kelvin = json.getInt("kelvin"),
-            red = rgb.getInt("r"),
-            green = rgb.getInt("g"),
-            blue = rgb.getInt("b"),
-            brightness = json.getInt("brightness"),
-            saved = json.getBoolean("saved"),
-            dirty = json.getBoolean("dirty")
+            enabled = systemMode == "L01",
+            colorMode = colorMode.lowercase(),
+            kelvin = kelvin,
+            red = rgb[0]!!,
+            green = rgb[1]!!,
+            blue = rgb[2]!!,
+            brightness = brightness,
+            saved = saved == "YES",
+            dirty = dirty == "YES"
         )
     }
 
     fun setLightEnabled(enabled: Boolean) {
-        val baseUrl = requireBaseUrl()
-        val payload = JSONObject()
-            .put("enabled", enabled)
-            .toString()
+        val command = if (enabled) "LIGHT ON" else "LIGHT OFF"
+        val expected = if (enabled) "OK LIGHT=ON" else "OK LIGHT=OFF"
+        val response = sendNanoCommand(command)
 
-        val body = request(
-            baseUrl = baseUrl,
-            path = "/api/light/settings",
-            method = "POST",
-            body = payload,
-            contentType = "application/json; charset=utf-8"
-        )
-
-        val json = JSONObject(body)
-
-        if (!json.optBoolean("ok", false) ||
-            !json.optBoolean("applied", false) ||
-            json.optBoolean("enabled", !enabled) != enabled) {
-            throw IOException(json.optString("error", "LIGHT_APPLY_FAILED"))
+        if (response.nano != expected) {
+            throw IOException("UNEXPECTED_NANO_ACK: " + response.nano)
         }
+    }
+
+    private fun statusToken(line: String, key: String): String {
+        val keyPos = line.indexOf(key)
+        if (keyPos < 0) {
+            throw IOException("STATUS_FIELD_MISSING: " + key)
+        }
+
+        val start = keyPos + key.length
+        val end = line.indexOf(' ', start).let {
+            if (it < 0) line.length else it
+        }
+
+        return line.substring(start, end)
     }
 
     fun sendNanoCommand(command: String): NanoResponse {

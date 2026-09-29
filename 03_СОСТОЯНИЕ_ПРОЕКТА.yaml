@@ -1689,7 +1689,7 @@ android_app_r1_2026_09_29:
   app_time_verified: true
   app_dev_ping_verified: true
   app_transport_pass: passed
-  next: esp8266_http_bridge_r2_compile_upload
+  next: android_l01_r1_compatibility_test
 
 esp8266_http_bridge_r2_l01_stage1_2026_09_30:
   code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r2/esp8266_http_bridge_r2.ino"
@@ -1706,16 +1706,26 @@ esp8266_http_bridge_r2_l01_stage1_2026_09_30:
   upload_verified: false
   physical_light_status_verified: false
   physical_light_on_off_verified: false
-  next: compile_then_upload_r2
+  next: deferred_until_batched_esp_update
 
 android_l01_stage1_2026_09_30:
   project_path: "05_WiFi_и_приложение/android_app_r1"
   app_version_name: "0.2-l01-r1"
   source_created: true
-  reads_semantic_light_status: true
+  reads_semantic_light_status: false
+  r1_compatibility_adapter: true
+  r1_internal_commands: [STATUS, LIGHT_STATUS, LIGHT_ON, LIGHT_OFF]
   controls_enabled_only: true
   brightness_controls: false
   kelvin_controls: false
   rgb_controls: false
   physical_verified: false
-  next: after_esp_r2_upload_run_l01_on_off
+  next: run_l01_on_off_on_existing_http_bridge_r1
+
+esp_reflash_policy_2026_09_30:
+  owner_decision: true
+  current_physical_bridge: HTTP_BRIDGE_R1
+  compact_wiring_should_remain_undisturbed: true
+  reflash_for_each_app_iteration: false
+  batch_future_esp_changes_before_reflash: true
+  http_bridge_r2_source_kept_for_future: true

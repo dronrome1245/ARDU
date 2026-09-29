@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**Минимальный Android app transport R1 полностью пройден на физическом телефоне (`ping/status/time/Developer PING→PONG`). Следующий слой уже реализован в репозитории: ESP8266 `HTTP_BRIDGE_R2` + пользовательский L01 semantic API/status + ON/OFF в текущем Android-проекте. Текущий gate — compile/upload R2 на физический ESP и сквозной L01 ON/OFF test.**
+**Минимальный Android app transport R1 полностью пройден. Физический ESP оставляем на уже проверенном HTTP_BRIDGE_R1, чтобы не разбирать компактно спаянный стенд ради каждой app-итерации. L01 status + ON/OFF реализованы в Android через внутренний compatibility adapter к `/api/dev/nano`; обычный UI raw-команды не показывает. Текущий gate — обновить только Android app и пройти сквозной L01 ON/OFF. HTTP_BRIDGE_R2 отложен до пакетной перепрошивки ESP.**
 
 ## Что подтверждено и решено
 
@@ -1499,3 +1499,12 @@
 - Обычный Android UI больше не использует raw Developer endpoint для L01: добавлен блок `Обычный свет L01`, semantic read и кнопки ON/OFF.
 - **НЕ ПРОВЕРЕНО ФИЗИЧЕСКИ:** R2 ещё не компилировался/не загружался на ESP; L01 semantic ON/OFF из приложения ещё не проходил hardware test.
 - Следующий gate: compile/upload HTTP_BRIDGE_R2, получить `HTTP_BRIDGE_R2` в app, затем проверить L01 ON/OFF.
+
+### 2026-09-30 — ESP reflash deferred; L01 uses R1 compatibility adapter
+
+- **РЕШЕНИЕ владельца:** не разбирать/переключать уже компактно спаянный рабочий стенд ради каждой новой app-функции.
+- **РЕШЕНИЕ:** физический ESP пока остаётся на проверенном `HTTP_BRIDGE_R1`.
+- Android L01 stage 1 использует существующий `/api/dev/nano` только внутри transport layer: `STATUS`, `LIGHT STATUS`, `LIGHT ON`, `LIGHT OFF`.
+- Обычный пользовательский UI не показывает raw-команды/IP/UART; Nano остаётся источником истины.
+- `HTTP_BRIDGE_R2` не удаляется, но его физический compile/upload больше не является текущим gate. Семантические ESP endpoints будут собраны пакетно и прошиты позже одним обслуживаемым этапом.
+- **Текущий следующий gate:** пересобрать только Android app на телефоне и проверить L01 OFF→ON→OFF через текущий физический HTTP_BRIDGE_R1.
