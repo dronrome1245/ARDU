@@ -1407,3 +1407,10 @@
 - Ответ: `ok=true`, device=`ARDU-ESP8266`, fw=`HTTP_BRIDGE_R1`, `wifi_connected=true`, IP=`192.168.0.4`, RSSI=`-55 dBm`.
 - Wi-Fi Station + local HTTP server считаются пройденными.
 - Следующий gate: UART ESP↔Nano через `GET /api/status` и raw `POST /api/dev/nano` body=`PING`.
+
+
+### 2026-09-29 — рабочий UART divider Nano→ESP проверен
+
+- **ФАКТ:** рабочий делитель `Nano D1/TX → 1.5 kΩ → ESP RX`, с нижним плечом `3.0 kΩ` к GND, собран и проверен мультиметром.
+- **ФАКТ:** уровни относительно общей GND соответствуют ожидаемым (~5 V на Nano TX и ~3.3 V на ESP RX); падение между Nano TX и ESP RX около 1.65 V согласуется с делителем.
+- Следующий gate: повторный `GET /api/status` для проверки двунаправленного UART ESP↔Nano.
