@@ -1634,3 +1634,10 @@
 - Nano TX is ~5 V, ESP RX is ~3.3 V relative to common GND.
 - Measured TX-to-RX drop ~1.65 V, consistent with correct divider operation.
 - Next: re-test HTTP→UART bridge with `/api/status`.
+
+
+## 2026-09-29 — HTTP→ESP→Nano round trip passed
+
+- `STATUS` returned FW10 CORE R1 over HTTP/UART with no timeout.
+- `PING` returned `PONG`.
+- `TIME` returned `ERR RTC_INVALID`, proving command transport is functional while RTC remains invalid.
