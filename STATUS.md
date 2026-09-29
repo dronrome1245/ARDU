@@ -1424,3 +1424,11 @@
 - `GET /api/time` reaches Nano but returns `ERR RTC_INVALID`.
 - **Вывод:** Wi-Fi + HTTP + both UART directions are working; remaining issue is isolated to RTC validity/wiring/state, not ESP transport.
 - Next: restore/verify DS3231, then Android Studio Kotlin R1 can start on the now-proven transport.
+
+
+### 2026-09-29 — RTC write restored after wiring fix
+
+- **ФАКТ:** после исправления провода DS3231 команда через HTTP/UART `SET 2026-09-29 23:39:00` вернула `OK TIME=2026-09-29 23:39:00` с `timed_out=false`.
+- Предыдущий `ERR RTC_WRITE` был связан с физическим соединением RTC после компактной пересборки.
+- Остался финальный read-back gate: `GET /api/time` должен вернуть валидное `TIME ...`.
+- После read-back минимальный ESP/Wi-Fi/UART/RTC transport gate считается закрытым, следующий этап — Android Studio Kotlin app R1.
