@@ -1666,3 +1666,23 @@ transport_gate_closed_2026_09_29:
   rtc_readback_value: "2026-09-29 23:41:24"
   final_regression_via_android_app: true
   next: android_studio_kotlin_app_r1
+
+android_app_r1_2026_09_29:
+  code_path: "05_WiFi_и_приложение/android_app_r1"
+  test_doc: "05_WiFi_и_приложение/ANDROID_APP_R1_TEST.md"
+  platform: Android_Studio
+  language: Kotlin
+  agp: "9.4.1"
+  gradle: "9.6.0"
+  compile_sdk: 36
+  min_sdk: 26
+  source_created: true
+  endpoints: [GET_api_ping, GET_api_status, GET_api_time, POST_api_dev_nano]
+  events_deferred: true
+  nano_source_of_truth: true
+  normal_ui_shows_ip: false
+  gradle_sync_verified: false
+  build_verified: false
+  physical_phone_run_verified: false
+  app_transport_pass: pending
+  next: android_app_r1_physical_transport_pass

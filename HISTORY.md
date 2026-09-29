@@ -1663,3 +1663,14 @@
 - RTC read-back after wiring repair: `TIME 2026-09-29 23:41:24`, `timed_out=false`.
 - Together with verified `/api/ping`, `STATUS`, and `PING→PONG`, this closes the minimum ESP HTTP↔UART↔Nano↔RTC transport smoke test.
 - Next implementation stage: native Android Studio/Kotlin app R1.
+
+## 2026-09-29 — создан Android Studio/Kotlin app R1 transport layer
+
+- После закрытия Wi-Fi/HTTP↔UART↔Nano↔DS3231 gate создан первый native Android/Kotlin project: `05_WiFi_и_приложение/android_app_r1/`.
+- Transport вынесен в `ArduApiClient`; UI не выполняет HTTP напрямую.
+- Реализованы `/api/ping`, `/api/status`, `/api/time` и Developer raw `POST /api/dev/nano`.
+- Для текущего HTTP_BRIDGE_R1 приложение отображает raw Nano STATUS/TIME из фактического поля `nano`, не подменяя текущий transport bridge будущим semantic API.
+- Обычный UI не показывает IP/UART; raw-команды находятся только в скрываемом Developer Mode.
+- Добавлены Gradle wrapper, Android manifest/network config и `ANDROID_APP_R1_TEST.md`.
+- `/api/events` оставлен на следующую малую итерацию.
+- В текущем AI/runtime нет Android SDK, поэтому Gradle Sync/build/install и физический app transport PASS здесь не объявляются выполненными.

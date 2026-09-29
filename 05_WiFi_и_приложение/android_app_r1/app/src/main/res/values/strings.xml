@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ARDU</string>
+    <string name="title_ardu">ARDU</string>
+    <string name="connection_checking">Проверка связи…</string>
+    <string name="connection_offline">Нет связи</string>
+    <string name="refresh">Обновить</string>
+    <string name="device_state">Состояние устройства</string>
+    <string name="ardu_time">Время ARDU (DS3231)</string>
+    <string name="unknown_value">—</string>
+    <string name="developer_mode">Developer Mode</string>
+    <string name="hide_developer_mode">Скрыть Developer Mode</string>
+    <string name="raw_command_hint">Команда Nano, например PING</string>
+    <string name="send">Отправить</string>
+    <string name="developer_response">Ответ Nano</string>
+</resources>

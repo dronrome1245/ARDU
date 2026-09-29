@@ -1,10 +1,10 @@
 # Статус проекта ARDU
 
-Дата состояния: 2026-09-27
+Дата состояния: 2026-09-29
 
 ## Текущий этап
 
-**FW-9, M02 R1, L01 R1/R2/R3 закрыты. M06 исключён владельцем. Физическое кольцо = 44 LED. Старые 43-LED тестовые скетчи сохраняются без изменений. Текущий этап — CLAP DIAG R1; после clap algorithm — общая Nano-прошивка сразу под 44 LED с адаптацией геометрии музыкальных режимов.**
+**FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют закрытый минимальный transport gate. Создан исходный Android Studio/Kotlin app R1 для `/api/ping`, `/api/status`, `/api/time` и Developer raw Nano command. Текущий gate — Gradle Sync + запуск на физическом Android-телефоне и сквозной app transport pass; после него — пользовательский экран L01 и regression через приложение по D-071.**
 
 ## Что подтверждено и решено
 
@@ -1441,3 +1441,14 @@
 - **ФАКТ:** ранее в том же рабочем стенде подтверждены `/api/ping`, `/api/status` и raw `PING→PONG`.
 - Минимальный gate `Android/PC → Wi-Fi → ESP8266 HTTP → UART → Nano → DS3231 → ответ обратно` закрыт.
 - По D-071 следующий практический этап — Android Studio / Kotlin app R1; повторный ручной общий regression выполняется уже через приложение.
+
+### 2026-09-29 — создан исходный Android Studio/Kotlin app R1
+
+- **ФАКТ ПО РЕПОЗИТОРИЮ:** создан `05_WiFi_и_приложение/android_app_r1/` — native Android/Kotlin проект R1 с Gradle wrapper.
+- R1 реализует `GET /api/ping`, `GET /api/status`, `GET /api/time` и скрытый Developer Mode для raw `POST /api/dev/nano`.
+- Текущий bridge-контракт отражён без выдуманного semantic layer: STATUS/TIME берутся из поля `nano` и показывают фактический ответ Nano.
+- Nano остаётся источником истины; обычный UI не показывает IP или UART.
+- `/api/events` намеренно отложен на следующую малую Developer Mode итерацию.
+- Добавлен `05_WiFi_и_приложение/ANDROID_APP_R1_TEST.md`.
+- **НЕ ПРОВЕРЕНО ФИЗИЧЕСКИ:** Gradle Sync, Android build/install и реальные HTTP-запросы именно из приложения на телефоне ещё не пройдены.
+- Следующий gate: открыть проект в Android Studio, запустить на физическом телефоне и закрыть `ping → status → time → Developer PING/PONG`; после PASS перейти к экрану L01.

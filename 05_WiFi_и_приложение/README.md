@@ -9,3 +9,9 @@
 5. `../08_Исходники_и_референсы/Ardublock2_РАЗБОР.md` — почему принято именно так.
 
 Старое приложение LumpV3.1 не является реализационным шаблоном. Оно используется как источник функций и истории поведения.
+
+## Android app R1
+
+- исходники: `android_app_r1/`;
+- transport test: `ANDROID_APP_R1_TEST.md`;
+- первый gate: `/api/ping` → `/api/status` → `/api/time` → Developer raw `PING`.
