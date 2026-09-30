@@ -128,7 +128,7 @@ ARDU — проект двух синхронных круглых потоло�
 3. L01 R1/R2/R3 закрыты; физическое кольцо теперь 44 LED. Старые hardware-tested 43-LED скетчи по D-066 не переписывать.
 4. Clap baseline принят: double clap, TRSH=70, TIMEOUT=500; семейная calibration отложена до приложения.
 5. FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют проверенный минимальный end-to-end transport: Wi-Fi/HTTP ↔ UART ↔ Nano ↔ DS3231.
-6. Android transport, OTA и semantic L01 ON/OFF уже пройдены. Физический ESP обновляется по Wi-Fi; wired programmer path = recovery-only. Текущий крупный gate — HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1`: arbitrary Kelvin, RGB и явное сохранение startup-профиля с power-cycle regression.
+6. Android transport, OTA и полный L01 profile/persistence уже пройдены на HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1`. Wired ESP programmer path = recovery-only. Следующий крупный gate — clap app control + family calibration; для него сначала создаётся FW10 CORE R2 с CLAPCAL и проверяется AVR flash/SRAM budget до физической загрузки Nano.
 7. Второе кольцо D7 физически подключать после устойчивой полной настройки первого кольца; оно получает зеркальный кадр, а не отдельную логику.
 
 
