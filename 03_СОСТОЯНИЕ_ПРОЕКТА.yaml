@@ -1746,8 +1746,8 @@ esp8266_http_bridge_r3_ota_2026_09_30:
     password_required: true
     serial_logging_disabled: true
   compile_verified: false
-  wired_upload_verified: false
-  normal_boot_http_verified: false
+  wired_upload_verified: true
+  normal_boot_http_verified: true
   ota_discovery_verified: false
   ota_upload_verified: false
   future_default_esp_update_path: OTA_after_pass
@@ -1772,4 +1772,17 @@ esp8266_http_bridge_r4_ota_2026_09_30:
   compile_verified: false
   wired_upload_verified: false
   ota_upload_verified: false
-  next: compile_r4
+  next: verify_ota_network_upload
+
+r4_ping_result_2026_09_30:
+  status: passed
+  ip: "192.168.0.4"
+  firmware: HTTP_BRIDGE_R4
+  wifi_connected: true
+  rssi_dbm: -57
+  ota_ready: true
+  ota_hostname: ardu
+  ota_port: 8266
+  mdns_ardu_local_windows_curl: unresolved
+  interpretation: direct_ip_transport_ok_mdns_resolution_issue_only
+  next: ota_network_upload_proof
