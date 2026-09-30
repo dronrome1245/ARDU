@@ -1724,11 +1724,12 @@ android_l01_stage1_2026_09_30:
 
 esp_reflash_policy_2026_09_30:
   owner_decision: true
-  current_physical_bridge: HTTP_BRIDGE_R1
+  current_physical_bridge: HTTP_BRIDGE_R5
   compact_wiring_should_remain_undisturbed: true
   reflash_for_each_app_iteration: false
-  batch_future_esp_changes_before_reflash: true
-  http_bridge_r2_source_kept_for_future: true
+  default_future_esp_update_path: OTA_after_post_upload_regression
+  wired_programmer_role: recovery_only_after_post_upload_regression
+  http_bridge_r2_source_kept_for_history: true
 
 esp8266_http_bridge_r3_ota_2026_09_30:
   status: superseded_before_test
@@ -1792,7 +1793,7 @@ r4_ping_result_2026_09_30:
 
 
 esp8266_http_bridge_r5_ota_proof_2026_09_30:
-  status: prepared_for_physical_ota_test
+  status: ota_uploaded_and_booted
   code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r5/esp8266_http_bridge_r5.ino"
   base: HTTP_BRIDGE_R4
   revision: 5
@@ -1804,11 +1805,17 @@ esp8266_http_bridge_r5_ota_proof_2026_09_30:
   local_credentials_required_before_upload: true
   target_network_port: "ardu 192.168.0.4"
   wiring_change_required: false
-  compile_verified: false
-  ota_upload_verified: false
+  compile_verified: true
+  ota_authentication_verified: true
+  ota_upload_verified: true
+  reboot_verified: true
+  api_ping_after_reboot_verified: true
+  api_ping_firmware: HTTP_BRIDGE_R5
+  wifi_after_reboot_verified: true
+  ota_service_after_reboot_verified: true
   post_upload_checks:
     - GET_api_ping_fw_HTTP_BRIDGE_R5
     - GET_api_status
     - GET_api_time
     - Developer_PING_PONG
-  next: owner_verify_then_upload_via_network_port
+  next: verify_post_ota_status_time_ping
