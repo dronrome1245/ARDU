@@ -1957,3 +1957,14 @@ R3 экономит относительно R2:
 - R3 разрешён для аппаратного CLAPCAL integration test;
 - это НЕ финальное закрытие memory budget для Music/Ambient;
 - после functional CLAPCAL pass перед full Music/Ambient integration потребуется отдельный общий memory optimization/budget этап.
+
+
+## 2026-09-30 — CORE R3 upload attempt did not write Nano; CLAPCAL paused
+
+- CORE R3 Verify: flash 27822/30720 (90%), globals 1392/2048 (67%).
+- Owner attempted Nano upload on COM3 / ATmega328P Old Bootloader while the compact ESP↔Nano UART wiring remained in place and ESP was held in reset.
+- avrdude returned repeated `programmer is not responding / not in sync: resp=0x00`.
+- No successful flash write occurred; physical Nano therefore remains on the previously verified FW10 CORE R1.
+- This failure is not a flash-size error. It is consistent with the already known Nano bootloader requirement that D0/D1 be isolated from the ESP during USB serial upload; merely holding ESP RESET low was not sufficient on this physical assembly.
+- Re-evaluation: CLAPCAL is useful but not required to continue the app. FW10 CORE R1 already provides the accepted runtime double-clap baseline `TRSH=70 / TIMEOUT=500`, plus L01/Night/Alarm/Dawn/RTC.
+- Current tactic: do not disturb the compact Nano wiring just for calibration. Keep CORE R2/R3 sources for a later deliberate Nano maintenance batch.
