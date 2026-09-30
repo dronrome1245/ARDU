@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**HTTP_BRIDGE_R6 физически загружен по OTA и `/api/ping` подтверждает `HTTP_BRIDGE_R6`; Android brightness slider и Kelvin presets физически работают. Два ручных `curl.exe` JSON-write из Windows PowerShell были отклонены R6, но те же semantic writes проходят через Android; это фиксируется как различие shell/body quoting, а не как hardware failure. Следующий крупный слой уже подготовлен: `HTTP_BRIDGE_R7` + Android `0.5-l01-profile-r1` закрывают оставшийся L01 profile одним пакетом — arbitrary Kelvin `1800..6500`, RGB и explicit startup-profile save с cold power-cycle regression.**
+**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ на физическом стенде. Закрыт пользовательский L01 profile: ON/OFF, brightness, presets, arbitrary Kelvin `1800..6500`, RGB, явное сохранение startup profile и восстановление после cold power-cycle; после теста baseline `2700 K / brightness 64` снова сохранён. Следующий незакрытый слой L01 — хлопковый выключатель: app enable/disable + семейная calibration. Для calibration требуется новая Nano revision, потому что `FW10 CORE R1` содержит detector и EEPROM, но не содержит `CLAPCAL` wizard. Текущий gate — подготовить `FW10 CORE R2` с интегрированным CLAPCAL и сначала пройти только compile/flash/SRAM budget до загрузки на железо.**
 
 ## Что подтверждено и решено
 
