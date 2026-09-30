@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ на физическом стенде. Закрыт пользовательский L01 profile: ON/OFF, brightness, presets, arbitrary Kelvin `1800..6500`, RGB, явное сохранение startup profile и восстановление после cold power-cycle; после теста baseline `2700 K / brightness 64` снова сохранён. Следующий незакрытый слой L01 — хлопковый выключатель: app enable/disable + семейная calibration. Для calibration требуется новая Nano revision, потому что `FW10 CORE R1` содержит detector и EEPROM, но не содержит `CLAPCAL` wizard. Текущий gate — подготовить `FW10 CORE R2` с интегрированным CLAPCAL и сначала пройти только compile/flash/SRAM budget до загрузки на железо.**
+**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ; L01 profile/persistence закрыт. Подготовлен новый `FW10 CORE R2` с интегрированным family `CLAPCAL` на базе уже проверенной diagnostic branch: 3..12 пар, quiet P99, suggested threshold, SAVE/CANCEL; EEPROM layout `CLAP_BASE=192` сохранён. Текущий обязательный gate — только Verify/compile-budget для ATmega328P. CORE R1 baseline был 26014/30720 flash и 1316/2048 globals; до получения нового memory report R2 на Nano не загружать.**
 
 ## Что подтверждено и решено
 
