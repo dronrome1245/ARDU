@@ -2013,3 +2013,16 @@ fw10_core_r3_clapcal_plan_2026_09_30:
   compile_budget_result: accepted_for_clap_hardware_test_not_final_music_budget
   upload_allowed: true
   next: hardware_clapcal_batch
+
+fw10_core_r3_upload_attempt_1_2026_09_30:
+  compile_verified: true
+  target: Arduino_Nano_ATmega328P_Old_Bootloader
+  port: COM3
+  avrdude_baud: 57600
+  result: failed
+  sync_response: "0x00"
+  attempts: 10
+  flash_write_verified: false
+  current_nano_firmware_assumption: FW10_CORE_R1_unchanged
+  likely_layer: bootloader_reset_or_com_port_access
+  next: manual_nano_reset_during_upload_with_esp_held_reset
