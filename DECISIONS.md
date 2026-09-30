@@ -1197,3 +1197,20 @@ App calibration по D-068 позже может заменить threshold/time
 7. OTA code не пишет progress/error в ESP `Serial`, потому что этот UART соединён с Nano.
 
 Причина: уже компактно спаянный стенд не должен требовать перекоммутации ради обычных программных итераций.
+
+---
+
+## D-076 — HTTP_BRIDGE_R4 заменяет непроверенный R3
+
+**Дата:** 2026-09-30  
+**Статус:** ДЕЙСТВУЕТ  
+**УТОЧНЯЕТ:** D-075.
+
+R3 не прошивался и не тестировался на железе. Pre-compile QA обнаружил несовместимую форму сравнения Arduino String с flash-string в placeholder validation.
+
+Поэтому:
+1. R3 считать `superseded_before_test`;
+2. физически прошивать только `HTTP_BRIDGE_R4`;
+3. R4 сохраняет все решения D-075: ручные Wi-Fi/OTA credentials в локальном скетче, ArduinoOTA, hostname `ardu`, port `8266`, password authentication;
+4. R4 использует `strcmp` для placeholder validation и не запускает reconnect/OTA при незаполненных placeholders;
+5. после hardware PASS R4 OTA становится основным способом дальнейших ESP updates.
