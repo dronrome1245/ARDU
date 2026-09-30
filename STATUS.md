@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ; L01 profile/persistence закрыт. Подготовлен новый `FW10 CORE R2` с интегрированным family `CLAPCAL` на базе уже проверенной diagnostic branch: 3..12 пар, quiet P99, suggested threshold, SAVE/CANCEL; EEPROM layout `CLAP_BASE=192` сохранён. Текущий обязательный gate — только Verify/compile-budget для ATmega328P. CORE R1 baseline был 26014/30720 flash и 1316/2048 globals; до получения нового memory report R2 на Nano не загружать.**
+**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ; L01 profile/persistence закрыт. `FW10 CORE R2` с family `CLAPCAL` успешно компилируется, но compile-budget не принят для дальнейшей интеграции: flash `29788/30720` (96%, свободно 932 байта), globals `1445/2048` (70%, свободно 603 байта). До оптимизации R2 на Nano не загружать: текущий flash-запас недостаточен для последующего добавления Ambient/Music в общую прошивку. Следующий gate — уменьшить размер CORE R2 без изменения поведения/EEPROM и повторить Verify.**
 
 ## Что подтверждено и решено
 
