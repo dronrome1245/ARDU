@@ -1526,3 +1526,10 @@
 - Создан `HTTP_BRIDGE_R4`: placeholder checks используют обычный `strcmp`; при незаполненных credentials reconnect-loop Wi-Fi/OTA не запускается.
 - Архитектура R4 осталась той же: ручные SSID/password/OTA password + ArduinoOTA + transport/L01 functionality.
 - **НЕ ПРОВЕРЕНО:** R4 ещё не компилировался и не загружался.
+
+### 2026-09-30 — ESP GPIO2 pull-up and bootloader behavior confirmed
+
+- **ФАКТ владельца:** текущая физическая сборка имеет `ESP GPIO2 → 4.7 kΩ → 3.3 V`.
+- **РЕШЕНИЕ:** этот pull-up оставить; GPIO2 является boot-strap pin и должен быть HIGH при normal boot и UART bootloader. Через 4.7 kΩ это допустимо; прямое жесткое соединение GPIO2→3.3 V не использовать.
+- **ФАКТ владельца:** текущая прошивка ESP теперь начинается без дополнительного ручного краткого `RST→GND` на этапе `Connecting...`.
+- **ИНТЕРПРЕТАЦИЯ:** отдельный manual reset не обязателен, если ESP уже вошёл в ROM bootloader при reset/power-up с `GPIO0=LOW`.
