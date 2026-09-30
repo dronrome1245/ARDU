@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ArduinoOTA полностью доказан на физическом стенде. R5 загружен по Wi-Fi через сетевой порт `ardu 192.168.0.4`, после reboot `/api/ping` вернул `fw=HTTP_BRIDGE_R5`, а post-OTA regression прошёл: `/api/status` → `FW=FW10_CORE REV=1`, `/api/time` → валидное DS3231 time, Developer `PING` → `PONG`. Проводная прошивка ESP теперь recovery-only; обычные ESP revisions делать OTA без перекоммутации. Текущий функциональный этап — Android L01 integration на физическом HTTP_BRIDGE_R5.**
+**ArduinoOTA полностью доказан; wired ESP flashing = recovery-only. На физическом HTTP_BRIDGE_R5 дополнительно пройден read-only semantic L01 endpoint: `/api/light/status` вернул `enabled=false`, `2700 K`, `RGB 255,170,87`, brightness `64`, `saved=true`, `dirty=false`. Android transport обновлён до `0.3-l01-semantic-r1`: обычный L01 UI теперь использует `/api/light/status` и `/api/light/settings`, raw `/api/dev/nano` остаётся только Developer Mode. Текущий gate — физический Android read-only pass, затем L01 ON/OFF.**
 
 ## Что подтверждено и решено
 
