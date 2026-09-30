@@ -987,3 +987,17 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 - Developer `PING→PONG`.
 
 Вывод: semantic Android L01 ON/OFF на HTTP_BRIDGE_R5 физически закрыт; можно переходить к brightness + Kelvin presets.
+
+
+## S-L01-APP-003 — R6 brightness/Kelvin physical result 2026-09-30
+
+Данные владельца:
+- после OTA `GET /api/ping` → `fw=HTTP_BRIDGE_R6`, `wifi_connected=true`, `ota_ready=true`, RSSI -57 dBm;
+- `GET /api/light/status` на момент проверки → L01 ON, Kelvin 2700, brightness 64;
+- Android brightness и Kelvin controls работают физически;
+- два ручных `curl.exe` JSON POST были отклонены endpoint.
+
+Интерпретация:
+- R6 image/OTA/semantic write path физически работает через Android;
+- отказ именно двух ручных curl вызовов не доказывает дефект R6 parser, так как Android вызывает тот же endpoint успешно;
+- для следующих PowerShell JSON tests использовать `Invoke-RestMethod`, чтобы исключить native-command quoting.
