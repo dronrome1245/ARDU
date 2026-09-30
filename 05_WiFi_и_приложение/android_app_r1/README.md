@@ -52,13 +52,17 @@ R1 сначала пробует локальное имя `ardu.local`, зат�
 - `/api/time` → растущее время DS3231;
 - Developer `PING` → `PONG`.
 
-## L01 stage 1 — без перепрошивки ESP
+## L01 stage 1 — semantic API на HTTP_BRIDGE_R5
 
-Физический ESP остаётся на уже проверенном `HTTP_BRIDGE_R1`.
+Физический ESP теперь работает на `HTTP_BRIDGE_R5`; OTA и post-OTA transport regression пройдены.
 
-Обычный пользовательский UI остаётся semantic: пользователь не видит IP/UART/raw-команды. Внутри Android transport layer временно используется существующий `POST /api/dev/nano` как compatibility adapter:
-- read L01: `STATUS` + `LIGHT STATUS`;
-- ON: `LIGHT ON`;
-- OFF: `LIGHT OFF`.
+Обычный пользовательский L01 UI больше не использует временный raw compatibility adapter:
+- read L01: `GET /api/light/status`;
+- ON/OFF: `POST /api/light/settings {"enabled":true|false}`;
+- после write приложение перечитывает фактическое состояние L01;
+- Nano остаётся источником истины;
+- raw `POST /api/dev/nano` остаётся только в Developer Mode.
 
-Nano остаётся источником истины. `HTTP_BRIDGE_R2` сохраняется в репозитории как заготовка для будущего пакетного обновления ESP, но сейчас физическая перепрошивка не требуется.
+Версия приложения для этого слоя: `0.3-l01-semantic-r1`.
+
+До физического PASS L01 ON/OFF brightness/Kelvin/RGB/persistence в UI не добавляются.
