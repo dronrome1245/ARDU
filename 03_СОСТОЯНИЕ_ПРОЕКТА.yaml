@@ -1727,8 +1727,8 @@ esp_reflash_policy_2026_09_30:
   current_physical_bridge: HTTP_BRIDGE_R5
   compact_wiring_should_remain_undisturbed: true
   reflash_for_each_app_iteration: false
-  default_future_esp_update_path: OTA_after_post_upload_regression
-  wired_programmer_role: recovery_only_after_post_upload_regression
+  default_future_esp_update_path: OTA
+  wired_programmer_role: recovery_only
   http_bridge_r2_source_kept_for_history: true
 
 esp8266_http_bridge_r3_ota_2026_09_30:
@@ -1818,4 +1818,15 @@ esp8266_http_bridge_r5_ota_proof_2026_09_30:
     - GET_api_status
     - GET_api_time
     - Developer_PING_PONG
-  next: verify_post_ota_status_time_ping
+  post_upload_status_verified: true
+  post_upload_status_fw: FW10_CORE
+  post_upload_status_rev: 1
+  post_upload_mode_observed: DAWN
+  post_upload_rtc_valid: true
+  post_upload_time_verified: true
+  post_upload_time: "2026-09-30 22:18:58"
+  post_upload_dev_ping_pong_verified: true
+  post_upload_transport_regression: passed
+  wired_programmer_role: recovery_only
+  future_default_esp_update_path: OTA
+  next: android_l01_semantic_on_off
