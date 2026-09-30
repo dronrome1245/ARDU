@@ -1751,3 +1751,10 @@
 - This is accepted as the external HIGH pull-up for the ESP8266 boot-strap pin.
 - Owner also reports ESP flashing now starts without the previous additional `RST→GND` pulse during `Connecting...`.
 - Do not assume automatic DTR/RTS reset from this observation; the ESP may simply already be in UART bootloader after reset/power-up with GPIO0 LOW.
+
+## 2026-09-30 — R4 Wi-Fi and OTA service came online
+
+- Initial R4 Wi-Fi failure was caused by an incorrect SSID in the local sketch.
+- After correcting SSID and reflashing, `/api/ping` at `192.168.0.4` returned `HTTP_BRIDGE_R4`, Wi-Fi connected, RSSI -57 dBm, and OTA ready on hostname `ardu`, port 8266.
+- `ardu.local` still does not resolve from the Windows curl environment; this is treated as mDNS resolution only because direct IP HTTP works.
+- Next: verify actual OTA upload over Wi-Fi.
