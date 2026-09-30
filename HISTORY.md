@@ -1898,3 +1898,23 @@
 - Normal runtime clap при active calibration приостанавливается.
 - Создан `FW10_CORE_R2_CLAPCAL_TEST.md`.
 - Из-за baseline CORE R1 flash 84% следующий gate строго compile-budget; Upload до него запрещён.
+
+
+## 2026-09-30 — CORE R2 first compile passed but budget too tight
+
+Владелец выполнил Verify `nano_fw10_core_r2.ino`.
+
+Результат:
+- flash: `29788 / 30720 bytes` = 96%;
+- свободно flash: `932 bytes`;
+- globals SRAM: `1445 / 2048 bytes` = 70%;
+- свободно для stack/locals: `603 bytes`.
+
+Сравнение с CORE R1:
+- flash было `26014`; рост = `+3774 bytes`;
+- globals было `1316`; рост = `+129 bytes`.
+
+Компиляция технически PASS, но проектный budget gate не принят:
+- 932 bytes flash недостаточно для будущей интеграции Ambient/Music;
+- Upload R2 до оптимизации запрещён;
+- EEPROM layout/поведение менять не требуется — сначала уменьшить код CLAPCAL/diagnostics и повторить Verify.
