@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ; L01 profile/persistence закрыт. `FW10 CORE R3` с compact family CLAPCAL успешно компилируется: flash `27822/30720` (90%, free 2898), globals `1392/2048` (67%, free 656). Это принято для аппаратного CLAPCAL integration test, но не считается финальным memory budget для будущих Music/Ambient. R2 не загружался. Текущий gate — одним большим блоком: upload Nano R3 → startup/smoke → clap enable/disable → 9-pair calibration → FINISH/test → SAVE → full power-cycle persistence.**
+**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ; L01 profile/persistence закрыт. FW10 CORE R3 CLAPCAL компилируется (`27822/30720` flash, `1392/2048` globals), но первая попытка Upload на Nano при сохранённой ESP↔Nano UART-проводке завершилась `avrdude: programmer is not responding / not in sync`; прошивка Nano не изменилась и физически остаётся проверенный FW10 CORE R1. CLAPCAL не является обязательным для продолжения: текущий R1 уже имеет рабочий double-clap `TRSH=70 / TIMEOUT=500`. Практический фокус возвращён на развитие приложения поверх работающего R1/R7; Nano CLAPCAL оставлен подготовленным отдельным будущим этапом.**
 
 ## Что подтверждено и решено
 
