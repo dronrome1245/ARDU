@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "0.3-l01-semantic-r1"
+        versionCode = 4
+        versionName = "0.4-l01-bright-kelvin-r1"
     }
 
     compileOptions {
