@@ -146,3 +146,17 @@ PASS read-only означает, что Android успешно использу�
 7. Developer `PING` → `PONG`.
 
 В этом gate не нажимать отдельный SAVE и не проверять power-cycle persistence: persistence — следующий слой.
+
+## L01 stage 3 — complete profile + persistence
+
+Проверять одним пакетом после OTA R7:
+1. arbitrary Kelvin: 2200 → 3500 → 5200;
+2. RGB: красный `255,0,0`, зелёный `0,255,0`, синий `0,0,255`;
+3. вернуть Kelvin 4000 и brightness 100;
+4. нажать `Сохранить как свет после включения питания`; dirty должен стать false;
+5. полностью снять питание ARDU и включить снова;
+6. после cold boot L01 должен восстановиться как 4000 K / brightness 100;
+7. затем вернуть проектный baseline 2700 K / 64 и снова сохранить;
+8. Developer PING→PONG.
+
+Это один пакетный integration gate; отдельные микротесты между пунктами не требуются, если приложение корректно reread-ит state и нет ошибок.
