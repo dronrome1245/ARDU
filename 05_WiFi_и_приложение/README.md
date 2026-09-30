@@ -33,3 +33,13 @@
 - после первого wired upload R4 последующие ESP updates выполняются ArduinoOTA по Wi-Fi;
 - OTA hostname = `ardu`, port = `8266`;
 - OTA progress намеренно не печатается в ESP Serial, потому что Serial используется как transport к Nano.
+
+## ESP8266 HTTP BRIDGE R6 / L01 brightness + Kelvin
+
+- код: `esp8266_http_bridge_r6/esp8266_http_bridge_r6.ino`;
+- OTA update поверх hardware-tested R5;
+- сохраняет R5 Wi-Fi/HTTP/UART/OTA;
+- `POST /api/light/settings` дополнительно принимает atomic `brightness` 0..255;
+- Kelvin slice принимает presets 2700/4000/6000;
+- Android `0.4-l01-bright-kelvin-r1` добавляет brightness slider и три preset buttons;
+- RGB, произвольный Kelvin slider и persistence остаются следующими слоями.
