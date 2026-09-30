@@ -1768,3 +1768,13 @@
 - R5 keeps R4 behavior and changes only the externally visible `/api/ping` firmware identifier to `HTTP_BRIDGE_R5`, so a successful reboot can be proven unambiguously.
 - Repository R5 contains only credential placeholders. Before OTA upload the owner must copy the same local Wi-Fi and OTA credentials used by the working R4 into the local R5 file.
 - OTA upload itself is still pending; working UART/power wiring must not be changed.
+
+
+## 2026-09-30 — first real Wi-Fi OTA upload passed
+
+- Arduino IDE uploaded the prepared R5 image through network port `ardu 192.168.0.4` with password authentication.
+- OTA authentication succeeded and the image transfer completed without changing GPIO0/RST/Nano RESET/UART wiring.
+- After the ESP reboot, `GET http://192.168.0.4/api/ping` returned `fw=HTTP_BRIDGE_R5`, `wifi_connected=true`, `ota_ready=true`, hostname `ardu`, port `8266`.
+- This proves that a new ESP firmware image can be installed over Wi-Fi and boot successfully.
+- Remaining OTA gate: verify post-OTA Nano transport with `/api/status`, `/api/time`, and Developer `PING→PONG`.
+- Security note: verbose Arduino upload output can expose the OTA password in the local command line. Do not paste or commit that secret; rotate it in a later local OTA revision.
