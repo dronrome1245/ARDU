@@ -128,3 +128,21 @@ PASS read-only означает, что Android успешно использу�
 7. Developer `PING` должен по-прежнему вернуть `PONG`.
 
 До PASS этого gate не добавлять brightness/Kelvin/RGB/persistence.
+
+## L01 stage 2 — brightness + Kelvin presets
+
+Предусловия:
+- L01 semantic read PASS;
+- Android ON/OFF regression PASS;
+- ESP обновлён OTA до `HTTP_BRIDGE_R6`.
+
+Пакетный тест:
+1. Запустить Android `0.4-l01-bright-kelvin-r1` и включить L01.
+2. Перетащить brightness примерно на 32 → 128 → 220; после каждого отпускания slider приложение должно перечитать то же значение, а кольцо визуально менять яркость.
+3. Нажать 2700 K → 4000 K → 6000 K; строка L01 должна показывать выбранный preset, а кольцо визуально переходить от тёплого к более холодному белому.
+4. Вернуть 2700 K и brightness 64.
+5. Нажать `Обновить`; состояние должно остаться 2700 K / 64.
+6. Выполнить ON→OFF→ON; текущий RAM-профиль должен сохраниться.
+7. Developer `PING` → `PONG`.
+
+В этом gate не нажимать отдельный SAVE и не проверять power-cycle persistence: persistence — следующий слой.
