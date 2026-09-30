@@ -8,7 +8,7 @@ R4 — исправленная обслуживаемая ESP8266-ревизи�
 
 Она сохраняет HTTP/UART transport R1, L01 semantic endpoints R2 и добавляет password-protected ArduinoOTA.
 
-Главная цель: один последний wired upload R3, после которого дальнейшие ESP firmware updates выполнять по домашнему Wi-Fi без перекоммутации UART/GPIO0/RESET.
+Главная цель: один последний wired upload R4, после которого следующую ревизию R5 загрузить по домашнему Wi-Fi без перекоммутации UART/GPIO0/RESET.
 
 ## 1. Перед первой wired прошивкой
 
@@ -26,7 +26,7 @@ const char* OTA_PASSWORD = "PUT_A_STRONG_OTA_PASSWORD_HERE";
 
 на реальные локальные значения.
 
-Требование R3: OTA password минимум 8 символов.
+Требование R4/R5: OTA password минимум 8 символов.
 
 Не коммитить реальные значения в публичный GitHub.
 
@@ -135,7 +135,7 @@ curl.exe http://ardu.local/api/ping
 
 ## PASS
 
-R3 PASS если:
+OTA gate PASS если:
 1. wired upload R3 выполнен один раз;
 2. Wi-Fi/HTTP работает с ручными credentials из скетча;
 3. ping показывает `HTTP_BRIDGE_R4` и `ota_ready=true`;
@@ -144,3 +144,20 @@ R3 PASS если:
 6. после OTA transport ESP↔Nano и Android app остаются рабочими.
 
 После этого физический programmer wiring ESP не требуется для обычных firmware revisions, пока OTA itself исправен.
+
+
+## Фактический результат 2026-09-30
+
+Подтверждено владельцем:
+- Arduino IDE видит network port `ardu 192.168.0.4`;
+- OTA password authentication проходит;
+- R5 загружен по Wi-Fi без изменения рабочей проводки;
+- после автоматического reboot `GET /api/ping` вернул `fw=HTTP_BRIDGE_R5`;
+- после reboot Wi-Fi снова подключён и `ota_ready=true`.
+
+Осталось подтвердить:
+- `GET /api/status`;
+- `GET /api/time`;
+- Developer `PING→PONG`.
+
+Только после этого весь post-OTA transport regression считается закрытым.
