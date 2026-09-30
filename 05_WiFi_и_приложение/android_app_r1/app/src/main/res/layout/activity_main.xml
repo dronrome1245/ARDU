@@ -108,6 +108,62 @@
                 android:text="@string/light_off" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/brightnessValueText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/light_brightness_default"
+            android:textSize="16sp" />
+
+        <SeekBar
+            android:id="@+id/brightnessSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:progress="64" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/light_kelvin_presets"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/preset2700Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
+                android:layout_weight="1"
+                android:enabled="false"
+                android:text="@string/light_preset_2700" />
+
+            <Button
+                android:id="@+id/preset4000Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:layout_weight="1"
+                android:enabled="false"
+                android:text="@string/light_preset_4000" />
+
+            <Button
+                android:id="@+id/preset6000Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:layout_weight="1"
+                android:enabled="false"
+                android:text="@string/light_preset_6000" />
+        </LinearLayout>
         <Button
             android:id="@+id/developerToggleButton"
             android:layout_width="match_parent"
