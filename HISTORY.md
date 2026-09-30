@@ -1977,3 +1977,13 @@ R3 экономит относительно R2:
 - Bootloader handshake не состоялся; запись flash не подтверждена и Nano следует считать оставшимся на предыдущем FW10 CORE R1.
 - Имя build artifact esp8266_http_bridge_r2.ino.hex отражает локальное имя reused sketch tab и не определяет содержимое/target; AVR memory report и avrdude target были Nano/ATmega328P.
 - Следующий diagnostic: ESP Reset LOW, Nano RESET свободен, Serial Monitor закрыт, затем manual Nano reset точно в начале Upload. Только если это не поможет — временно разорвать одну линию ESP TX→Nano D0.
+
+
+## 2026-10-01 — создан единый план финализации ARDU v1
+
+- Владелец решил завершить проект без дальнейшей серии мелких firmware-upload итераций.
+- Добавлен `FINALIZATION_PLAN.md`.
+- Зафиксирован release-порядок: full Nano v1 → one Nano upload → full ESP v1 → one OTA upload → Android functionality → design/UX → second ring/power → ceiling install → acceptance.
+- Промежуточный CORE R3 CLAPCAL больше не является текущим upload gate.
+- Для финальной Nano release обязательны все активные Music/Ambient режимы, family CLAPCAL, full persistence, 44+44 output и runtime-adjustable safe current limit.
+- Следующая работа — интеграция/оптимизация полного Nano v1 source без физического upload до завершения scope.
