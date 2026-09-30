@@ -1947,7 +1947,7 @@ android_l01_stage3_2026_09_30:
 
 
 fw10_core_r2_clapcal_plan_2026_09_30:
-  status: implementation_pending
+  status: source_prepared
   base: FW10_CORE_R1
   purpose: integrate_app_ready_family_clap_calibration
   preserve:
@@ -1966,4 +1966,10 @@ fw10_core_r2_clapcal_plan_2026_09_30:
   previous_core_r1_sram_globals: 1316
   previous_core_r1_sram_total: 2048
   upload_before_compile_budget_pass: false
-  next: implement_core_r2_then_verify
+  code_path: "04_Прошивка/nano_fw10_core_r2/nano_fw10_core_r2.ino"
+  test_doc: "04_Прошивка/FW10_CORE_R2_CLAPCAL_TEST.md"
+  revision: 2
+  eeprom_layout_changed: false
+  static_structure_check: passed
+  compile_verified: false
+  next: owner_verify_compile_budget
