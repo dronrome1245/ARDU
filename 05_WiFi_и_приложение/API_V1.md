@@ -152,6 +152,26 @@ ESP преобразует это только в `LIGHT ON` / `LIGHT OFF` и в
 }
 ```
 
+**Реализовано в HTTP_BRIDGE_R6 — второй атомарный срез:**
+
+```json
+{"brightness":128}
+```
+
+и Kelvin presets:
+
+```json
+{"kelvin":2700}
+{"kelvin":4000}
+{"kelvin":6000}
+```
+
+R6 принимает по одному полю за запрос. Mapping:
+- `brightness` → `LIGHT BRIGHT <0..255>`;
+- `kelvin=2700|4000|6000` → `LIGHT PRESET <value>`.
+
+После успешного write приложение перечитывает `GET /api/light/status`; ESP и телефон не становятся источником истины. Произвольный Kelvin slider, RGB, clap и persistence остаются следующими слоями.
+
 `enabled` включает/выключает L01 программно. `brightness` ограничивается общим лимитом тока Nano. `color_mode` = `kelvin` или `rgb`. Для `kelvin` используется приблизительная RGB-имитация температуры; приложение предоставляет presets 2700/4000/6000 и slider. Для `rgb` используется произвольный color picker. `persist_startup_profile=true` означает записать текущий L01 profile как тот, который будет применён после cold power-on. `clap_enabled` включает/выключает локальный хлопковый выключатель.
 
 Точный clap detector остаётся внутренней логикой Nano и не переносится в приложение.
