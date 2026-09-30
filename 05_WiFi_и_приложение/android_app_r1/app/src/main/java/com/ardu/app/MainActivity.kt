@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.SeekBar
 import android.widget.TextView
 import com.ardu.app.net.ArduApiClient
 import com.ardu.app.net.LightStatus
@@ -23,6 +24,11 @@ class MainActivity : Activity() {
     private lateinit var lightStateText: TextView
     private lateinit var lightOnButton: Button
     private lateinit var lightOffButton: Button
+    private lateinit var brightnessValueText: TextView
+    private lateinit var brightnessSeekBar: SeekBar
+    private lateinit var preset2700Button: Button
+    private lateinit var preset4000Button: Button
+    private lateinit var preset6000Button: Button
     private var lightApiAvailable = false
 
     private lateinit var developerToggleButton: Button
@@ -43,6 +49,11 @@ class MainActivity : Activity() {
         lightStateText = findViewById(R.id.lightStateText)
         lightOnButton = findViewById(R.id.lightOnButton)
         lightOffButton = findViewById(R.id.lightOffButton)
+        brightnessValueText = findViewById(R.id.brightnessValueText)
+        brightnessSeekBar = findViewById(R.id.brightnessSeekBar)
+        preset2700Button = findViewById(R.id.preset2700Button)
+        preset4000Button = findViewById(R.id.preset4000Button)
+        preset6000Button = findViewById(R.id.preset6000Button)
 
         developerToggleButton = findViewById(R.id.developerToggleButton)
         developerPanel = findViewById(R.id.developerPanel)
@@ -53,6 +64,32 @@ class MainActivity : Activity() {
         refreshButton.setOnClickListener { refreshDevice() }
         lightOnButton.setOnClickListener { setLightEnabled(true) }
         lightOffButton.setOnClickListener { setLightEnabled(false) }
+
+        brightnessSeekBar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    brightnessValueText.text = getString(
+                        R.string.light_brightness_format,
+                        progress
+                    )
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    setLightBrightness(seekBar.progress)
+                }
+            }
+        )
+
+        preset2700Button.setOnClickListener { setLightKelvinPreset(2700) }
+        preset4000Button.setOnClickListener { setLightKelvinPreset(4000) }
+        preset6000Button.setOnClickListener { setLightKelvinPreset(6000) }
+
         developerToggleButton.setOnClickListener { toggleDeveloperMode() }
         sendRawButton.setOnClickListener { sendRawCommand() }
 
@@ -125,6 +162,11 @@ class MainActivity : Activity() {
             color,
             status.brightness
         )
+        brightnessValueText.text = getString(
+            R.string.light_brightness_format,
+            status.brightness
+        )
+        brightnessSeekBar.progress = status.brightness
     }
 
     private fun showLightApiUnavailable() {
@@ -133,6 +175,18 @@ class MainActivity : Activity() {
     }
 
     private fun setLightEnabled(enabled: Boolean) {
+        applyLightChange { api.setLightEnabled(enabled) }
+    }
+
+    private fun setLightBrightness(brightness: Int) {
+        applyLightChange { api.setLightBrightness(brightness) }
+    }
+
+    private fun setLightKelvinPreset(kelvin: Int) {
+        applyLightChange { api.setLightKelvinPreset(kelvin) }
+    }
+
+    private fun applyLightChange(action: () -> Unit) {
         if (!lightApiAvailable) return
 
         setBusy(true)
@@ -140,7 +194,7 @@ class MainActivity : Activity() {
 
         worker.execute {
             try {
-                api.setLightEnabled(enabled)
+                action()
                 val light = api.lightStatus()
                 val status = api.status()
 
@@ -195,5 +249,9 @@ class MainActivity : Activity() {
         refreshButton.isEnabled = !busy
         lightOnButton.isEnabled = !busy && lightApiAvailable
         lightOffButton.isEnabled = !busy && lightApiAvailable
+        brightnessSeekBar.isEnabled = !busy && lightApiAvailable
+        preset2700Button.isEnabled = !busy && lightApiAvailable
+        preset4000Button.isEnabled = !busy && lightApiAvailable
+        preset6000Button.isEnabled = !busy && lightApiAvailable
     }
 }
