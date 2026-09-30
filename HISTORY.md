@@ -1816,3 +1816,20 @@
 - Это совпадает с ранее подтверждённым прямым `GET /api/light/status`.
 - Read-only semantic Android gate закрыт.
 - Следующий gate: пакетный ON/OFF regression через `POST /api/light/settings`.
+
+
+## 2026-09-30 — Android semantic L01 ON/OFF regression passed
+
+- Владелец подтвердил полный ранее заданный пакетный checklist как PASS.
+- Через обычный Android UI semantic `POST /api/light/settings` корректно переключает L01 ON/OFF.
+- Выполнены три цикла ON→OFF.
+- После ON общий Nano STATUS показывает `MODE=L01`; после OFF — `MODE=OFF`.
+- После полного закрытия/повторного открытия приложения состояние перечитывается с Nano.
+- Сохранённый профиль отображается как `2700 K / brightness 64`.
+- Developer `PING` после regression возвращает `PONG`.
+- L01 ON/OFF semantic integration закрыт.
+
+Следующий слой реализован в репозитории:
+- `HTTP_BRIDGE_R6` — atomic brightness + Kelvin preset writes;
+- Android `0.4-l01-bright-kelvin-r1` — brightness slider + presets 2700/4000/6000.
+- Physical R6 OTA/build/runtime ещё не проверены.
