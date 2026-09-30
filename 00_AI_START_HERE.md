@@ -128,7 +128,7 @@ ARDU — проект двух синхронных круглых потоло�
 3. L01 R1/R2/R3 закрыты; физическое кольцо теперь 44 LED. Старые hardware-tested 43-LED скетчи по D-066 не переписывать.
 4. Clap baseline принят: double clap, TRSH=70, TIMEOUT=500; семейная calibration отложена до приложения.
 5. FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют проверенный минимальный end-to-end transport: Wi-Fi/HTTP ↔ UART ↔ Nano ↔ DS3231.
-6. Минимальный Android transport R1 полностью пройден. По новому решению владельца готовится один обслуживаемый ESP update: HTTP_BRIDGE_R3 с ручными Wi-Fi credentials прямо в локальном скетче и password-protected OTA. Текущий gate — один wired upload R3, затем доказать следующую ESP-прошивку по Wi-Fi OTA; после этого физическую перекоммутацию ESP для обычных revisions не использовать.
+6. Минимальный Android transport R1 полностью пройден. По новому решению владельца готовится один обслуживаемый ESP update: HTTP_BRIDGE_R4 с ручными Wi-Fi credentials прямо в локальном скетче и password-protected OTA. Текущий gate — один wired upload R4, затем доказать следующую ESP-прошивку по Wi-Fi OTA; после этого физическую перекоммутацию ESP для обычных revisions не использовать.
 7. Второе кольцо D7 физически подключать после устойчивой полной настройки первого кольца; оно получает зеркальный кадр, а не отдельную логику.
 
 

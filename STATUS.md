@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**Минимальный Android app transport R1 полностью пройден. По решению владельца создаётся обслуживаемая ESP ревизия HTTP_BRIDGE_R3: Wi-Fi SSID/password вводятся вручную прямо в локальную копию скетча, добавляется password-protected ArduinoOTA. Текущий gate — один wired upload R3, normal-boot HTTP pass и первый OTA proof; после этого последующие ESP revisions должны прошиваться по Wi-Fi без перекоммутации.**
+**Минимальный Android app transport R1 полностью пройден. По решению владельца создаётся обслуживаемая ESP ревизия HTTP_BRIDGE_R4: Wi-Fi SSID/password вводятся вручную прямо в локальную копию скетча, добавляется password-protected ArduinoOTA. Текущий gate — один wired upload R4, normal-boot HTTP pass и первый OTA proof; после этого последующие ESP revisions должны прошиваться по Wi-Fi без перекоммутации.**
 
 ## Что подтверждено и решено
 
@@ -1509,7 +1509,7 @@
 - `HTTP_BRIDGE_R2` не удаляется, но его физический compile/upload больше не является текущим gate. Семантические ESP endpoints будут собраны пакетно и прошиты позже одним обслуживаемым этапом.
 - **Текущий следующий gate:** пересобрать только Android app на телефоне и проверить L01 OFF→ON→OFF через текущий физический HTTP_BRIDGE_R1.
 
-### 2026-09-30 — HTTP_BRIDGE_R3 with manual Wi-Fi credentials + OTA prepared
+### 2026-09-30 — HTTP_BRIDGE_R4 with manual Wi-Fi credentials + OTA prepared
 
 - **РЕШЕНИЕ владельца:** отказаться от `wifi_secrets.h` для ближайшей физической прошивки; SSID/password вводить вручную в локальную копию скетча непосредственно перед upload.
 - **РЕШЕНИЕ владельца:** добавить OTA, чтобы после одного wired upload дальнейшие ESP revisions загружать по Wi-Fi без перекоммутации спаянного стенда.
@@ -1518,3 +1518,11 @@
 - OTA callbacks намеренно не печатают в `Serial`, потому что ESP Serial является UART к Nano.
 - `GET /api/ping` R3 сообщает `ota_ready/ota_hostname/ota_port`, но не раскрывает password.
 - **НЕ ПРОВЕРЕНО ФИЗИЧЕСКИ:** R3 ещё не компилировался, не прошивался и OTA proof ещё не выполнен.
+
+### 2026-09-30 — R3 superseded before test; R4 prepared
+
+- **ФАКТ ПО QA:** до физической компиляции R3 обнаружена несовместимость проверки placeholders с актуальным ESP8266 `WString`: сравнение `String != F(...)` не является поддерживаемым оператором.
+- R3 помечается `superseded_before_test`; на железо его не загружать.
+- Создан `HTTP_BRIDGE_R4`: placeholder checks используют обычный `strcmp`; при незаполненных credentials reconnect-loop Wi-Fi/OTA не запускается.
+- Архитектура R4 осталась той же: ручные SSID/password/OTA password + ArduinoOTA + transport/L01 functionality.
+- **НЕ ПРОВЕРЕНО:** R4 ещё не компилировался и не загружался.

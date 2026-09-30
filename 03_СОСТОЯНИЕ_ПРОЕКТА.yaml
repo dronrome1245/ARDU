@@ -1689,7 +1689,7 @@ android_app_r1_2026_09_29:
   app_time_verified: true
   app_dev_ping_verified: true
   app_transport_pass: passed
-  next: esp8266_http_bridge_r3_first_wired_flash
+  next: esp8266_http_bridge_r4_first_wired_flash
 
 esp8266_http_bridge_r2_l01_stage1_2026_09_30:
   code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r2/esp8266_http_bridge_r2.ino"
@@ -1731,6 +1731,7 @@ esp_reflash_policy_2026_09_30:
   http_bridge_r2_source_kept_for_future: true
 
 esp8266_http_bridge_r3_ota_2026_09_30:
+  status: superseded_before_test
   code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r3/esp8266_http_bridge_r3.ino"
   test_doc: "05_WiFi_и_приложение/ESP8266_HTTP_BRIDGE_R3_OTA_TEST.md"
   revision: 3
@@ -1752,3 +1753,23 @@ esp8266_http_bridge_r3_ota_2026_09_30:
   future_default_esp_update_path: OTA_after_pass
   wired_programmer_after_pass: recovery_only
   next: compile_r3
+
+esp8266_http_bridge_r4_ota_2026_09_30:
+  code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r4/esp8266_http_bridge_r4.ino"
+  test_doc: "05_WiFi_и_приложение/ESP8266_HTTP_BRIDGE_R4_OTA_TEST.md"
+  revision: 4
+  supersedes: HTTP_BRIDGE_R3
+  reason: pre_compile_wstring_flash_comparison_fix
+  wifi_credentials_source: manual_local_edit_in_sketch
+  ota:
+    implementation: ArduinoOTA
+    hostname: ardu
+    port: 8266
+    password_required: true
+    serial_logging_disabled: true
+  placeholder_check: strcmp
+  reconnect_guard_when_unconfigured: true
+  compile_verified: false
+  wired_upload_verified: false
+  ota_upload_verified: false
+  next: compile_r4

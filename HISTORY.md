@@ -1737,3 +1737,10 @@
 - Avoided Serial logging from OTA callbacks because ESP Serial is the live Nano UART transport.
 - R3 keeps the startup UART framing fix and all R2 HTTP/L01 functionality.
 - Physical compile/wired upload/OTA proof remain pending.
+
+## 2026-09-30 — R3 superseded by R4 before hardware test
+
+- Post-commit source QA against current ESP8266 WString API found that R3 placeholder comparison used an unsupported `String != F(...)` form.
+- No owner compile/upload of R3 had been performed yet.
+- Created R4 with `strcmp` placeholder checks and an explicit guard preventing Wi-Fi reconnect/OTA startup while credentials remain placeholders.
+- R3 remains historical and must not be flashed.
