@@ -43,3 +43,14 @@
 - Kelvin slice принимает presets 2700/4000/6000;
 - Android `0.4-l01-bright-kelvin-r1` добавляет brightness slider и три preset buttons;
 - RGB, произвольный Kelvin slider и persistence остаются следующими слоями.
+
+## ESP8266 HTTP BRIDGE R7 / complete L01 profile
+
+- код: `esp8266_http_bridge_r7/esp8266_http_bridge_r7.ino`;
+- test: `ESP8266_HTTP_BRIDGE_R7_TEST.md`;
+- OTA поверх физического R6;
+- сохраняет ON/OFF + brightness + Kelvin presets;
+- добавляет arbitrary Kelvin `1800..6500`;
+- добавляет RGB `0..255` на канал;
+- добавляет explicit `LIGHT SAVE` через semantic persistence API;
+- Android `0.5-l01-profile-r1` добавляет Kelvin slider, RGB controls и кнопку сохранения startup profile.
