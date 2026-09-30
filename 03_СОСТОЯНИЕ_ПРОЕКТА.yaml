@@ -1724,8 +1724,12 @@ android_l01_stage1_2026_09_30:
   android_read_only_verified: true
   android_read_only_connection: HTTP_BRIDGE_R5
   android_read_only_display: "Выключен • 2700 K • яркость 64"
-  physical_verified: false
-  next: physical_android_on_off_regression
+  physical_verified: true
+  physical_on_off_cycles: 3
+  reconnect_state_reread_verified: true
+  developer_ping_after_on_off_verified: true
+  result: passed
+  next: r6_brightness_kelvin_presets
 
 esp_reflash_policy_2026_09_30:
   owner_decision: true
@@ -1849,3 +1853,42 @@ r5_light_status_read_result_2026_09_30:
   dirty: false
   interpretation: current_top_level_mode_not_L01_profile_valid
   next: android_semantic_read_only_gate
+
+
+esp8266_http_bridge_r6_l01_stage2_2026_09_30:
+  status: source_prepared
+  code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r6/esp8266_http_bridge_r6.ino"
+  test_doc: "05_WiFi_и_приложение/ESP8266_HTTP_BRIDGE_R6_TEST.md"
+  revision: 6
+  base: HTTP_BRIDGE_R5
+  keeps_ota: true
+  semantic_settings:
+    enabled: retained
+    brightness_range: "0..255"
+    kelvin_presets: [2700, 4000, 6000]
+  nano_mapping:
+    brightness: "LIGHT BRIGHT <0..255>"
+    kelvin_preset: "LIGHT PRESET <2700|4000|6000>"
+  arbitrary_kelvin: false
+  rgb: false
+  persistence_api: false
+  compile_verified: false
+  ota_upload_verified: false
+  physical_verified: false
+  next: verify_then_ota_upload_r6
+
+android_l01_stage2_2026_09_30:
+  project_path: "05_WiFi_и_приложение/android_app_r1"
+  app_version_name: "0.4-l01-bright-kelvin-r1"
+  source_created: true
+  requires_bridge: HTTP_BRIDGE_R6
+  brightness_slider: true
+  brightness_write_on_stop_tracking: true
+  kelvin_preset_buttons: [2700, 4000, 6000]
+  state_reread_after_write: true
+  rgb_controls: false
+  arbitrary_kelvin_slider: false
+  persistence_controls: false
+  build_verified: false
+  physical_verified: false
+  next: after_r6_ota_run_batch_test
