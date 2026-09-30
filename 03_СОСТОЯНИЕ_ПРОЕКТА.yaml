@@ -1770,9 +1770,12 @@ esp8266_http_bridge_r4_ota_2026_09_30:
   placeholder_check: strcmp
   reconnect_guard_when_unconfigured: true
   compile_verified: false
-  wired_upload_verified: false
+  wired_upload_verified: true
+  normal_boot_http_verified: true
+  ota_discovery_verified: true
+  ota_network_port: "ardu 192.168.0.4"
   ota_upload_verified: false
-  next: verify_ota_network_upload
+  next: upload_http_bridge_r5_via_network_port
 
 r4_ping_result_2026_09_30:
   status: passed
@@ -1786,3 +1789,26 @@ r4_ping_result_2026_09_30:
   mdns_ardu_local_windows_curl: unresolved
   interpretation: direct_ip_transport_ok_mdns_resolution_issue_only
   next: ota_network_upload_proof
+
+
+esp8266_http_bridge_r5_ota_proof_2026_09_30:
+  status: prepared_for_physical_ota_test
+  code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r5/esp8266_http_bridge_r5.ino"
+  base: HTTP_BRIDGE_R4
+  revision: 5
+  purpose: first_real_ota_upload_proof
+  functional_change: false
+  observable_change:
+    api_ping_fw: HTTP_BRIDGE_R5
+  repository_credentials: placeholders_only
+  local_credentials_required_before_upload: true
+  target_network_port: "ardu 192.168.0.4"
+  wiring_change_required: false
+  compile_verified: false
+  ota_upload_verified: false
+  post_upload_checks:
+    - GET_api_ping_fw_HTTP_BRIDGE_R5
+    - GET_api_status
+    - GET_api_time
+    - Developer_PING_PONG
+  next: owner_verify_then_upload_via_network_port
