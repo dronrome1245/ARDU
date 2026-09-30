@@ -1758,3 +1758,13 @@
 - After correcting SSID and reflashing, `/api/ping` at `192.168.0.4` returned `HTTP_BRIDGE_R4`, Wi-Fi connected, RSSI -57 dBm, and OTA ready on hostname `ardu`, port 8266.
 - `ardu.local` still does not resolve from the Windows curl environment; this is treated as mDNS resolution only because direct IP HTTP works.
 - Next: verify actual OTA upload over Wi-Fi.
+
+
+## 2026-09-30 — OTA discovery passed; prepared HTTP_BRIDGE_R5 proof
+
+- Arduino IDE now shows the network port `ardu 192.168.0.4` from the physically running HTTP_BRIDGE_R4.
+- This closes the OTA discovery gate even though Windows `curl` still does not resolve `ardu.local`.
+- Created `esp8266_http_bridge_r5/esp8266_http_bridge_r5.ino` as the first OTA-proof image.
+- R5 keeps R4 behavior and changes only the externally visible `/api/ping` firmware identifier to `HTTP_BRIDGE_R5`, so a successful reboot can be proven unambiguously.
+- Repository R5 contains only credential placeholders. Before OTA upload the owner must copy the same local Wi-Fi and OTA credentials used by the working R4 into the local R5 file.
+- OTA upload itself is still pending; working UART/power wiring must not be changed.
