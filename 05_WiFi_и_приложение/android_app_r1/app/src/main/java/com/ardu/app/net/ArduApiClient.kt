@@ -119,16 +119,51 @@ class ArduApiClient {
     }
 
     fun setLightEnabled(enabled: Boolean) {
-        val baseUrl = requireBaseUrl()
-        val payload = JSONObject()
-            .put("enabled", enabled)
-            .toString()
+        val json = postLightSettings(
+            JSONObject().put("enabled", enabled)
+        )
 
+        if (json.optBoolean("enabled", !enabled) != enabled) {
+            throw IOException("LIGHT_ENABLED_NOT_APPLIED")
+        }
+    }
+
+    fun setLightBrightness(brightness: Int) {
+        require(brightness in 0..255) {
+            "Яркость должна быть в диапазоне 0..255"
+        }
+
+        val json = postLightSettings(
+            JSONObject().put("brightness", brightness)
+        )
+
+        if (json.optInt("brightness", -1) != brightness) {
+            throw IOException("LIGHT_BRIGHTNESS_NOT_APPLIED")
+        }
+    }
+
+    fun setLightKelvinPreset(kelvin: Int) {
+        require(kelvin == 2700 || kelvin == 4000 || kelvin == 6000) {
+            "Неподдерживаемый Kelvin preset"
+        }
+
+        val json = postLightSettings(
+            JSONObject().put("kelvin", kelvin)
+        )
+
+        if (json.optInt("kelvin", -1) != kelvin ||
+            json.optString("color_mode") != "kelvin") {
+            throw IOException("LIGHT_KELVIN_NOT_APPLIED")
+        }
+    }
+
+    private fun postLightSettings(payload: JSONObject): JSONObject {
+        val baseUrl = requireBaseUrl()
         val body = request(
             baseUrl = baseUrl,
             path = "/api/light/settings",
             method = "POST",
-            body = payload
+            body = payload.toString()
         )
 
         val json = JSONObject(body)
@@ -136,10 +171,11 @@ class ArduApiClient {
             throw IOException(json.optString("error", "LIGHT_SETTINGS_FAILED"))
         }
 
-        if (!json.optBoolean("applied", false) ||
-            json.optBoolean("enabled", !enabled) != enabled) {
+        if (!json.optBoolean("applied", false)) {
             throw IOException("LIGHT_SETTINGS_NOT_APPLIED")
         }
+
+        return json
     }
 
     fun sendNanoCommand(command: String): NanoResponse {
