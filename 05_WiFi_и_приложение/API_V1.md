@@ -16,7 +16,7 @@
 
 ## 2. Состояние
 
-### OTA status fields (HTTP_BRIDGE_R3)
+### OTA status fields (HTTP_BRIDGE_R4)
 
 В R3 `GET /api/ping` дополнительно возвращает:
 - `ota_ready` — OTA service запущен после успешного Wi-Fi connect;
