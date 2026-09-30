@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ArduinoOTA полностью доказан; wired ESP flashing = recovery-only. На физическом HTTP_BRIDGE_R5 дополнительно пройден read-only semantic L01 endpoint: `/api/light/status` вернул `enabled=false`, `2700 K`, `RGB 255,170,87`, brightness `64`, `saved=true`, `dirty=false`. Android transport обновлён до `0.3-l01-semantic-r1`: обычный L01 UI теперь использует `/api/light/status` и `/api/light/settings`, raw `/api/dev/nano` остаётся только Developer Mode. Текущий gate — физический Android read-only pass, затем L01 ON/OFF.**
+**ArduinoOTA полностью доказан; wired ESP flashing = recovery-only. На физическом HTTP_BRIDGE_R5 semantic L01 read пройден как напрямую по HTTP, так и через Android `0.3-l01-semantic-r1`: приложение показывает `Онлайн • HTTP_BRIDGE_R5` и фактический профиль `Выключен • 2700 K • яркость 64`. Обычный L01 UI использует `/api/light/status` и `/api/light/settings`, raw `/api/dev/nano` остаётся только Developer Mode. Текущий gate — пакетный физический L01 ON/OFF regression через приложение.**
 
 ## Что подтверждено и решено
 
