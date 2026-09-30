@@ -44,9 +44,29 @@ YP-8:
 
 Для надежного normal boot:
 - ESP GPIO0 -> 4.7 kΩ -> 3.3 V
+- ESP GPIO2 -> 4.7 kΩ -> 3.3 V — текущая фактическая сборка владельца; допустимый внешний pull-up boot-strap pin
 - ESP RST -> 4.7 kΩ -> 3.3 V
+- GPIO15 должен быть LOW; на белой adapter board проекта pull-down уже присутствует
+- CH_PD/EN должен быть HIGH; на adapter board проекта pull-up уже присутствует
 
 GPIO0 НЕ соединять с GND в рабочем режиме.
+GPIO2 НЕ соединять напрямую с 3.3 V: только через pull-up resistor; в ROM bootloader GPIO2 может работать как UART output.
+
+## 3.1. Boot strap states
+
+Normal flash boot:
+- GPIO15 = LOW
+- GPIO0 = HIGH
+- GPIO2 = HIGH
+- CH_PD/EN = HIGH
+- RST = HIGH
+
+UART bootloader:
+- GPIO15 = LOW
+- GPIO0 = LOW
+- GPIO2 = HIGH
+
+Фактический внешний 4.7 kΩ pull-up GPIO2 владельца оставлять допустимо и полезно для надежного HIGH.
 
 ## 4. Рабочий UART ESP <-> Nano
 
