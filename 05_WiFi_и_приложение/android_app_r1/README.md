@@ -79,3 +79,16 @@ R1 сначала пробует локальное имя `ardu.local`, зат�
 - raw endpoint остаётся только Developer Mode.
 
 Физический ESP для этого слоя должен быть `HTTP_BRIDGE_R6`, который добавляет atomic `brightness` и Kelvin preset writes. RGB, произвольный Kelvin slider и persistence пока не входят в этот gate.
+
+## L01 stage 3 — complete profile
+
+Версия приложения: `0.5-l01-profile-r1`.
+
+Добавлено:
+- arbitrary Kelvin slider `1800..6500`;
+- RGB controls `R/G/B 0..255` + `Применить RGB`;
+- индикатор saved/dirty;
+- кнопка `Сохранить как свет после включения питания`;
+- persistence write выполняется только по явной кнопке, не при каждом движении slider.
+
+Backend: `HTTP_BRIDGE_R7`.
