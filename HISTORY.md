@@ -1778,3 +1778,19 @@
 - This proves that a new ESP firmware image can be installed over Wi-Fi and boot successfully.
 - Remaining OTA gate: verify post-OTA Nano transport with `/api/status`, `/api/time`, and Developer `PING→PONG`.
 - Security note: verbose Arduino upload output can expose the OTA password in the local command line. Do not paste or commit that secret; rotate it in a later local OTA revision.
+
+
+## 2026-09-30 — post-OTA Nano transport regression passed
+
+После успешной OTA-загрузки HTTP_BRIDGE_R5 владелец подтвердил:
+- `GET /api/status` → `ok=true`, Nano: `FW=FW10_CORE REV=1`, `LEDS=44`, `RTC_VALID=YES`, `CLAP_TRSH=70`, `UPTIME_MS=2157794`;
+- на момент проверки Nano находился в `MODE=DAWN`; это наблюдаемое состояние машины режимов, а не ошибка транспорта;
+- `GET /api/time` → `TIME 2026-09-30 22:18:58`;
+- Developer `PING` → `PONG`;
+- все ответы `timed_out=false`.
+
+Итог:
+- первый реальный ESP OTA gate полностью закрыт;
+- wired programmer path переведён в recovery-only;
+- последующие штатные ESP revisions выполнять OTA;
+- следующий функциональный этап — Android L01 на физическом HTTP_BRIDGE_R5.
