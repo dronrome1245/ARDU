@@ -1859,3 +1859,24 @@
 - EEPROM write не выполняется на каждом движении slider; persistence только по явной кнопке.
 - Подготовлен один пакетный test с cold power-cycle.
 - Compile/OTA/physical R7 ещё не подтверждены.
+
+
+## 2026-09-30 — R7 complete L01 profile passed
+
+Владелец подтвердил весь пакет R7 как PASS.
+
+Подтверждено на физическом стенде:
+- HTTP_BRIDGE_R7 загружен по OTA;
+- Android `0.5-l01-profile-r1` работает;
+- arbitrary Kelvin slider работает в диапазоне пользовательского теста;
+- Kelvin presets работают;
+- brightness работает;
+- RGB red/green/blue test работает;
+- explicit startup-profile save работает;
+- cold power-cycle восстанавливает сохранённый L01 profile;
+- после regression проектный baseline `2700 K / brightness 64` возвращён и снова сохранён;
+- OFF→ON / Refresh / Developer PING regression пройден.
+
+Итог: L01 color/brightness/profile/persistence integration закрыт.
+
+Следующий незакрытый L01 feature — clap app control + family calibration. CORE R1 уже содержит runtime double-clap detector и persistent threshold/timeout, но app-ready CLAPCAL state machine пока находится только в отдельной diagnostic branch.
