@@ -46,3 +46,11 @@ Arduino Nano / ATmega328P (Old Bootloader) → Verify.
 - Global variables use ...
 
 Цель R3 — существенно улучшить запас относительно R2; итоговое решение об Upload принимается после фактического compiler report.
+
+
+## Фактический Verify 2026-09-30
+
+- flash: `27822 / 30720` = 90%, free 2898;
+- globals: `1392 / 2048` = 67%, free 656.
+
+Результат: compile-budget принят для CLAPCAL hardware test. Финальный Music/Ambient memory budget этим не закрывается.
