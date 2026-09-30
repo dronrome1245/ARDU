@@ -1,10 +1,10 @@
 # Статус проекта ARDU
 
-Дата состояния: 2026-09-29
+Дата состояния: 2026-09-30
 
 ## Текущий этап
 
-**Минимальный Android app transport R1 полностью пройден. По решению владельца создаётся обслуживаемая ESP ревизия HTTP_BRIDGE_R4: Wi-Fi SSID/password вводятся вручную прямо в локальную копию скетча, добавляется password-protected ArduinoOTA. Текущий gate — один wired upload R4, normal-boot HTTP pass и первый OTA proof; после этого последующие ESP revisions должны прошиваться по Wi-Fi без перекоммутации.**
+**HTTP_BRIDGE_R4 физически работает на ESP8266: Wi-Fi/HTTP PASS, `ota_ready=true`, а Arduino IDE видит сетевой порт `ardu 192.168.0.4`. OTA discovery gate пройден. Подготовлен HTTP_BRIDGE_R5 как минимальная OTA-proof revision без функциональных изменений, кроме видимого `fw=HTTP_BRIDGE_R5`. Текущий gate — загрузить R5 через сетевой порт без изменения проводки, дождаться reboot и подтвердить `/api/ping`, STATUS/TIME и Developer `PING→PONG`. После PASS wired programmer path становится recovery-only.**
 
 ## Что подтверждено и решено
 
