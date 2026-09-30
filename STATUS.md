@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ArduinoOTA полностью доказан; wired ESP flashing = recovery-only. На физическом HTTP_BRIDGE_R5 semantic L01 read пройден как напрямую по HTTP, так и через Android `0.3-l01-semantic-r1`: приложение показывает `Онлайн • HTTP_BRIDGE_R5` и фактический профиль `Выключен • 2700 K • яркость 64`. Обычный L01 UI использует `/api/light/status` и `/api/light/settings`, raw `/api/dev/nano` остаётся только Developer Mode. Текущий gate — пакетный физический L01 ON/OFF regression через приложение.**
+**Android semantic L01 ON/OFF на физическом HTTP_BRIDGE_R5 полностью ПРОЙДЕН: владелец подтвердил весь пакет — ON/OFF три цикла, корректные `MODE=L01/OFF`, reconnect/state reread и Developer `PING→PONG`. Следующий слой подготовлен: `HTTP_BRIDGE_R6` расширяет semantic L01 settings brightness `0..255` и Kelvin presets `2700/4000/6000`; Android `0.4-l01-bright-kelvin-r1` добавляет brightness slider и три preset buttons. Текущий gate — OTA R6 + один пакетный direct API/Android brightness+Kelvin regression. RGB, произвольный Kelvin slider и persistence пока не входят в слой.**
 
 ## Что подтверждено и решено
 
