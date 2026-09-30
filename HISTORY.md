@@ -1833,3 +1833,29 @@
 - `HTTP_BRIDGE_R6` — atomic brightness + Kelvin preset writes;
 - Android `0.4-l01-bright-kelvin-r1` — brightness slider + presets 2700/4000/6000.
 - Physical R6 OTA/build/runtime ещё не проверены.
+
+
+## 2026-09-30 — R6 brightness/Kelvin Android block passed
+
+- Владелец OTA-загрузил HTTP_BRIDGE_R6 без изменения проводки.
+- `GET /api/ping` после reboot вернул `fw=HTTP_BRIDGE_R6`, Wi-Fi connected, OTA ready.
+- Два ручных Windows PowerShell вызова `curl.exe --data-binary` для JSON brightness/Kelvin вернули `R6_SUPPORTS_ENABLED_BRIGHTNESS_KELVIN_PRESETS_ONLY`.
+- При этом владелец подтвердил: «в приложении все работает» — Android `0.4-l01-bright-kelvin-r1` физически управляет brightness и Kelvin presets через semantic endpoint.
+- Поэтому R6 feature layer считается hardware-working через Android transport; direct curl discrepancy оставлен как shell/body quoting issue для тестовой команды, а не как дефект света/ESP transport.
+- Для следующих JSON smoke-tests использовать PowerShell `Invoke-RestMethod`.
+
+После этого по просьбе владельца тестовые итерации укрупняются: следующий gate объединяет arbitrary Kelvin + RGB + persistence.
+
+
+## 2026-09-30 — prepared R7 complete L01 profile
+
+- Создан `esp8266_http_bridge_r7`.
+- R7 сохраняет R6 ON/OFF/brightness и расширяет `POST /api/light/settings`:
+  - arbitrary Kelvin `1800..6500` → `LIGHT KELVIN`;
+  - RGB → `LIGHT RGB`;
+  - `persist_startup_profile=true` → `LIGHT SAVE`.
+- Android обновлён до `0.5-l01-profile-r1`.
+- Добавлены Kelvin slider, RGB controls, saved/dirty indicator и явная кнопка сохранения startup profile.
+- EEPROM write не выполняется на каждом движении slider; persistence только по явной кнопке.
+- Подготовлен один пакетный test с cold power-cycle.
+- Compile/OTA/physical R7 ещё не подтверждены.
