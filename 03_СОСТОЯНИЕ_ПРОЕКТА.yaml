@@ -1721,8 +1721,11 @@ android_l01_stage1_2026_09_30:
   brightness_controls: false
   kelvin_controls: false
   rgb_controls: false
+  android_read_only_verified: true
+  android_read_only_connection: HTTP_BRIDGE_R5
+  android_read_only_display: "Выключен • 2700 K • яркость 64"
   physical_verified: false
-  next: physical_android_read_only_then_on_off
+  next: physical_android_on_off_regression
 
 esp_reflash_policy_2026_09_30:
   owner_decision: true
