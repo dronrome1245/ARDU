@@ -1806,3 +1806,13 @@
 - Raw `POST /api/dev/nano` remains only for Developer Mode.
 - App version bumped to `0.3-l01-semantic-r1`.
 - Physical Android read/write test remains pending.
+
+
+## 2026-09-30 — Android semantic L01 read-only passed
+
+- На физическом Android-телефоне приложение `0.3-l01-semantic-r1` подключилось к `HTTP_BRIDGE_R5`.
+- Верх экрана показывает `Онлайн • HTTP_BRIDGE_R5`.
+- Блок L01 показывает `Выключен • 2700 K • яркость 64`.
+- Это совпадает с ранее подтверждённым прямым `GET /api/light/status`.
+- Read-only semantic Android gate закрыт.
+- Следующий gate: пакетный ON/OFF regression через `POST /api/light/settings`.
