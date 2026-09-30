@@ -1971,5 +1971,15 @@ fw10_core_r2_clapcal_plan_2026_09_30:
   revision: 2
   eeprom_layout_changed: false
   static_structure_check: passed
-  compile_verified: false
-  next: owner_verify_compile_budget
+  compile_verified: true
+  compile_flash_bytes: 29788
+  compile_flash_total: 30720
+  compile_flash_percent: 96
+  compile_flash_free_bytes: 932
+  compile_sram_globals_bytes: 1445
+  compile_sram_total: 2048
+  compile_sram_percent: 70
+  compile_sram_free_bytes: 603
+  compile_budget_result: fail_for_future_integration
+  upload_allowed: false
+  next: optimize_core_r2_then_reverify
