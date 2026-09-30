@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**HTTP_BRIDGE_R4 физически работает на ESP8266: Wi-Fi/HTTP PASS, `ota_ready=true`, а Arduino IDE видит сетевой порт `ardu 192.168.0.4`. OTA discovery gate пройден. Подготовлен HTTP_BRIDGE_R5 как минимальная OTA-proof revision без функциональных изменений, кроме видимого `fw=HTTP_BRIDGE_R5`. Текущий gate — загрузить R5 через сетевой порт без изменения проводки, дождаться reboot и подтвердить `/api/ping`, STATUS/TIME и Developer `PING→PONG`. После PASS wired programmer path становится recovery-only.**
+**Первый реальный ArduinoOTA upload по Wi-Fi выполнен: R4 принял OTA-аутентификацию, R5 был передан через сетевой порт `ardu 192.168.0.4`, ESP автоматически перезагрузился, а `GET /api/ping` после reboot вернул `fw=HTTP_BRIDGE_R5`, `wifi_connected=true`, `ota_ready=true`. OTA upload/boot proof пройден без изменения проводки. Текущий gate — короткий post-OTA regression Nano transport: `/api/status`, `/api/time`, Developer `PING→PONG`. После его PASS wired programmer path становится recovery-only и работа возвращается к Android L01.**
 
 ## Что подтверждено и решено
 
