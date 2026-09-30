@@ -142,9 +142,9 @@ class ArduApiClient {
         }
     }
 
-    fun setLightKelvinPreset(kelvin: Int) {
-        require(kelvin == 2700 || kelvin == 4000 || kelvin == 6000) {
-            "Неподдерживаемый Kelvin preset"
+    fun setLightKelvin(kelvin: Int) {
+        require(kelvin in 1800..6500) {
+            "Kelvin должен быть в диапазоне 1800..6500"
         }
 
         val json = postLightSettings(
@@ -154,6 +154,41 @@ class ArduApiClient {
         if (json.optInt("kelvin", -1) != kelvin ||
             json.optString("color_mode") != "kelvin") {
             throw IOException("LIGHT_KELVIN_NOT_APPLIED")
+        }
+    }
+
+    fun setLightRgb(red: Int, green: Int, blue: Int) {
+        require(red in 0..255 && green in 0..255 && blue in 0..255) {
+            "RGB должен быть в диапазоне 0..255"
+        }
+
+        val rgb = JSONObject()
+            .put("r", red)
+            .put("g", green)
+            .put("b", blue)
+
+        val json = postLightSettings(
+            JSONObject().put("rgb", rgb)
+        )
+
+        val applied = json.optJSONObject("rgb")
+            ?: throw IOException("LIGHT_RGB_NOT_APPLIED")
+
+        if (applied.optInt("r", -1) != red ||
+            applied.optInt("g", -1) != green ||
+            applied.optInt("b", -1) != blue ||
+            json.optString("color_mode") != "rgb") {
+            throw IOException("LIGHT_RGB_NOT_APPLIED")
+        }
+    }
+
+    fun saveLightStartupProfile() {
+        val json = postLightSettings(
+            JSONObject().put("persist_startup_profile", true)
+        )
+
+        if (!json.optBoolean("persist_startup_profile", false)) {
+            throw IOException("LIGHT_PROFILE_NOT_SAVED")
         }
     }
 
