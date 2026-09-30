@@ -25,4 +25,10 @@
     <string name="light_state_format">%1$s • %2$s • яркость %3$d</string>
     <string name="light_applying">Применение…</string>
     <string name="light_apply_error">Ошибка L01: %1$s</string>
+    <string name="light_brightness_default">Яркость: 64</string>
+    <string name="light_brightness_format">Яркость: %1$d</string>
+    <string name="light_kelvin_presets">Температура</string>
+    <string name="light_preset_2700">2700 K</string>
+    <string name="light_preset_4000">4000 K</string>
+    <string name="light_preset_6000">6000 K</string>
 </resources>
