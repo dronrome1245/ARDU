@@ -1733,7 +1733,7 @@ android_l01_stage1_2026_09_30:
 
 esp_reflash_policy_2026_09_30:
   owner_decision: true
-  current_physical_bridge: HTTP_BRIDGE_R5
+  current_physical_bridge: HTTP_BRIDGE_R6
   compact_wiring_should_remain_undisturbed: true
   reflash_for_each_app_iteration: false
   default_future_esp_update_path: OTA
@@ -1856,7 +1856,7 @@ r5_light_status_read_result_2026_09_30:
 
 
 esp8266_http_bridge_r6_l01_stage2_2026_09_30:
-  status: source_prepared
+  status: ota_and_android_physical_pass
   code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r6/esp8266_http_bridge_r6.ino"
   test_doc: "05_WiFi_и_приложение/ESP8266_HTTP_BRIDGE_R6_TEST.md"
   revision: 6
@@ -1872,10 +1872,15 @@ esp8266_http_bridge_r6_l01_stage2_2026_09_30:
   arbitrary_kelvin: false
   rgb: false
   persistence_api: false
-  compile_verified: false
-  ota_upload_verified: false
-  physical_verified: false
-  next: verify_then_ota_upload_r6
+  compile_verified: true
+  ota_upload_verified: true
+  api_ping_firmware: HTTP_BRIDGE_R6
+  android_brightness_verified: true
+  android_kelvin_presets_verified: true
+  direct_curl_json_smoke: failed_body_not_matched
+  direct_curl_failure_interpretation: powershell_native_json_quoting_suspected
+  physical_verified: true
+  next: r7_complete_l01_profile
 
 android_l01_stage2_2026_09_30:
   project_path: "05_WiFi_и_приложение/android_app_r1"
@@ -1889,6 +1894,46 @@ android_l01_stage2_2026_09_30:
   rgb_controls: false
   arbitrary_kelvin_slider: false
   persistence_controls: false
+  build_verified: true
+  physical_verified: true
+  result: passed
+  next: android_l01_stage3
+
+
+esp8266_http_bridge_r7_l01_stage3_2026_09_30:
+  status: source_prepared
+  code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r7/esp8266_http_bridge_r7.ino"
+  test_doc: "05_WiFi_и_приложение/ESP8266_HTTP_BRIDGE_R7_TEST.md"
+  revision: 7
+  base: HTTP_BRIDGE_R6
+  semantic_settings:
+    enabled: retained
+    brightness: retained
+    kelvin_range: "1800..6500"
+    rgb_channels: "0..255"
+    persist_startup_profile: true
+  nano_mapping:
+    kelvin: "LIGHT KELVIN"
+    rgb: "LIGHT RGB"
+    persist: "LIGHT SAVE"
+  compile_verified: false
+  ota_upload_verified: false
+  physical_verified: false
+  next: verify_ota_and_full_l01_profile_batch
+
+android_l01_stage3_2026_09_30:
+  project_path: "05_WiFi_и_приложение/android_app_r1"
+  app_version_name: "0.5-l01-profile-r1"
+  source_created: true
+  requires_bridge: HTTP_BRIDGE_R7
+  arbitrary_kelvin_slider: true
+  kelvin_range: "1800..6500"
+  rgb_controls: true
+  rgb_apply_button: true
+  persistence_button: true
+  saved_dirty_indicator: true
+  persistence_only_on_explicit_save: true
+  cold_power_cycle_test_required: true
   build_verified: false
   physical_verified: false
-  next: after_r6_ota_run_batch_test
+  next: after_r7_ota_run_full_profile_batch
