@@ -1986,7 +1986,7 @@ fw10_core_r2_clapcal_plan_2026_09_30:
 
 
 fw10_core_r3_clapcal_plan_2026_09_30:
-  status: source_prepared
+  status: compile_pass_hardware_test_allowed
   code_path: "04_Прошивка/nano_fw10_core_r3/nano_fw10_core_r3.ino"
   test_doc: "04_Прошивка/FW10_CORE_R3_CLAPCAL_TEST.md"
   revision: 3
@@ -2001,6 +2001,15 @@ fw10_core_r3_clapcal_plan_2026_09_30:
     compact_uart_diagnostics: true
   eeprom_layout_changed: false
   static_structure_check: passed
-  compile_verified: false
-  upload_allowed: false
-  next: owner_verify_memory_report
+  compile_verified: true
+  compile_flash_bytes: 27822
+  compile_flash_total: 30720
+  compile_flash_percent: 90
+  compile_flash_free_bytes: 2898
+  compile_sram_globals_bytes: 1392
+  compile_sram_total: 2048
+  compile_sram_percent: 67
+  compile_sram_free_bytes: 656
+  compile_budget_result: accepted_for_clap_hardware_test_not_final_music_budget
+  upload_allowed: true
+  next: hardware_clapcal_batch
