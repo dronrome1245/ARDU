@@ -123,13 +123,15 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-1. FW-9 / NIGHT R2 и M02 R1 закрыты на одном D6-кольце.
-2. M06 был аппаратно проверен, после чего владелец исключил стробоскоп из целевого функционала; ID M06 не переиспользовать.
-3. L01 R1/R2/R3 закрыты; физическое кольцо теперь 44 LED. Старые hardware-tested 43-LED скетчи по D-066 не переписывать.
-4. Clap baseline принят: double clap, TRSH=70, TIMEOUT=500; семейная calibration отложена до приложения.
-5. FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют проверенный минимальный end-to-end transport: Wi-Fi/HTTP ↔ UART ↔ Nano ↔ DS3231.
-6. Android transport, OTA и полный L01 profile/persistence уже пройдены на HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1`. Wired ESP programmer path = recovery-only. Следующий крупный gate — clap app control + family calibration; для него сначала создаётся FW10 CORE R2 с CLAPCAL и проверяется AVR flash/SRAM budget до физической загрузки Nano.
-7. Второе кольцо D7 физически подключать после устойчивой полной настройки первого кольца; оно получает зеркальный кадр, а не отдельную логику.
+По решению владельца 2026-10-01 проект переведён в режим финализации v1. Канонический порядок: `FINALIZATION_PLAN.md`.
+
+1. Не загружать промежуточный CORE R3.
+2. Собрать одну полную Nano v1: L01 + clap/CLAPCAL + RTC/Alarm/Dawn + Night + Ambient + все активные Music ID + persistence + D6/D7 44+44 + регулируемый безопасный current limit.
+3. До физической загрузки выполнить интеграцию, оптимизацию flash/SRAM и заморозить UART v1.
+4. Выполнить один финальный Nano upload с временным разрывом ESP TX→Nano D0.
+5. Затем собрать и один раз OTA-загрузить полный ESP8266 v1 semantic HTTP API.
+6. После firmware freeze завершить Android functional UI, затем дизайн/UX.
+7. После этого подключить второе кольцо, провести силовой тест, потолочный монтаж и финальную приёмку.
 
 
 ## 12. База ColorMusic/FHT
