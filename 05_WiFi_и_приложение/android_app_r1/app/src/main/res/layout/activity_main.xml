@@ -164,6 +164,91 @@
                 android:enabled="false"
                 android:text="@string/light_preset_6000" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/kelvinValueText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="@string/light_kelvin_default"
+            android:textSize="16sp" />
+
+        <SeekBar
+            android:id="@+id/kelvinSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:min="1800"
+            android:max="6500"
+            android:progress="2700" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="@string/light_rgb_title"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/redValueText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/light_rgb_red_default" />
+
+        <SeekBar
+            android:id="@+id/redSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:progress="255" />
+
+        <TextView
+            android:id="@+id/greenValueText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/light_rgb_green_default" />
+
+        <SeekBar
+            android:id="@+id/greenSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:progress="170" />
+
+        <TextView
+            android:id="@+id/blueValueText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/light_rgb_blue_default" />
+
+        <SeekBar
+            android:id="@+id/blueSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:progress="87" />
+
+        <Button
+            android:id="@+id/applyRgbButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="@string/light_apply_rgb" />
+
+        <TextView
+            android:id="@+id/profileStateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="@string/light_profile_saved" />
+
+        <Button
+            android:id="@+id/saveStartupProfileButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:enabled="false"
+            android:text="@string/light_save_startup_profile" />
+
         <Button
             android:id="@+id/developerToggleButton"
             android:layout_width="match_parent"
