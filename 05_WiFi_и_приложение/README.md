@@ -25,11 +25,11 @@
 - R1 diagnostic endpoints сохранены;
 - R2 включает ранее добавленный startup UART framing fix.
 
-## ESP8266 HTTP BRIDGE R3 / OTA
+## ESP8266 HTTP BRIDGE R4 / OTA
 
-- код: `esp8266_http_bridge_r3/esp8266_http_bridge_r3.ino`;
-- тест: `ESP8266_HTTP_BRIDGE_R3_OTA_TEST.md`;
+- код: `esp8266_http_bridge_r4/esp8266_http_bridge_r4.ino`;
+- тест: `ESP8266_HTTP_BRIDGE_R4_OTA_TEST.md`;
 - Wi-Fi SSID/password и OTA password вводятся вручную прямо в локальную копию скетча перед первой wired прошивкой;
-- после первого wired upload R3 последующие ESP updates выполняются ArduinoOTA по Wi-Fi;
+- после первого wired upload R4 последующие ESP updates выполняются ArduinoOTA по Wi-Fi;
 - OTA hostname = `ardu`, port = `8266`;
 - OTA progress намеренно не печатается в ESP Serial, потому что Serial используется как transport к Nano.
