@@ -128,7 +128,7 @@ ARDU — проект двух синхронных круглых потоло�
 3. L01 R1/R2/R3 закрыты; физическое кольцо теперь 44 LED. Старые hardware-tested 43-LED скетчи по D-066 не переписывать.
 4. Clap baseline принят: double clap, TRSH=70, TIMEOUT=500; семейная calibration отложена до приложения.
 5. FW-10 CORE R1 + ESP8266 HTTP BRIDGE R1 имеют проверенный минимальный end-to-end transport: Wi-Fi/HTTP ↔ UART ↔ Nano ↔ DS3231.
-6. По D-071 повторный общий regression перенесён на приложение. Минимальный Android transport R1 полностью пройден на физическом телефоне. Из-за уже компактно спаянного рабочего стенда ESP сейчас не перепрошиваем: L01 status + ON/OFF реализуются в Android через compatibility adapter поверх существующего HTTP_BRIDGE_R1 `/api/dev/nano`, при этом обычный UI raw-команды не показывает. Текущий gate — обновить только Android app и пройти L01 ON/OFF; после pass — brightness + Kelvin presets тем же способом. HTTP_BRIDGE_R2 отложен до пакетного обновления ESP.
+6. Минимальный Android transport R1 полностью пройден. По новому решению владельца готовится один обслуживаемый ESP update: HTTP_BRIDGE_R3 с ручными Wi-Fi credentials прямо в локальном скетче и password-protected OTA. Текущий gate — один wired upload R3, затем доказать следующую ESP-прошивку по Wi-Fi OTA; после этого физическую перекоммутацию ESP для обычных revisions не использовать.
 7. Второе кольцо D7 физически подключать после устойчивой полной настройки первого кольца; оно получает зеркальный кадр, а не отдельную логику.
 
 

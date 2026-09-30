@@ -1176,3 +1176,24 @@ App calibration по D-068 позже может заменить threshold/time
 5. HTTP_BRIDGE_R2 и последующие semantic ESP endpoints разрабатываются/накапливаются в репозитории, но прошиваются пакетно, когда это оправдывает вмешательство в монтаж.
 
 Первый такой compatibility слой: L01 `STATUS/ON/OFF`.
+
+---
+
+## D-075 — один wired ESP update для включения OTA
+
+**Дата:** 2026-09-30  
+**Статус:** ДЕЙСТВУЕТ  
+**УТОЧНЯЕТ:** D-074.
+
+**Решение владельца:** выполнить ещё один осознанный wired ESP update, цель которого — убрать необходимость дальнейшей физической перекоммутации.
+
+Правила:
+1. новая ревизия — `HTTP_BRIDGE_R3`; R1/R2 не переписывать;
+2. перед первым upload владелец вручную подставляет `WIFI_SSID`, `WIFI_PASSWORD`, `OTA_PASSWORD` прямо в локальный скетч;
+3. реальные credentials/password не коммитить в публичный GitHub;
+4. R3 включает password-protected ArduinoOTA в домашней Station-сети, hostname `ardu`, port `8266`;
+5. после hardware PASS R3 последующие ESP firmware revisions по умолчанию прошивать OTA;
+6. wired programmer procedure сохраняется только как recovery path, если OTA перестал работать;
+7. OTA code не пишет progress/error в ESP `Serial`, потому что этот UART соединён с Nano.
+
+Причина: уже компактно спаянный стенд не должен требовать перекоммутации ради обычных программных итераций.

@@ -946,3 +946,13 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 - переключение состояния по `clap.hasClaps(2)`.
 - Clap state machine анализирует derivative, а не абсолютную амплитуду.
 - README текущей Clap предупреждает о несовместимости с актуальной VolAnalyzer, поэтому ARDU diagnostic не смешивает несогласованные версии библиотек.
+
+## 2026-09-30 — ESP8266 ArduinoOTA — official core
+
+- Official ESP8266 Arduino core ArduinoOTA API: `ArduinoOTA.setPort()`, `setHostname()`, `setPassword()`, `begin()`, `handle()`; default ESP8266 OTA port is 8266.
+- Official BasicOTA example confirms Station Wi-Fi + ArduinoOTA workflow.
+- Sources:
+  - https://github.com/esp8266/Arduino/blob/master/libraries/ArduinoOTA/ArduinoOTA.h
+  - https://github.com/esp8266/Arduino/blob/master/libraries/ArduinoOTA/ArduinoOTA.cpp
+  - https://github.com/esp8266/Arduino/blob/master/libraries/ArduinoOTA/examples/BasicOTA/BasicOTA.ino
+- ARDU-specific constraint: do not print OTA progress to ESP Serial because it is the Nano command UART.

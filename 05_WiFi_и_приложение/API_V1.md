@@ -16,6 +16,16 @@
 
 ## 2. Состояние
 
+### OTA status fields (HTTP_BRIDGE_R3)
+
+В R3 `GET /api/ping` дополнительно возвращает:
+- `ota_ready` — OTA service запущен после успешного Wi-Fi connect;
+- `ota_hostname` — `ardu`;
+- `ota_port` — `8266`.
+
+OTA password никогда не возвращается через HTTP.
+
+
 ### `GET /api/status`
 
 Предварительный ответ:

@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**Минимальный Android app transport R1 полностью пройден. Физический ESP оставляем на уже проверенном HTTP_BRIDGE_R1, чтобы не разбирать компактно спаянный стенд ради каждой app-итерации. L01 status + ON/OFF реализованы в Android через внутренний compatibility adapter к `/api/dev/nano`; обычный UI raw-команды не показывает. Текущий gate — обновить только Android app и пройти сквозной L01 ON/OFF. HTTP_BRIDGE_R2 отложен до пакетной перепрошивки ESP.**
+**Минимальный Android app transport R1 полностью пройден. По решению владельца создаётся обслуживаемая ESP ревизия HTTP_BRIDGE_R3: Wi-Fi SSID/password вводятся вручную прямо в локальную копию скетча, добавляется password-protected ArduinoOTA. Текущий gate — один wired upload R3, normal-boot HTTP pass и первый OTA proof; после этого последующие ESP revisions должны прошиваться по Wi-Fi без перекоммутации.**
 
 ## Что подтверждено и решено
 
@@ -1508,3 +1508,13 @@
 - Обычный пользовательский UI не показывает raw-команды/IP/UART; Nano остаётся источником истины.
 - `HTTP_BRIDGE_R2` не удаляется, но его физический compile/upload больше не является текущим gate. Семантические ESP endpoints будут собраны пакетно и прошиты позже одним обслуживаемым этапом.
 - **Текущий следующий gate:** пересобрать только Android app на телефоне и проверить L01 OFF→ON→OFF через текущий физический HTTP_BRIDGE_R1.
+
+### 2026-09-30 — HTTP_BRIDGE_R3 with manual Wi-Fi credentials + OTA prepared
+
+- **РЕШЕНИЕ владельца:** отказаться от `wifi_secrets.h` для ближайшей физической прошивки; SSID/password вводить вручную в локальную копию скетча непосредственно перед upload.
+- **РЕШЕНИЕ владельца:** добавить OTA, чтобы после одного wired upload дальнейшие ESP revisions загружать по Wi-Fi без перекоммутации спаянного стенда.
+- **ФАКТ ПО КОДУ:** создан `esp8266_http_bridge_r3/esp8266_http_bridge_r3.ino`.
+- R3 наследует transport R1 и semantic L01 endpoints R2, добавляет ArduinoOTA с hostname `ardu`, port `8266`, password authentication и `ArduinoOTA.handle()` в loop.
+- OTA callbacks намеренно не печатают в `Serial`, потому что ESP Serial является UART к Nano.
+- `GET /api/ping` R3 сообщает `ota_ready/ota_hostname/ota_port`, но не раскрывает password.
+- **НЕ ПРОВЕРЕНО ФИЗИЧЕСКИ:** R3 ещё не компилировался, не прошивался и OTA proof ещё не выполнен.

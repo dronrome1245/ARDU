@@ -1727,3 +1727,13 @@
 - Текущий L01 stage 1 переведён на Android compatibility adapter поверх уже hardware-tested HTTP_BRIDGE_R1.
 - Android internally sends `LIGHT STATUS`, `LIGHT ON`, `LIGHT OFF` through existing `POST /api/dev/nano`; ordinary UI raw transport details are hidden.
 - HTTP_BRIDGE_R2 source сохранён для будущего пакетного ESP update; физический R2 upload сейчас отложен.
+
+## 2026-09-30 — prepared ESP HTTP_BRIDGE_R3 with OTA
+
+- Owner requested manual Wi-Fi credentials directly in the local sketch because the current physical ESP no longer answers at the previous address and credentials were suspected.
+- Created a new R3 instead of rewriting R1/R2.
+- R3 contains explicit local placeholders for SSID, Wi-Fi password and OTA password.
+- Added ESP8266 ArduinoOTA: hostname `ardu`, port `8266`, password authentication, OTA handle in main loop.
+- Avoided Serial logging from OTA callbacks because ESP Serial is the live Nano UART transport.
+- R3 keeps the startup UART framing fix and all R2 HTTP/L01 functionality.
+- Physical compile/wired upload/OTA proof remain pending.
