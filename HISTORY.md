@@ -1794,3 +1794,15 @@
 - wired programmer path переведён в recovery-only;
 - последующие штатные ESP revisions выполнять OTA;
 - следующий функциональный этап — Android L01 на физическом HTTP_BRIDGE_R5.
+
+
+## 2026-09-30 — Android L01 switched to semantic R5 API
+
+- Physical `GET /api/light/status` on HTTP_BRIDGE_R5 passed.
+- Returned state: `enabled=false`, `color_mode=kelvin`, `kelvin=2700`, `RGB=255,170,87`, `brightness=64`, `saved=true`, `dirty=false`.
+- Updated Android `ArduApiClient` so normal L01 UI reads `GET /api/light/status` directly.
+- L01 ON/OFF now uses `POST /api/light/settings {"enabled":true|false}`.
+- After a write, existing MainActivity logic still rereads L01 state from the device.
+- Raw `POST /api/dev/nano` remains only for Developer Mode.
+- App version bumped to `0.3-l01-semantic-r1`.
+- Physical Android read/write test remains pending.
