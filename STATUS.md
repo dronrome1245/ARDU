@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**Android semantic L01 ON/OFF на физическом HTTP_BRIDGE_R5 полностью ПРОЙДЕН: владелец подтвердил весь пакет — ON/OFF три цикла, корректные `MODE=L01/OFF`, reconnect/state reread и Developer `PING→PONG`. Следующий слой подготовлен: `HTTP_BRIDGE_R6` расширяет semantic L01 settings brightness `0..255` и Kelvin presets `2700/4000/6000`; Android `0.4-l01-bright-kelvin-r1` добавляет brightness slider и три preset buttons. Текущий gate — OTA R6 + один пакетный direct API/Android brightness+Kelvin regression. RGB, произвольный Kelvin slider и persistence пока не входят в слой.**
+**HTTP_BRIDGE_R6 физически загружен по OTA и `/api/ping` подтверждает `HTTP_BRIDGE_R6`; Android brightness slider и Kelvin presets физически работают. Два ручных `curl.exe` JSON-write из Windows PowerShell были отклонены R6, но те же semantic writes проходят через Android; это фиксируется как различие shell/body quoting, а не как hardware failure. Следующий крупный слой уже подготовлен: `HTTP_BRIDGE_R7` + Android `0.5-l01-profile-r1` закрывают оставшийся L01 profile одним пакетом — arbitrary Kelvin `1800..6500`, RGB и explicit startup-profile save с cold power-cycle regression.**
 
 ## Что подтверждено и решено
 
