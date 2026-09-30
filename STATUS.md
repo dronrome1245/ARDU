@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ; L01 profile/persistence закрыт. `FW10 CORE R2` с family `CLAPCAL` успешно компилируется, но compile-budget не принят для дальнейшей интеграции: flash `29788/30720` (96%, свободно 932 байта), globals `1445/2048` (70%, свободно 603 байта). До оптимизации R2 на Nano не загружать: текущий flash-запас недостаточен для последующего добавления Ambient/Music в общую прошивку. Следующий gate — уменьшить размер CORE R2 без изменения поведения/EEPROM и повторить Verify.**
+**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ; L01 profile/persistence закрыт. CORE R2 compile прошёл, но 96% flash признан слишком тесным и R2 не загружался. Подготовлен `FW10 CORE R3` с компактным CLAPCAL при сохранении D-068 и EEPROM layout: один detector runtime/calibration, один weak strength на pair, compact quiet histogram и сокращённые UART diagnostics. Текущий gate — только Verify R3 и новый flash/SRAM report; до него Upload запрещён.**
 
 ## Что подтверждено и решено
 
