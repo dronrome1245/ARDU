@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ; L01 profile/persistence закрыт. FW10 CORE R3 CLAPCAL компилируется (`27822/30720` flash, `1392/2048` globals), но первая попытка Upload на Nano при сохранённой ESP↔Nano UART-проводке завершилась `avrdude: programmer is not responding / not in sync`; прошивка Nano не изменилась и физически остаётся проверенный FW10 CORE R1. CLAPCAL не является обязательным для продолжения: текущий R1 уже имеет рабочий double-clap `TRSH=70 / TIMEOUT=500`. Практический фокус возвращён на развитие приложения поверх работающего R1/R7; Nano CLAPCAL оставлен подготовленным отдельным будущим этапом.**
+**ФИНАЛИЗАЦИЯ ARDU v1. По решению владельца 2026-10-01 промежуточные firmware upload-итерации прекращаются. Физический Nano остаётся на проверенном FW10 CORE R1 до готовности одной полной release-сборки v1; CORE R3 не загружать. Физический ESP8266 сейчас имеет hardware-tested линию HTTP_BRIDGE_R7/OTA. Следующая работа — собрать и оптимизировать полную Nano v1 с L01 + clap/CLAPCAL + RTC/Alarm/Dawn + Night + Ambient + Music M01/M02/M03/M04/M05/M08/M09 + persistence + 44+44 D6/D7 + безопасный регулируемый current limit, заморозить UART v1 и только затем выполнить один финальный Nano upload. После него — один полный ESP v1 OTA update, затем Android functional completion, дизайн, двухкольцевой power test, монтаж и release. Канонический план: `FINALIZATION_PLAN.md`.**
 
 ## Что подтверждено и решено
 
@@ -1549,3 +1549,14 @@
 - **ФАКТ:** `curl http://ardu.local/api/ping` на Windows не резолвится: `Could not resolve host: ardu.local`.
 - **ВЫВОД:** Wi-Fi, HTTP и OTA service на ESP работают; текущая проблема локализована к mDNS/hostname resolution на ПК, а не к ESP connectivity.
 - Следующий gate: доказать OTA upload через network port/IP, затем STATUS/TIME/Developer PING regression и L01 app test.
+
+
+### 2026-10-01 — проект переведён в режим финализации v1
+
+- **РЕШЕНИЕ владельца:** больше не выполнять мелкие промежуточные загрузки Nano/ESP ради каждой функции; подготовить полные release-прошивки и загрузить их по одному разу.
+- Создан канонический `FINALIZATION_PLAN.md`.
+- CORE R3 остаётся compile-tested исходником CLAPCAL, но физически не загружается как промежуточная ревизия.
+- Финальная Nano v1 должна включить все обязательные режимы, family CLAPCAL, persistence, D6+D7 44+44 и service-adjustable current limit.
+- Финальный ESP v1 должен получить полный semantic API и сохранить OTA.
+- После firmware freeze порядок: Android functionality → дизайн/UX → второе кольцо/power → потолочный монтаж → acceptance/release.
+- Следующий практический шаг: сборка исходника полной Nano v1 и compile/SRAM optimization без физической прошивки до полного scope.
