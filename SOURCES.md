@@ -956,3 +956,19 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
   - https://github.com/esp8266/Arduino/blob/master/libraries/ArduinoOTA/ArduinoOTA.cpp
   - https://github.com/esp8266/Arduino/blob/master/libraries/ArduinoOTA/examples/BasicOTA/BasicOTA.ino
 - ARDU-specific constraint: do not print OTA progress to ESP Serial because it is the Nano command UART.
+
+
+## S-OTA-001 — первый реальный ESP OTA pass 2026-09-30
+
+Пользовательский лог Arduino IDE и HTTP regression после загрузки по Wi-Fi.
+
+Подтверждено:
+- Arduino IDE обнаруживает network port `ardu 192.168.0.4`;
+- OTA authentication проходит;
+- следующая ревизия R5 передана по Wi-Fi без изменения рабочей проводки;
+- после reboot `GET /api/ping` возвращает `fw=HTTP_BRIDGE_R5`, `wifi_connected=true`, `ota_ready=true`, hostname `ardu`, port `8266`;
+- `GET /api/status` после OTA возвращает `FW=FW10_CORE REV=1`, `RTC_VALID=YES`, `timed_out=false`;
+- `GET /api/time` возвращает `TIME 2026-09-30 22:18:58`, `timed_out=false`;
+- Developer `PING` возвращает `PONG`, `timed_out=false`.
+
+Вывод: OTA update/boot и ESP↔Nano transport после OTA физически подтверждены. Проводной programmer path далее нужен только как recovery.
