@@ -325,3 +325,30 @@ R6 принимает по одному полю за запрос. Mapping:
 ```
 
 ESP не рассчитывает threshold: он только маршрутизирует команды и состояние Nano.
+
+### HTTP_BRIDGE_R7 — полный L01 profile write slice
+
+`POST /api/light/settings` дополнительно поддерживает атомарные payload:
+
+```json
+{"kelvin":3500}
+```
+
+Диапазон arbitrary Kelvin: `1800..6500`.
+
+```json
+{"rgb":{"r":255,"g":40,"b":10}}
+```
+
+RGB диапазон каждого канала: `0..255`.
+
+```json
+{"persist_startup_profile":true}
+```
+
+Mapping к Nano:
+- `kelvin` → `LIGHT KELVIN <1800..6500>`;
+- `rgb` → `LIGHT RGB <r> <g> <b>`;
+- `persist_startup_profile=true` → `LIGHT SAVE`.
+
+R7 сохраняет уже реализованные atomic `enabled` и `brightness`. После любого write приложение перечитывает `GET /api/light/status`; Nano остаётся источником истины.
