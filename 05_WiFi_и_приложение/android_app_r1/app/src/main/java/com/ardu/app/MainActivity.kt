@@ -29,6 +29,17 @@ class MainActivity : Activity() {
     private lateinit var preset2700Button: Button
     private lateinit var preset4000Button: Button
     private lateinit var preset6000Button: Button
+    private lateinit var kelvinValueText: TextView
+    private lateinit var kelvinSeekBar: SeekBar
+    private lateinit var redValueText: TextView
+    private lateinit var greenValueText: TextView
+    private lateinit var blueValueText: TextView
+    private lateinit var redSeekBar: SeekBar
+    private lateinit var greenSeekBar: SeekBar
+    private lateinit var blueSeekBar: SeekBar
+    private lateinit var applyRgbButton: Button
+    private lateinit var profileStateText: TextView
+    private lateinit var saveStartupProfileButton: Button
     private var lightApiAvailable = false
 
     private lateinit var developerToggleButton: Button
@@ -54,6 +65,17 @@ class MainActivity : Activity() {
         preset2700Button = findViewById(R.id.preset2700Button)
         preset4000Button = findViewById(R.id.preset4000Button)
         preset6000Button = findViewById(R.id.preset6000Button)
+        kelvinValueText = findViewById(R.id.kelvinValueText)
+        kelvinSeekBar = findViewById(R.id.kelvinSeekBar)
+        redValueText = findViewById(R.id.redValueText)
+        greenValueText = findViewById(R.id.greenValueText)
+        blueValueText = findViewById(R.id.blueValueText)
+        redSeekBar = findViewById(R.id.redSeekBar)
+        greenSeekBar = findViewById(R.id.greenSeekBar)
+        blueSeekBar = findViewById(R.id.blueSeekBar)
+        applyRgbButton = findViewById(R.id.applyRgbButton)
+        profileStateText = findViewById(R.id.profileStateText)
+        saveStartupProfileButton = findViewById(R.id.saveStartupProfileButton)
 
         developerToggleButton = findViewById(R.id.developerToggleButton)
         developerPanel = findViewById(R.id.developerPanel)
@@ -86,9 +108,59 @@ class MainActivity : Activity() {
             }
         )
 
-        preset2700Button.setOnClickListener { setLightKelvinPreset(2700) }
-        preset4000Button.setOnClickListener { setLightKelvinPreset(4000) }
-        preset6000Button.setOnClickListener { setLightKelvinPreset(6000) }
+        preset2700Button.setOnClickListener { setLightKelvin(2700) }
+        preset4000Button.setOnClickListener { setLightKelvin(4000) }
+        preset6000Button.setOnClickListener { setLightKelvin(6000) }
+
+        kelvinSeekBar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    kelvinValueText.text = getString(
+                        R.string.light_kelvin_format,
+                        progress
+                    )
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    setLightKelvin(seekBar.progress)
+                }
+            }
+        )
+
+        val rgbListener = object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(
+                seekBar: SeekBar,
+                progress: Int,
+                fromUser: Boolean
+            ) {
+                updateRgbLabels()
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
+            override fun onStopTrackingTouch(seekBar: SeekBar) = Unit
+        }
+
+        redSeekBar.setOnSeekBarChangeListener(rgbListener)
+        greenSeekBar.setOnSeekBarChangeListener(rgbListener)
+        blueSeekBar.setOnSeekBarChangeListener(rgbListener)
+
+        applyRgbButton.setOnClickListener {
+            setLightRgb(
+                redSeekBar.progress,
+                greenSeekBar.progress,
+                blueSeekBar.progress
+            )
+        }
+
+        saveStartupProfileButton.setOnClickListener {
+            saveLightStartupProfile()
+        }
 
         developerToggleButton.setOnClickListener { toggleDeveloperMode() }
         sendRawButton.setOnClickListener { sendRawCommand() }
@@ -167,6 +239,20 @@ class MainActivity : Activity() {
             status.brightness
         )
         brightnessSeekBar.progress = status.brightness
+        kelvinValueText.text = getString(
+            R.string.light_kelvin_format,
+            status.kelvin
+        )
+        kelvinSeekBar.progress = status.kelvin
+        redSeekBar.progress = status.red
+        greenSeekBar.progress = status.green
+        blueSeekBar.progress = status.blue
+        updateRgbLabels()
+
+        profileStateText.text = getString(
+            if (status.dirty) R.string.light_profile_unsaved
+            else R.string.light_profile_saved
+        )
     }
 
     private fun showLightApiUnavailable() {
@@ -182,8 +268,34 @@ class MainActivity : Activity() {
         applyLightChange { api.setLightBrightness(brightness) }
     }
 
-    private fun setLightKelvinPreset(kelvin: Int) {
-        applyLightChange { api.setLightKelvinPreset(kelvin) }
+    private fun setLightKelvin(kelvin: Int) {
+        applyLightChange { api.setLightKelvin(kelvin) }
+    }
+
+    private fun setLightRgb(red: Int, green: Int, blue: Int) {
+        applyLightChange { api.setLightRgb(red, green, blue) }
+    }
+
+    private fun saveLightStartupProfile() {
+        applyLightChange { api.saveLightStartupProfile() }
+    }
+
+    private fun updateRgbLabels() {
+        redValueText.text = getString(
+            R.string.light_rgb_component_format,
+            "R",
+            redSeekBar.progress
+        )
+        greenValueText.text = getString(
+            R.string.light_rgb_component_format,
+            "G",
+            greenSeekBar.progress
+        )
+        blueValueText.text = getString(
+            R.string.light_rgb_component_format,
+            "B",
+            blueSeekBar.progress
+        )
     }
 
     private fun applyLightChange(action: () -> Unit) {
@@ -253,5 +365,11 @@ class MainActivity : Activity() {
         preset2700Button.isEnabled = !busy && lightApiAvailable
         preset4000Button.isEnabled = !busy && lightApiAvailable
         preset6000Button.isEnabled = !busy && lightApiAvailable
+        kelvinSeekBar.isEnabled = !busy && lightApiAvailable
+        redSeekBar.isEnabled = !busy && lightApiAvailable
+        greenSeekBar.isEnabled = !busy && lightApiAvailable
+        blueSeekBar.isEnabled = !busy && lightApiAvailable
+        applyRgbButton.isEnabled = !busy && lightApiAvailable
+        saveStartupProfileButton.isEnabled = !busy && lightApiAvailable
     }
 }
