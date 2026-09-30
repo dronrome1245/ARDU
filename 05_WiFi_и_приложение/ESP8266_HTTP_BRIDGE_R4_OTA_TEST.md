@@ -136,12 +136,12 @@ curl.exe http://ardu.local/api/ping
 ## PASS
 
 OTA gate PASS если:
-1. wired upload R3 выполнен один раз;
+1. wired upload R4 выполнен один раз;
 2. Wi-Fi/HTTP работает с ручными credentials из скетча;
-3. ping показывает `HTTP_BRIDGE_R4` и `ota_ready=true`;
+3. исходный R4 ping показывает `HTTP_BRIDGE_R4` и `ota_ready=true`;
 4. Arduino IDE видит network OTA port;
 5. тестовая следующая ESP revision загружается по Wi-Fi;
-6. после OTA transport ESP↔Nano и Android app остаются рабочими.
+6. после OTA transport ESP↔Nano остаётся рабочим; Android L01 regression выполняется следующим отдельным слоем.
 
 После этого физический programmer wiring ESP не требуется для обычных firmware revisions, пока OTA itself исправен.
 
@@ -155,9 +155,9 @@ OTA gate PASS если:
 - после автоматического reboot `GET /api/ping` вернул `fw=HTTP_BRIDGE_R5`;
 - после reboot Wi-Fi снова подключён и `ota_ready=true`.
 
-Осталось подтвердить:
-- `GET /api/status`;
-- `GET /api/time`;
-- Developer `PING→PONG`.
+Post-OTA regression также подтверждён:
+- `GET /api/status` → `ok=true`, `FW=FW10_CORE REV=1`, `timed_out=false`;
+- `GET /api/time` → валидное `TIME 2026-09-30 22:18:58`, `timed_out=false`;
+- Developer `PING` → `PONG`, `timed_out=false`.
 
-Только после этого весь post-OTA transport regression считается закрытым.
+Итог: весь OTA gate закрыт. Wired programmer path используется только для recovery; обычные ESP revisions выполняются OTA.
