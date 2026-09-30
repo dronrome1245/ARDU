@@ -1744,3 +1744,10 @@
 - No owner compile/upload of R3 had been performed yet.
 - Created R4 with `strcmp` placeholder checks and an explicit guard preventing Wi-Fi reconnect/OTA startup while credentials remain placeholders.
 - R3 remains historical and must not be flashed.
+
+## 2026-09-30 — GPIO2 pull-up retained; manual flash reset no longer required
+
+- Owner reports current build has `ESP GPIO2 → 4.7 kΩ → 3.3 V`.
+- This is accepted as the external HIGH pull-up for the ESP8266 boot-strap pin.
+- Owner also reports ESP flashing now starts without the previous additional `RST→GND` pulse during `Connecting...`.
+- Do not assume automatic DTR/RTS reset from this observation; the ESP may simply already be in UART bootloader after reset/power-up with GPIO0 LOW.
