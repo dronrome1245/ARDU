@@ -972,3 +972,18 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 - Developer `PING` возвращает `PONG`, `timed_out=false`.
 
 Вывод: OTA update/boot и ESP↔Nano transport после OTA физически подтверждены. Проводной programmer path далее нужен только как recovery.
+
+
+## S-L01-APP-002 — Android semantic L01 ON/OFF PASS 2026-09-30
+
+Подтверждение владельца физического стенда после ранее заданного полного checklist: «все pass».
+
+Проверенный пакет включал:
+- L01 ON → физическое D6-кольцо и `MODE=L01`;
+- L01 OFF → физическое выключение и `MODE=OFF`;
+- ещё два повторных ON→OFF цикла;
+- закрытие/повторное открытие Android-приложения с reread состояния;
+- сохранённый профиль `2700 K / brightness 64`;
+- Developer `PING→PONG`.
+
+Вывод: semantic Android L01 ON/OFF на HTTP_BRIDGE_R5 физически закрыт; можно переходить к brightness + Kelvin presets.
