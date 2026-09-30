@@ -2026,3 +2026,33 @@ fw10_core_r3_upload_attempt_1_2026_09_30:
   current_nano_firmware_assumption: FW10_CORE_R1_unchanged
   likely_layer: bootloader_reset_or_com_port_access
   next: manual_nano_reset_during_upload_with_esp_held_reset
+
+
+finalization_v1_2026_10_01:
+  status: active
+  canonical_plan: FINALIZATION_PLAN.md
+  owner_decision: one_final_nano_and_one_final_esp_release_before_app_design_and_launch
+  physical_nano_current: FW10_CORE_R1
+  intermediate_core_r3_upload: cancelled
+  physical_esp_line: HTTP_BRIDGE_R7_OTA_working
+  next:
+    - integrate_full_nano_v1_source
+    - integrate_clapcal
+    - integrate_ambient_f01_f02_f03
+    - integrate_music_m01_m02_m03_m04_m05_m08_m09
+    - adapt_all_renderers_to_44_led
+    - enable_mirrored_d6_d7
+    - finalize_persistence_and_settings
+    - add_adjustable_safe_current_limit
+    - freeze_uart_v1
+    - optimize_flash_sram
+    - verify_full_release
+    - one_final_nano_upload
+    - one_final_esp_ota_release
+    - android_functional_completion
+    - design_ux
+    - second_ring_power_test
+    - ceiling_install
+    - final_acceptance
+  firmware_freeze_after_acceptance: true
+  firmware_revision_after_freeze_only_for_release_blocker: true
