@@ -1918,3 +1918,19 @@
 - 932 bytes flash недостаточно для будущей интеграции Ambient/Music;
 - Upload R2 до оптимизации запрещён;
 - EEPROM layout/поведение менять не требуется — сначала уменьшить код CLAPCAL/diagnostics и повторить Verify.
+
+
+## 2026-09-30 — FW10 CORE R3 compact CLAPCAL prepared
+
+После CORE R2 compile 96% создана новая ревизия R3; R2 не изменялся и не загружался.
+
+Оптимизации:
+- один `ClapDetector` переиспользуется runtime/calibration;
+- вместо 24 clap-strength значений хранится до 12 weak pair strengths;
+- top-2 sample candidates считаются на лету;
+- quiet P99: 32×uint8 histogram / 20 ms sampling вместо 64×uint16;
+- сокращены CLAPCAL diagnostics и HELP;
+- EEPROM `CLAP_BASE=192` и persisted threshold/timeout format сохранены;
+- D-068 сохраняется: quiet baseline на Nano, sample strengths на Nano, suggested threshold на Nano, RAM-before-SAVE, CANCEL.
+
+Static structure/balance scan пройден. Следующий gate — Verify R3 и фактический memory report. Upload до него запрещён.
