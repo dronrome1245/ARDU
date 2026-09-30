@@ -1710,17 +1710,19 @@ esp8266_http_bridge_r2_l01_stage1_2026_09_30:
 
 android_l01_stage1_2026_09_30:
   project_path: "05_WiFi_и_приложение/android_app_r1"
-  app_version_name: "0.2-l01-r1"
+  app_version_name: "0.3-l01-semantic-r1"
   source_created: true
-  reads_semantic_light_status: false
-  r1_compatibility_adapter: true
-  r1_internal_commands: [STATUS, LIGHT_STATUS, LIGHT_ON, LIGHT_OFF]
+  reads_semantic_light_status: true
+  semantic_read_endpoint: GET_api_light_status
+  semantic_write_endpoint: POST_api_light_settings_enabled_only
+  r1_compatibility_adapter: false
+  developer_raw_endpoint_retained: true
   controls_enabled_only: true
   brightness_controls: false
   kelvin_controls: false
   rgb_controls: false
   physical_verified: false
-  next: run_l01_on_off_on_existing_http_bridge_r1
+  next: physical_android_read_only_then_on_off
 
 esp_reflash_policy_2026_09_30:
   owner_decision: true
@@ -1830,3 +1832,17 @@ esp8266_http_bridge_r5_ota_proof_2026_09_30:
   wired_programmer_role: recovery_only
   future_default_esp_update_path: OTA
   next: android_l01_semantic_on_off
+
+
+r5_light_status_read_result_2026_09_30:
+  status: passed
+  endpoint: GET_api_light_status
+  enabled: false
+  color_mode: kelvin
+  kelvin: 2700
+  rgb: [255, 170, 87]
+  brightness: 64
+  saved: true
+  dirty: false
+  interpretation: current_top_level_mode_not_L01_profile_valid
+  next: android_semantic_read_only_gate
