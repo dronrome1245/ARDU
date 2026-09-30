@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**Первый реальный ArduinoOTA upload по Wi-Fi выполнен: R4 принял OTA-аутентификацию, R5 был передан через сетевой порт `ardu 192.168.0.4`, ESP автоматически перезагрузился, а `GET /api/ping` после reboot вернул `fw=HTTP_BRIDGE_R5`, `wifi_connected=true`, `ota_ready=true`. OTA upload/boot proof пройден без изменения проводки. Текущий gate — короткий post-OTA regression Nano transport: `/api/status`, `/api/time`, Developer `PING→PONG`. После его PASS wired programmer path становится recovery-only и работа возвращается к Android L01.**
+**ArduinoOTA полностью доказан на физическом стенде. R5 загружен по Wi-Fi через сетевой порт `ardu 192.168.0.4`, после reboot `/api/ping` вернул `fw=HTTP_BRIDGE_R5`, а post-OTA regression прошёл: `/api/status` → `FW=FW10_CORE REV=1`, `/api/time` → валидное DS3231 time, Developer `PING` → `PONG`. Проводная прошивка ESP теперь recovery-only; обычные ESP revisions делать OTA без перекоммутации. Текущий функциональный этап — Android L01 integration на физическом HTTP_BRIDGE_R5.**
 
 ## Что подтверждено и решено
 
