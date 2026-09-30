@@ -1983,3 +1983,24 @@ fw10_core_r2_clapcal_plan_2026_09_30:
   compile_budget_result: fail_for_future_integration
   upload_allowed: false
   next: optimize_core_r2_then_reverify
+
+
+fw10_core_r3_clapcal_plan_2026_09_30:
+  status: source_prepared
+  code_path: "04_Прошивка/nano_fw10_core_r3/nano_fw10_core_r3.ino"
+  test_doc: "04_Прошивка/FW10_CORE_R3_CLAPCAL_TEST.md"
+  revision: 3
+  supersedes_for_test: FW10_CORE_R2
+  r2_uploaded: false
+  optimization:
+    one_detector: true
+    weak_strength_per_pair_only: true
+    sample_top2_streaming: true
+    quiet_histogram_bins: 32
+    quiet_histogram_counter_bits: 8
+    compact_uart_diagnostics: true
+  eeprom_layout_changed: false
+  static_structure_check: passed
+  compile_verified: false
+  upload_allowed: false
+  next: owner_verify_memory_report
