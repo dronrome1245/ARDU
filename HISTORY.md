@@ -1880,3 +1880,21 @@
 Итог: L01 color/brightness/profile/persistence integration закрыт.
 
 Следующий незакрытый L01 feature — clap app control + family calibration. CORE R1 уже содержит runtime double-clap detector и persistent threshold/timeout, но app-ready CLAPCAL state machine пока находится только в отдельной diagnostic branch.
+
+
+## 2026-09-30 — FW10 CORE R2 CLAPCAL source prepared
+
+- Создана новая ревизия `04_Прошивка/nano_fw10_core_r2/nano_fw10_core_r2.ino`; R1 не переписывался.
+- Интегрирован app-ready family CLAPCAL из отдельной R3 diagnostic branch.
+- Добавлены команды:
+  - `CLAPCAL START <3..12>`;
+  - `SAMPLE`;
+  - `FINISH`;
+  - `SAVE`;
+  - `STATUS`;
+  - `CANCEL`.
+- Calibration переиспользует A0, runtime RawEnvelope/ClapDetector и существующий EEPROM `CLAP_BASE=192`.
+- Для sample-strength detector используется второй маленький объект того же класса, а не вторая независимая audio architecture.
+- Normal runtime clap при active calibration приостанавливается.
+- Создан `FW10_CORE_R2_CLAPCAL_TEST.md`.
+- Из-за baseline CORE R1 flash 84% следующий gate строго compile-budget; Upload до него запрещён.
