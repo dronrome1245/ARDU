@@ -1733,7 +1733,7 @@ android_l01_stage1_2026_09_30:
 
 esp_reflash_policy_2026_09_30:
   owner_decision: true
-  current_physical_bridge: HTTP_BRIDGE_R6
+  current_physical_bridge: HTTP_BRIDGE_R7
   compact_wiring_should_remain_undisturbed: true
   reflash_for_each_app_iteration: false
   default_future_esp_update_path: OTA
@@ -1901,7 +1901,7 @@ android_l01_stage2_2026_09_30:
 
 
 esp8266_http_bridge_r7_l01_stage3_2026_09_30:
-  status: source_prepared
+  status: physical_pass
   code_path: "05_WiFi_и_приложение/esp8266_http_bridge_r7/esp8266_http_bridge_r7.ino"
   test_doc: "05_WiFi_и_приложение/ESP8266_HTTP_BRIDGE_R7_TEST.md"
   revision: 7
@@ -1916,10 +1916,16 @@ esp8266_http_bridge_r7_l01_stage3_2026_09_30:
     kelvin: "LIGHT KELVIN"
     rgb: "LIGHT RGB"
     persist: "LIGHT SAVE"
-  compile_verified: false
-  ota_upload_verified: false
-  physical_verified: false
-  next: verify_ota_and_full_l01_profile_batch
+  compile_verified: true
+  ota_upload_verified: true
+  physical_verified: true
+  arbitrary_kelvin_verified: true
+  rgb_verified: true
+  persistence_verified: true
+  cold_power_cycle_restore_verified: true
+  baseline_restored: "2700K_brightness64"
+  result: passed
+  next: clap_control_and_family_calibration
 
 android_l01_stage3_2026_09_30:
   project_path: "05_WiFi_и_приложение/android_app_r1"
@@ -1934,6 +1940,30 @@ android_l01_stage3_2026_09_30:
   saved_dirty_indicator: true
   persistence_only_on_explicit_save: true
   cold_power_cycle_test_required: true
-  build_verified: false
-  physical_verified: false
-  next: after_r7_ota_run_full_profile_batch
+  build_verified: true
+  physical_verified: true
+  result: passed
+  next: clap_control_and_family_calibration
+
+
+fw10_core_r2_clapcal_plan_2026_09_30:
+  status: implementation_pending
+  base: FW10_CORE_R1
+  purpose: integrate_app_ready_family_clap_calibration
+  preserve:
+    - l01
+    - clap_runtime
+    - rtc
+    - alarm_dawn
+    - night
+    - eeprom_layout
+  calibration_source: nano_clap_gyver_r3_cal
+  calibration_pairs_range: "3..12"
+  recommended_pairs: 9
+  compile_budget_gate_required: true
+  previous_core_r1_flash_bytes: 26014
+  previous_core_r1_flash_total: 30720
+  previous_core_r1_sram_globals: 1316
+  previous_core_r1_sram_total: 2048
+  upload_before_compile_budget_pass: false
+  next: implement_core_r2_then_verify
