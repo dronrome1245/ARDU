@@ -1934,3 +1934,26 @@
 - D-068 сохраняется: quiet baseline на Nano, sample strengths на Nano, suggested threshold на Nano, RAM-before-SAVE, CANCEL.
 
 Static structure/balance scan пройден. Следующий gate — Verify R3 и фактический memory report. Upload до него запрещён.
+
+
+## 2026-09-30 — CORE R3 compile budget accepted for CLAPCAL hardware test
+
+Verify `nano_fw10_core_r3`:
+- flash `27822 / 30720` = 90%;
+- flash free = `2898` bytes;
+- globals `1392 / 2048` = 67%;
+- reported free SRAM = `656` bytes.
+
+Сравнение:
+- R1: 26014 flash / 1316 globals;
+- R2: 29788 flash / 1445 globals;
+- R3: 27822 flash / 1392 globals.
+
+R3 экономит относительно R2:
+- 1966 bytes flash;
+- 53 bytes globals.
+
+Решение:
+- R3 разрешён для аппаратного CLAPCAL integration test;
+- это НЕ финальное закрытие memory budget для Music/Ambient;
+- после functional CLAPCAL pass перед full Music/Ambient integration потребуется отдельный общий memory optimization/budget этап.
