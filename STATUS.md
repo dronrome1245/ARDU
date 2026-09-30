@@ -1533,3 +1533,19 @@
 - **РЕШЕНИЕ:** этот pull-up оставить; GPIO2 является boot-strap pin и должен быть HIGH при normal boot и UART bootloader. Через 4.7 kΩ это допустимо; прямое жесткое соединение GPIO2→3.3 V не использовать.
 - **ФАКТ владельца:** текущая прошивка ESP теперь начинается без дополнительного ручного краткого `RST→GND` на этапе `Connecting...`.
 - **ИНТЕРПРЕТАЦИЯ:** отдельный manual reset не обязателен, если ESP уже вошёл в ROM bootloader при reset/power-up с `GPIO0=LOW`.
+
+### 2026-09-30 — HTTP_BRIDGE_R4 Wi-Fi/HTTP/OTA startup passed
+
+- **ФАКТ:** после исправления SSID в локальной копии R4 физический ESP8266 успешно подключился к домашнему Wi-Fi.
+- **ФАКТ:** `GET http://192.168.0.4/api/ping` вернул:
+  - `ok=true`;
+  - `fw=HTTP_BRIDGE_R4`;
+  - `wifi_connected=true`;
+  - `ip=192.168.0.4`;
+  - `rssi=-57`;
+  - `ota_ready=true`;
+  - `ota_hostname=ardu`;
+  - `ota_port=8266`.
+- **ФАКТ:** `curl http://ardu.local/api/ping` на Windows не резолвится: `Could not resolve host: ardu.local`.
+- **ВЫВОД:** Wi-Fi, HTTP и OTA service на ESP работают; текущая проблема локализована к mDNS/hostname resolution на ПК, а не к ESP connectivity.
+- Следующий gate: доказать OTA upload через network port/IP, затем STATUS/TIME/Developer PING regression и L01 app test.
