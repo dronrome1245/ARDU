@@ -1214,3 +1214,29 @@ R3 не прошивался и не тестировался на железе.
 3. R4 сохраняет все решения D-075: ручные Wi-Fi/OTA credentials в локальном скетче, ArduinoOTA, hostname `ardu`, port `8266`, password authentication;
 4. R4 использует `strcmp` для placeholder validation и не запускает reconnect/OTA при незаполненных placeholders;
 5. после hardware PASS R4 OTA становится основным способом дальнейших ESP updates.
+
+
+---
+
+## D-077 — ARDU v1 закрывается одной финальной Nano/ESP release-сборкой
+
+**Дата:** 2026-10-01  
+**Статус:** ДЕЙСТВУЕТ  
+**УТОЧНЯЕТ/ЗАМЕНЯЕТ ПОРЯДОК:** D-071 и поздние промежуточные firmware gates в части количества upload-итераций.
+
+**Решение владельца:** накопленные subsystem tests считаются достаточной базой; больше не загружать отдельную новую прошивку на Nano/ESP для каждого следующего функционального слоя.
+
+Новый порядок:
+1. текущий физический Nano остаётся на FW10 CORE R1 до готовности полной Nano v1;
+2. CORE R3 CLAPCAL не загружать отдельно;
+3. полная Nano v1 сразу объединяет L01, clap+family CLAPCAL, RTC/Alarm/Dawn, Night, Ambient, Music M01/M02/M03/M04/M05/M08/M09, persistence, D6+D7 44+44 и current limiting;
+4. до upload разрешены code integration/refactor/compile/size/static проверки;
+5. Nano v1 загружается один раз после полного compile-budget gate;
+6. после заморозки UART v1 собирается полный ESP8266 v1 semantic API и загружается один раз по OTA;
+7. после firmware freeze завершить Android functionality, затем дизайн/UX;
+8. затем подключить второе кольцо, подобрать рабочий current limit настройкой без перепрошивки, выполнить монтаж и финальный acceptance;
+9. после freeze новая firmware revision допускается только для release-blocker.
+
+**Причина:** все основные подсистемы уже проходили отдельные hardware tests; дальнейшие мелкие upload-итерации дают меньше пользы, чем риск вмешательства в компактный стенд и затягивание завершения проекта.
+
+Канонический подробный порядок: `FINALIZATION_PLAN.md`.
