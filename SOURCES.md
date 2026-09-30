@@ -1001,3 +1001,21 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 - R6 image/OTA/semantic write path физически работает через Android;
 - отказ именно двух ручных curl вызовов не доказывает дефект R6 parser, так как Android вызывает тот же endpoint успешно;
 - для следующих PowerShell JSON tests использовать `Invoke-RestMethod`, чтобы исключить native-command quoting.
+
+
+## S-L01-APP-004 — R7 complete L01 profile PASS 2026-09-30
+
+Подтверждение владельца: «R7 весь блок PASS».
+
+Проверенный пакет включал:
+- OTA R7;
+- arbitrary Kelvin;
+- brightness;
+- Kelvin presets;
+- RGB primary colors;
+- explicit startup-profile save;
+- cold power-cycle restore;
+- возврат baseline `2700 K / brightness 64` и повторное сохранение;
+- OFF/ON, Refresh, Developer PING regression.
+
+Вывод: L01 profile/persistence через Android→ESP→Nano→EEPROM физически закрыт.
