@@ -66,3 +66,16 @@ R1 сначала пробует локальное имя `ardu.local`, зат�
 Версия приложения для этого слоя: `0.3-l01-semantic-r1`.
 
 До физического PASS L01 ON/OFF brightness/Kelvin/RGB/persistence в UI не добавляются.
+
+## L01 stage 2 — brightness + Kelvin presets
+
+Версия приложения: `0.4-l01-bright-kelvin-r1`.
+
+После физического ON/OFF PASS обычный L01 UI расширен:
+- brightness slider `0..255`; один semantic write выполняется при отпускании slider;
+- preset buttons `2700 K / 4000 K / 6000 K`;
+- после каждого write приложение перечитывает `GET /api/light/status`;
+- ON/OFF остаётся semantic;
+- raw endpoint остаётся только Developer Mode.
+
+Физический ESP для этого слоя должен быть `HTTP_BRIDGE_R6`, который добавляет atomic `brightness` и Kelvin preset writes. RGB, произвольный Kelvin slider и persistence пока не входят в этот gate.
