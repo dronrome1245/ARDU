@@ -31,4 +31,15 @@
     <string name="light_preset_2700">2700 K</string>
     <string name="light_preset_4000">4000 K</string>
     <string name="light_preset_6000">6000 K</string>
+    <string name="light_kelvin_default">Kelvin: 2700 K</string>
+    <string name="light_kelvin_format">Kelvin: %1$d K</string>
+    <string name="light_rgb_title">Произвольный цвет RGB</string>
+    <string name="light_rgb_red_default">R: 255</string>
+    <string name="light_rgb_green_default">G: 170</string>
+    <string name="light_rgb_blue_default">B: 87</string>
+    <string name="light_rgb_component_format">%1$s: %2$d</string>
+    <string name="light_apply_rgb">Применить RGB</string>
+    <string name="light_profile_saved">Startup-профиль сохранён</string>
+    <string name="light_profile_unsaved">Есть несохранённые изменения</string>
+    <string name="light_save_startup_profile">Сохранить как свет после включения питания</string>
 </resources>
