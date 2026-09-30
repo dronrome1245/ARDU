@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ; L01 profile/persistence закрыт. CORE R2 compile прошёл, но 96% flash признан слишком тесным и R2 не загружался. Подготовлен `FW10 CORE R3` с компактным CLAPCAL при сохранении D-068 и EEPROM layout: один detector runtime/calibration, один weak strength на pair, compact quiet histogram и сокращённые UART diagnostics. Текущий gate — только Verify R3 и новый flash/SRAM report; до него Upload запрещён.**
+**HTTP_BRIDGE_R7 + Android `0.5-l01-profile-r1` полностью ПРОЙДЕНЫ; L01 profile/persistence закрыт. `FW10 CORE R3` с compact family CLAPCAL успешно компилируется: flash `27822/30720` (90%, free 2898), globals `1392/2048` (67%, free 656). Это принято для аппаратного CLAPCAL integration test, но не считается финальным memory budget для будущих Music/Ambient. R2 не загружался. Текущий gate — одним большим блоком: upload Nano R3 → startup/smoke → clap enable/disable → 9-pair calibration → FINISH/test → SAVE → full power-cycle persistence.**
 
 ## Что подтверждено и решено
 
