@@ -250,25 +250,25 @@ enum BandIndex : uint8_t {
 };
 
 struct Bands {
-  uint8_t low = 0, mid = 0, high = 0, peak = 0;
+  uint8_t low, mid, high, peak;
 };
 
 struct MusicModeSettings {
-  uint8_t brightness = 64;
-  uint8_t background = 0;
-  uint8_t smooth = 80;
-  uint8_t sensitivity = 100;
-  uint8_t speed = 0;
-  uint8_t aux = 0;
-  uint8_t submode = 0;
+  uint8_t brightness;
+  uint8_t background;
+  uint8_t smooth;
+  uint8_t sensitivity;
+  uint8_t speed;
+  uint8_t aux;
+  uint8_t submode;
 };
 
 struct AmbientSettingsV1 {
-  uint8_t effect = 0;
-  uint8_t f01Hue = 0, f01Sat = 255, f01Brightness = 64;
-  uint8_t f02Hue = 0, f02Sat = 255, f02Brightness = 64, f02Speed = 100;
-  uint8_t f03Hue = 0, f03Brightness = 64, f03Speed = 1, f03Step10 = 5;
-  uint8_t autoCycle = 0, autoPeriodSec = 10;
+  uint8_t effect;
+  uint8_t f01Hue, f01Sat, f01Brightness;
+  uint8_t f02Hue, f02Sat, f02Brightness, f02Speed;
+  uint8_t f03Hue, f03Brightness, f03Speed, f03Step10;
+  uint8_t autoCycle, autoPeriodSec;
 };
 
 struct ExtendedSettings {
@@ -889,8 +889,19 @@ void setMusicDefaults(MusicModeSettings& m, MusicMode id){
 
 void setExtendedDefaults(){
   extCfg=ExtendedSettings();
+  extCfg.currentLimitMa=Cfg::DEFAULT_CURRENT_LIMIT_MA;
+  extCfg.vuLowPass=300;
+  extCfg.micDcOffset=250;
+  extCfg.spectrumLowPass=40;
+  extCfg.audioCalibrated=1;
+  extCfg.selectedMusic=MusicMode::M01;
   for(uint8_t i=0;i<static_cast<uint8_t>(MusicMode::COUNT);++i)
     setMusicDefaults(extCfg.music[i],static_cast<MusicMode>(i));
+  extCfg.ambient.effect=0;
+  extCfg.ambient.f01Hue=0; extCfg.ambient.f01Sat=255; extCfg.ambient.f01Brightness=64;
+  extCfg.ambient.f02Hue=0; extCfg.ambient.f02Sat=255; extCfg.ambient.f02Brightness=64; extCfg.ambient.f02Speed=100;
+  extCfg.ambient.f03Hue=0; extCfg.ambient.f03Brightness=64; extCfg.ambient.f03Speed=1; extCfg.ambient.f03Step10=5;
+  extCfg.ambient.autoCycle=0; extCfg.ambient.autoPeriodSec=10;
   extCfg.storageValid=false;
   extCfg.dirty=false;
 }
@@ -1114,7 +1125,7 @@ void analyzeFht(){
 
 Bands readBands(){
   analyzeFht();
-  Bands b;
+  Bands b{};
   const uint16_t sens=activeMusicCfg().sensitivity;
   for(uint8_t i=2;i<32;++i){
     uint8_t v=fht_log_out[i];
@@ -1147,8 +1158,8 @@ void updateBandRuntime(){
     const uint8_t v=bandValue(musicRt.band.last,i);
     musicRt.band.average[i]=v*MUSIC_AVER_K+musicRt.band.average[i]*(1.0f-MUSIC_AVER_K);
     musicRt.band.filtered[i]=v*smooth+musicRt.band.filtered[i]*(1.0f-smooth);
-    const bool fire=v>0 && (musicRt.band.filtered[i]*cfg.sensitivity >
-        musicRt.band.average[i]*MUSIC_MAX_COEF_FREQ*100.0f);
+    const bool fire=v>0 &&
+        musicRt.band.filtered[i] > musicRt.band.average[i]*MUSIC_MAX_COEF_FREQ;
     if(fire){
       musicRt.band.brightness[i]=255;
       musicRt.band.flashMask|=_BV(i);
@@ -1163,7 +1174,8 @@ void updateBandRuntime(){
 
 void renderVu(bool rainbow){
   const MusicModeSettings& cfg=activeMusicCfg();
-  fill_solid(leds,Cfg::LED_COUNT,cfg.background?CHSV(HUE_PURPLE,255,cfg.background):CRGB::Black);
+  if(cfg.background) fill_solid(leds,Cfg::LED_COUNT,CHSV(HUE_PURPLE,255,cfg.background));
+  else fill_solid(leds,Cfg::LED_COUNT,CRGB::Black);
   const uint8_t maxPairs=Cfg::LED_COUNT/2;
   uint8_t pairs=musicRt.vu.pairs;
   if(pairs>maxPairs)pairs=maxPairs;
@@ -1275,7 +1287,8 @@ void shiftM08(){
 void renderM08(){
   MusicModeSettings& cfg=activeMusicCfg();
   const unsigned long now=millis();
-  if(now-musicRt.band.lastShiftMs>=cfg.speed){
+  const uint8_t shiftMs=cfg.speed?cfg.speed:1;
+  if(now-musicRt.band.lastShiftMs>=shiftMs){
     musicRt.band.lastShiftMs=now;shiftM08();
   }
   uint8_t band=0;
@@ -1394,7 +1407,8 @@ void updateAmbient(){
     FastLED.setBrightness(a.f01Brightness);frameDirty=true;return;
   }
   if(e==AmbientEffect::F02){
-    if(now-lastAmbientFrameMs>=a.f02Speed){lastAmbientFrameMs=now;++ambientRuntimeHue;}
+    const uint8_t speedMs=a.f02Speed?a.f02Speed:1;
+    if(now-lastAmbientFrameMs>=speedMs){lastAmbientFrameMs=now;++ambientRuntimeHue;}
     fill_solid(leds,Cfg::LED_COUNT,CHSV(static_cast<uint8_t>(a.f02Hue+ambientRuntimeHue),a.f02Sat,255));
     FastLED.setBrightness(a.f02Brightness);frameDirty=true;return;
   }
@@ -2115,40 +2129,40 @@ void handleMusic(char* a){
   MusicModeSettings& m=activeMusicCfg(); long v=0;
   if(strncmp(a,"BRIGHT ",7)==0){
     if(!parseLongRange(a+7,0,255,v)){Serial.println(F("ERR BAD_BRIGHTNESS"));return;}
-    m.brightness=v;extCfg.dirty=true;return Serial.println(F("OK"));
+    m.brightness=v;extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"BACKGROUND ",11)==0){
     if(!parseLongRange(a+11,0,255,v)){Serial.println(F("ERR BAD_BACKGROUND"));return;}
-    m.background=v;extCfg.dirty=true;return Serial.println(F("OK"));
+    m.background=v;extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"SMOOTH ",7)==0){
     if(!parseLongRange(a+7,5,100,v)){Serial.println(F("ERR BAD_SMOOTH"));return;}
-    m.smooth=v;extCfg.dirty=true;return Serial.println(F("OK"));
+    m.smooth=v;extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"SENS ",5)==0){
     if(!parseLongRange(a+5,50,200,v)){Serial.println(F("ERR BAD_SENS"));return;}
-    m.sensitivity=v;extCfg.dirty=true;return Serial.println(F("OK"));
+    m.sensitivity=v;extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"SUBMODE ",8)==0){
     if(extCfg.selectedMusic!=MusicMode::M05&&extCfg.selectedMusic!=MusicMode::M08){Serial.println(F("ERR NOT_APPLICABLE"));return;}
     uint8_t sm;if(!parseSubmode(a+8,sm)){Serial.println(F("ERR BAD_SUBMODE"));return;}
-    m.submode=sm;extCfg.dirty=true;resetMusicRuntime();return Serial.println(F("OK"));
+    m.submode=sm;extCfg.dirty=true;resetMusicRuntime();Serial.println(F("OK"));return;
   }
   if(strncmp(a,"SPEED ",6)==0){
     if(extCfg.selectedMusic!=MusicMode::M08||!parseLongRange(a+6,1,255,v)){Serial.println(F("ERR BAD_SPEED"));return;}
-    m.speed=v;extCfg.dirty=true;return Serial.println(F("OK"));
+    m.speed=v;extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"RAINSTEP10 ",11)==0){
     if(extCfg.selectedMusic!=MusicMode::M02||!parseLongRange(a+11,5,200,v)){Serial.println(F("ERR BAD_RAINSTEP"));return;}
-    m.aux=v;extCfg.dirty=true;return Serial.println(F("OK"));
+    m.aux=v;extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"HUESTART ",9)==0){
     if(extCfg.selectedMusic!=MusicMode::M09||!parseLongRange(a+9,0,255,v)){Serial.println(F("ERR BAD_HUE_START"));return;}
-    m.speed=v;extCfg.dirty=true;return Serial.println(F("OK"));
+    m.speed=v;extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"HUESTEP ",8)==0){
     if(extCfg.selectedMusic!=MusicMode::M09||!parseLongRange(a+8,1,255,v)){Serial.println(F("ERR BAD_HUE_STEP"));return;}
-    m.aux=v;extCfg.dirty=true;return Serial.println(F("OK"));
+    m.aux=v;extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   Serial.println(F("ERR MUSIC_COMMAND"));
 }
@@ -2159,41 +2173,41 @@ void handleAmbient(char* a){
   if(strcmp(a,"ON")==0){applyMode(SystemMode::AMBIENT,true);Serial.println(F("OK MODE=AMBIENT"));return;}
   if(strcmp(a,"OFF")==0){applyMode(SystemMode::OFF,true);Serial.println(F("OK MODE=OFF"));return;}
   if(strcmp(a,"SAVE")==0){saveExtended();Serial.println(F("OK AMBIENT_SAVED"));return;}
-  if(strcmp(a,"NEXT")==0){nextAmbient(1);return Serial.println(F("OK"));}
-  if(strcmp(a,"PREV")==0){nextAmbient(-1);return Serial.println(F("OK"));}
+  if(strcmp(a,"NEXT")==0){nextAmbient(1);Serial.println(F("OK"));return;}
+  if(strcmp(a,"PREV")==0){nextAmbient(-1);Serial.println(F("OK"));return;}
   if(strncmp(a,"EFFECT ",7)==0){
     if(strcmp(a+7,"F01")==0)x.effect=0;else if(strcmp(a+7,"F02")==0)x.effect=1;
     else if(strcmp(a+7,"F03")==0)x.effect=2;else{Serial.println(F("ERR BAD_EFFECT"));return;}
-    extCfg.dirty=true;prepareAmbient();applyMode(SystemMode::AMBIENT,true);return Serial.println(F("OK"));
+    extCfg.dirty=true;prepareAmbient();applyMode(SystemMode::AMBIENT,true);Serial.println(F("OK"));return;
   }
-  if(strcmp(a,"AUTO ON")==0){x.autoCycle=1;extCfg.dirty=true;lastAmbientAutoMs=millis();return Serial.println(F("OK"));}
-  if(strcmp(a,"AUTO OFF")==0){x.autoCycle=0;extCfg.dirty=true;return Serial.println(F("OK"));}
+  if(strcmp(a,"AUTO ON")==0){x.autoCycle=1;extCfg.dirty=true;lastAmbientAutoMs=millis();Serial.println(F("OK"));return;}
+  if(strcmp(a,"AUTO OFF")==0){x.autoCycle=0;extCfg.dirty=true;Serial.println(F("OK"));return;}
   if(strncmp(a,"PERIOD ",7)==0){
-    if(!parseLongRange(a+7,1,255,v)){Serial.println(F("ERR BAD_PERIOD"));return;}x.autoPeriodSec=v;extCfg.dirty=true;return Serial.println(F("OK"));
+    if(!parseLongRange(a+7,1,255,v)){Serial.println(F("ERR BAD_PERIOD"));return;}x.autoPeriodSec=v;extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"HUE ",4)==0){
     if(!parseLongRange(a+4,0,255,v)){Serial.println(F("ERR BAD_HUE"));return;}
     if(x.effect==0)x.f01Hue=v;else if(x.effect==1)x.f02Hue=v;else x.f03Hue=v;
-    extCfg.dirty=true;prepareAmbient();return Serial.println(F("OK"));
+    extCfg.dirty=true;prepareAmbient();Serial.println(F("OK"));return;
   }
   if(strncmp(a,"SAT ",4)==0){
     if(!parseLongRange(a+4,0,255,v)){Serial.println(F("ERR BAD_SAT"));return;}
     if(x.effect==0)x.f01Sat=v;else if(x.effect==1)x.f02Sat=v;else{Serial.println(F("ERR NOT_APPLICABLE"));return;}
-    extCfg.dirty=true;return Serial.println(F("OK"));
+    extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"BRIGHT ",7)==0){
     if(!parseLongRange(a+7,0,255,v)){Serial.println(F("ERR BAD_BRIGHTNESS"));return;}
     if(x.effect==0)x.f01Brightness=v;else if(x.effect==1)x.f02Brightness=v;else x.f03Brightness=v;
-    extCfg.dirty=true;return Serial.println(F("OK"));
+    extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"SPEED ",6)==0){
     if(!parseLongRange(a+6,1,255,v)){Serial.println(F("ERR BAD_SPEED"));return;}
     if(x.effect==1)x.f02Speed=v;else if(x.effect==2)x.f03Speed=v;else{Serial.println(F("ERR NOT_APPLICABLE"));return;}
-    extCfg.dirty=true;return Serial.println(F("OK"));
+    extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   if(strncmp(a,"STEP10 ",7)==0){
     if(x.effect!=2||!parseLongRange(a+7,5,100,v)){Serial.println(F("ERR BAD_STEP10"));return;}
-    x.f03Step10=v;extCfg.dirty=true;return Serial.println(F("OK"));
+    x.f03Step10=v;extCfg.dirty=true;Serial.println(F("OK"));return;
   }
   Serial.println(F("ERR AMBIENT_COMMAND"));
 }
