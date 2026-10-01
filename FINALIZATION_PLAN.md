@@ -558,3 +558,23 @@ App strategy должна поддерживать:
 4. заморозить UART v1;
 5. Verify до приемлемого release budget;
 6. только затем выполнить единственный финальный Nano upload.
+
+
+## 13. Release-candidate checkpoint — 2026-10-01
+
+### Nano v1
+- path: `04_Прошивка/nano_ardu_v1/nano_ardu_v1.ino`;
+- full target scope integrated;
+- compact UART v1 frozen;
+- CI PASS: 28024/30720 flash (91%), 1070/2048 globals (52%), 978 bytes free SRAM;
+- physical upload pending.
+
+### ESP8266 v1
+- path: `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino`;
+- full semantic HTTP API + Station Wi-Fi + OTA;
+- static Nano opcode mapping PASS;
+- CI PASS: RAM 39%, IRAM 92%, IROM code 324376 bytes;
+- physical OTA pending.
+
+### Следующий gate
+Никаких новых feature layers до загрузки. Выполнить `RELEASE_V1_UPLOAD_ACCEPTANCE.md`, затем firmware freeze и переход к Android.
