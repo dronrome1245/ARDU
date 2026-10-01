@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1. По решению владельца 2026-10-01 промежуточные firmware upload-итерации прекращаются. Физический Nano остаётся на проверенном FW10 CORE R1 до готовности одной полной release-сборки v1; CORE R3 не загружать. Физический ESP8266 сейчас имеет hardware-tested линию HTTP_BRIDGE_R7/OTA. Следующая работа — собрать и оптимизировать полную Nano v1 с L01 + clap/CLAPCAL + RTC/Alarm/Dawn + Night + Ambient + Music M01/M02/M03/M04/M05/M08/M09 + persistence + 44+44 D6/D7 + безопасный регулируемый current limit, заморозить UART v1 и только затем выполнить один финальный Nano upload. После него — один полный ESP v1 OTA update, затем Android functional completion, дизайн, двухкольцевой power test, монтаж и release. Канонический план: `FINALIZATION_PLAN.md`.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — RELEASE CANDIDATES READY. Полная Nano v1 и полная ESP8266 v1 собраны, compact UART v1 заморожен и обе прошивки проходят CI. Nano: 28024/30720 flash (91%), globals 1070/2048 (52%). ESP8266: RAM 31988/80192 (39%), IRAM 60823/65536 (92%), IROM code 324376 bytes. Физический Nano пока остаётся на FW10 CORE R1, физический ESP — на hardware-tested HTTP_BRIDGE_R7. Следующий и единственный firmware gate — один обслуживаемый hardware session: финальный Nano upload → восстановление UART → финальный ESP v1 OTA → общий acceptance. После PASS firmware freeze и переход к Android functionality/design.**
 
 ## Что подтверждено и решено
 
@@ -1606,3 +1606,17 @@
 - Последний GitHub Actions `Arduino Verify` = SUCCESS.
 - **ФИЗИЧЕСКИ НЕ ЗАГРУЖЕНО:** Nano всё ещё работает на FW10 CORE R1.
 - Следующий практический этап — подготовить финальный ESP8266 v1 под замороженный compact UART v1 и выполнить compile gate обеих release-прошивок перед одним обслуживаемым сеансом финальной загрузки Nano + ESP.
+
+
+### 2026-10-01 — final ESP8266 v1 source + Nano/ESP contract compile pass
+
+- Создан `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino`.
+- ESP v1 сохраняет проверенные Station Wi-Fi + ArduinoOTA и реализует полный semantic HTTP API поверх compact numeric Nano UART v1.
+- Реализованы: status/settings/time, mode/power, полный L01 + clap calibration wizard, Music, Ambient, Night, Alarm/Dawn, current limit, events и Developer raw numeric endpoint.
+- Ambient effect selection дополнительно коммитится persistent через opcode 110.
+- Static contract scan: каждый literal opcode ESP присутствует в Nano; missing opcodes = NONE.
+- Compact UART v1 документирован в `06_Интерфейс_управления/UART_V1.md`.
+- **ESP CI PASS:** RAM 31988/80192 (39%); IRAM 60823/65536 (92%); IROM code 324376 bytes.
+- **Nano после persistence fix CI PASS:** 28024/30720 flash (91%); globals 1070/2048 (52%), free SRAM 978 bytes.
+- Night HUE/SAT/BRIGHT и Dawn parameters теперь имеют RAM live-preview + явные save opcodes 56/77, чтобы slider не писал EEPROM на каждом промежуточном значении.
+- Физические release uploads ещё не выполнялись.
