@@ -1164,7 +1164,9 @@ void handleAmbientEffect() {
   const int code=ambientCode(id);
   if(code<0){sendError(400,F("BAD_EFFECT"));return;}
   if(!runAck(100,makeCommand(100,code)))return;
-  sendJson(200,F("{\"ok\":true,\"applied\":true}"));
+  // Effect selection is a user setting, not only a temporary preview.
+  if(!runAck(110,F("110")))return;
+  sendJson(200,F("{\"ok\":true,\"applied\":true,\"persisted\":true}"));
 }
 
 void handleAmbientSettings() {
