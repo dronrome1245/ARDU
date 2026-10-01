@@ -1,0 +1,32 @@
+name: Arduino Verify
+
+on:
+  push:
+    paths:
+      - "04_Прошивка/nano_ardu_v1/**"
+      - ".github/workflows/arduino-verify.yml"
+  workflow_dispatch:
+
+jobs:
+  nano-v1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: arduino/setup-arduino-cli@v2
+
+      - name: Install AVR core
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr
+
+      - name: Install FastLED
+        run: arduino-cli lib install FastLED
+
+      - name: Compile ARDU Nano v1
+        run: |
+          arduino-cli compile \
+            --fqbn arduino:avr:nano:cpu=atmega328old \
+            --warnings all \
+            --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
+            "04_Прошивка/nano_ardu_v1"
