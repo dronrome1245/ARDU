@@ -1040,6 +1040,16 @@ void prepareLight() {
 }
 
 uint16_t minuteOfDay(uint8_t h,uint8_t m){return static_cast<uint16_t>(h)*60U+m;}
+void emitEvent(uint8_t code){
+  Serial.print(F("V "));Serial.println(code);
+}
+void emitEvent2(uint8_t code,uint16_t value){
+  Serial.print(F("V "));Serial.print(code);Serial.print(' ');Serial.println(value);
+}
+void emitEvent3(uint8_t code,uint16_t a,uint16_t b){
+  Serial.print(F("V "));Serial.print(code);Serial.print(' ');Serial.print(a);Serial.print(' ');Serial.println(b);
+}
+
 
 bool insideNightWindow(const RtcTime& now){
   const uint16_t cur=minuteOfDay(now.hour,now.minute);
@@ -1061,8 +1071,7 @@ bool reconcileNight(bool announce=false){
     nightWindowActive=insideNightWindow(now);
     nightEffectivePower=nightWindowActive;
     if(announce && before!=nightEffectivePower){
-      Serial.print(F("EVENT NIGHT_SCHEDULE POWER="));
-      Serial.println(nightEffectivePower?F("ON"):F("OFF"));
+      emitEvent2(1,nightEffectivePower?1:0);
     }
   }
 
@@ -1434,7 +1443,7 @@ void calibrateAudio(){
   extCfg.vuLowPass=lp>1000?1000:static_cast<uint16_t>(lp);
   if(extCfg.micDcOffset<MIC_DC_MIN||extCfg.micDcOffset>MIC_DC_MAX){
     extCfg.audioCalibrated=0;configureAudioForMode();
-    Serial.print(F("ERR CAL_BAD_DC DC="));Serial.println(extCfg.micDcOffset);return;
+    uartErr(UE_STATE);return;
   }
   audioFastPrescaler();
   uint8_t spectrMax=0;
@@ -1445,9 +1454,8 @@ void calibrateAudio(){
   const uint16_t sp=static_cast<uint16_t>(spectrMax)+3U;
   extCfg.spectrumLowPass=sp>255?255:static_cast<uint8_t>(sp);
   extCfg.audioCalibrated=1;extCfg.dirty=true;saveExtended();resetMusicRuntime();
-  Serial.print(F("CAL AUDIO DC="));Serial.print(extCfg.micDcOffset);
-  Serial.print(F(" VU_LP="));Serial.print(extCfg.vuLowPass);
-  Serial.print(F(" SPECTR_LP="));Serial.println(extCfg.spectrumLowPass);
+  Serial.print(F("D 90 0 "));Serial.print(extCfg.micDcOffset);Serial.print(' ');
+  Serial.print(extCfg.vuLowPass);Serial.print(' ');Serial.println(extCfg.spectrumLowPass);
 }
 
 void prepareAmbient(){
@@ -1522,14 +1530,13 @@ void startDawn(unsigned long durationMs,DawnSource source){
     dawnRuntime=DawnRuntime();
   }
   prepareDawn(0);
-  Serial.print(F("EVENT DAWN_START SOURCE=")); Serial.print(dawnSourceName(source));
-  Serial.print(F(" DURATION_S=")); Serial.println(durationMs/1000UL);
+  emitEvent3(2,static_cast<uint8_t>(source),static_cast<uint16_t>(durationMs/1000UL));
 }
 
 void stopDawn(){
   dawnPhase=DawnPhase::IDLE; dawnDurationMs=0; setDawnRuntimeIdle();
   currentMode=SystemMode::OFF; saveCore(); prepareOff();
-  Serial.println(F("EVENT DAWN_STOP"));
+  emitEvent(3);
 }
 
 void updateDawn(){
@@ -1543,7 +1550,7 @@ void updateDawn(){
     dawnRuntime.phase=DawnPhase::HOLD;
     if(dawnRuntime.source==DawnSource::NONE)dawnRuntime.source=DawnSource::MANUAL;
     saveDawnRuntime();
-    Serial.println(F("EVENT DAWN_COMPLETE"));
+    emitEvent(4);
     return;
   }
   const uint16_t p=static_cast<uint16_t>((static_cast<uint64_t>(elapsed)*1000ULL)/dawnDurationMs);
@@ -1561,8 +1568,7 @@ bool recoverDawn(bool isCold){
     }
     currentMode=SystemMode::DAWN; dawnPhase=DawnPhase::HOLD;
     prepareDawn(1000); dawnRecoveredAtBoot=true;
-    Serial.print(F("EVENT DAWN_RECOVER PHASE=HOLD SOURCE="));
-    Serial.println(dawnSourceName(dawnRuntime.source));
+    emitEvent3(5,2,static_cast<uint8_t>(dawnRuntime.source));
     return true;
   }
 
@@ -1624,7 +1630,7 @@ void updateAlarm(){
   if(now.hour==alarmCfg.hour && now.minute==alarmCfg.minute && !alarmTriggeredToday(now)){
     alarmCfg.lastTriggerYear=now.year; alarmCfg.lastTriggerMonth=now.month; alarmCfg.lastTriggerDay=now.day;
     saveAlarm();
-    Serial.print(F("EVENT ALARM_TRIGGER RTC=")); printRtc(now); Serial.println();
+    emitEvent(6);
     startDawn(static_cast<unsigned long>(dawnCfg.fadeMinutes)*60UL*1000UL,DawnSource::ALARM);
   }
 }
@@ -1727,10 +1733,10 @@ void resetClapDetector(){
 void toggleLightByClap(){
   if(currentMode==SystemMode::LIGHT){
     currentMode=SystemMode::OFF;saveCore();prepareOff();
-    Serial.println(F("EVENT CLAP_TOGGLE LIGHT=OFF"));
+    emitEvent2(7,0);
   }else if(currentMode==SystemMode::OFF){
     currentMode=SystemMode::LIGHT;saveCore();prepareLight();
-    Serial.println(F("EVENT CLAP_TOGGLE LIGHT=ON"));
+    emitEvent2(7,1);
   }else return;
   resetClapDetector();
 }
@@ -1789,13 +1795,12 @@ void resetClapCalibration(){
 void startClapCalibration(uint8_t pairs){
   resetClapCalibration();clapCalActive=true;clapCalTargetPairs=pairs;
   clapCalQuietP99=measureClapQuietP99();
-  Serial.print(F("CAL Q "));Serial.print(clapCalQuietP99);
-  Serial.print(' ');Serial.println(clapCalTargetPairs);
+  Serial.print(F("D 40 0 "));Serial.print(clapCalQuietP99);Serial.print(' ');Serial.println(clapCalTargetPairs);
 }
 
 void captureClapCalibrationSample(){
-  if(!clapCalActive){Serial.println(F("ERR CAL_STATE"));return;}
-  if(clapCalGoodPairs>=clapCalTargetPairs){Serial.println(F("ERR CAL_DONE"));return;}
+  if(!clapCalActive){uartErr(UE_STATE);return;}
+  if(clapCalGoodPairs>=clapCalTargetPairs){uartErr(UE_STATE);return;}
 
   delay(Cfg::CLAPCAL_PRE_DELAY_MS);
   clapVol.reset();
@@ -1816,18 +1821,16 @@ void captureClapCalibrationSample(){
   }
   resetClapDetector();
 
-  if(count<2){Serial.print(F("CAL F "));Serial.println(count);return;}
+  if(count<2){Serial.print(F("D 41 0 "));Serial.println(count);return;}
   clapCalWeak[clapCalGoodPairs]=top2;
   ++clapCalGoodPairs;
-  Serial.print(F("CAL S "));Serial.print(clapCalGoodPairs);
-  Serial.print('/');Serial.print(clapCalTargetPairs);
-  Serial.print(' ');Serial.print(top2);
-  Serial.print(' ');Serial.println(top1);
+  Serial.print(F("D 41 1 "));Serial.print(clapCalGoodPairs);Serial.print(' ');
+  Serial.print(clapCalTargetPairs);Serial.print(' ');Serial.print(top2);Serial.print(' ');Serial.println(top1);
 }
 
 void finishClapCalibration(){
   if(!clapCalActive||clapCalGoodPairs<clapCalTargetPairs){
-    Serial.println(F("ERR CAL_INCOMPLETE"));return;
+    uartErr(UE_STATE);return;
   }
 
   sortU16(clapCalWeak,clapCalGoodPairs);
@@ -1842,14 +1845,13 @@ void finishClapCalibration(){
   if(v<35)v=35;if(v>150)v=150;
 
   if(fromNoise>=clapCalP20||v>=clapCalP20){
-    Serial.println(F("ERR CAL_SEPARATION"));return;
+    uartErr(UE_STATE);return;
   }
 
   clapCalSuggested=v;clapCfg.threshold=v;clapCfg.dirty=true;
   clapCalFinished=true;clapCalActive=false;resetClapDetector();
-  Serial.print(F("CAL R "));Serial.print(clapCalQuietP99);
-  Serial.print(' ');Serial.print(clapCalP20);
-  Serial.print(' ');Serial.println(clapCalSuggested);
+  Serial.print(F("D 42 0 "));Serial.print(clapCalQuietP99);Serial.print(' ');
+  Serial.print(clapCalP20);Serial.print(' ');Serial.println(clapCalSuggested);
 }
 
 void printClapCalStatus(){
@@ -2107,7 +2109,7 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
       if(n!=1||a[0]>1)return uartErr(UE_RANGE);alarmCfg.enabled=a[0];saveAlarm();uartAck(op);return;
     case 61:
       if(n!=2||a[0]>23||a[1]>59)return uartErr(UE_RANGE);alarmCfg.hour=a[0];alarmCfg.minute=a[1];saveAlarm();uartAck(op);return;
-    case 71:stopDawn();return;
+    case 71:stopDawn();uartAck(op);return;
     case 73:
       if(n!=1||!argRange(a[0],1,120))return uartErr(UE_RANGE);dawnCfg.fadeMinutes=a[0];saveDawnSettings();uartAck(op);return;
     case 74:
@@ -2233,11 +2235,10 @@ void setup(){
       currentMode=SystemMode::LIGHT;
       prepareLight();
       saveCore();
-      Serial.println(F("EVENT COLD_POWER_ON MODE=L01"));
+      emitEvent(8);
     } else {
       applyMode(coreCfg.storageValid?coreCfg.lastMode:SystemMode::LIGHT,false);
-      Serial.print(F("EVENT WARM_RESET RESTORE_MODE="));
-      Serial.println(modeName(currentMode));
+      emitEvent2(9,static_cast<uint8_t>(currentMode));
     }
   }
 
