@@ -2024,8 +2024,9 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
       if(n)return uartErr(UE_PARSE);printCompactTime(4);return;
     case 5: { // set RTC: year month day hour minute second
       if(n!=6)return uartErr(UE_PARSE);
-      RtcTime t{a[0],static_cast<uint8_t>(a[1]),static_cast<uint8_t>(a[2]),
-        static_cast<uint8_t>(a[3]),static_cast<uint8_t>(a[4]),static_cast<uint8_t>(a[5])};
+      RtcTime t;
+      t.year=a[0];t.month=static_cast<uint8_t>(a[1]);t.day=static_cast<uint8_t>(a[2]);
+      t.hour=static_cast<uint8_t>(a[3]);t.minute=static_cast<uint8_t>(a[4]);t.second=static_cast<uint8_t>(a[5]);
       if(!validRtc(t)||!rtcSet(t))return uartErr(UE_RTC);
       rtcLostPower=false;uartAck(op);return;
     }
@@ -2247,7 +2248,7 @@ void setup(){
   }
 
   showIfSafe();
-  printMainStatus();
+  printCompactStatus();
 }
 
 void loop(){
