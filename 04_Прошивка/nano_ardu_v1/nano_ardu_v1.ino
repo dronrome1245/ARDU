@@ -248,6 +248,10 @@ enum class AmbientEffect : uint8_t {
   F01 = 0, F02 = 1, F03 = 2
 };
 
+enum UartError : uint8_t {
+  UE_PARSE=1, UE_RANGE=2, UE_RTC=3, UE_STATE=4, UE_APPLICABILITY=5
+};
+
 enum BandIndex : uint8_t {
   BAND_LOW = 0, BAND_MID = 1, BAND_HIGH = 2, BAND_COUNT = 3
 };
@@ -1588,9 +1592,7 @@ bool recoverDawn(bool isCold){
     currentMode=SystemMode::DAWN; dawnPhase=DawnPhase::HOLD;
     dawnRuntime.phase=DawnPhase::HOLD; saveDawnRuntime(); prepareDawn(1000);
     dawnRecoveredAtBoot=true;
-    Serial.print(F("EVENT DAWN_RECOVER PHASE=HOLD SOURCE="));
-    Serial.print(dawnSourceName(dawnRuntime.source));
-    Serial.print(F(" ELAPSED_S=")); Serial.println(elapsed);
+    emitEvent3(5,2,static_cast<uint8_t>(dawnRuntime.source));
     return true;
   }
 
@@ -1599,10 +1601,7 @@ bool recoverDawn(bool isCold){
   dawnStartMs=millis()-elapsed*1000UL; lastDawnFrameMs=0;
   const uint16_t p=static_cast<uint16_t>((static_cast<uint64_t>(elapsed)*1000ULL)/dawnRuntime.durationSeconds);
   prepareDawn(p); dawnRecoveredAtBoot=true;
-  Serial.print(F("EVENT DAWN_RECOVER PHASE=RUNNING SOURCE="));
-  Serial.print(dawnSourceName(dawnRuntime.source));
-  Serial.print(F(" ELAPSED_S=")); Serial.print(elapsed);
-  Serial.print(F(" REMAINING_S=")); Serial.println(dawnRuntime.durationSeconds-elapsed);
+  emitEvent3(5,1,static_cast<uint8_t>(dawnRuntime.source));
   return true;
 }
 
@@ -1904,9 +1903,7 @@ const __FlashStringHelper* resetName(){
 // Responses: O <opcode> = ACK, E <code> = error, D ... = data.
 // ESP8266 owns semantic HTTP names; Nano keeps this compact internal contract.
 
-enum UartError : uint8_t {
-  UE_PARSE=1, UE_RANGE=2, UE_RTC=3, UE_STATE=4, UE_APPLICABILITY=5
-};
+
 
 void uartAck(uint16_t op){
   Serial.print(F("O "));Serial.println(op);
