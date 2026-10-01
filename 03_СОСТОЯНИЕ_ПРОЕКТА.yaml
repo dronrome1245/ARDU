@@ -2083,3 +2083,16 @@ ceiling_topology_2026_10_01:
     - verify_exact_s30_5_input_terminal_marking
     - verify_pe_fg_requirement
     - verify_safe_enclosure_and_mains_termination
+
+
+s30_5_pe_confirmation_2026_10_01:
+  source: owner_photos
+  case: metal
+  terminals_confirmed: [L, N, PE, minus_v, plus_v]
+  pe_terminal_present: true
+  pe_currently_connected: false
+  final_install_requires_pe: true
+  neutral_must_not_be_used_as_pe: true
+  if_pe_unavailable: replace_with_class_ii_double_insulated_5v_psu
+  blocks_firmware_work: false
+  blocks_final_mains_install_until_resolved: true
