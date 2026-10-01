@@ -2038,3 +2038,17 @@ R3 экономит относительно R2:
 - Финальный текущий CI report: 28090/30720 flash (91%), 1070/2048 globals (52%), 978 bytes свободно для stack/locals.
 - GitHub Actions run 15 прошёл SUCCESS.
 - Physical Nano upload ещё не выполнялся; рабочее железо остаётся на FW10 CORE R1.
+
+
+## 2026-10-01 — final ESP v1 implemented and both firmware compile gates closed
+
+- После compact Nano v1 создан полный `esp8266_ardu_v1`.
+- ESP переводит semantic HTTP API в frozen numeric UART v1.
+- Добавлены full settings/status/time, L01, clap calibration, Music, Ambient, Night, Alarm/Dawn, current limit, async events и Developer numeric raw command.
+- Static opcode scan: missing mappings = NONE.
+- ESP8266 core 3.1.2 GitHub Actions compile passed.
+- ESP memory: RAM 31988/80192 (39%), IRAM 60823/65536 (92%), IROM 324376 bytes.
+- Nano persistence refinement: Night/Dawn slider fields больше не пишут EEPROM на каждом preview; добавлены opcodes 56/77 для commit.
+- Nano repeated compile after change passed: 28024/30720 flash (91%), 1070/2048 globals (52%).
+- Оба physical devices пока не обновлялись до release v1.
+- Следующий этап — единый final upload + acceptance session.
