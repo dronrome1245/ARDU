@@ -1,7 +1,7 @@
 # ARDU HTTP API v1 — предварительный контракт
 
-Статус: ЧАСТИЧНО РЕАЛИЗОВАН  
-Дата актуализации: 2026-09-30
+Статус: RELEASE v1 РЕАЛИЗОВАН В SOURCE / CI PASS / PHYSICAL UPLOAD PENDING  
+Дата актуализации: 2026-10-01
 
 ## 1. Общие правила
 
@@ -352,3 +352,96 @@ Mapping к Nano:
 - `persist_startup_profile=true` → `LIGHT SAVE`.
 
 R7 сохраняет уже реализованные atomic `enabled` и `brightness`. После любого write приложение перечитывает `GET /api/light/status`; Nano остаётся источником истины.
+
+
+## 11. Финальный release-контракт ESP8266 v1 — 2026-10-01
+
+Реализация: `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino`.
+
+Физическая загрузка ещё не выполнена, но source compile gate пройден.
+
+### Реализованные endpoints
+
+- `GET /api/ping`
+- `GET /api/status`
+- `GET /api/settings`
+- `GET /api/time`
+- `POST /api/time/sync`
+- `POST /api/power`
+- `POST /api/mode`
+- `GET /api/light/status`
+- `POST /api/light/settings`
+- `GET /api/light/clap/calibration`
+- `POST /api/light/clap/calibration/start`
+- `POST /api/light/clap/calibration/sample`
+- `POST /api/light/clap/calibration/finish`
+- `POST /api/light/clap/calibration/save`
+- `POST /api/light/clap/calibration/cancel`
+- `POST /api/music/mode`
+- `POST /api/music/settings`
+- `POST /api/music/calibrate`
+- `POST /api/ambient/effect`
+- `POST /api/ambient/settings`
+- `POST /api/night/settings`
+- `POST /api/alarm/settings`
+- `POST /api/alarm/stop-dawn`
+- `GET/POST /api/system/current-limit`
+- `GET /api/events`
+- `POST /api/dev/nano`
+
+### Persistence/live-preview
+
+Для slider-like настроек:
+- Music/Ambient/Night/Alarm-Dawn принимают optional `"persist":false` для live preview;
+- default при отсутствии поля = `true`;
+- приложение при движении slider отправляет throttled preview с `persist:false`;
+- при отпускании slider отправляет финальное значение с `persist:true`.
+
+L01 сохраняет startup profile только по явному `"persist_startup_profile":true`.
+
+Ambient effect selection `POST /api/ambient/effect` сохраняется сразу как пользовательский выбор.
+
+### Music final fields
+
+`POST /api/music/settings` поддерживает применимые поля:
+- `active_brightness`;
+- `background_brightness`;
+- `smoothing`;
+- `sensitivity`;
+- `submode`: `three|low|mid|high` для M05/M08;
+- `speed` для M08;
+- `rainbow_step10` для M02;
+- `hue_start`, `hue_step` для M09;
+- `persist`.
+
+### Ambient final fields
+
+- `auto_cycle`;
+- `auto_period_s`;
+- `hue`;
+- `saturation` (F01/F02);
+- `brightness`;
+- `speed` (F02/F03);
+- `rainbow_step` 0.5..10.0 (F03);
+- `persist`.
+
+### Night final fields
+
+- `enabled`;
+- `hue`;
+- `saturation`;
+- `brightness`;
+- `schedule_enabled`;
+- `schedule_on` / `schedule_off` in `HH:MM`;
+- `persist`.
+
+### Alarm/Dawn final fields
+
+- `enabled`;
+- `hour`, `minute`;
+- `fade_minutes`;
+- `max_brightness`;
+- `start_hue`, `end_hue`;
+- `persist`.
+
+Внутренний numeric UART описан отдельно: `06_Интерфейс_управления/UART_V1.md`.
