@@ -354,6 +354,7 @@ char rxBuffer[Cfg::RX_BUFFER_SIZE];
 size_t rxLength = 0;
 unsigned long lastSerialRxMs = 0;
 bool frameDirty = false;
+uint8_t requestedBrightness = 255;
 
 bool rtcPresent = false;
 bool rtcLostPower = true;
@@ -1093,6 +1094,7 @@ uint8_t limitedBrightness(){
 
 void showIfSafe(){
   if(!frameDirty || serialGuard()) return;
+  FastLED.setBrightness(limitedBrightness());
   FastLED.show(); frameDirty=false;
 }
 
