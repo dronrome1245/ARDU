@@ -1590,3 +1590,19 @@
 - **РЕШЕНИЕ:** металлический S-30-5 с клеммой ⏚ исключён из финального потолочного монтажа и остаётся стендовым/лабораторным БП.
 - Для финальной установки требуется Class II / double-insulated 230→5 V источник достаточной мощности, не требующий PE.
 - Это не блокирует Nano/ESP firmware, Android и low-voltage проектирование.
+
+
+### 2026-10-01 — full Nano v1 compact release candidate fits ATmega328P
+
+- Создана и доведена до successful CI compile полная `04_Прошивка/nano_ardu_v1/nano_ardu_v1.ino`.
+- В release candidate входят: 2×44 mirrored D6/D7, L01, clap + CLAPCAL, RTC, Night, Alarm/Dawn recovery, Ambient F01-F03, Music M01/M02/M03/M04/M05/M08/M09, extended persistence и service current limit.
+- Первый прямой merge был слишком большим: `43638/30720` flash и `1975/2048` globals.
+- После compact refactor:
+  - удалён Wire в пользу компактного DS3231 TWI path;
+  - UART v1 переведён на компактный числовой протокол;
+  - заменён тяжёлый FastLED power model на компактный dual-ring limiter;
+  - уплотнены async EVENT/calibration replies.
+- **CI PASS:** flash `28090/30720` = 91%; globals `1070/2048` = 52%; свободно SRAM для stack/locals `978 bytes`.
+- Последний GitHub Actions `Arduino Verify` = SUCCESS.
+- **ФИЗИЧЕСКИ НЕ ЗАГРУЖЕНО:** Nano всё ещё работает на FW10 CORE R1.
+- Следующий практический этап — подготовить финальный ESP8266 v1 под замороженный compact UART v1 и выполнить compile gate обеих release-прошивок перед одним обслуживаемым сеансом финальной загрузки Nano + ESP.
