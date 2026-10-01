@@ -1882,431 +1882,298 @@ const __FlashStringHelper* resetName(){
   return F("WARM_UNKNOWN");
 }
 
-// -------------------- status --------------------
+// -------------------- compact UART v1 --------------------
+// Line format: <opcode> [arg0 ... arg5]\n
+// Responses: O <opcode> = ACK, E <code> = error, D ... = data.
+// ESP8266 owns semantic HTTP names; Nano keeps this compact internal contract.
 
-void printMainStatus(){
-  RtcTime now;
-  const bool rv=rtcValidNow(&now);
-  Serial.print(F("STATUS FW=ARDU_V1 REV="));Serial.print(Cfg::FW_REV);
-  Serial.print(F(" MODE="));Serial.print(modeName(currentMode));
-  Serial.print(F(" RESET="));Serial.print(resetName());
-  Serial.print(F(" MCUSR="));Serial.print(rawResetFlags);
-  Serial.print(F(" LEDS="));Serial.print(Cfg::LED_COUNT);
-  Serial.print(F(" RING_A=D6 RING_B=D7 MIRROR=YES"));
-  Serial.print(F(" LIMIT_MA="));Serial.print(extCfg.currentLimitMa);
-  Serial.print(F(" RTC_VALID="));Serial.print(rv?F("YES"):F("NO"));
-  if(rv){Serial.print(F(" TIME="));printRtc(now);}
-  Serial.print(F(" CLAP="));Serial.print(coreCfg.clapEnabled?F("ON"):F("OFF"));
-  Serial.print(F(" CLAP_TRSH="));Serial.print(clapCfg.threshold);
-  Serial.print(F(" UPTIME_MS="));Serial.println(millis());
+enum UartError : uint8_t {
+  UE_PARSE=1, UE_RANGE=2, UE_RTC=3, UE_STATE=4, UE_APPLICABILITY=5
+};
+
+void uartAck(uint16_t op){
+  Serial.print(F("O "));Serial.println(op);
 }
 
-void printLightStatus(){
-  const CRGB c=lightColor();
-  Serial.print(F("LIGHT STATUS MODE="));
-  Serial.print(lightCfg.colorMode==ColorMode::KELVIN?F("KELVIN"):F("RGB"));
-  Serial.print(F(" KELVIN="));Serial.print(lightCfg.kelvin);
-  Serial.print(F(" RGB="));Serial.print(c.r);Serial.print(',');Serial.print(c.g);Serial.print(',');Serial.print(c.b);
-  Serial.print(F(" BRIGHTNESS="));Serial.print(lightCfg.brightness);
-  Serial.print(F(" SAVED="));Serial.print(lightCfg.storageValid?F("YES"):F("NO"));
-  Serial.print(F(" DIRTY="));Serial.println(lightCfg.dirty?F("YES"):F("NO"));
+void uartErr(uint8_t code){
+  Serial.print(F("E "));Serial.println(code);
 }
 
-void printClapStatus(){
-  Serial.print(F("CLAP STATUS ENABLED="));Serial.print(coreCfg.clapEnabled?F("YES"):F("NO"));
-  Serial.print(F(" GESTURE=DOUBLE TRSH="));Serial.print(clapCfg.threshold);
-  Serial.print(F(" TIMEOUT_MS="));Serial.print(clapCfg.timeoutMs);
-  Serial.print(F(" SAVED="));Serial.print(clapCfg.storageValid?F("YES"):F("NO"));
-  Serial.print(F(" DIRTY="));Serial.print(clapCfg.dirty?F("YES"):F("NO"));
-  Serial.print(F(" CALIBRATION=READY"));
-  Serial.println();
+bool parseU16Token(const char*& p,uint16_t& out){
+  while(*p==' ')++p;
+  if(*p<'0'||*p>'9')return false;
+  uint32_t v=0;
+  while(*p>='0'&&*p<='9'){
+    v=v*10UL+static_cast<uint8_t>(*p-'0');
+    if(v>65535UL)return false;
+    ++p;
+  }
+  out=static_cast<uint16_t>(v);
+  return *p==' '||*p=='\0';
 }
 
-void printAlarmDawnStatus(){
-  Serial.print(F("ALARM STATUS ENABLED="));Serial.print(alarmCfg.enabled?F("YES"):F("NO"));
-  Serial.print(F(" TIME="));print2(alarmCfg.hour);Serial.print(':');print2(alarmCfg.minute);
-  Serial.print(F(" DAWN="));Serial.print(dawnPhaseName());
-  Serial.print(F(" SOURCE="));Serial.print(dawnSourceName(dawnRuntime.source));
-  Serial.print(F(" FADE_MIN="));Serial.print(dawnCfg.fadeMinutes);
-  Serial.print(F(" MAX_BR="));Serial.print(dawnCfg.maxBrightness);
-  Serial.print(F(" START_HUE="));Serial.print(dawnCfg.startHue);
-  Serial.print(F(" END_HUE="));Serial.print(dawnCfg.endHue);
-  Serial.print(F(" RECOVERED="));Serial.println(dawnRecoveredAtBoot?F("YES"):F("NO"));
-}
-
-void printNightStatus(){
-  Serial.print(F("NIGHT STATUS MODE_SELECTED="));Serial.print(currentMode==SystemMode::NIGHT?F("YES"):F("NO"));
-  Serial.print(F(" POWER="));Serial.print(nightEffectivePower?F("ON"):F("OFF"));
-  Serial.print(F(" HUE="));Serial.print(nightCfg.hue);
-  Serial.print(F(" SAT="));Serial.print(nightCfg.saturation);
-  Serial.print(F(" BRIGHTNESS="));Serial.print(nightCfg.brightness);
-  Serial.print(F(" SCHEDULE="));Serial.print(nightCfg.scheduleEnabled?F("ON"):F("OFF"));
-  Serial.print(F(" ON="));print2(nightCfg.onHour);Serial.print(':');print2(nightCfg.onMinute);
-  Serial.print(F(" OFF="));print2(nightCfg.offHour);Serial.print(':');print2(nightCfg.offMinute);
-  Serial.print(F(" WINDOW="));Serial.println(nightWindowActive?F("ACTIVE"):F("INACTIVE"));
-}
-
-// -------------------- commands --------------------
-
-bool parseRgb(const char* p,uint8_t& r,uint8_t& g,uint8_t& b){
-  char* e=nullptr; long rv=strtol(p,&e,10); if(e==p||rv<0||rv>255)return false;
-  while(*e==' ')++e; char* e2=nullptr; long gv=strtol(e,&e2,10); if(e2==e||gv<0||gv>255)return false;
-  while(*e2==' ')++e2; char* e3=nullptr; long bv=strtol(e2,&e3,10); if(e3==e2||bv<0||bv>255)return false;
-  while(*e3==' ')++e3; if(*e3!='\0')return false;
-  r=rv;g=gv;b=bv;return true;
-}
-
-void handleLight(char* a){
-  if(strcmp(a,"STATUS")==0){printLightStatus();return;}
-  if(strcmp(a,"ON")==0){applyMode(SystemMode::LIGHT,true);Serial.println(F("OK LIGHT=ON"));return;}
-  if(strcmp(a,"OFF")==0){applyMode(SystemMode::OFF,true);Serial.println(F("OK LIGHT=OFF"));return;}
-  if(strcmp(a,"SAVE")==0){saveLight();Serial.println(F("OK LIGHT_SAVED"));return;}
-  if(strcmp(a,"LOAD")==0){loadLight();if(currentMode==SystemMode::LIGHT)prepareLight();Serial.println(F("OK LIGHT_LOADED"));return;}
-  if(strcmp(a,"CLAP ON")==0){coreCfg.clapEnabled=true;saveCore();Serial.println(F("OK CLAP=ON"));return;}
-  if(strcmp(a,"CLAP OFF")==0){coreCfg.clapEnabled=false;saveCore();Serial.println(F("OK CLAP=OFF"));return;}
-
-  if(strncmp(a,"BRIGHT ",7)==0){
-    uint8_t v=0;if(!parseByte(a+7,v)){Serial.println(F("ERR BAD_BRIGHTNESS"));return;}
-    lightCfg.brightness=v;lightCfg.dirty=true;if(currentMode==SystemMode::LIGHT)prepareLight();Serial.println(F("OK"));return;
+bool parseOpcodeLine(const char* p,uint16_t& op,uint16_t* a,uint8_t& n){
+  n=0;
+  if(!parseU16Token(p,op))return false;
+  while(*p){
+    while(*p==' ')++p;
+    if(!*p)break;
+    if(n>=6||!parseU16Token(p,a[n]))return false;
+    ++n;
   }
-  if(strncmp(a,"KELVIN ",7)==0){
-    long v=0;if(!parseLongRange(a+7,Cfg::MIN_KELVIN,Cfg::MAX_KELVIN,v)){Serial.println(F("ERR BAD_KELVIN"));return;}
-    lightCfg.colorMode=ColorMode::KELVIN;lightCfg.kelvin=v;lightCfg.dirty=true;
-    if(currentMode==SystemMode::LIGHT)prepareLight();Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"PRESET ",7)==0){
-    long v=0;if(!parseLongRange(a+7,0,10000,v)||(v!=2700&&v!=4000&&v!=6000)){Serial.println(F("ERR BAD_PRESET"));return;}
-    lightCfg.colorMode=ColorMode::KELVIN;lightCfg.kelvin=v;lightCfg.dirty=true;
-    if(currentMode==SystemMode::LIGHT)prepareLight();Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"RGB ",4)==0){
-    uint8_t r,g,b;if(!parseRgb(a+4,r,g,b)){Serial.println(F("ERR BAD_RGB"));return;}
-    lightCfg.colorMode=ColorMode::RGB;lightCfg.customRgb=CRGB(r,g,b);lightCfg.dirty=true;
-    if(currentMode==SystemMode::LIGHT)prepareLight();Serial.println(F("OK"));return;
-  }
-  Serial.println(F("ERR LIGHT_COMMAND"));
-}
-
-void handleClap(char* a){
-  if(strcmp(a,"STATUS")==0){printClapStatus();return;}
-  if(strcmp(a,"SAVE")==0){saveClap();resetClapDetector();Serial.println(F("OK CLAP_SAVED"));return;}
-  if(strcmp(a,"DEFAULTS")==0){
-    clapCfg.threshold=Cfg::DEFAULT_CLAP_TRSH;clapCfg.timeoutMs=Cfg::DEFAULT_CLAP_TIMEOUT_MS;
-    clapCfg.dirty=true;resetClapDetector();Serial.println(F("OK CLAP_DEFAULTS TRSH=70 TIMEOUT=500"));return;
-  }
-  if(strncmp(a,"TRSH ",5)==0){
-    long v=0;if(!parseLongRange(a+5,20,300,v)){Serial.println(F("ERR BAD_TRSH"));return;}
-    clapCfg.threshold=v;clapCfg.dirty=true;resetClapDetector();Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"TIMEOUT ",8)==0){
-    long v=0;if(!parseLongRange(a+8,250,1200,v)){Serial.println(F("ERR BAD_TIMEOUT"));return;}
-    clapCfg.timeoutMs=v;clapCfg.dirty=true;resetClapDetector();Serial.println(F("OK"));return;
-  }
-  Serial.println(F("ERR CLAP_COMMAND"));
-}
-
-
-void handleClapCal(char* a){
-  if(strncmp(a,"START ",6)==0){
-    long p=0;
-    if(!parseLongRange(a+6,Cfg::CLAPCAL_MIN_PAIRS,Cfg::CLAPCAL_MAX_PAIRS,p)){
-      Serial.println(F("ERR CAL_PAIRS"));return;
-    }
-    startClapCalibration(static_cast<uint8_t>(p));return;
-  }
-  if(strcmp(a,"SAMPLE")==0){captureClapCalibrationSample();return;}
-  if(strcmp(a,"FINISH")==0){finishClapCalibration();return;}
-  if(strcmp(a,"SAVE")==0){
-    if(!clapCalFinished&&!clapCfg.dirty){Serial.println(F("ERR CAL_SAVE"));return;}
-    saveClap();resetClapDetector();Serial.println(F("OK CAL_SAVED"));return;
-  }
-  if(strcmp(a,"STATUS")==0){printClapCalStatus();return;}
-  if(strcmp(a,"CANCEL")==0){
-    resetClapCalibration();loadClap();resetClapDetector();
-    Serial.println(F("OK CAL_CANCEL"));return;
-  }
-  Serial.println(F("ERR CAL_CMD"));
-}
-
-void handleNight(char* a){
-  if(strcmp(a,"STATUS")==0){printNightStatus();return;}
-  if(strcmp(a,"ON")==0){
-    nightCfg.scheduleEnabled=false;nightCfg.manualEnabled=true;saveNight();
-    applyMode(SystemMode::NIGHT,true);Serial.println(F("OK NIGHT=ON CONTROL=MANUAL"));return;
-  }
-  if(strcmp(a,"OFF")==0){
-    nightCfg.scheduleEnabled=false;nightCfg.manualEnabled=false;saveNight();
-    applyMode(SystemMode::NIGHT,true);Serial.println(F("OK NIGHT=OFF CONTROL=MANUAL"));return;
-  }
-  if(strcmp(a,"SCHEDULE ON")==0){
-    if(!rtcValidNow()){Serial.println(F("ERR RTC_INVALID"));return;}
-    nightCfg.scheduleEnabled=true;saveNight();currentMode=SystemMode::NIGHT;saveCore();(void)reconcileNight(false);
-    Serial.println(F("OK NIGHT_SCHEDULE=ON"));return;
-  }
-  if(strcmp(a,"SCHEDULE OFF")==0){
-    nightCfg.scheduleEnabled=false;saveNight();(void)reconcileNight(false);
-    Serial.println(F("OK NIGHT_SCHEDULE=OFF"));return;
-  }
-  if(strncmp(a,"HUE ",4)==0){
-    uint8_t v;if(!parseByte(a+4,v)){Serial.println(F("ERR BAD_HUE"));return;}
-    nightCfg.hue=v;saveNight();(void)reconcileNight(false);Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"SAT ",4)==0){
-    uint8_t v;if(!parseByte(a+4,v)){Serial.println(F("ERR BAD_SAT"));return;}
-    nightCfg.saturation=v;saveNight();(void)reconcileNight(false);Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"BRIGHT ",7)==0){
-    uint8_t v;if(!parseByte(a+7,v)){Serial.println(F("ERR BAD_BRIGHTNESS"));return;}
-    nightCfg.brightness=v;saveNight();(void)reconcileNight(false);Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"SCHEDULESET ",12)==0){
-    char* p=a+12;char* sp=strchr(p,' ');if(!sp){Serial.println(F("ERR BAD_SCHEDULE"));return;}
-    *sp='\0';uint8_t oh,om,fh,fm;
-    if(!parseClock(p,oh,om)||!parseClock(sp+1,fh,fm)||(oh==fh&&om==fm)){Serial.println(F("ERR BAD_SCHEDULE"));return;}
-    nightCfg.onHour=oh;nightCfg.onMinute=om;nightCfg.offHour=fh;nightCfg.offMinute=fm;saveNight();
-    if(nightCfg.scheduleEnabled)(void)reconcileNight(false);Serial.println(F("OK"));return;
-  }
-  Serial.println(F("ERR NIGHT_COMMAND"));
-}
-
-void handleAlarm(char* a){
-  if(strcmp(a,"STATUS")==0){printAlarmDawnStatus();return;}
-  if(strcmp(a,"ON")==0){alarmCfg.enabled=true;saveAlarm();Serial.println(F("OK ALARM=ON"));return;}
-  if(strcmp(a,"OFF")==0){alarmCfg.enabled=false;saveAlarm();Serial.println(F("OK ALARM=OFF"));return;}
-  if(strcmp(a,"CLEARLAST")==0){
-    alarmCfg.lastTriggerYear=0;alarmCfg.lastTriggerMonth=0;alarmCfg.lastTriggerDay=0;saveAlarm();
-    Serial.println(F("OK LAST_TRIGGER=NONE"));return;
-  }
-  if(strncmp(a,"SET ",4)==0){
-    uint8_t h,m;if(!parseClock(a+4,h,m)){Serial.println(F("ERR BAD_ALARM_TIME"));return;}
-    alarmCfg.hour=h;alarmCfg.minute=m;saveAlarm();Serial.println(F("OK"));return;
-  }
-  Serial.println(F("ERR ALARM_COMMAND"));
-}
-
-void handleDawn(char* a){
-  if(strcmp(a,"STATUS")==0){printAlarmDawnStatus();return;}
-  if(strcmp(a,"START")==0){
-    startDawn(static_cast<unsigned long>(dawnCfg.fadeMinutes)*60UL*1000UL,DawnSource::MANUAL);return;
-  }
-  if(strcmp(a,"STOP")==0){stopDawn();return;}
-  if(strncmp(a,"TEST ",5)==0){
-    long s=0;if(!parseLongRange(a+5,5,120,s)){Serial.println(F("ERR BAD_TEST_SECONDS"));return;}
-    startDawn(static_cast<unsigned long>(s)*1000UL,DawnSource::TEST);return;
-  }
-  if(strncmp(a,"FADEMIN ",8)==0){
-    long v=0;if(!parseLongRange(a+8,1,120,v)){Serial.println(F("ERR BAD_FADE"));return;}
-    dawnCfg.fadeMinutes=v;saveDawnSettings();Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"MAXBR ",6)==0){
-    long v=0;if(!parseLongRange(a+6,1,255,v)){Serial.println(F("ERR BAD_MAXBR"));return;}
-    dawnCfg.maxBrightness=v;saveDawnSettings();Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"STARTHUE ",9)==0){
-    uint8_t v;if(!parseByte(a+9,v)){Serial.println(F("ERR BAD_HUE"));return;}
-    dawnCfg.startHue=v;saveDawnSettings();Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"ENDHUE ",7)==0){
-    uint8_t v;if(!parseByte(a+7,v)){Serial.println(F("ERR BAD_HUE"));return;}
-    dawnCfg.endHue=v;saveDawnSettings();Serial.println(F("OK"));return;
-  }
-  Serial.println(F("ERR DAWN_COMMAND"));
-}
-
-
-void printMusicStatus(){
-  const MusicModeSettings& m=activeMusicCfg();
-  Serial.print(F("MUSIC STATUS ID="));Serial.print(musicName(extCfg.selectedMusic));
-  Serial.print(F(" BRIGHT="));Serial.print(m.brightness);
-  Serial.print(F(" BG="));Serial.print(m.background);
-  Serial.print(F(" SMOOTH="));Serial.print(m.smooth);
-  Serial.print(F(" SENS="));Serial.print(m.sensitivity);
-  Serial.print(F(" SPEED="));Serial.print(m.speed);
-  Serial.print(F(" AUX="));Serial.print(m.aux);
-  Serial.print(F(" SUB="));Serial.print(m.submode);
-  Serial.print(F(" CAL="));Serial.print(extCfg.audioCalibrated?F("YES"):F("NO"));
-  Serial.print(F(" DC="));Serial.print(extCfg.micDcOffset);
-  Serial.print(F(" VU_LP="));Serial.print(extCfg.vuLowPass);
-  Serial.print(F(" SPECTR_LP="));Serial.println(extCfg.spectrumLowPass);
-}
-
-void printAmbientStatus(){
-  AmbientSettingsV1& a=extCfg.ambient;
-  Serial.print(F("AMBIENT STATUS EFFECT="));Serial.print(ambientName());
-  Serial.print(F(" AUTO="));Serial.print(a.autoCycle?F("ON"):F("OFF"));
-  Serial.print(F(" PERIOD="));Serial.print(a.autoPeriodSec);
-  Serial.print(F(" F01="));Serial.print(a.f01Hue);Serial.print(',');Serial.print(a.f01Sat);Serial.print(',');Serial.print(a.f01Brightness);
-  Serial.print(F(" F02="));Serial.print(a.f02Hue);Serial.print(',');Serial.print(a.f02Sat);Serial.print(',');Serial.print(a.f02Brightness);Serial.print(',');Serial.print(a.f02Speed);
-  Serial.print(F(" F03="));Serial.print(a.f03Hue);Serial.print(',');Serial.print(a.f03Brightness);Serial.print(',');Serial.print(a.f03Speed);Serial.print(',');Serial.println(a.f03Step10);
-}
-
-void printSystemStatus(){
-  Serial.print(F("SYSTEM STATUS LIMIT_MA="));Serial.print(extCfg.currentLimitMa);
-  Serial.print(F(" HARD_LIMIT_MA="));Serial.print(Cfg::HARD_CURRENT_LIMIT_MA);
-  Serial.print(F(" EXT_SAVED="));Serial.print(extCfg.storageValid?F("YES"):F("NO"));
-  Serial.print(F(" EXT_DIRTY="));Serial.println(extCfg.dirty?F("YES"):F("NO"));
-}
-
-bool parseSubmode(const char* p,uint8_t& out){
-  if(strcmp(p,"THREE")==0)out=0;
-  else if(strcmp(p,"LOW")==0)out=1;
-  else if(strcmp(p,"MID")==0)out=2;
-  else if(strcmp(p,"HIGH")==0)out=3;
-  else return false;
   return true;
 }
 
-void handleSystem(char* a){
-  if(strcmp(a,"STATUS")==0){printSystemStatus();return;}
-  if(strcmp(a,"SAVE")==0){saveExtended();Serial.println(F("OK SYSTEM_SAVED"));return;}
-  if(strncmp(a,"LIMIT ",6)==0){
-    long v=0;if(!parseLongRange(a+6,Cfg::MIN_CURRENT_LIMIT_MA,Cfg::HARD_CURRENT_LIMIT_MA,v)){Serial.println(F("ERR BAD_LIMIT"));return;}
-    extCfg.currentLimitMa=static_cast<uint16_t>(v);extCfg.dirty=true;
-    FastLED.setMaxPowerInVoltsAndMilliamps(5,extCfg.currentLimitMa);
-    saveExtended();Serial.print(F("OK LIMIT_MA="));Serial.println(extCfg.currentLimitMa);return;
-  }
-  Serial.println(F("ERR SYSTEM_COMMAND"));
+bool argRange(uint16_t v,uint16_t lo,uint16_t hi){
+  return v>=lo&&v<=hi;
 }
 
-void handleMusic(char* a){
-  if(strcmp(a,"STATUS")==0){printMusicStatus();return;}
-  if(strcmp(a,"ON")==0){applyMode(SystemMode::MUSIC,true);Serial.println(F("OK MODE=MUSIC"));return;}
-  if(strcmp(a,"OFF")==0){applyMode(SystemMode::OFF,true);Serial.println(F("OK MODE=OFF"));return;}
-  if(strcmp(a,"CAL")==0){calibrateAudio();return;}
-  if(strcmp(a,"SAVE")==0){saveExtended();Serial.println(F("OK MUSIC_SAVED"));return;}
-  if(strncmp(a,"MODE ",5)==0){
-    MusicMode mm;if(!parseMusicMode(a+5,mm)){Serial.println(F("ERR BAD_MUSIC_MODE"));return;}
-    extCfg.selectedMusic=mm;extCfg.dirty=true;saveExtended();applyMode(SystemMode::MUSIC,true);
-    Serial.print(F("OK MUSIC_MODE="));Serial.println(musicName(mm));return;
-  }
-  MusicModeSettings& m=activeMusicCfg(); long v=0;
-  if(strncmp(a,"BRIGHT ",7)==0){
-    if(!parseLongRange(a+7,0,255,v)){Serial.println(F("ERR BAD_BRIGHTNESS"));return;}
-    m.brightness=v;extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"BACKGROUND ",11)==0){
-    if(!parseLongRange(a+11,0,255,v)){Serial.println(F("ERR BAD_BACKGROUND"));return;}
-    m.background=v;extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"SMOOTH ",7)==0){
-    if(!parseLongRange(a+7,5,100,v)){Serial.println(F("ERR BAD_SMOOTH"));return;}
-    m.smooth=v;extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"SENS ",5)==0){
-    if(!parseLongRange(a+5,50,200,v)){Serial.println(F("ERR BAD_SENS"));return;}
-    m.sensitivity=v;extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"SUBMODE ",8)==0){
-    if(extCfg.selectedMusic!=MusicMode::M05&&extCfg.selectedMusic!=MusicMode::M08){Serial.println(F("ERR NOT_APPLICABLE"));return;}
-    uint8_t sm;if(!parseSubmode(a+8,sm)){Serial.println(F("ERR BAD_SUBMODE"));return;}
-    m.submode=sm;extCfg.dirty=true;resetMusicRuntime();Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"SPEED ",6)==0){
-    if(extCfg.selectedMusic!=MusicMode::M08||!parseLongRange(a+6,1,255,v)){Serial.println(F("ERR BAD_SPEED"));return;}
-    m.speed=v;extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"RAINSTEP10 ",11)==0){
-    if(extCfg.selectedMusic!=MusicMode::M02||!parseLongRange(a+11,5,200,v)){Serial.println(F("ERR BAD_RAINSTEP"));return;}
-    m.aux=v;extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"HUESTART ",9)==0){
-    if(extCfg.selectedMusic!=MusicMode::M09||!parseLongRange(a+9,0,255,v)){Serial.println(F("ERR BAD_HUE_START"));return;}
-    m.speed=v;extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"HUESTEP ",8)==0){
-    if(extCfg.selectedMusic!=MusicMode::M09||!parseLongRange(a+8,1,255,v)){Serial.println(F("ERR BAD_HUE_STEP"));return;}
-    m.aux=v;extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  Serial.println(F("ERR MUSIC_COMMAND"));
+void dataPrefix(uint8_t group,uint8_t item){
+  Serial.print(F("D "));Serial.print(group);Serial.print(' ');Serial.print(item);Serial.print(' ');
 }
 
-void handleAmbient(char* a){
-  AmbientSettingsV1& x=extCfg.ambient; long v=0;
-  if(strcmp(a,"STATUS")==0){printAmbientStatus();return;}
-  if(strcmp(a,"ON")==0){applyMode(SystemMode::AMBIENT,true);Serial.println(F("OK MODE=AMBIENT"));return;}
-  if(strcmp(a,"OFF")==0){applyMode(SystemMode::OFF,true);Serial.println(F("OK MODE=OFF"));return;}
-  if(strcmp(a,"SAVE")==0){saveExtended();Serial.println(F("OK AMBIENT_SAVED"));return;}
-  if(strcmp(a,"NEXT")==0){nextAmbient(1);Serial.println(F("OK"));return;}
-  if(strcmp(a,"PREV")==0){nextAmbient(-1);Serial.println(F("OK"));return;}
-  if(strncmp(a,"EFFECT ",7)==0){
-    if(strcmp(a+7,"F01")==0)x.effect=0;else if(strcmp(a+7,"F02")==0)x.effect=1;
-    else if(strcmp(a+7,"F03")==0)x.effect=2;else{Serial.println(F("ERR BAD_EFFECT"));return;}
-    extCfg.dirty=true;prepareAmbient();applyMode(SystemMode::AMBIENT,true);Serial.println(F("OK"));return;
+void printCompactTime(uint8_t group){
+  RtcTime t;
+  const bool ok=rtcValidNow(&t);
+  Serial.print(F("D "));Serial.print(group);Serial.print(' ');Serial.print(ok?1:0);
+  if(ok){
+    Serial.print(' ');Serial.print(t.year);Serial.print(' ');Serial.print(t.month);
+    Serial.print(' ');Serial.print(t.day);Serial.print(' ');Serial.print(t.hour);
+    Serial.print(' ');Serial.print(t.minute);Serial.print(' ');Serial.print(t.second);
   }
-  if(strcmp(a,"AUTO ON")==0){x.autoCycle=1;extCfg.dirty=true;lastAmbientAutoMs=millis();Serial.println(F("OK"));return;}
-  if(strcmp(a,"AUTO OFF")==0){x.autoCycle=0;extCfg.dirty=true;Serial.println(F("OK"));return;}
-  if(strncmp(a,"PERIOD ",7)==0){
-    if(!parseLongRange(a+7,1,255,v)){Serial.println(F("ERR BAD_PERIOD"));return;}x.autoPeriodSec=v;extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"HUE ",4)==0){
-    if(!parseLongRange(a+4,0,255,v)){Serial.println(F("ERR BAD_HUE"));return;}
-    if(x.effect==0)x.f01Hue=v;else if(x.effect==1)x.f02Hue=v;else x.f03Hue=v;
-    extCfg.dirty=true;prepareAmbient();Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"SAT ",4)==0){
-    if(!parseLongRange(a+4,0,255,v)){Serial.println(F("ERR BAD_SAT"));return;}
-    if(x.effect==0)x.f01Sat=v;else if(x.effect==1)x.f02Sat=v;else{Serial.println(F("ERR NOT_APPLICABLE"));return;}
-    extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"BRIGHT ",7)==0){
-    if(!parseLongRange(a+7,0,255,v)){Serial.println(F("ERR BAD_BRIGHTNESS"));return;}
-    if(x.effect==0)x.f01Brightness=v;else if(x.effect==1)x.f02Brightness=v;else x.f03Brightness=v;
-    extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"SPEED ",6)==0){
-    if(!parseLongRange(a+6,1,255,v)){Serial.println(F("ERR BAD_SPEED"));return;}
-    if(x.effect==1)x.f02Speed=v;else if(x.effect==2)x.f03Speed=v;else{Serial.println(F("ERR NOT_APPLICABLE"));return;}
-    extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  if(strncmp(a,"STEP10 ",7)==0){
-    if(x.effect!=2||!parseLongRange(a+7,5,100,v)){Serial.println(F("ERR BAD_STEP10"));return;}
-    x.f03Step10=v;extCfg.dirty=true;Serial.println(F("OK"));return;
-  }
-  Serial.println(F("ERR AMBIENT_COMMAND"));
+  Serial.println();
 }
 
-void printAllSettings(){
-  Serial.println(F("SETTINGS BEGIN V=1"));
-  printLightStatus();printClapStatus();printMusicStatus();printAmbientStatus();printNightStatus();printAlarmDawnStatus();printSystemStatus();
-  Serial.println(F("SETTINGS END"));
+void printCompactStatus(){
+  RtcTime t;const bool rv=rtcValidNow(&t);
+  Serial.print(F("D 2 "));
+  Serial.print(static_cast<uint8_t>(currentMode));Serial.print(' ');
+  Serial.print(rv?1:0);Serial.print(' ');
+  Serial.print(coreCfg.clapEnabled?1:0);Serial.print(' ');
+  Serial.print(clapCfg.threshold);Serial.print(' ');
+  Serial.print(clapCfg.timeoutMs);Serial.print(' ');
+  Serial.print(extCfg.currentLimitMa);Serial.print(' ');
+  Serial.print(static_cast<uint8_t>(extCfg.selectedMusic));Serial.print(' ');
+  Serial.print(extCfg.ambient.effect);Serial.print(' ');
+  Serial.print(rawResetFlags);Serial.print(' ');
+  Serial.println(millis());
+}
+
+void printCompactSettings(){
+  const CRGB lc=lightColor();
+  dataPrefix(3,0);
+  Serial.print(static_cast<uint8_t>(lightCfg.colorMode));Serial.print(' ');
+  Serial.print(lightCfg.kelvin);Serial.print(' ');
+  Serial.print(lc.r);Serial.print(' ');Serial.print(lc.g);Serial.print(' ');Serial.print(lc.b);Serial.print(' ');
+  Serial.print(lightCfg.brightness);Serial.print(' ');Serial.print(lightCfg.storageValid?1:0);Serial.print(' ');
+  Serial.println(lightCfg.dirty?1:0);
+
+  dataPrefix(3,1);
+  Serial.print(coreCfg.clapEnabled?1:0);Serial.print(' ');Serial.print(clapCfg.threshold);Serial.print(' ');
+  Serial.print(clapCfg.timeoutMs);Serial.print(' ');Serial.print(clapCfg.storageValid?1:0);Serial.print(' ');
+  Serial.print(clapCalActive?1:0);Serial.print(' ');Serial.print(clapCalFinished?1:0);Serial.print(' ');
+  Serial.print(clapCalGoodPairs);Serial.print(' ');Serial.print(clapCalTargetPairs);Serial.print(' ');
+  Serial.print(clapCalQuietP99);Serial.print(' ');Serial.println(clapCalSuggested);
+
+  dataPrefix(3,2);
+  Serial.print(nightCfg.manualEnabled?1:0);Serial.print(' ');Serial.print(nightCfg.hue);Serial.print(' ');
+  Serial.print(nightCfg.saturation);Serial.print(' ');Serial.print(nightCfg.brightness);Serial.print(' ');
+  Serial.print(nightCfg.scheduleEnabled?1:0);Serial.print(' ');Serial.print(nightCfg.onHour);Serial.print(' ');
+  Serial.print(nightCfg.onMinute);Serial.print(' ');Serial.print(nightCfg.offHour);Serial.print(' ');
+  Serial.println(nightCfg.offMinute);
+
+  dataPrefix(3,3);
+  Serial.print(alarmCfg.enabled?1:0);Serial.print(' ');Serial.print(alarmCfg.hour);Serial.print(' ');
+  Serial.print(alarmCfg.minute);Serial.print(' ');Serial.print(dawnCfg.fadeMinutes);Serial.print(' ');
+  Serial.print(dawnCfg.maxBrightness);Serial.print(' ');Serial.print(dawnCfg.startHue);Serial.print(' ');
+  Serial.print(dawnCfg.endHue);Serial.print(' ');Serial.print(static_cast<uint8_t>(dawnPhase));Serial.print(' ');
+  Serial.println(dawnRecoveredAtBoot?1:0);
+
+  AmbientSettingsV1& x=extCfg.ambient;
+  dataPrefix(3,4);
+  Serial.print(x.effect);Serial.print(' ');Serial.print(x.autoCycle);Serial.print(' ');Serial.print(x.autoPeriodSec);Serial.print(' ');
+  Serial.print(x.f01Hue);Serial.print(' ');Serial.print(x.f01Sat);Serial.print(' ');Serial.print(x.f01Brightness);Serial.print(' ');
+  Serial.print(x.f02Hue);Serial.print(' ');Serial.print(x.f02Sat);Serial.print(' ');Serial.print(x.f02Brightness);Serial.print(' ');
+  Serial.print(x.f02Speed);Serial.print(' ');Serial.print(x.f03Hue);Serial.print(' ');Serial.print(x.f03Brightness);Serial.print(' ');
+  Serial.print(x.f03Speed);Serial.print(' ');Serial.println(x.f03Step10);
+
+  for(uint8_t i=0;i<static_cast<uint8_t>(MusicMode::COUNT);++i){
+    const MusicModeSettings& m=extCfg.music[i];
+    dataPrefix(3,static_cast<uint8_t>(10+i));
+    Serial.print(m.brightness);Serial.print(' ');Serial.print(m.background);Serial.print(' ');
+    Serial.print(m.smooth);Serial.print(' ');Serial.print(m.sensitivity);Serial.print(' ');
+    Serial.print(m.speed);Serial.print(' ');Serial.print(m.aux);Serial.print(' ');Serial.println(m.submode);
+  }
+
+  dataPrefix(3,20);
+  Serial.print(extCfg.currentLimitMa);Serial.print(' ');Serial.print(extCfg.audioCalibrated);Serial.print(' ');
+  Serial.print(extCfg.micDcOffset);Serial.print(' ');Serial.print(extCfg.vuLowPass);Serial.print(' ');
+  Serial.println(extCfg.spectrumLowPass);
+  uartAck(3);
+}
+
+void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
+  switch(op){
+    case 1: // ping
+      if(n)return uartErr(UE_PARSE);uartAck(op);return;
+    case 2:
+      if(n)return uartErr(UE_PARSE);printCompactStatus();return;
+    case 3:
+      if(n)return uartErr(UE_PARSE);printCompactSettings();return;
+    case 4:
+      if(n)return uartErr(UE_PARSE);printCompactTime(4);return;
+    case 5: { // set RTC: year month day hour minute second
+      if(n!=6)return uartErr(UE_PARSE);
+      RtcTime t{a[0],static_cast<uint8_t>(a[1]),static_cast<uint8_t>(a[2]),
+        static_cast<uint8_t>(a[3]),static_cast<uint8_t>(a[4]),static_cast<uint8_t>(a[5])};
+      if(!validRtc(t)||!rtcSet(t))return uartErr(UE_RTC);
+      rtcLostPower=false;uartAck(op);return;
+    }
+    case 10: { // top mode: 0 off, 1 light, 2 night, 3 ambient, 4 music
+      if(n!=1||a[0]>4)return uartErr(UE_RANGE);
+      const SystemMode map[5]={SystemMode::OFF,SystemMode::LIGHT,SystemMode::NIGHT,SystemMode::AMBIENT,SystemMode::MUSIC};
+      applyMode(map[a[0]],true);uartAck(op);return;
+    }
+    case 20:
+      if(n!=1||a[0]>1)return uartErr(UE_RANGE);
+      applyMode(a[0]?SystemMode::LIGHT:SystemMode::OFF,true);uartAck(op);return;
+    case 21:
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);
+      lightCfg.brightness=a[0];lightCfg.dirty=true;if(currentMode==SystemMode::LIGHT)prepareLight();uartAck(op);return;
+    case 22:
+      if(n!=1||!argRange(a[0],Cfg::MIN_KELVIN,Cfg::MAX_KELVIN))return uartErr(UE_RANGE);
+      lightCfg.colorMode=ColorMode::KELVIN;lightCfg.kelvin=a[0];lightCfg.dirty=true;
+      if(currentMode==SystemMode::LIGHT)prepareLight();uartAck(op);return;
+    case 23:
+      if(n!=3||a[0]>255||a[1]>255||a[2]>255)return uartErr(UE_RANGE);
+      lightCfg.colorMode=ColorMode::RGB;lightCfg.customRgb=CRGB(a[0],a[1],a[2]);lightCfg.dirty=true;
+      if(currentMode==SystemMode::LIGHT)prepareLight();uartAck(op);return;
+    case 24:saveLight();uartAck(op);return;
+    case 25:loadLight();if(currentMode==SystemMode::LIGHT)prepareLight();uartAck(op);return;
+    case 26:
+      if(n!=1||a[0]>1)return uartErr(UE_RANGE);
+      coreCfg.clapEnabled=a[0];saveCore();uartAck(op);return;
+    case 30:
+      if(n!=1||!argRange(a[0],20,300))return uartErr(UE_RANGE);
+      clapCfg.threshold=a[0];clapCfg.dirty=true;resetClapDetector();uartAck(op);return;
+    case 31:
+      if(n!=1||!argRange(a[0],250,1200))return uartErr(UE_RANGE);
+      clapCfg.timeoutMs=a[0];clapCfg.dirty=true;resetClapDetector();uartAck(op);return;
+    case 32:saveClap();resetClapDetector();uartAck(op);return;
+    case 33:
+      clapCfg.threshold=Cfg::DEFAULT_CLAP_TRSH;clapCfg.timeoutMs=Cfg::DEFAULT_CLAP_TIMEOUT_MS;
+      clapCfg.dirty=true;resetClapDetector();uartAck(op);return;
+    case 40:
+      if(n!=1||!argRange(a[0],Cfg::CLAPCAL_MIN_PAIRS,Cfg::CLAPCAL_MAX_PAIRS))return uartErr(UE_RANGE);
+      startClapCalibration(static_cast<uint8_t>(a[0]));return;
+    case 41:if(n)return uartErr(UE_PARSE);captureClapCalibrationSample();return;
+    case 42:if(n)return uartErr(UE_PARSE);finishClapCalibration();return;
+    case 43:
+      if(n)return uartErr(UE_PARSE);
+      if(!clapCalFinished&&!clapCfg.dirty)return uartErr(UE_STATE);
+      saveClap();resetClapDetector();uartAck(op);return;
+    case 44:
+      if(n)return uartErr(UE_PARSE);
+      resetClapCalibration();loadClap();resetClapDetector();uartAck(op);return;
+    case 45:
+      if(n)return uartErr(UE_PARSE);
+      dataPrefix(45,0);Serial.print(clapCalActive?1:0);Serial.print(' ');
+      Serial.print(clapCalFinished?1:0);Serial.print(' ');Serial.print(clapCalGoodPairs);Serial.print(' ');
+      Serial.print(clapCalTargetPairs);Serial.print(' ');Serial.print(clapCalQuietP99);Serial.print(' ');
+      Serial.println(clapCalSuggested);return;
+    case 50:
+      if(n!=1||a[0]>1)return uartErr(UE_RANGE);
+      nightCfg.scheduleEnabled=false;nightCfg.manualEnabled=a[0];saveNight();applyMode(SystemMode::NIGHT,true);uartAck(op);return;
+    case 51:
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);nightCfg.hue=a[0];saveNight();(void)reconcileNight(false);uartAck(op);return;
+    case 52:
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);nightCfg.saturation=a[0];saveNight();(void)reconcileNight(false);uartAck(op);return;
+    case 53:
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);nightCfg.brightness=a[0];saveNight();(void)reconcileNight(false);uartAck(op);return;
+    case 54:
+      if(n!=1||a[0]>1)return uartErr(UE_RANGE);
+      if(a[0]&&!rtcValidNow())return uartErr(UE_RTC);
+      nightCfg.scheduleEnabled=a[0];saveNight();currentMode=SystemMode::NIGHT;saveCore();(void)reconcileNight(false);uartAck(op);return;
+    case 55:
+      if(n!=4||a[0]>23||a[1]>59||a[2]>23||a[3]>59||(a[0]==a[2]&&a[1]==a[3]))return uartErr(UE_RANGE);
+      nightCfg.onHour=a[0];nightCfg.onMinute=a[1];nightCfg.offHour=a[2];nightCfg.offMinute=a[3];
+      saveNight();if(nightCfg.scheduleEnabled)(void)reconcileNight(false);uartAck(op);return;
+    case 60:
+      if(n!=1||a[0]>1)return uartErr(UE_RANGE);alarmCfg.enabled=a[0];saveAlarm();uartAck(op);return;
+    case 61:
+      if(n!=2||a[0]>23||a[1]>59)return uartErr(UE_RANGE);alarmCfg.hour=a[0];alarmCfg.minute=a[1];saveAlarm();uartAck(op);return;
+    case 62:
+      alarmCfg.lastTriggerYear=0;alarmCfg.lastTriggerMonth=0;alarmCfg.lastTriggerDay=0;saveAlarm();uartAck(op);return;
+    case 70:startDawn(static_cast<unsigned long>(dawnCfg.fadeMinutes)*60000UL,DawnSource::MANUAL);return;
+    case 71:stopDawn();return;
+    case 72:
+      if(n!=1||!argRange(a[0],5,120))return uartErr(UE_RANGE);
+      startDawn(static_cast<unsigned long>(a[0])*1000UL,DawnSource::TEST);return;
+    case 73:
+      if(n!=1||!argRange(a[0],1,120))return uartErr(UE_RANGE);dawnCfg.fadeMinutes=a[0];saveDawnSettings();uartAck(op);return;
+    case 74:
+      if(n!=1||!argRange(a[0],1,255))return uartErr(UE_RANGE);dawnCfg.maxBrightness=a[0];saveDawnSettings();uartAck(op);return;
+    case 75:
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);dawnCfg.startHue=a[0];saveDawnSettings();uartAck(op);return;
+    case 76:
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);dawnCfg.endHue=a[0];saveDawnSettings();uartAck(op);return;
+    case 80:
+      if(n!=1||a[0]>=static_cast<uint8_t>(MusicMode::COUNT))return uartErr(UE_RANGE);
+      extCfg.selectedMusic=static_cast<MusicMode>(a[0]);extCfg.dirty=true;saveExtended();applyMode(SystemMode::MUSIC,true);uartAck(op);return;
+    case 81:case 82:case 83:case 84:case 85:case 86:case 87:case 88: {
+      if(n!=1)return uartErr(UE_PARSE);
+      MusicModeSettings& m=activeMusicCfg();
+      if(op==81){if(a[0]>255)return uartErr(UE_RANGE);m.brightness=a[0];}
+      else if(op==82){if(a[0]>255)return uartErr(UE_RANGE);m.background=a[0];}
+      else if(op==83){if(!argRange(a[0],5,100))return uartErr(UE_RANGE);m.smooth=a[0];}
+      else if(op==84){if(!argRange(a[0],50,200))return uartErr(UE_RANGE);m.sensitivity=a[0];}
+      else if(op==85){
+        if((extCfg.selectedMusic!=MusicMode::M05&&extCfg.selectedMusic!=MusicMode::M08)||a[0]>3)return uartErr(UE_APPLICABILITY);
+        m.submode=a[0];resetMusicRuntime();
+      }else if(op==86){
+        if(extCfg.selectedMusic!=MusicMode::M08||!argRange(a[0],1,255))return uartErr(UE_APPLICABILITY);m.speed=a[0];
+      }else if(op==87){
+        if(extCfg.selectedMusic==MusicMode::M02){if(!argRange(a[0],5,200))return uartErr(UE_RANGE);m.aux=a[0];}
+        else if(extCfg.selectedMusic==MusicMode::M09){if(!argRange(a[0],1,255))return uartErr(UE_RANGE);m.aux=a[0];}
+        else return uartErr(UE_APPLICABILITY);
+      }else{
+        if(extCfg.selectedMusic!=MusicMode::M09||a[0]>255)return uartErr(UE_APPLICABILITY);m.speed=a[0];
+      }
+      extCfg.dirty=true;uartAck(op);return;
+    }
+    case 89:saveExtended();uartAck(op);return;
+    case 90:calibrateAudio();return;
+    case 100:
+      if(n!=1||a[0]>2)return uartErr(UE_RANGE);extCfg.ambient.effect=a[0];extCfg.dirty=true;prepareAmbient();applyMode(SystemMode::AMBIENT,true);uartAck(op);return;
+    case 101:nextAmbient(1);uartAck(op);return;
+    case 102:nextAmbient(-1);uartAck(op);return;
+    case 103:
+      if(n!=1||a[0]>1)return uartErr(UE_RANGE);extCfg.ambient.autoCycle=a[0];extCfg.dirty=true;lastAmbientAutoMs=millis();uartAck(op);return;
+    case 104:
+      if(n!=1||!argRange(a[0],1,255))return uartErr(UE_RANGE);extCfg.ambient.autoPeriodSec=a[0];extCfg.dirty=true;uartAck(op);return;
+    case 105:case 106:case 107:case 108:case 109: {
+      if(n!=1)return uartErr(UE_PARSE);AmbientSettingsV1& x=extCfg.ambient;
+      if(op==105){if(a[0]>255)return uartErr(UE_RANGE);if(x.effect==0)x.f01Hue=a[0];else if(x.effect==1)x.f02Hue=a[0];else x.f03Hue=a[0];prepareAmbient();}
+      else if(op==106){if(a[0]>255||x.effect==2)return uartErr(UE_APPLICABILITY);if(x.effect==0)x.f01Sat=a[0];else x.f02Sat=a[0];}
+      else if(op==107){if(a[0]>255)return uartErr(UE_RANGE);if(x.effect==0)x.f01Brightness=a[0];else if(x.effect==1)x.f02Brightness=a[0];else x.f03Brightness=a[0];}
+      else if(op==108){if(!argRange(a[0],1,255)||x.effect==0)return uartErr(UE_APPLICABILITY);if(x.effect==1)x.f02Speed=a[0];else x.f03Speed=a[0];}
+      else{if(x.effect!=2||!argRange(a[0],5,100))return uartErr(UE_APPLICABILITY);x.f03Step10=a[0];}
+      extCfg.dirty=true;uartAck(op);return;
+    }
+    case 110:saveExtended();uartAck(op);return;
+    case 120:
+      if(n!=1||!argRange(a[0],Cfg::MIN_CURRENT_LIMIT_MA,Cfg::HARD_CURRENT_LIMIT_MA))return uartErr(UE_RANGE);
+      extCfg.currentLimitMa=a[0];extCfg.dirty=true;FastLED.setMaxPowerInVoltsAndMilliamps(5,extCfg.currentLimitMa);saveExtended();uartAck(op);return;
+    case 121:saveExtended();uartAck(op);return;
+    default:uartErr(UE_PARSE);return;
+  }
 }
 
 void handleCommand(char* cmd){
   resetClapDetector();
-
-  if(strcmp(cmd,"PING")==0){Serial.println(F("PONG"));return;}
-  if(strcmp(cmd,"STATUS")==0){printMainStatus();return;}
-  if(strcmp(cmd,"TIME")==0){
-    RtcTime now;if(!rtcValidNow(&now)){Serial.println(F("ERR RTC_INVALID"));return;}
-    Serial.print(F("TIME "));printRtc(now);Serial.println();return;
-  }
-  if(strncmp(cmd,"SET ",4)==0){
-    RtcTime t;if(!parseSetTime(cmd+4,t)){Serial.println(F("ERR BAD_TIME_FORMAT"));return;}
-    if(!rtcSet(t)){Serial.println(F("ERR RTC_WRITE"));return;}
-    rtcLostPower=false;Serial.print(F("OK TIME="));printRtc(t);Serial.println();return;
-  }
-  if(strcmp(cmd,"MODE LIGHT")==0||strcmp(cmd,"MODE L01")==0){applyMode(SystemMode::LIGHT,true);Serial.println(F("OK MODE=L01"));return;}
-  if(strcmp(cmd,"MODE NIGHT")==0){applyMode(SystemMode::NIGHT,true);Serial.println(F("OK MODE=NIGHT"));return;}
-  if(strcmp(cmd,"MODE AMBIENT")==0){applyMode(SystemMode::AMBIENT,true);Serial.println(F("OK MODE=AMBIENT"));return;}
-  if(strcmp(cmd,"MODE MUSIC")==0){applyMode(SystemMode::MUSIC,true);Serial.println(F("OK MODE=MUSIC"));return;}
-  if(strcmp(cmd,"MODE OFF")==0){applyMode(SystemMode::OFF,true);Serial.println(F("OK MODE=OFF"));return;}
-
-  if(strncmp(cmd,"LIGHT ",6)==0){handleLight(cmd+6);return;}
-  if(strncmp(cmd,"CLAP ",5)==0){handleClap(cmd+5);return;}
-  if(strncmp(cmd,"CLAPCAL ",8)==0){handleClapCal(cmd+8);return;}
-  if(strncmp(cmd,"NIGHT ",6)==0){handleNight(cmd+6);return;}
-  if(strncmp(cmd,"ALARM ",6)==0){handleAlarm(cmd+6);return;}
-  if(strncmp(cmd,"DAWN ",5)==0){handleDawn(cmd+5);return;}
-  if(strncmp(cmd,"MUSIC ",6)==0){handleMusic(cmd+6);return;}
-  if(strncmp(cmd,"AMBIENT ",8)==0){handleAmbient(cmd+8);return;}
-  if(strncmp(cmd,"SYSTEM ",7)==0){handleSystem(cmd+7);return;}
-  if(strcmp(cmd,"SETTINGS")==0){printAllSettings();return;}
-
-  if(strcmp(cmd,"HELP")==0){
-    Serial.println(F("STATUS SETTINGS TIME SET MODE LIGHT CLAP CLAPCAL NIGHT ALARM DAWN MUSIC AMBIENT SYSTEM PING"));
-    return;
-  }
-  Serial.println(F("ERR UNKNOWN_COMMAND"));
+  uint16_t op=0,a[6];uint8_t n=0;
+  if(!parseOpcodeLine(cmd,op,a,n)){uartErr(UE_PARSE);return;}
+  handleCompactCommand(op,a,n);
 }
 
 void pollSerial(){
@@ -2321,7 +2188,7 @@ void pollSerial(){
       continue;
     }
     if(rxLength<Cfg::RX_BUFFER_SIZE-1)rxBuffer[rxLength++]=c;
-    else{rxLength=0;Serial.println(F("ERR LINE_TOO_LONG"));}
+    else{rxLength=0;uartErr(UE_PARSE);}
   }
 }
 
@@ -2362,8 +2229,7 @@ void setup(){
     if(rtcReadLostPower(lost))rtcLostPower=lost;
   }
 
-  Serial.println(F("ARDU NANO ARDU_V1 R1 READY"));
-  Serial.println(F("44+44 D6/D7 L01 CLAPCAL RTC NIGHT DAWN AMBIENT MUSIC"));
+  Serial.println(F("ARDU1 1"));
 
   const bool recovered=recoverDawn(coldBoot);
 
