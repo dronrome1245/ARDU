@@ -23,6 +23,16 @@ jobs:
       - name: Install FastLED
         run: arduino-cli lib install FastLED
 
+      - name: Compile CORE R3 baseline
+        continue-on-error: true
+        run: |
+          arduino-cli compile \
+            --fqbn arduino:avr:nano:cpu=atmega328old \
+            --warnings none \
+            --build-path "$GITHUB_WORKSPACE/build-core-r3" \
+            --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
+            "04_Прошивка/nano_fw10_core_r3"
+
       - name: Compile ARDU Nano v1
         run: |
           arduino-cli compile \
