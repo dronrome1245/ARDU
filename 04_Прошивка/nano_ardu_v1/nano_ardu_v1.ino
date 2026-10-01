@@ -16,7 +16,7 @@
 */
 
 #include <Arduino.h>
-#include <Wire.h>
+#include <util/twi.h>
 #include <EEPROM.h>
 #include <avr/io.h>
 #define FHT_N 64
@@ -528,32 +528,76 @@ bool parseSetTime(const char* text, RtcTime& t) {
 
 // -------------------- RTC --------------------
 
-bool rtcProbe() {
-  Wire.beginTransmission(Cfg::DS3231_ADDR);
-  return Wire.endTransmission() == 0;
+void twiMasterInit(){
+  TWSR=0;
+  TWBR=static_cast<uint8_t>(((F_CPU/100000UL)-16UL)/2UL);
+  TWCR=_BV(TWEN);
 }
 
-bool rtcReadRegs(uint8_t reg, uint8_t* data, uint8_t len) {
-  Wire.beginTransmission(Cfg::DS3231_ADDR);
-  Wire.write(reg);
-  if (Wire.endTransmission(false) != 0) return false;
-  const uint8_t got = Wire.requestFrom(Cfg::DS3231_ADDR, len);
-  if (got != len) {
-    while (Wire.available()) (void)Wire.read();
-    return false;
-  }
-  for (uint8_t i=0;i<len;++i) {
-    if (!Wire.available()) return false;
-    data[i]=Wire.read();
-  }
+bool twiWait(){
+  uint16_t guard=60000;
+  while(!(TWCR&_BV(TWINT)) && --guard){}
+  return guard!=0;
+}
+
+bool twiStart(uint8_t addressRw){
+  TWCR=_BV(TWINT)|_BV(TWSTA)|_BV(TWEN);
+  if(!twiWait())return false;
+  uint8_t st=TWSR&0xF8;
+  if(st!=TW_START && st!=TW_REP_START)return false;
+  TWDR=addressRw;
+  TWCR=_BV(TWINT)|_BV(TWEN);
+  if(!twiWait())return false;
+  st=TWSR&0xF8;
+  return st==TW_MT_SLA_ACK || st==TW_MR_SLA_ACK;
+}
+
+void twiStop(){
+  TWCR=_BV(TWINT)|_BV(TWEN)|_BV(TWSTO);
+}
+
+bool twiWriteByte(uint8_t value){
+  TWDR=value;
+  TWCR=_BV(TWINT)|_BV(TWEN);
+  if(!twiWait())return false;
+  return (TWSR&0xF8)==TW_MT_DATA_ACK;
+}
+
+bool twiReadByte(uint8_t& value,bool ack){
+  TWCR=_BV(TWINT)|_BV(TWEN)|(ack?_BV(TWEA):0);
+  if(!twiWait())return false;
+  const uint8_t st=TWSR&0xF8;
+  if(st!=(ack?TW_MR_DATA_ACK:TW_MR_DATA_NACK))return false;
+  value=TWDR;
   return true;
 }
 
-bool rtcWriteReg(uint8_t reg, uint8_t value) {
-  Wire.beginTransmission(Cfg::DS3231_ADDR);
-  Wire.write(reg);
-  Wire.write(value);
-  return Wire.endTransmission() == 0;
+bool rtcProbe(){
+  if(!twiStart((Cfg::DS3231_ADDR<<1)|TW_WRITE)){twiStop();return false;}
+  twiStop();return true;
+}
+
+bool rtcReadRegs(uint8_t reg,uint8_t* data,uint8_t len){
+  if(!twiStart((Cfg::DS3231_ADDR<<1)|TW_WRITE)){twiStop();return false;}
+  if(!twiWriteByte(reg)){twiStop();return false;}
+  if(!twiStart((Cfg::DS3231_ADDR<<1)|TW_READ)){twiStop();return false;}
+  for(uint8_t i=0;i<len;++i){
+    if(!twiReadByte(data[i],i+1<len)){twiStop();return false;}
+  }
+  twiStop();return true;
+}
+
+bool rtcWriteRegs(uint8_t reg,const uint8_t* data,uint8_t len){
+  if(!twiStart((Cfg::DS3231_ADDR<<1)|TW_WRITE)){twiStop();return false;}
+  if(!twiWriteByte(reg)){twiStop();return false;}
+  for(uint8_t i=0;i<len;++i){
+    if(!twiWriteByte(data[i])){twiStop();return false;}
+  }
+  twiStop();return true;
+}
+
+bool rtcWriteReg(uint8_t reg,uint8_t value){
+  return rtcWriteRegs(reg,&value,1);
 }
 
 bool rtcReadLostPower(bool& lost) {
@@ -593,17 +637,12 @@ bool rtcRead(RtcTime& t) {
 }
 
 bool rtcSet(const RtcTime& t) {
-  if (!validRtc(t)) return false;
-  Wire.beginTransmission(Cfg::DS3231_ADDR);
-  Wire.write(0x00);
-  Wire.write(decToBcd(t.second));
-  Wire.write(decToBcd(t.minute));
-  Wire.write(decToBcd(t.hour));
-  Wire.write(decToBcd(1));
-  Wire.write(decToBcd(t.day));
-  Wire.write(decToBcd(t.month));
-  Wire.write(decToBcd(static_cast<uint8_t>(t.year-2000)));
-  if (Wire.endTransmission()!=0) return false;
+  if(!validRtc(t))return false;
+  uint8_t d[7]={
+    decToBcd(t.second),decToBcd(t.minute),decToBcd(t.hour),decToBcd(1),
+    decToBcd(t.day),decToBcd(t.month),decToBcd(static_cast<uint8_t>(t.year-2000))
+  };
+  if(!rtcWriteRegs(0x00,d,7))return false;
   return rtcClearLostPower();
 }
 
@@ -2302,8 +2341,7 @@ void setup(){
   prepareOff();
   FastLED.show();
 
-  Wire.begin();
-  Wire.setClock(100000UL);
+  twiMasterInit();
   delay(80);
 
   loadAlarm();
