@@ -1030,12 +1030,12 @@ CRGB lightColor(){
 
 void prepareOff() {
   fill_solid(leds,Cfg::LED_COUNT,CRGB::Black);
-  FastLED.setBrightness(0); frameDirty=true;
+  requestedBrightness=static_cast<uint8_t>(0); frameDirty=true;
 }
 
 void prepareLight() {
   fill_solid(leds,Cfg::LED_COUNT,lightColor());
-  FastLED.setBrightness(lightCfg.brightness); frameDirty=true;
+  requestedBrightness=static_cast<uint8_t>(lightCfg.brightness); frameDirty=true;
 }
 
 uint16_t minuteOfDay(uint8_t h,uint8_t m){return static_cast<uint16_t>(h)*60U+m;}
@@ -1068,7 +1068,7 @@ bool reconcileNight(bool announce=false){
   if(currentMode==SystemMode::NIGHT){
     if(nightEffectivePower){
       fill_solid(leds,Cfg::LED_COUNT,CHSV(nightCfg.hue,nightCfg.saturation,255));
-      FastLED.setBrightness(nightCfg.brightness);
+      requestedBrightness=static_cast<uint8_t>(nightCfg.brightness);
     } else {
       prepareOff();
       return true;
@@ -1076,6 +1076,19 @@ bool reconcileNight(bool announce=false){
     frameDirty=true;
   }
   return true;
+}
+
+uint8_t limitedBrightness(){
+  if(!requestedBrightness)return 0;
+  uint32_t sum=0;
+  for(uint8_t i=0;i<Cfg::LED_COUNT;++i)
+    sum+=static_cast<uint16_t>(leds[i].r)+leds[i].g+leds[i].b;
+  if(!sum)return requestedBrightness;
+  // Two mirrored 44-LED rings, approx. 20 mA per RGB channel at value 255.
+  const uint32_t denom=sum*40UL;
+  uint32_t safe=static_cast<uint32_t>(extCfg.currentLimitMa)*65025UL/denom;
+  if(safe>255)safe=255;
+  return requestedBrightness<safe?requestedBrightness:static_cast<uint8_t>(safe);
 }
 
 void showIfSafe(){
@@ -1240,7 +1253,7 @@ void renderVu(bool rainbow){
     leds[p]=c;
     leds[Cfg::LED_COUNT-1U-p]=c;
   }
-  FastLED.setBrightness(cfg.brightness); frameDirty=true;
+  requestedBrightness=static_cast<uint8_t>(cfg.brightness); frameDirty=true;
 }
 
 uint16_t readVuPeak(){
@@ -1284,7 +1297,7 @@ void updateVu(bool rainbow){
 
 void renderM03(){
   const MusicModeSettings& cfg=activeMusicCfg();
-  FastLED.setBrightness(cfg.brightness);
+  requestedBrightness=static_cast<uint8_t>(cfg.brightness);
   for(uint8_t i=0;i<Cfg::LED_COUNT;++i){
     const uint8_t zone=static_cast<uint8_t>((static_cast<uint16_t>(i)*5U)/Cfg::LED_COUNT);
     const uint8_t band=(zone==0||zone==4)?BAND_HIGH:((zone==1||zone==3)?BAND_MID:BAND_LOW);
@@ -1295,7 +1308,7 @@ void renderM03(){
 
 void renderM04(){
   const MusicModeSettings& cfg=activeMusicCfg();
-  FastLED.setBrightness(cfg.brightness);
+  requestedBrightness=static_cast<uint8_t>(cfg.brightness);
   for(uint8_t i=0;i<Cfg::LED_COUNT;++i){
     const uint8_t zone=static_cast<uint8_t>((static_cast<uint16_t>(i)*3U)/Cfg::LED_COUNT);
     const uint8_t band=zone==0?BAND_HIGH:(zone==1?BAND_MID:BAND_LOW);
@@ -1324,7 +1337,7 @@ void renderM05(){
   if(selectedBand(musicRt.band.flashMask,band))
     fill_solid(leds,Cfg::LED_COUNT,CHSV(bandHue(band),255,musicRt.band.brightness[band]));
   else fill_solid(leds,Cfg::LED_COUNT,CHSV(HUE_PURPLE,255,cfg.background));
-  FastLED.setBrightness(cfg.brightness);frameDirty=true;
+  requestedBrightness=static_cast<uint8_t>(cfg.brightness);frameDirty=true;
 }
 
 void shiftM08(){
@@ -1347,7 +1360,7 @@ void renderM08(){
     c=CHSV(bandHue(band),255,musicRt.band.brightness[band]);
   leds[Cfg::LED_COUNT/2-1]=c;
   leds[Cfg::LED_COUNT/2]=c;
-  FastLED.setBrightness(cfg.brightness);frameDirty=true;
+  requestedBrightness=static_cast<uint8_t>(cfg.brightness);frameDirty=true;
 }
 
 void updateSpectrum(){
@@ -1388,7 +1401,7 @@ void renderM09(){
     leds[half-1-pos]=c;
     leds[half+pos]=c;
   }
-  FastLED.setBrightness(cfg.brightness);frameDirty=true;
+  requestedBrightness=static_cast<uint8_t>(cfg.brightness);frameDirty=true;
 }
 
 void updateMusic(){
@@ -1457,13 +1470,13 @@ void updateAmbient(){
   const AmbientEffect e=static_cast<AmbientEffect>(a.effect);
   if(e==AmbientEffect::F01){
     fill_solid(leds,Cfg::LED_COUNT,CHSV(a.f01Hue,a.f01Sat,255));
-    FastLED.setBrightness(a.f01Brightness);frameDirty=true;return;
+    requestedBrightness=static_cast<uint8_t>(a.f01Brightness);frameDirty=true;return;
   }
   if(e==AmbientEffect::F02){
     const uint8_t speedMs=a.f02Speed?a.f02Speed:1;
     if(now-lastAmbientFrameMs>=speedMs){lastAmbientFrameMs=now;++ambientRuntimeHue;}
     fill_solid(leds,Cfg::LED_COUNT,CHSV(static_cast<uint8_t>(a.f02Hue+ambientRuntimeHue),a.f02Sat,255));
-    FastLED.setBrightness(a.f02Brightness);frameDirty=true;return;
+    requestedBrightness=static_cast<uint8_t>(a.f02Brightness);frameDirty=true;return;
   }
   if(now-lastAmbientFrameMs>=30UL){lastAmbientFrameMs=now;ambientRuntimeHue=static_cast<uint8_t>(ambientRuntimeHue+a.f03Speed);}
   for(uint8_t i=0;i<Cfg::LED_COUNT;++i){
@@ -1471,7 +1484,7 @@ void updateAmbient(){
         (static_cast<uint16_t>(i)*a.f03Step10)/10U);
     leds[i]=CHSV(h,255,255);
   }
-  FastLED.setBrightness(a.f03Brightness);frameDirty=true;
+  requestedBrightness=static_cast<uint8_t>(a.f03Brightness);frameDirty=true;
 }
 
 // -------------------- Dawn --------------------
@@ -1487,7 +1500,7 @@ void prepareDawn(uint16_t p){
   const uint8_t h=dawnHue(p);
   const uint8_t br=static_cast<uint8_t>(static_cast<uint32_t>(dawnCfg.maxBrightness)*p/1000UL);
   fill_solid(leds,Cfg::LED_COUNT,CHSV(h,255,255));
-  FastLED.setBrightness(br); frameDirty=true;
+  requestedBrightness=static_cast<uint8_t>(br); frameDirty=true;
 }
 
 void startDawn(unsigned long durationMs,DawnSource source){
@@ -2050,20 +2063,9 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
       lightCfg.colorMode=ColorMode::RGB;lightCfg.customRgb=CRGB(a[0],a[1],a[2]);lightCfg.dirty=true;
       if(currentMode==SystemMode::LIGHT)prepareLight();uartAck(op);return;
     case 24:saveLight();uartAck(op);return;
-    case 25:loadLight();if(currentMode==SystemMode::LIGHT)prepareLight();uartAck(op);return;
     case 26:
       if(n!=1||a[0]>1)return uartErr(UE_RANGE);
       coreCfg.clapEnabled=a[0];saveCore();uartAck(op);return;
-    case 30:
-      if(n!=1||!argRange(a[0],20,300))return uartErr(UE_RANGE);
-      clapCfg.threshold=a[0];clapCfg.dirty=true;resetClapDetector();uartAck(op);return;
-    case 31:
-      if(n!=1||!argRange(a[0],250,1200))return uartErr(UE_RANGE);
-      clapCfg.timeoutMs=a[0];clapCfg.dirty=true;resetClapDetector();uartAck(op);return;
-    case 32:saveClap();resetClapDetector();uartAck(op);return;
-    case 33:
-      clapCfg.threshold=Cfg::DEFAULT_CLAP_TRSH;clapCfg.timeoutMs=Cfg::DEFAULT_CLAP_TIMEOUT_MS;
-      clapCfg.dirty=true;resetClapDetector();uartAck(op);return;
     case 40:
       if(n!=1||!argRange(a[0],Cfg::CLAPCAL_MIN_PAIRS,Cfg::CLAPCAL_MAX_PAIRS))return uartErr(UE_RANGE);
       startClapCalibration(static_cast<uint8_t>(a[0]));return;
@@ -2103,13 +2105,7 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
       if(n!=1||a[0]>1)return uartErr(UE_RANGE);alarmCfg.enabled=a[0];saveAlarm();uartAck(op);return;
     case 61:
       if(n!=2||a[0]>23||a[1]>59)return uartErr(UE_RANGE);alarmCfg.hour=a[0];alarmCfg.minute=a[1];saveAlarm();uartAck(op);return;
-    case 62:
-      alarmCfg.lastTriggerYear=0;alarmCfg.lastTriggerMonth=0;alarmCfg.lastTriggerDay=0;saveAlarm();uartAck(op);return;
-    case 70:startDawn(static_cast<unsigned long>(dawnCfg.fadeMinutes)*60000UL,DawnSource::MANUAL);return;
     case 71:stopDawn();return;
-    case 72:
-      if(n!=1||!argRange(a[0],5,120))return uartErr(UE_RANGE);
-      startDawn(static_cast<unsigned long>(a[0])*1000UL,DawnSource::TEST);return;
     case 73:
       if(n!=1||!argRange(a[0],1,120))return uartErr(UE_RANGE);dawnCfg.fadeMinutes=a[0];saveDawnSettings();uartAck(op);return;
     case 74:
@@ -2146,8 +2142,6 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
     case 90:calibrateAudio();return;
     case 100:
       if(n!=1||a[0]>2)return uartErr(UE_RANGE);extCfg.ambient.effect=a[0];extCfg.dirty=true;prepareAmbient();applyMode(SystemMode::AMBIENT,true);uartAck(op);return;
-    case 101:nextAmbient(1);uartAck(op);return;
-    case 102:nextAmbient(-1);uartAck(op);return;
     case 103:
       if(n!=1||a[0]>1)return uartErr(UE_RANGE);extCfg.ambient.autoCycle=a[0];extCfg.dirty=true;lastAmbientAutoMs=millis();uartAck(op);return;
     case 104:
@@ -2164,8 +2158,7 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
     case 110:saveExtended();uartAck(op);return;
     case 120:
       if(n!=1||!argRange(a[0],Cfg::MIN_CURRENT_LIMIT_MA,Cfg::HARD_CURRENT_LIMIT_MA))return uartErr(UE_RANGE);
-      extCfg.currentLimitMa=a[0];extCfg.dirty=true;FastLED.setMaxPowerInVoltsAndMilliamps(5,extCfg.currentLimitMa);saveExtended();uartAck(op);return;
-    case 121:saveExtended();uartAck(op);return;
+      extCfg.currentLimitMa=a[0];extCfg.dirty=true;saveExtended();uartAck(op);return;
     default:uartErr(UE_PARSE);return;
   }
 }
@@ -2205,7 +2198,6 @@ void setup(){
 
   FastLED.addLeds<WS2812B,Pins::RING_A,GRB>(leds,Cfg::LED_COUNT);
   FastLED.addLeds<WS2812B,Pins::RING_B,GRB>(leds,Cfg::LED_COUNT);
-  FastLED.setMaxPowerInVoltsAndMilliamps(5,extCfg.currentLimitMa);
   prepareOff();
   FastLED.show();
 
