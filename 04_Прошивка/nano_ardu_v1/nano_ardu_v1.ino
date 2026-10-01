@@ -231,6 +231,11 @@ struct CoreState {
   bool storageValid = false;
 };
 
+struct TempAnchor {
+  uint16_t k;
+  uint8_t r, g, b;
+};
+
 enum class MusicMode : uint8_t {
   M01 = 0, M02 = 1, M03 = 2, M04 = 3, M05 = 4, M08 = 5, M09 = 6, COUNT = 7
 };
@@ -946,7 +951,7 @@ void loadExtended(){
 
 // -------------------- Light color/render --------------------
 
-struct TempAnchor { uint16_t k; uint8_t r,g,b; };
+
 const TempAnchor TEMP[] PROGMEM = {
   {1800,255,147,41},{2200,255,157,61},{2700,255,170,87},{3000,255,183,114},
   {4000,255,228,206},{5000,255,244,234},{6000,245,249,255},{6500,232,241,255}
