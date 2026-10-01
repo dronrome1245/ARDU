@@ -21,6 +21,7 @@
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
+#include "ardu_esp_v1_types.h"
 
 // ---------------------------------------------------------------------------
 // LOCAL VALUES ONLY. Never commit real credentials to the public repository.
@@ -111,12 +112,6 @@ void handleOptions() {
   addCommonHeaders();
   server.send(204, F("text/plain"), "");
 }
-
-enum JsonRead : uint8_t {
-  JSON_MISSING = 0,
-  JSON_OK = 1,
-  JSON_BAD = 2
-};
 
 int jsonValueStart(const String& input, const char* key) {
   String needle;
@@ -292,13 +287,6 @@ void drainNanoAsync() {
 // ---------------------------------------------------------------------------
 // Compact UART v1
 // ---------------------------------------------------------------------------
-
-struct NanoResult {
-  bool ok = false;
-  bool timedOut = false;
-  uint8_t errorCode = 0;
-  String response;
-};
 
 bool safeRawCommand(const String& command) {
   if (!command.length() || command.length() > Cfg::MAX_COMMAND_LENGTH) return false;
