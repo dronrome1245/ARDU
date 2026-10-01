@@ -23,16 +23,6 @@ jobs:
       - name: Install FastLED
         run: arduino-cli lib install FastLED
 
-      - name: Compile CORE R3 baseline
-        continue-on-error: true
-        run: |
-          arduino-cli compile \
-            --fqbn arduino:avr:nano:cpu=atmega328old \
-            --warnings none \
-            --build-path "$GITHUB_WORKSPACE/build-core-r3" \
-            --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
-            "04_Прошивка/nano_fw10_core_r3"
-
       - name: Compile ARDU Nano v1
         run: |
           arduino-cli compile \
@@ -46,14 +36,10 @@ jobs:
         if: always()
         run: |
           AVR_BIN="$(dirname "$(find "$HOME/.arduino15/packages/arduino/tools/avr-gcc" -type f -name avr-nm | head -n 1)")"
-          for LABEL in core-r3 nano-v1; do
-            if [ "$LABEL" = "core-r3" ]; then DIR="$GITHUB_WORKSPACE/build-core-r3"; else DIR="$GITHUB_WORKSPACE/build-nano-v1"; fi
-            ELF="$(find "$DIR" -name '*.elf' | head -n 1)"
-            echo "=== $LABEL ==="
-            if [ -z "$ELF" ]; then echo "No ELF produced"; continue; fi
-            "$AVR_BIN/avr-size" -A "$ELF" || true
-            echo "--- largest flash/all symbols ---"
-            "$AVR_BIN/avr-nm" -S --size-sort "$ELF" | tail -n 100 || true
-            echo "--- SRAM symbols ---"
-            "$AVR_BIN/avr-nm" -S --size-sort "$ELF" | grep -E ' [BbDd] ' | tail -n 100 || true
-          done
+          ELF="$(find "$GITHUB_WORKSPACE/build-nano-v1" -name '*.elf' | head -n 1)"
+          if [ -z "$ELF" ]; then echo "No ELF produced"; exit 0; fi
+          "$AVR_BIN/avr-size" -A "$ELF" || true
+          echo "--- largest flash/all symbols ---"
+          "$AVR_BIN/avr-nm" -S --size-sort "$ELF" | tail -n 100 || true
+          echo "--- SRAM symbols ---"
+          "$AVR_BIN/avr-nm" -S --size-sort "$ELF" | grep -E ' [BbDd] ' | tail -n 100 || true
