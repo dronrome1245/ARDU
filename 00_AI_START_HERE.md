@@ -123,15 +123,14 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-По решению владельца 2026-10-01 проект переведён в режим финализации v1. Канонический порядок: `FINALIZATION_PLAN.md`.
+Обе финальные release-прошивки v1 собраны и проходят CI. Канонический порядок: `FINALIZATION_PLAN.md` и `RELEASE_V1_UPLOAD_ACCEPTANCE.md`.
 
-1. Не загружать промежуточный CORE R3.
-2. Собрать одну полную Nano v1: L01 + clap/CLAPCAL + RTC/Alarm/Dawn + Night + Ambient + все активные Music ID + persistence + D6/D7 44+44 + регулируемый безопасный current limit.
-3. До физической загрузки выполнить интеграцию, оптимизацию flash/SRAM и заморозить UART v1.
-4. Выполнить один финальный Nano upload с временным разрывом ESP TX→Nano D0.
-5. Затем собрать и один раз OTA-загрузить полный ESP8266 v1 semantic HTTP API.
-6. После firmware freeze завершить Android functional UI, затем дизайн/UX.
-7. После этого подключить второе кольцо, провести силовой тест, потолочный монтаж и финальную приёмку.
+1. Nano release candidate: `04_Прошивка/nano_ardu_v1/nano_ardu_v1.ino` — compile PASS, 28024/30720 flash (91%), 1070/2048 globals (52%).
+2. ESP release candidate: `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino` — compile PASS, RAM 39%, IRAM 92%, IROM 324376 bytes.
+3. Compact numeric Nano↔ESP UART v1 заморожен: `06_Интерфейс_управления/UART_V1.md`.
+4. Следующий этап — один обслуживаемый hardware session: финальный Nano upload → восстановить UART → финальный ESP OTA upload → acceptance.
+5. После PASS прошивки замораживаются и работа переходит к Android functionality/design.
+6. Затем второе кольцо, силовой тест с финальным Class II PSU, потолочный монтаж и release.
 
 
 ## 12. База ColorMusic/FHT
