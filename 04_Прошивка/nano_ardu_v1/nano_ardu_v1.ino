@@ -2089,11 +2089,11 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
       if(n!=1||a[0]>1)return uartErr(UE_RANGE);
       nightCfg.scheduleEnabled=false;nightCfg.manualEnabled=a[0];saveNight();applyMode(SystemMode::NIGHT,true);uartAck(op);return;
     case 51:
-      if(n!=1||a[0]>255)return uartErr(UE_RANGE);nightCfg.hue=a[0];saveNight();(void)reconcileNight(false);uartAck(op);return;
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);nightCfg.hue=a[0];(void)reconcileNight(false);uartAck(op);return;
     case 52:
-      if(n!=1||a[0]>255)return uartErr(UE_RANGE);nightCfg.saturation=a[0];saveNight();(void)reconcileNight(false);uartAck(op);return;
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);nightCfg.saturation=a[0];(void)reconcileNight(false);uartAck(op);return;
     case 53:
-      if(n!=1||a[0]>255)return uartErr(UE_RANGE);nightCfg.brightness=a[0];saveNight();(void)reconcileNight(false);uartAck(op);return;
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);nightCfg.brightness=a[0];(void)reconcileNight(false);uartAck(op);return;
     case 54:
       if(n!=1||a[0]>1)return uartErr(UE_RANGE);
       if(a[0]&&!rtcValidNow())return uartErr(UE_RTC);
@@ -2102,19 +2102,23 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
       if(n!=4||a[0]>23||a[1]>59||a[2]>23||a[3]>59||(a[0]==a[2]&&a[1]==a[3]))return uartErr(UE_RANGE);
       nightCfg.onHour=a[0];nightCfg.onMinute=a[1];nightCfg.offHour=a[2];nightCfg.offMinute=a[3];
       saveNight();if(nightCfg.scheduleEnabled)(void)reconcileNight(false);uartAck(op);return;
+    case 56:
+      if(n)return uartErr(UE_PARSE);saveNight();uartAck(op);return;
     case 60:
       if(n!=1||a[0]>1)return uartErr(UE_RANGE);alarmCfg.enabled=a[0];saveAlarm();uartAck(op);return;
     case 61:
       if(n!=2||a[0]>23||a[1]>59)return uartErr(UE_RANGE);alarmCfg.hour=a[0];alarmCfg.minute=a[1];saveAlarm();uartAck(op);return;
     case 71:stopDawn();uartAck(op);return;
     case 73:
-      if(n!=1||!argRange(a[0],1,120))return uartErr(UE_RANGE);dawnCfg.fadeMinutes=a[0];saveDawnSettings();uartAck(op);return;
+      if(n!=1||!argRange(a[0],1,120))return uartErr(UE_RANGE);dawnCfg.fadeMinutes=a[0];uartAck(op);return;
     case 74:
-      if(n!=1||!argRange(a[0],1,255))return uartErr(UE_RANGE);dawnCfg.maxBrightness=a[0];saveDawnSettings();uartAck(op);return;
+      if(n!=1||!argRange(a[0],1,255))return uartErr(UE_RANGE);dawnCfg.maxBrightness=a[0];uartAck(op);return;
     case 75:
-      if(n!=1||a[0]>255)return uartErr(UE_RANGE);dawnCfg.startHue=a[0];saveDawnSettings();uartAck(op);return;
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);dawnCfg.startHue=a[0];uartAck(op);return;
     case 76:
-      if(n!=1||a[0]>255)return uartErr(UE_RANGE);dawnCfg.endHue=a[0];saveDawnSettings();uartAck(op);return;
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);dawnCfg.endHue=a[0];uartAck(op);return;
+    case 77:
+      if(n)return uartErr(UE_PARSE);saveDawnSettings();uartAck(op);return;
     case 80:
       if(n!=1||a[0]>=static_cast<uint8_t>(MusicMode::COUNT))return uartErr(UE_RANGE);
       extCfg.selectedMusic=static_cast<MusicMode>(a[0]);extCfg.dirty=true;saveExtended();applyMode(SystemMode::MUSIC,true);uartAck(op);return;
