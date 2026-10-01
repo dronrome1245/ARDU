@@ -2027,3 +2027,14 @@ R3 экономит относительно R2:
 - По предыдущему фото S-30-5 имеет металлический корпус и PE-клемму.
 - Финальное решение: S-30-5 оставить для стенда; в потолок установить Class II/double-insulated 230→5 V PSU.
 - Firmware/app work продолжается без блокировки.
+
+
+## 2026-10-01 — full Nano v1 reduced from 142% to 91% flash and CI passed
+
+- Создан `nano_ardu_v1` с полным целевым scope.
+- Первый интеграционный build: 43638/30720 flash (142%), globals 1975/2048 (96%).
+- Выполнен целевой compact refactor без удаления обязательных пользовательских режимов.
+- Основные изменения: compact DS3231 TWI вместо Wire, numeric UART v1, compact two-ring current limiter, compact events/calibration replies.
+- Финальный текущий CI report: 28090/30720 flash (91%), 1070/2048 globals (52%), 978 bytes свободно для stack/locals.
+- GitHub Actions run 15 прошёл SUCCESS.
+- Physical Nano upload ещё не выполнялся; рабочее железо остаётся на FW10 CORE R1.
