@@ -1300,3 +1300,25 @@ R3 не прошивался и не тестировался на железе.
 3. Для финальной ARDU установить Class II / double-insulated 230→5 V PSU достаточной мощности, которому PE не требуется.
 4. N не использовать вместо PE.
 5. Выбор конкретного финального PSU не блокирует сборку firmware/app.
+
+
+---
+
+## D-081 — compact numeric UART v1 frozen; Nano/ESP release candidates ready
+
+**Дата:** 2026-10-01  
+**Статус:** ДЕЙСТВУЕТ
+
+**Решение:**
+1. Внутренний Nano↔ESP контракт v1 заморожен как compact numeric UART, документ `06_Интерфейс_управления/UART_V1.md`.
+2. Телефон не формирует numeric opcodes; только ESP владеет mapping HTTP→UART.
+3. Nano live-preview для L01/Music/Ambient/Night/Dawn не должен изнашивать EEPROM; commit выполняется отдельными save opcodes, где параметр может двигаться slider-ом.
+4. Полные release candidates:
+   - Nano: `nano_ardu_v1`;
+   - ESP: `esp8266_ardu_v1`.
+5. Оба compile gate пройдены; до физической загрузки разрешены только release-blocker fixes.
+6. Следующий этап — один hardware upload/acceptance session; после PASS firmware freeze.
+
+**Compile evidence:**
+- Nano: 28024/30720 flash, 1070/2048 globals.
+- ESP: RAM 31988/80192, IRAM 60823/65536, IROM 324376 bytes.
