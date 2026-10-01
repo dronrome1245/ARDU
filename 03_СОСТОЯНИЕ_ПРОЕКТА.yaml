@@ -2109,3 +2109,38 @@ ceiling_pe_2026_10_01:
     pe_required: false
     power_selection: after_final_current_budget
   blocks_firmware: false
+
+
+nano_ardu_v1_release_candidate_2026_10_01:
+  status: ci_compile_pass
+  path: "04_Прошивка/nano_ardu_v1/nano_ardu_v1.ino"
+  scope_complete:
+    - dual_ring_d6_d7_44_plus_44
+    - l01
+    - clap_runtime
+    - family_clapcal
+    - rtc
+    - night_schedule
+    - alarm_dawn_recovery
+    - ambient_f01_f02_f03
+    - music_m01_m02_m03_m04_m05_m08_m09
+    - persistence
+    - service_current_limit
+  initial_build:
+    flash_bytes: 43638
+    flash_percent: 142
+    globals_bytes: 1975
+    globals_percent: 96
+  compact_build:
+    flash_bytes: 28090
+    flash_total: 30720
+    flash_percent: 91
+    globals_bytes: 1070
+    sram_total: 2048
+    globals_percent: 52
+    free_sram_bytes: 978
+    ci: success
+  physical_uploaded: false
+  physical_nano_current: FW10_CORE_R1
+  uart_v1: compact_numeric_frozen
+  next: build_and_compile_final_esp_v1_before_release_upload_session
