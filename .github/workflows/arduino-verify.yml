@@ -27,6 +27,21 @@ jobs:
         run: |
           arduino-cli compile \
             --fqbn arduino:avr:nano:cpu=atmega328old \
-            --warnings all \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-nano-v1" \
             --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
             "04_Прошивка/nano_ardu_v1"
+
+      - name: Size profile
+        if: always()
+        run: |
+          ELF="$(find "$GITHUB_WORKSPACE/build-nano-v1" -name '*.elf' | head -n 1)"
+          if [ -z "$ELF" ]; then
+            echo "No ELF produced"
+            exit 0
+          fi
+          AVR_BIN="$(dirname "$(find "$HOME/.arduino15/packages/arduino/tools/avr-gcc" -type f -name avr-nm | head -n 1)")"
+          echo "ELF=$ELF"
+          "$AVR_BIN/avr-size" -A "$ELF" || true
+          echo "=== largest symbols ==="
+          "$AVR_BIN/avr-nm" -S --size-sort "$ELF" | tail -n 120 || true
