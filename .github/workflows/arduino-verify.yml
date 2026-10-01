@@ -45,13 +45,15 @@ jobs:
       - name: Size profile
         if: always()
         run: |
-          ELF="$(find "$GITHUB_WORKSPACE/build-nano-v1" -name '*.elf' | head -n 1)"
-          if [ -z "$ELF" ]; then
-            echo "No ELF produced"
-            exit 0
-          fi
           AVR_BIN="$(dirname "$(find "$HOME/.arduino15/packages/arduino/tools/avr-gcc" -type f -name avr-nm | head -n 1)")"
-          echo "ELF=$ELF"
-          "$AVR_BIN/avr-size" -A "$ELF" || true
-          echo "=== largest symbols ==="
-          "$AVR_BIN/avr-nm" -S --size-sort "$ELF" | tail -n 120 || true
+          for LABEL in core-r3 nano-v1; do
+            if [ "$LABEL" = "core-r3" ]; then DIR="$GITHUB_WORKSPACE/build-core-r3"; else DIR="$GITHUB_WORKSPACE/build-nano-v1"; fi
+            ELF="$(find "$DIR" -name '*.elf' | head -n 1)"
+            echo "=== $LABEL ==="
+            if [ -z "$ELF" ]; then echo "No ELF produced"; continue; fi
+            "$AVR_BIN/avr-size" -A "$ELF" || true
+            echo "--- largest flash/all symbols ---"
+            "$AVR_BIN/avr-nm" -S --size-sort "$ELF" | tail -n 100 || true
+            echo "--- SRAM symbols ---"
+            "$AVR_BIN/avr-nm" -S --size-sort "$ELF" | grep -E ' [BbDd] ' | tail -n 100 || true
+          done
