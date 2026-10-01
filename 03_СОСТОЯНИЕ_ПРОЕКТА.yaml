@@ -2144,3 +2144,34 @@ nano_ardu_v1_release_candidate_2026_10_01:
   physical_nano_current: FW10_CORE_R1
   uart_v1: compact_numeric_frozen
   next: build_and_compile_final_esp_v1_before_release_upload_session
+
+
+esp8266_ardu_v1_release_candidate_2026_10_01:
+  status: ci_compile_pass
+  path: "05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino"
+  uart_contract: "06_Интерфейс_управления/UART_V1.md"
+  static_opcode_scan_missing: 0
+  endpoints_complete: true
+  ota: true
+  station_only: true
+  compile:
+    esp8266_core: "3.1.2"
+    ram_bytes: 31988
+    ram_total: 80192
+    ram_percent: 39
+    iram_bytes: 60823
+    iram_total: 65536
+    iram_percent: 92
+    irom_code_bytes: 324376
+  physical_uploaded: false
+  current_physical_esp: HTTP_BRIDGE_R7
+  next: final_release_upload_acceptance
+
+nano_ardu_v1_persistence_refinement_2026_10_01:
+  night_live_preview_opcodes: [51,52,53]
+  night_save_opcode: 56
+  dawn_live_preview_opcodes: [73,74,75,76]
+  dawn_save_opcode: 77
+  compile_flash_bytes: 28024
+  compile_globals_bytes: 1070
+  compile_pass: true
