@@ -19,8 +19,6 @@
 #include <Wire.h>
 #include <EEPROM.h>
 #include <avr/io.h>
-#include <math.h>
-
 #define FHT_N 64
 #define LOG_OUT 1
 #include <FHT.h>
@@ -46,7 +44,7 @@ constexpr uint16_t DEFAULT_CURRENT_LIMIT_MA = 3000;
 constexpr uint16_t MIN_CURRENT_LIMIT_MA = 500;
 constexpr uint16_t HARD_CURRENT_LIMIT_MA = 4500;
 constexpr unsigned long SERIAL_RX_GUARD_MS = 5UL;
-constexpr size_t RX_BUFFER_SIZE = 96;
+constexpr size_t RX_BUFFER_SIZE = 64;
 
 constexpr uint8_t DS3231_ADDR = 0x68;
 constexpr unsigned long RTC_POLL_MS = 250UL;
@@ -299,10 +297,9 @@ struct __attribute__((packed)) ExtendedPersist {
 };
 
 struct VuRuntime {
-  float soundLevel;
-  float filtered;
-  float averageLevel;
-  float maxLevel;
+  uint16_t filtered;
+  uint16_t averageLevel;
+  uint16_t maxLevel;
   uint16_t lastPeak;
   uint16_t rainbowHue10;
   uint8_t pairs;
@@ -310,8 +307,8 @@ struct VuRuntime {
 };
 
 struct BandRuntime {
-  float filtered[BAND_COUNT];
-  float average[BAND_COUNT];
+  uint16_t filtered[BAND_COUNT];
+  uint16_t average[BAND_COUNT];
   uint8_t brightness[BAND_COUNT];
   uint8_t flashMask;
   uint8_t runningMask;
@@ -321,7 +318,7 @@ struct BandRuntime {
 
 struct SpectrumRuntime {
   uint8_t trail[20];
-  float maxFiltered;
+  uint16_t maxFiltered256;
 };
 
 union MusicRuntime {
@@ -950,7 +947,7 @@ void loadExtended(){
 // -------------------- Light color/render --------------------
 
 struct TempAnchor { uint16_t k; uint8_t r,g,b; };
-const TempAnchor TEMP[] = {
+const TempAnchor TEMP[] PROGMEM = {
   {1800,255,147,41},{2200,255,157,61},{2700,255,170,87},{3000,255,183,114},
   {4000,255,228,206},{5000,255,244,234},{6000,245,249,255},{6500,232,241,255}
 };
@@ -963,18 +960,24 @@ uint8_t lerp8(uint8_t a,uint8_t b,uint16_t n,uint16_t d){
   return v<0?0:(v>255?255:static_cast<uint8_t>(v));
 }
 
+TempAnchor tempAnchor(uint8_t i){
+  TempAnchor a;
+  memcpy_P(&a,&TEMP[i],sizeof(a));
+  return a;
+}
+
 CRGB kelvinRgb(uint16_t k){
-  if(k<=TEMP[0].k) return CRGB(TEMP[0].r,TEMP[0].g,TEMP[0].b);
+  TempAnchor a=tempAnchor(0);
+  if(k<=a.k)return CRGB(a.r,a.g,a.b);
   for(uint8_t i=0;i<TEMP_N-1;++i){
-    if(k<=TEMP[i+1].k){
-      const uint16_t n=k-TEMP[i].k, d=TEMP[i+1].k-TEMP[i].k;
-      return CRGB(
-        lerp8(TEMP[i].r,TEMP[i+1].r,n,d),
-        lerp8(TEMP[i].g,TEMP[i+1].g,n,d),
-        lerp8(TEMP[i].b,TEMP[i+1].b,n,d));
+    const TempAnchor b=tempAnchor(i+1);
+    if(k<=b.k){
+      const uint16_t n=k-a.k,d=b.k-a.k;
+      return CRGB(lerp8(a.r,b.r,n,d),lerp8(a.g,b.g,n,d),lerp8(a.b,b.b,n,d));
     }
+    a=b;
   }
-  return CRGB(TEMP[TEMP_N-1].r,TEMP[TEMP_N-1].g,TEMP[TEMP_N-1].b);
+  return CRGB(a.r,a.g,a.b);
 }
 
 CRGB lightColor(){
@@ -1047,8 +1050,6 @@ constexpr uint8_t LOW_BIN_FIRST=2, LOW_BIN_LAST=5;
 constexpr uint8_t MID_BIN_FIRST=6, MID_BIN_LAST=10;
 constexpr uint8_t HIGH_BIN_FIRST=11, HIGH_BIN_LAST=31;
 constexpr unsigned long MUSIC_FRAME_MS=5UL;
-constexpr float MUSIC_AVER_K=0.006f;
-constexpr float MUSIC_MAX_COEF_FREQ=1.2f;
 constexpr uint8_t MUSIC_DECAY_STEP=20;
 constexpr int16_t MIC_DC_MIN=120, MIC_DC_MAX=400;
 
@@ -1107,9 +1108,9 @@ void resetMusicRuntime(){
   memset(&musicRt,0,sizeof(musicRt));
   lastMusicFrameMs=0;
   if(extCfg.selectedMusic==MusicMode::M01 || extCfg.selectedMusic==MusicMode::M02){
-    musicRt.vu.averageLevel=50.0f; musicRt.vu.maxLevel=100.0f;
+    musicRt.vu.averageLevel=50; musicRt.vu.maxLevel=100;
   }else if(extCfg.selectedMusic==MusicMode::M09){
-    musicRt.spectrum.maxFiltered=5.0f;
+    musicRt.spectrum.maxFiltered256=5U*256U;
   }else{
     const uint8_t bg=activeMusicCfg().background;
     for(uint8_t i=0;i<BAND_COUNT;++i) musicRt.band.brightness[i]=bg;
@@ -1153,13 +1154,16 @@ uint8_t bandHue(uint8_t i){
 void updateBandRuntime(){
   musicRt.band.last=readBands();
   const MusicModeSettings& cfg=activeMusicCfg();
-  const float smooth=static_cast<float>(cfg.smooth)/100.0f;
   for(uint8_t i=0;i<BAND_COUNT;++i){
     const uint8_t v=bandValue(musicRt.band.last,i);
-    musicRt.band.average[i]=v*MUSIC_AVER_K+musicRt.band.average[i]*(1.0f-MUSIC_AVER_K);
-    musicRt.band.filtered[i]=v*smooth+musicRt.band.filtered[i]*(1.0f-smooth);
+    const int16_t avgDelta=static_cast<int16_t>(v)-static_cast<int16_t>(musicRt.band.average[i]);
+    musicRt.band.average[i]=static_cast<uint16_t>(static_cast<int16_t>(musicRt.band.average[i])+avgDelta/166);
+    musicRt.band.filtered[i]=static_cast<uint16_t>(
+        (static_cast<uint32_t>(v)*cfg.smooth+
+         static_cast<uint32_t>(musicRt.band.filtered[i])*(100U-cfg.smooth))/100U);
     const bool fire=v>0 &&
-        musicRt.band.filtered[i] > musicRt.band.average[i]*MUSIC_MAX_COEF_FREQ;
+        static_cast<uint32_t>(musicRt.band.filtered[i])*10UL >
+        static_cast<uint32_t>(musicRt.band.average[i])*12UL;
     if(fire){
       musicRt.band.brightness[i]=255;
       musicRt.band.flashMask|=_BV(i);
@@ -1209,25 +1213,27 @@ void updateVu(bool rainbow){
   }
   const uint16_t peak=readVuPeak();
   musicRt.vu.lastPeak=peak;
-  float level=0.0f;
+  uint16_t level=0;
   if(peak>extCfg.vuLowPass && extCfg.vuLowPass<1023){
-    float mapped=(static_cast<float>(peak-extCfg.vuLowPass)*500.0f)/
-        static_cast<float>(1023U-extCfg.vuLowPass);
-    if(mapped<0)mapped=0;if(mapped>500)mapped=500;
-    mapped*=static_cast<float>(cfg.sensitivity)/100.0f;
-    level=pow(mapped,1.4f);
+    level=static_cast<uint16_t>(
+        (static_cast<uint32_t>(peak-extCfg.vuLowPass)*500UL)/
+        static_cast<uint16_t>(1023U-extCfg.vuLowPass));
+    level=static_cast<uint16_t>(static_cast<uint32_t>(level)*cfg.sensitivity/100U);
+    if(level>700)level=700;
   }
-  musicRt.vu.soundLevel=level;
-  const float smooth=static_cast<float>(cfg.smooth)/100.0f;
-  musicRt.vu.filtered=level*smooth+musicRt.vu.filtered*(1.0f-smooth);
-  if(musicRt.vu.filtered>15.0f){
-    musicRt.vu.averageLevel=musicRt.vu.filtered*MUSIC_AVER_K+
-        musicRt.vu.averageLevel*(1.0f-MUSIC_AVER_K);
-    musicRt.vu.maxLevel=musicRt.vu.averageLevel*1.8f;
-    if(musicRt.vu.maxLevel<1.0f)musicRt.vu.maxLevel=1.0f;
-    float ratio=musicRt.vu.filtered/musicRt.vu.maxLevel;
-    if(ratio<0)ratio=0;if(ratio>1)ratio=1;
-    musicRt.vu.pairs=static_cast<uint8_t>(ratio*(Cfg::LED_COUNT/2));
+  musicRt.vu.filtered=static_cast<uint16_t>(
+      (static_cast<uint32_t>(level)*cfg.smooth+
+       static_cast<uint32_t>(musicRt.vu.filtered)*(100U-cfg.smooth))/100U);
+  if(musicRt.vu.filtered>15){
+    const int16_t delta=static_cast<int16_t>(musicRt.vu.filtered)-static_cast<int16_t>(musicRt.vu.averageLevel);
+    musicRt.vu.averageLevel=static_cast<uint16_t>(
+        static_cast<int16_t>(musicRt.vu.averageLevel)+delta/166);
+    musicRt.vu.maxLevel=static_cast<uint16_t>(
+        (static_cast<uint32_t>(musicRt.vu.averageLevel)*18UL)/10UL);
+    if(musicRt.vu.maxLevel<1)musicRt.vu.maxLevel=1;
+    uint32_t pairs=static_cast<uint32_t>(musicRt.vu.filtered)*(Cfg::LED_COUNT/2U)/musicRt.vu.maxLevel;
+    if(pairs>Cfg::LED_COUNT/2U)pairs=Cfg::LED_COUNT/2U;
+    musicRt.vu.pairs=static_cast<uint8_t>(pairs);
   }else musicRt.vu.pairs=0;
   renderVu(rainbow);
 }
@@ -1316,9 +1322,11 @@ void updateSpectrum(){
       musicRt.spectrum.trail[i]=musicRt.spectrum.trail[i]>2?musicRt.spectrum.trail[i]-2:0;
     }
   }
-  musicRt.spectrum.maxFiltered=frameMax*MUSIC_AVER_K+
-      musicRt.spectrum.maxFiltered*(1.0f-MUSIC_AVER_K);
-  if(musicRt.spectrum.maxFiltered<5.0f)musicRt.spectrum.maxFiltered=5.0f;
+  const int32_t target=static_cast<int32_t>(frameMax)*256L;
+  const int32_t delta=target-static_cast<int32_t>(musicRt.spectrum.maxFiltered256);
+  musicRt.spectrum.maxFiltered256=static_cast<uint16_t>(
+      static_cast<int32_t>(musicRt.spectrum.maxFiltered256)+delta/166L);
+  if(musicRt.spectrum.maxFiltered256<5U*256U)musicRt.spectrum.maxFiltered256=5U*256U;
 }
 
 void renderM09(){
@@ -1327,9 +1335,10 @@ void renderM09(){
   for(uint8_t pos=0;pos<half;++pos){
     uint8_t bin=static_cast<uint8_t>((static_cast<uint16_t>(pos)*MUSIC_DISPLAY_BINS)/half);
     if(bin>=MUSIC_DISPLAY_BINS)bin=MUSIC_DISPLAY_BINS-1;
-    float ratio=musicRt.spectrum.trail[bin]/musicRt.spectrum.maxFiltered;
-    if(ratio<0)ratio=0;if(ratio>1)ratio=1;
-    const uint8_t br=static_cast<uint8_t>(ratio*255.0f);
+    uint32_t br32=static_cast<uint32_t>(musicRt.spectrum.trail[bin])*255UL*256UL/
+        musicRt.spectrum.maxFiltered256;
+    if(br32>255)br32=255;
+    const uint8_t br=static_cast<uint8_t>(br32);
     const uint8_t hue=static_cast<uint8_t>(cfg.speed+static_cast<uint16_t>(pos)*cfg.aux);
     const CRGB c=CHSV(hue,255,br);
     leds[half-1-pos]=c;
