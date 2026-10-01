@@ -2056,3 +2056,30 @@ finalization_v1_2026_10_01:
     - final_acceptance
   firmware_freeze_after_acceptance: true
   firmware_revision_after_freeze_only_for_release_blocker: true
+
+
+ceiling_topology_2026_10_01:
+  status: confirmed_by_owner
+  distance_between_housings_m: 2
+  existing_feed:
+    conductors: 2
+    cross_section_mm2: 2.5
+    same_wall_switch: true
+    wall_wiring_accessible: false
+  psu_location: near_ring_a_at_accessible_old_ceiling_light_point
+  controller_location: near_ring_a_with_psu
+  ring_a:
+    data_pin: D6
+    power: local
+  ring_b:
+    data_pin: D7
+    route_length_m_approx: 2
+    new_low_voltage_route: true
+    required_conductors: [plus_5v, gnd, data_d7]
+    data_reference_gnd_required: true
+    preliminary_power_conductor_mm2: ">=1.5"
+  mains_line_used_for_data: false
+  open_safety_gate:
+    - verify_exact_s30_5_input_terminal_marking
+    - verify_pe_fg_requirement
+    - verify_safe_enclosure_and_mains_termination
