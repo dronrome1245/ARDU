@@ -927,8 +927,9 @@ class MainActivity : Activity() {
         val l = snapshot.settings.light
         lightStateText.text =
             "${if (snapshot.status.mode == "light") "Включён" else "Выключен"} • " +
-            "${if (l.colorMode == "kelvin") "${l.kelvin} K" else "RGB ${l.red},${l.green},${l.blue}"} • " +
-            "яркость ${l.brightness} • ${if (l.dirty) "не сохранён" else "сохранён"}"
+            "${if (l.colorMode == "kelvin") "${l.kelvin} K" else "RGB"} • " +
+            "${brightnessPercent(l.brightness)}%" +
+            if (l.dirty) " • изменения не сохранены" else ""
 
         lightBrightnessSeek.progress = l.brightness
         lightKelvinSeek.progress = l.kelvin
