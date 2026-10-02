@@ -2082,3 +2082,15 @@ R3 экономит относительно R2:
 - Скриншот подтверждает, что saved/manual address + LAN mock path работают на реальном телефоне.
 - Mock manual smoke PASS.
 - Следующий software этап до replacement Nano: visual design/UX polish.
+
+
+## 2026-10-02 — Android v1 visual redesign completed
+
+- Rebuilt `activity_main.xml` from engineering prototype into production-oriented dark UI.
+- Added reusable ARDU color palette, card/button/input/navigation drawables and styles.
+- Primary navigation is now fixed at the bottom and always fits the screen.
+- Settings are separated from the five user modes.
+- Added RGB/Hue previews for Light, Ambient, Night and Dawn colors.
+- Added active bottom-tab state and Online/Offline visual status.
+- Version bumped to `0.10-design-v1-rc1`.
+- Final CI after style fix: contract tests PASS; debug APK build PASS.
