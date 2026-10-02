@@ -288,13 +288,12 @@
                             android:text="+" />
                     </LinearLayout>
 
-                    <SeekBar
+                    <com.ardu.app.ui.SmartSliderView
                         android:id="@+id/lightBrightnessSeek"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="58dp"
                         android:layout_marginTop="8dp"
-                        android:max="255"
-                        android:progress="64" />
+                        android:contentDescription="Яркость света" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -319,14 +318,12 @@
                         android:textColor="@color/ardu_text"
                         android:textSize="22sp" />
 
-                    <SeekBar
+                    <com.ardu.app.ui.SmartSliderView
                         android:id="@+id/lightKelvinSeek"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="58dp"
                         android:layout_marginTop="4dp"
-                        android:min="1800"
-                        android:max="6500"
-                        android:progress="2700" />
+                        android:contentDescription="Температура белого света" />
 
                     <TextView
                         style="@style/ARDU.Muted"
