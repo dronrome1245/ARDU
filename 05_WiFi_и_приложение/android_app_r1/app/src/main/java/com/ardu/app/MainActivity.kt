@@ -466,23 +466,23 @@ class MainActivity : Activity() {
 
     private fun updateAmbientPreview() {
         val effect = latestSettings?.ambient?.effect ?: "F01"
-        val saturation = if (effect == "F03") 255 else ambientSaturationSeek.progress
+        val saturation = if (effect == "F03") 255 else ambientSaturationSeek.value()
         setPreview(
             ambientColorPreview,
-            hueColor(ambientHueSeek.progress, saturation, ambientBrightnessSeek.progress)
+            hueColor(ambientHueSeek.value(), saturation, ambientBrightnessSeek.value())
         )
     }
 
     private fun updateNightPreview() {
         setPreview(
             nightColorPreview,
-            hueColor(nightHueSeek.progress, nightSaturationSeek.progress, nightBrightnessSeek.progress)
+            hueColor(nightHueSeek.value(), nightSaturationSeek.value(), nightBrightnessSeek.value())
         )
     }
 
     private fun updateAlarmPreviews() {
-        setPreview(alarmStartPreview, hueColor(alarmStartHueSeek.progress, 255, 255))
-        setPreview(alarmEndPreview, hueColor(alarmEndHueSeek.progress, 255, 255))
+        setPreview(alarmStartPreview, hueColor(alarmStartHueSeek.value(), 255, 255))
+        setPreview(alarmEndPreview, hueColor(alarmEndHueSeek.value(), 255, 255))
     }
 
     private fun hueColor(hue: Int, saturation: Int, brightness: Int): Int =
@@ -852,7 +852,7 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun bindService()    private fun bindService() {
+    private fun bindService() {
         findViewById<Button>(R.id.saveAddressButton).setOnClickListener {
             val raw = addressInput.text.toString().trim()
             val normalized = if (raw.isBlank()) null else {
