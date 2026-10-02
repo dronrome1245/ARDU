@@ -21,7 +21,8 @@ class SmartSliderView @JvmOverloads constructor(
     enum class VisualMode {
         ACCENT,
         BRIGHTNESS,
-        KELVIN
+        KELVIN,
+        HUE
     }
 
     private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -103,11 +104,13 @@ class SmartSliderView @JvmOverloads constructor(
             VisualMode.ACCENT -> drawAccentTrack(canvas, track, radius)
             VisualMode.BRIGHTNESS -> drawBrightnessTrack(canvas, track, radius)
             VisualMode.KELVIN -> drawKelvinTrack(canvas, track, radius)
+            VisualMode.HUE -> drawHueTrack(canvas, track, radius)
         }
 
         val thumbX = xForValue(currentValue, left, right)
         thumbPaint.color = when (visualMode) {
             VisualMode.KELVIN -> kelvinColor(currentValue)
+            VisualMode.HUE -> hueColor(currentValue)
             VisualMode.BRIGHTNESS -> Color.rgb(93, 226, 197)
             VisualMode.ACCENT -> Color.rgb(93, 226, 197)
         }
@@ -186,6 +189,25 @@ class SmartSliderView @JvmOverloads constructor(
         trackPaint.shader = null
     }
 
+    private fun drawHueTrack(canvas: Canvas, track: RectF, radius: Float) {
+        trackPaint.shader = LinearGradient(
+            track.left, 0f, track.right, 0f,
+            intArrayOf(
+                Color.RED,
+                Color.YELLOW,
+                Color.GREEN,
+                Color.CYAN,
+                Color.BLUE,
+                Color.MAGENTA,
+                Color.RED
+            ),
+            null,
+            Shader.TileMode.CLAMP
+        )
+        canvas.drawRoundRect(track, radius, radius, trackPaint)
+        trackPaint.shader = null
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
@@ -239,6 +261,12 @@ class SmartSliderView @JvmOverloads constructor(
         left + (right - left) *
             ((value - minimumValue).toFloat() / (maximumValue - minimumValue).toFloat())
                 .coerceIn(0f, 1f)
+
+    private fun hueColor(value: Int): Int {
+        val fraction = ((value - minimumValue).toFloat() /
+            (maximumValue - minimumValue).toFloat()).coerceIn(0f, 1f)
+        return Color.HSVToColor(floatArrayOf(fraction * 360f, 1f, 1f))
+    }
 
     private fun kelvinColor(kelvin: Int): Int {
         val fraction = ((kelvin - minimumValue).toFloat() /
