@@ -1,0 +1,33 @@
+name: Mock ESP Verify
+
+on:
+  push:
+    paths:
+      - "05_WiFi_и_приложение/mock_esp_v1/**"
+      - ".github/workflows/mock-esp-verify.yml"
+  workflow_dispatch:
+
+jobs:
+  mock-esp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Python syntax
+        run: python -m py_compile "05_WiFi_и_приложение/mock_esp_v1/mock_esp_v1.py"
+
+      - name: HTTP smoke
+        shell: bash
+        run: |
+          python "05_WiFi_и_приложение/mock_esp_v1/mock_esp_v1.py" --host 127.0.0.1 --port 18080 > /tmp/ardu-mock.log 2>&1 &
+          PID=$!
+          trap 'kill $PID || true' EXIT
+          sleep 1
+          curl -fsS http://127.0.0.1:18080/api/ping | python -c 'import json,sys; d=json.load(sys.stdin); assert d["ok"] and d["fw"]=="ARDU_ESP_V1_MOCK"'
+          curl -fsS http://127.0.0.1:18080/api/settings | python -c 'import json,sys; d=json.load(sys.stdin); assert d["schema"]==1 and "M09" in d["music"]["modes"]'
+          curl -fsS -X POST http://127.0.0.1:18080/api/music/mode -H 'Content-Type: application/json' -d '{"id":"M08"}' | python -c 'import json,sys; assert json.load(sys.stdin)["applied"]'
+          curl -fsS http://127.0.0.1:18080/api/settings | python -c 'import json,sys; d=json.load(sys.stdin); assert d["mode"]=="music" and d["music"]["selected"]=="M08"'
