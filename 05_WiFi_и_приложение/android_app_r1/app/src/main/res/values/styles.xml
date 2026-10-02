@@ -14,37 +14,37 @@
         <item name="android:editTextStyle">@style/Widget.ARDU.EditText</item>
     </style>
 
-    <style name="ARDU.Card">
+    <style name="ARDU.Card" parent="">
         <item name="android:background">@drawable/ardu_card</item>
         <item name="android:padding">18dp</item>
         <item name="android:layout_marginTop">12dp</item>
     </style>
 
-    <style name="ARDU.SectionTitle">
+    <style name="ARDU.SectionTitle" parent="">
         <item name="android:textColor">@color/ardu_text</item>
         <item name="android:textSize">26sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="ARDU.CardTitle">
+    <style name="ARDU.CardTitle" parent="">
         <item name="android:textColor">@color/ardu_text</item>
         <item name="android:textSize">17sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="ARDU.Label">
+    <style name="ARDU.Label" parent="">
         <item name="android:textColor">@color/ardu_text_secondary</item>
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="ARDU.Value">
+    <style name="ARDU.Value" parent="">
         <item name="android:textColor">@color/ardu_text</item>
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="ARDU.Muted">
+    <style name="ARDU.Muted" parent="">
         <item name="android:textColor">@color/ardu_text_muted</item>
         <item name="android:textSize">13sp</item>
     </style>
