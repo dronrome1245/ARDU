@@ -413,6 +413,13 @@ class MainActivity : Activity() {
     }
 
     private fun bindMusic() {
+        findViewById<Button>(R.id.musicOnButton).setOnClickListener {
+            runDeviceAction("Включение светомузыки") { api.setMode("music") }
+        }
+        findViewById<Button>(R.id.musicOffButton).setOnClickListener {
+            runDeviceAction("Выключение светомузыки") { api.setMode("off") }
+        }
+
         val names = mapOf(
             "M01" to "M01 VU",
             "M02" to "M02 Радуга",
@@ -507,6 +514,12 @@ class MainActivity : Activity() {
     }
 
     private fun bindAmbient() {
+        findViewById<Button>(R.id.ambientOnButton).setOnClickListener {
+            runDeviceAction("Включение фона") { api.setMode("ambient") }
+        }
+        findViewById<Button>(R.id.ambientOffButton).setOnClickListener {
+            runDeviceAction("Выключение фона") { api.setMode("off") }
+        }
         findViewById<Button>(R.id.ambientF01Button).setOnClickListener { setAmbientEffect("F01") }
         findViewById<Button>(R.id.ambientF02Button).setOnClickListener { setAmbientEffect("F02") }
         findViewById<Button>(R.id.ambientF03Button).setOnClickListener { setAmbientEffect("F03") }
