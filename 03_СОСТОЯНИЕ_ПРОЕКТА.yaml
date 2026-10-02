@@ -2175,3 +2175,30 @@ nano_ardu_v1_persistence_refinement_2026_10_01:
   compile_flash_bytes: 28024
   compile_globals_bytes: 1070
   compile_pass: true
+
+
+android_functional_v1_2026_10_02:
+  version: "0.9-functional-v1-rc1"
+  final_http_api: true
+  sections:
+    light: implemented
+    music: implemented
+    ambient: implemented
+    night: implemented
+    alarm_dawn: implemented
+  clap_calibration_wizard: implemented
+  rtc_sync: implemented
+  events: implemented
+  current_limit: implemented
+  developer_numeric_uart: implemented
+  saved_manual_address: implemented
+  mock_esp_contract_tests: pass
+  debug_apk_ci: pass
+  physical_end_to_end: pending
+
+nano_final_upload_blocker_2026_10_02:
+  owner_reported_upload_failure: true
+  replacement_nano_ordered: true
+  old_board_root_cause: unknown
+  firmware_source_change_required: false
+  next_after_replacement: final_release_upload_acceptance
