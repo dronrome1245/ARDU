@@ -128,9 +128,10 @@ ARDU — проект двух синхронных круглых потоло�
 1. Nano release candidate: `04_Прошивка/nano_ardu_v1/nano_ardu_v1.ino` — compile PASS, 28024/30720 flash (91%), 1070/2048 globals (52%).
 2. ESP release candidate: `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino` — compile PASS, RAM 39%, IRAM 92%, IROM 324376 bytes.
 3. Compact numeric Nano↔ESP UART v1 заморожен: `06_Интерфейс_управления/UART_V1.md`.
-4. Следующий этап — один обслуживаемый hardware session: финальный Nano upload → восстановить UART → финальный ESP OTA upload → acceptance.
-5. После PASS прошивки замораживаются и работа переходит к Android functionality/design.
-6. Затем второе кольцо, силовой тест с финальным Class II PSU, потолочный монтаж и release.
+4. **ФАКТ 2026-10-02:** текущая физическая Nano не принимает final upload; владелец заказал замену. Точная причина неисправности старой платы не подтверждена.
+5. Пока новая Nano в пути, Android functional v1 доведён до source/CI release candidate: `0.9-functional-v1-rc1`, contract tests + debug APK build PASS.
+6. Следующий physical gate после прихода платы: финальный Nano upload → восстановить UART → финальный ESP OTA → firmware acceptance → Android end-to-end acceptance.
+7. После PASS — Android design/UX polish, второе кольцо, силовой тест с финальным Class II PSU, потолочный монтаж и release.
 
 
 ## 12. База ColorMusic/FHT
