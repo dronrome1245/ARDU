@@ -161,3 +161,28 @@ No firmware/API changes.
 CI at final source commit:
 - API contract tests PASS;
 - debug APK build PASS.
+
+
+## Owner-approved final UI RC — 2026-10-03
+
+Current version: `0.14-ios-homehub-focus-rc1`.
+
+Final direction selected by owner from the UI concept boards:
+**Home Hub + Focus Dial**, mint-dark.
+
+New native UI components:
+- `ui/FocusDialView.kt`;
+- `ui/RoomHeroView.kt`.
+
+Light tab now opens a Home Hub overview and then a Focus Dial detail view. Other normal user tabs receive contextual room hero cards while preserving the complete v1 functionality implemented earlier.
+
+No firmware/API changes and no third-party UI dependency.
+
+Final CI:
+- static layout IDs: clean;
+- `testDebugUnitTest`: PASS;
+- `assembleDebug`: PASS;
+- Actions run: `37062432020`.
+
+Phone/mock check:
+`git pull` → run stateful ESP mock → reinstall/run Android → visually review Home Hub overview, Focus Dial detail and contextual heroes.
