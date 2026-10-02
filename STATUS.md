@@ -1636,3 +1636,13 @@
 - Android debug APK build PASS в GitHub Actions.
 - Physical Android end-to-end test отложен до final Nano+ESP uploads.
 - Acceptance plan: `05_WiFi_и_приложение/ANDROID_V1_FUNCTIONAL_TEST.md`.
+
+
+### 2026-10-02 — stateful ESP v1 mock ready for pre-hardware Android testing
+
+- Создан `05_WiFi_и_приложение/mock_esp_v1/mock_esp_v1.py`.
+- Mock использует только Python stdlib и поднимает stateful final HTTP API на PC.
+- Android-телефон может подключаться к `<PC_LAN_IP>:8080` через manual address.
+- Симулируются Light/Music/Ambient/Night/Alarm, clap calibration, audio calibration, current limit, events и numeric Developer UART.
+- Это только UI/API test double; LED/FHT/RTC/electrical behavior он не подтверждает.
+- Mock ESP Verify CI: Python syntax + HTTP/state smoke PASS.
