@@ -1,0 +1,25 @@
+name: Android Verify
+
+on:
+  push:
+    paths:
+      - "05_WiFi_и_приложение/android_app_r1/**"
+      - ".github/workflows/android-verify.yml"
+  workflow_dispatch:
+
+jobs:
+  android-debug:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "05_WiFi_и_приложение/android_app_r1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Build debug APK
+        run: bash ./gradlew --no-daemon assembleDebug
