@@ -578,3 +578,24 @@ App strategy должна поддерживать:
 
 ### Следующий gate
 Никаких новых feature layers до загрузки. Выполнить `RELEASE_V1_UPLOAD_ACCEPTANCE.md`, затем firmware freeze и переход к Android.
+
+
+## 14. Parallel Android checkpoint — 2026-10-02
+
+Physical Nano final upload временно заблокирован текущей платой; replacement Nano заказана владельцем.
+
+До её прихода без изменения frozen firmware/API выполнено:
+- Android final API client;
+- все 5 functional sections;
+- clap calibration wizard;
+- connection persistence/manual address;
+- service/events/current-limit/numeric developer tools;
+- JVM mock-ESP contract tests;
+- debug APK CI build.
+
+Android functional RC: `0.9-functional-v1-rc1`.
+
+После новой Nano:
+1. `RELEASE_V1_UPLOAD_ACCEPTANCE.md`;
+2. `05_WiFi_и_приложение/ANDROID_V1_FUNCTIONAL_TEST.md`;
+3. только после end-to-end PASS — Android visual design/UX polish.
