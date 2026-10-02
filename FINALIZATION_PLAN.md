@@ -599,3 +599,14 @@ Android functional RC: `0.9-functional-v1-rc1`.
 1. `RELEASE_V1_UPLOAD_ACCEPTANCE.md`;
 2. `05_WiFi_и_приложение/ANDROID_V1_FUNCTIONAL_TEST.md`;
 3. только после end-to-end PASS — Android visual design/UX polish.
+
+
+## 15. Android design checkpoint — 2026-10-02
+
+Android visual/UX polish was completed early while replacement Nano is in transit.
+
+Release candidate: `0.10-design-v1-rc1`.
+
+CI: contract tests PASS + debug APK PASS.
+
+This does not advance hardware acceptance. When replacement Nano arrives, continue directly with final Nano/ESP upload acceptance and Android end-to-end test; only release-blocker UI/API issues justify further functional changes.
