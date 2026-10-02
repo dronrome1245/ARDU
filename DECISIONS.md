@@ -1322,3 +1322,22 @@ R3 не прошивался и не тестировался на железе.
 **Compile evidence:**
 - Nano: 28024/30720 flash, 1070/2048 globals.
 - ESP: RAM 31988/80192, IRAM 60823/65536, IROM 324376 bytes.
+
+
+---
+
+## D-082 — Android v1 navigation and visual system
+
+**Дата:** 2026-10-02  
+**Статус:** ДЕЙСТВУЕТ
+
+**Решение:**
+1. Android v1 uses a dark low-glare UI suitable for a lighting controller.
+2. The five normal user sections are always available through fixed bottom navigation: Light, Music, Ambient, Night, Alarm.
+3. Primary navigation must not require horizontal scrolling.
+4. Settings/diagnostics are outside the five user sections and open from the header.
+5. Controls are grouped into cards by task; Developer Mode remains nested under Settings.
+6. Color-related controls show a local visual preview; the Nano remains the source of truth for actual device state.
+7. This is presentation/UX only and does not change HTTP or UART v1 contracts.
+
+**Implementation:** Android `0.10-design-v1-rc1`.
