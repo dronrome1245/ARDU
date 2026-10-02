@@ -21,5 +21,8 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Unit contract tests
+        run: bash ./gradlew --no-daemon testDebugUnitTest
+
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
