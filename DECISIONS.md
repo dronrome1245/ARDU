@@ -1341,3 +1341,28 @@ R3 не прошивался и не тестировался на железе.
 7. This is presentation/UX only and does not change HTTP or UART v1 contracts.
 
 **Implementation:** Android `0.10-design-v1-rc1`.
+
+
+---
+
+## D-083 — Smart-home interaction model for Android Light v1
+
+**Дата:** 2026-10-02  
+**Статус:** ДЕЙСТВУЕТ
+
+**Контекст:** владелец подтвердил общий dark style v0.10, но указал, что header/status занимает слишком много экрана, а пользовательские настройки не должны выглядеть как просто набор усиленных sliders.
+
+**Решение:**
+1. Primary header compact: connection + mode + RTC + small Refresh/Settings actions.
+2. Technical firmware/RSSI details live in Settings/diagnostics, not in the everyday header.
+3. Primary Light interactions use smart-home patterns:
+   - quick scenes;
+   - direct power action;
+   - percentage/step brightness controls;
+   - touch color wheel.
+4. Raw/fine sliders may remain, but as secondary precision controls rather than the main interaction.
+5. Precise RGB sliders are collapsed by default.
+6. Scene composition happens in Android through existing semantic API calls; no new firmware/API contract is introduced.
+7. Apply the same interaction language to other sections only after owner visual approval of the Light screen.
+
+**Implementation:** Android `0.11-home-ui-rc1`.
