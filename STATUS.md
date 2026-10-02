@@ -1662,3 +1662,22 @@
 - Это закрывает manual UI/API smoke для mock path.
 - Реальный hardware end-to-end остаётся pending до replacement Nano + final Nano/ESP uploads.
 - Пока replacement Nano в пути следующий software этап: Android design/UX polish без изменения frozen firmware/API.
+
+
+### 2026-10-02 — Android design/UX v1 RC implemented
+
+- Android version: `0.10-design-v1-rc1`.
+- Functional API layer unchanged; frozen firmware/HTTP/UART contracts were not modified.
+- Engineering prototype UI replaced by dark user-oriented UI:
+  - fixed bottom navigation for 5 main sections: Light / Music / Ambient / Night / Alarm;
+  - no horizontal scrolling for primary navigation;
+  - Settings moved to a separate header action;
+  - status/header card with connection, current semantic mode and RTC time;
+  - grouped settings cards with clearer hierarchy;
+  - primary/secondary action styling;
+  - live RGB/Hue color previews;
+  - Developer Mode visually isolated inside Settings.
+- Manual-address/mock workflow remains supported.
+- Static ID scan: missing/duplicate layout IDs = NONE.
+- GitHub Actions after redesign: JVM API contract tests PASS + debug APK build PASS.
+- Physical visual/UX smoke on owner phone is next software check; real end-to-end remains blocked only by replacement Nano/final firmware upload.
