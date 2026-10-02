@@ -2073,3 +2073,12 @@ R3 экономит относительно R2:
 - Mock stateful: semantic writes меняют settings/status, clap wizard и service endpoints работают без hardware.
 - Отдельный GitHub Actions workflow проверяет syntax, ping/settings и stateful Music write/reread.
 - Mock ESP Verify PASS.
+
+
+## 2026-10-02 — Android functional RC manually connected to stateful ESP mock
+
+- Владелец запустил stateful `ARDU_ESP_V1_MOCK` и Android app на физическом телефоне.
+- Приложение успешно показало Online, firmware mock, semantic current mode, RTC time и раздел Alarm/Dawn.
+- Скриншот подтверждает, что saved/manual address + LAN mock path работают на реальном телефоне.
+- Mock manual smoke PASS.
+- Следующий software этап до replacement Nano: visual design/UX polish.
