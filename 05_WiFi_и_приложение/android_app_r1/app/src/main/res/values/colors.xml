@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ardu_bg">#0B0E12</color>
+    <color name="ardu_surface">#15191F</color>
+    <color name="ardu_surface_alt">#1C222A</color>
+    <color name="ardu_surface_pressed">#252C35</color>
+    <color name="ardu_border">#2A323D</color>
+    <color name="ardu_text">#F4F7FA</color>
+    <color name="ardu_text_secondary">#AAB4C0</color>
+    <color name="ardu_text_muted">#74808D</color>
+    <color name="ardu_accent">#5DE2C5</color>
+    <color name="ardu_accent_dark">#123C35</color>
+    <color name="ardu_accent_pressed">#44CDAF</color>
+    <color name="ardu_on_accent">#071411</color>
+    <color name="ardu_success">#71E6A0</color>
+    <color name="ardu_warning">#F3C969</color>
+    <color name="ardu_danger">#FF7A84</color>
+</resources>
