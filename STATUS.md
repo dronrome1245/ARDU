@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.12-smart-slider-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Пока замена в пути Android доведён до full functional + smart-home UI: compact header, five-section bottom navigation, Light scenes, brightness steps, color wheel и custom semantic sliders. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.13-smart-home-tabs-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Android теперь имеет единый smart-home UI на Light/Music/Ambient/Night/Alarm: compact header, fixed navigation, scenes/color wheel, semantic sliders, selected-state mode cards, compact icon actions и выровненную типографику. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1727,4 +1727,37 @@
 - Component is reusable for Music/Ambient/Night/Alarm after owner visual approval.
 - Android version: `0.12-smart-slider-rc1`.
 - Final GitHub Actions run: contract tests PASS + debug APK build PASS.
+- Firmware/API contract unchanged.
+
+
+### 2026-10-02 — smart-home interaction language propagated to all user tabs
+
+- **ФАКТ ПО OWNER SCREENSHOT/FEEDBACK:** Light v0.12 visual direction accepted; owner explicitly asked to propagate it to other tabs, tune font sizes and use icons where text is redundant.
+- Android version: `0.13-smart-home-tabs-rc1`.
+- Music:
+  - all primary sliders replaced by `SmartSliderView`;
+  - brightness/background use brightness semantics;
+  - smoothing/sensitivity/speed use neutral accent semantics;
+  - M09 hue uses rainbow slider;
+  - mode buttons use selected-state smart cards;
+  - submode selection gets selected state;
+  - power actions reduced to compact ▶ / ■.
+- Ambient:
+  - Hue uses rainbow smart slider;
+  - saturation/speed/period use accent smart sliders;
+  - brightness uses brightness smart slider;
+  - F01/F02/F03 show selected state;
+  - compact ▶ / ■ power actions.
+- Night:
+  - Hue/saturation/brightness converted to semantic smart sliders;
+  - schedule retained as compact functional card.
+- Alarm/Dawn:
+  - fade, max brightness, start/end hue use smart sliders;
+  - hue sliders are rainbow-semantic;
+  - save time uses compact ✓ action;
+  - RTC sync and STOP Dawn labels shortened.
+- Typography scale normalized: section 24sp, card 16sp, values 15sp, secondary labels/buttons 13sp.
+- Stock `SeekBar` remains only in collapsed precise RGB service controls and service current-limit; no stock SeekBar remains in primary normal-user controls.
+- During refactor static ID validation caught an over-broad XML replacement; layout was restored from clean v0.12 and reapplied safely. Final ID scan: missing NONE, duplicates NONE.
+- GitHub Actions final run `37056022090`: contract tests PASS + debug APK build PASS.
 - Firmware/API contract unchanged.
