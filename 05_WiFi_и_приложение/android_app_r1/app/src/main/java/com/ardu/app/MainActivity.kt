@@ -1019,43 +1019,50 @@ class MainActivity : Activity() {
     private fun renderMusic(settings: ArduSettings) {
         val id = settings.music.selected
         val cfg = settings.music.modes[id] ?: return
-        musicModeText.text = "Режим: $id"
-        musicBrightnessSeek.progress = cfg.brightness
-        musicBackgroundSeek.progress = cfg.backgroundBrightness
-        musicSmoothingSeek.progress = cfg.smoothing.coerceIn(5, 100)
-        musicSensitivitySeek.progress = cfg.sensitivity.coerceIn(50, 200)
-        musicSpeedSeek.progress = cfg.speed.coerceIn(1, 255)
 
-        musicBrightnessText.text = "Яркость эффекта: ${cfg.brightness}"
-        musicBackgroundText.text = "Фоновая яркость: ${cfg.backgroundBrightness}"
-        musicSmoothingText.text = "Плавность: ${cfg.smoothing}"
-        musicSensitivityText.text = "Чувствительность: ${cfg.sensitivity}"
-        musicSpeedText.text = "Скорость: ${cfg.speed}"
+        musicModeText.text = musicModeTitle(id)
+        musicModeButtonMap.forEach { (modeId, button) ->
+            setChoiceState(button, modeId == id)
+        }
+
+        musicBrightnessSeek.setValue(cfg.brightness)
+        musicBackgroundSeek.setValue(cfg.backgroundBrightness)
+        musicSmoothingSeek.setValue(cfg.smoothing.coerceIn(5, 100))
+        musicSensitivitySeek.setValue(cfg.sensitivity.coerceIn(50, 200))
+        musicSpeedSeek.setValue(cfg.speed.coerceIn(1, 255))
+
+        musicBrightnessText.text = "Эффект • ${brightnessPercent(cfg.brightness)}%"
+        musicBackgroundText.text = "Фон • ${brightnessPercent(cfg.backgroundBrightness)}%"
+        musicSmoothingText.text = "Плавность • ${cfg.smoothing}"
+        musicSensitivityText.text = "Чувствительность • ${cfg.sensitivity}"
+        musicSpeedText.text = "Скорость • ${cfg.speed}"
 
         updateMusicVisibility(id)
 
+        musicSubmodeButtonMap.forEach { (submode, button) ->
+            setChoiceState(button, submode == cfg.submode)
+        }
+
         when (id) {
             "M02" -> {
-                musicAuxSeek.min = 5
-                musicAuxSeek.max = 200
-                musicAuxSeek.progress = cfg.aux.coerceIn(5, 200)
+                musicAuxSeek.configure(5, 200, SmartSliderView.VisualMode.ACCENT)
+                musicAuxSeek.setValue(cfg.aux.coerceIn(5, 200))
             }
             "M09" -> {
-                musicAuxSeek.min = 1
-                musicAuxSeek.max = 255
-                musicAuxSeek.progress = cfg.aux.coerceIn(1, 255)
-                musicHueStartSeek.progress = cfg.speed.coerceIn(0, 255)
-                musicHueStartText.text = "Начальный цвет: ${cfg.speed}"
+                musicAuxSeek.configure(1, 255, SmartSliderView.VisualMode.ACCENT)
+                musicAuxSeek.setValue(cfg.aux.coerceIn(1, 255))
+                musicHueStartSeek.setValue(cfg.speed.coerceIn(0, 255))
+                musicHueStartText.text = "Цвет • ${cfg.speed}"
             }
         }
-        updateMusicAuxLabel(musicAuxSeek.progress)
+        updateMusicAuxLabel(musicAuxSeek.value())
 
         val sys = settings.system
         musicCalibrationText.text =
             if (sys.audioCalibrated) {
-                "Калибровано: DC=${sys.micDc}, VU=${sys.vuLowPass}, Spectrum=${sys.spectrumLowPass}"
+                "DC ${sys.micDc} • VU ${sys.vuLowPass} • Spectrum ${sys.spectrumLowPass}"
             } else {
-                "Микрофон ещё не откалиброван"
+                "Микрофон не откалиброван"
             }
     }
 
@@ -1074,27 +1081,33 @@ class MainActivity : Activity() {
     private fun renderAmbient(settings: ArduSettings) {
         val a = settings.ambient
         val cfg = a.effects[a.effect] ?: return
-        ambientEffectText.text = "Эффект: ${a.effect}"
-        ambientHueSeek.progress = cfg.hue
-        ambientBrightnessSeek.progress = cfg.brightness
-        ambientHueText.text = "Цвет: ${cfg.hue}"
-        ambientBrightnessText.text = "Яркость: ${cfg.brightness}"
+
+        ambientEffectText.text = ambientEffectTitle(a.effect)
+        ambientEffectButtonMap.forEach { (id, button) ->
+            setChoiceState(button, id == a.effect)
+        }
+
+        ambientHueSeek.setValue(cfg.hue)
+        ambientBrightnessSeek.setValue(cfg.brightness)
+        ambientHueText.text = "Цвет • ${cfg.hue}"
+        ambientBrightnessText.text = "Яркость • ${brightnessPercent(cfg.brightness)}%"
 
         cfg.saturation?.let {
-            ambientSaturationSeek.progress = it
-            ambientSaturationText.text = "Насыщенность: $it"
+            ambientSaturationSeek.setValue(it)
+            ambientSaturationText.text = "Насыщенность • ${brightnessPercent(it)}%"
         }
         cfg.speed?.let {
-            ambientSpeedSeek.progress = it.coerceIn(1, 255)
-            ambientSpeedText.text = "Скорость: $it"
+            ambientSpeedSeek.setValue(it.coerceIn(1, 255))
+            ambientSpeedText.text = "Скорость • $it"
         }
         cfg.rainbowStep?.let {
-            ambientRainbowSeek.progress = (it * 10.0).toInt().coerceIn(5, 100)
-            ambientRainbowText.text = String.format(Locale.US, "Шаг радуги: %.1f", it)
+            ambientRainbowSeek.setValue((it * 10.0).toInt().coerceIn(5, 100))
+            ambientRainbowText.text = String.format(Locale.US, "Шаг • %.1f", it)
         }
+
         ambientAutoSwitch.isChecked = a.autoCycle
-        ambientPeriodSeek.progress = a.autoPeriodSec
-        ambientPeriodText.text = "Период: ${a.autoPeriodSec} с"
+        ambientPeriodSeek.setValue(a.autoPeriodSec)
+        ambientPeriodText.text = "Период • ${a.autoPeriodSec} с"
 
         ambientSaturationGroup.visibility = if (a.effect == "F03") View.GONE else View.VISIBLE
         ambientSpeedGroup.visibility = if (a.effect == "F01") View.GONE else View.VISIBLE
@@ -1104,37 +1117,41 @@ class MainActivity : Activity() {
 
     private fun renderNight(settings: ArduSettings) {
         val n = settings.night
+
         nightEnabledSwitch.isChecked = n.enabled
-        nightHueSeek.progress = n.hue
-        nightSaturationSeek.progress = n.saturation
-        nightBrightnessSeek.progress = n.brightness
+        nightHueSeek.setValue(n.hue)
+        nightSaturationSeek.setValue(n.saturation)
+        nightBrightnessSeek.setValue(n.brightness)
         nightScheduleSwitch.isChecked = n.scheduleEnabled
         nightOnInput.setText(n.scheduleOn)
         nightOffInput.setText(n.scheduleOff)
-        nightHueText.text = "Цвет: ${n.hue}"
-        nightSaturationText.text = "Насыщенность: ${n.saturation}"
-        nightBrightnessText.text = "Яркость: ${n.brightness}"
+
+        nightHueText.text = "Цвет • ${n.hue}"
+        nightSaturationText.text = "Насыщенность • ${brightnessPercent(n.saturation)}%"
+        nightBrightnessText.text = "Яркость • ${brightnessPercent(n.brightness)}%"
         updateNightPreview()
     }
 
     private fun renderAlarm(settings: ArduSettings) {
         val a = settings.alarm
+
         alarmEnabledSwitch.isChecked = a.enabled
-        alarmHourInput.setText(a.hour.toString())
-        alarmMinuteInput.setText(a.minute.toString())
-        alarmFadeSeek.progress = a.fadeMinutes
-        alarmBrightnessSeek.progress = a.maxBrightness
-        alarmStartHueSeek.progress = a.startHue
-        alarmEndHueSeek.progress = a.endHue
-        alarmFadeText.text = "Рассвет: ${a.fadeMinutes} мин"
-        alarmBrightnessText.text = "Макс. яркость: ${a.maxBrightness}"
-        alarmStartHueText.text = "Начальный цвет: ${a.startHue}"
-        alarmEndHueText.text = "Конечный цвет: ${a.endHue}"
+        alarmHourInput.setText(a.hour.toString().padStart(2, '0'))
+        alarmMinuteInput.setText(a.minute.toString().padStart(2, '0'))
+        alarmFadeSeek.setValue(a.fadeMinutes)
+        alarmBrightnessSeek.setValue(a.maxBrightness)
+        alarmStartHueSeek.setValue(a.startHue)
+        alarmEndHueSeek.setValue(a.endHue)
+
+        alarmFadeText.text = "${a.fadeMinutes} мин"
+        alarmBrightnessText.text = "${brightnessPercent(a.maxBrightness)}%"
+        alarmStartHueText.text = "Начало • ${a.startHue}"
+        alarmEndHueText.text = "Финиш • ${a.endHue}"
         alarmStateText.text =
-            "Будильник ${if (a.enabled) "включён" else "выключен"} • " +
+            "${if (a.enabled) "Включён" else "Выключен"} • " +
             String.format(Locale.US, "%02d:%02d", a.hour, a.minute) +
-            " • рассвет ${a.dawnPhase}" +
-            if (a.recovered) " • восстановлен после reset" else ""
+            if (a.dawnPhase != "idle") " • ${a.dawnPhase}" else ""
+
         updateAlarmPreviews()
     }
 
@@ -1157,6 +1174,31 @@ class MainActivity : Activity() {
             appendLine("Audio: ${if (sys.audioCalibrated) "CALIBRATED" else "NOT CALIBRATED"}")
             append("Uptime: ${status.uptimeMs} ms")
         }
+    }
+
+    private fun musicModeTitle(id: String): String = when (id) {
+        "M01" -> "VU градиент"
+        "M02" -> "VU радуга"
+        "M03" -> "5 полос"
+        "M04" -> "3 полосы"
+        "M05" -> "Частота"
+        "M08" -> "Бегущие частоты"
+        "M09" -> "Спектр"
+        else -> id
+    }
+
+    private fun ambientEffectTitle(id: String): String = when (id) {
+        "F01" -> "Постоянный цвет"
+        "F02" -> "Плавная смена"
+        "F03" -> "Бегущая радуга"
+        else -> id
+    }
+
+    private fun setChoiceState(button: Button, selected: Boolean) {
+        button.isSelected = selected
+        button.setTextColor(
+            getColor(if (selected) R.color.ardu_accent else R.color.ardu_text)
+        )
     }
 
     private fun modeTitle(mode: String): String = when (mode) {
