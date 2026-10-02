@@ -2133,3 +2133,16 @@ R3 экономит относительно R2:
 - Final layout validation: missing IDs = 0; duplicate IDs = 0.
 - Version = `0.13-smart-home-tabs-rc1`.
 - Final CI run 37056022090: unit contract tests PASS, debug APK build PASS.
+
+
+## 2026-10-03 — final Android design direction approved and implemented
+
+- Owner reviewed layout/theme collages and explicitly selected combined **Focus Dial + Home Hub** direction.
+- Palette selection: current mint-dark remains preferred.
+- Implemented Android `0.14-ios-homehub-focus-rc1`.
+- Added native `FocusDialView` and `RoomHeroView`; no third-party UI dependencies and no image assets required.
+- Light is now split at UI level into Home Hub overview and Focus Dial detailed control while using exactly the existing semantic API.
+- Contextual hero scenes added to Music, Ambient, Night and Alarm/Dawn.
+- Existing final functional controls preserved: RGB/color wheel, scenes, clap wizard, Music IDs/settings, Ambient, Night schedule, Alarm/Dawn, service/debug.
+- Static layout contract: zero missing/duplicate IDs.
+- Final Actions run 37062432020: API contract tests PASS; debug APK build PASS.
