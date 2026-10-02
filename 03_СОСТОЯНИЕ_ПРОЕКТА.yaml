@@ -2238,3 +2238,24 @@ android_home_ui_v0_11_2026_10_02:
   contract_tests: pass
   debug_apk_ci: pass
   owner_visual_smoke: pending
+
+
+android_smart_slider_v0_12_2026_10_02:
+  version: "0.12-smart-slider-rc1"
+  owner_feedback: "default Android sliders visually primitive"
+  custom_slider:
+    reusable: true
+    third_party_dependency: false
+    large_thumb: true
+    rounded_track: true
+    commit_on_release: true
+  light:
+    brightness_slider: smart_brightness
+    kelvin_slider: warm_to_cool_gradient
+    quick_scenes_preserved: true
+    plus_minus_preserved: true
+    color_wheel_preserved: true
+  firmware_api_contract_changed: false
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_visual_smoke: pending
