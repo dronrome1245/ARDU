@@ -119,3 +119,23 @@ CI:
 - contract tests используют local mock HTTP server и проверяют реальные release JSON shapes и POST payloads без физического ARDU.
 
 Физическая end-to-end проверка этой версии ожидает новый Nano + финальные Nano/ESP v1 uploads.
+
+
+## Design v1 release candidate — 2026-10-02
+
+Текущая версия: `0.10-design-v1-rc1`.
+
+После mock-phone functional PASS интерфейс переведён из технического prototype в пользовательский UI:
+- dark low-glare theme;
+- fixed 5-section bottom navigation;
+- Settings in the header;
+- semantic cards instead of one long flat form;
+- visible active section;
+- color previews;
+- Developer Mode isolated from normal controls.
+
+Final GitHub Actions gate:
+- `testDebugUnitTest` PASS;
+- `assembleDebug` PASS.
+
+Следующая проверка до replacement Nano может быть выполнена на том же stateful ESP mock: `git pull` → reinstall/run Android app → подключиться к `<PC_IP>:8080` и проверить все 5 вкладок визуально.
