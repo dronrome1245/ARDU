@@ -139,3 +139,25 @@ Final GitHub Actions gate:
 - `assembleDebug` PASS.
 
 Следующая проверка до replacement Nano может быть выполнена на том же stateful ESP mock: `git pull` → reinstall/run Android app → подключиться к `<PC_IP>:8080` и проверить все 5 вкладок визуально.
+
+
+## Smart-home Light pilot — 2026-10-02
+
+Version: `0.11-home-ui-rc1`.
+
+Owner feedback from the v0.10 physical-phone mock review was applied:
+- compact header;
+- Refresh/Settings are small header actions;
+- firmware/RSSI removed from everyday header;
+- Light quick scenes;
+- brightness percentage and +/- controls;
+- native touch color wheel;
+- exact RGB sliders collapsed by default.
+
+The old slider APIs are still used where useful for precision, but they are no longer the only/primary interaction.
+
+No firmware/API changes.
+
+CI at final source commit:
+- API contract tests PASS;
+- debug APK build PASS.
