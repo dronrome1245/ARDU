@@ -824,6 +824,7 @@ class MainActivity : Activity() {
                 musicAuxSeek.max = 255
                 musicAuxSeek.progress = cfg.aux.coerceIn(1, 255)
                 musicHueStartSeek.progress = cfg.speed.coerceIn(0, 255)
+                musicHueStartText.text = "Начальный цвет: ${cfg.speed}"
             }
         }
         updateMusicAuxLabel(musicAuxSeek.progress)
