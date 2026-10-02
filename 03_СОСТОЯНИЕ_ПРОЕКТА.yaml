@@ -2297,3 +2297,38 @@ android_smart_home_tabs_v0_13_2026_10_02:
   debug_apk_ci: pass
   firmware_api_contract_changed: false
   owner_cross_tab_visual_smoke: pending
+
+
+android_final_ui_v0_14_2026_10_03:
+  version: "0.14-ios-homehub-focus-rc1"
+  owner_approved: true
+  final_direction: "Home Hub + Focus Dial"
+  palette: mint_dark
+  light:
+    overview: home_hub
+    detail: focus_dial
+    focus_dial_range: [0, 255]
+    color_wheel_preserved: true
+    precise_rgb_preserved: true
+    clap_preserved: true
+    startup_profile_preserved: true
+  contextual_heroes:
+    implementation: native_canvas
+    external_bitmap_assets: false
+    scenes: [living, music, ambient, night, dawn]
+  other_tabs:
+    music: contextual_home_hub
+    ambient: contextual_home_hub
+    night: contextual_home_hub
+    alarm_dawn: contextual_home_hub
+  new_http_endpoints: 0
+  new_uart_opcodes: 0
+  firmware_changed: false
+  static_layout:
+    missing_ids: 0
+    duplicate_ids: 0
+    duplicate_functions: 0
+  final_actions_run: 37062432020
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_phone_visual_smoke: pending
