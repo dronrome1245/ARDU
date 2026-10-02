@@ -1387,3 +1387,33 @@ R3 не прошивался и не тестировался на железе.
 6. No third-party UI dependency is introduced.
 
 **Implementation:** Android `0.12-smart-slider-rc1`.
+
+
+---
+
+## D-085 — one smart-home visual language across all five Android user tabs
+
+**Дата:** 2026-10-02  
+**Статус:** ДЕЙСТВУЕТ
+
+**Основание:** владелец одобрил Light v0.12 style и попросил распространить его на остальные вкладки, подобрать высоту/размер шрифтов и использовать иконки без текста там, где действие очевидно.
+
+**Решение:**
+1. Light, Music, Ambient, Night and Alarm use the same card/spacing/typography language.
+2. Primary continuous user controls use `SmartSliderView`, not stock Android SeekBar.
+3. Slider visuals reflect meaning:
+   - brightness → brightness fill;
+   - hue → rainbow;
+   - Kelvin → warm→cool;
+   - generic numeric parameters → accent.
+4. Mode/effect/submode choices have explicit selected state.
+5. Obvious compact actions may be glyph-only if `contentDescription` preserves accessibility.
+6. Typography baseline:
+   - section title 24sp;
+   - card title 16sp;
+   - normal values 15sp;
+   - secondary labels/buttons 13sp.
+7. Stock SeekBar is acceptable only in collapsed precise/technical controls, not in normal primary interaction.
+8. No third-party UI dependency and no firmware/API changes.
+
+**Implementation:** Android `0.13-smart-home-tabs-rc1`.
