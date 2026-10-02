@@ -2219,3 +2219,22 @@ android_design_v1_2026_10_02:
   debug_apk_ci: pass
   physical_visual_smoke: pending
   physical_end_to_end: pending
+
+
+android_home_ui_v0_11_2026_10_02:
+  version: "0.11-home-ui-rc1"
+  owner_feedback_source: "v0.10 physical-phone screenshot review"
+  compact_header: true
+  technical_status_moved_to_settings: true
+  light_pilot:
+    power_card: true
+    quick_scenes: [evening_2200k, warm_2700k, day_4000k, cool_6000k]
+    brightness_percent: true
+    brightness_step_controls: true
+    fine_brightness_slider: true
+    touch_color_wheel: true
+    precise_rgb_collapsed: true
+  firmware_api_contract_changed: false
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_visual_smoke: pending
