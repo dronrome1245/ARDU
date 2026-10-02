@@ -1,10 +1,10 @@
 # Статус проекта ARDU
 
-Дата состояния: 2026-10-02
+Дата состояния: 2026-10-03
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.13-smart-home-tabs-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Android теперь имеет единый smart-home UI на Light/Music/Ambient/Night/Alarm: compact header, fixed navigation, scenes/color wheel, semantic sliders, selected-state mode cards, compact icon actions и выровненную типографику. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.14-ios-homehub-focus-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Владелец утвердил финальное направление Android: mint-dark Unified iPhone Style = Home Hub + Focus Dial. Свет разделён на Home Hub обзор и Focus Dial управление; Music/Ambient/Night/Alarm получили контекстные room-hero блоки в том же стиле. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1761,3 +1761,31 @@
 - During refactor static ID validation caught an over-broad XML replacement; layout was restored from clean v0.12 and reapplied safely. Final ID scan: missing NONE, duplicates NONE.
 - GitHub Actions final run `37056022090`: contract tests PASS + debug APK build PASS.
 - Firmware/API contract unchanged.
+
+
+### 2026-10-03 — OWNER APPROVED final Android direction implemented: Home Hub + Focus Dial
+
+- **РЕШЕНИЕ ВЛАДЕЛЬЦА:** финальный Android visual/interaction direction = Unified iPhone Style, объединяющий Home Hub и Focus Dial; текущая mint-dark palette остаётся.
+- Android version: `0.14-ios-homehub-focus-rc1`.
+- Light теперь имеет два внутренних UI-level экрана без нового API:
+  1. **Home Hub overview** — contextual living-room hero, device summary, quick scenes, brightness/Kelvin summary;
+  2. **Focus Dial control** — крупный интерактивный circular brightness dial, ON/OFF, Kelvin, color wheel, precise RGB, startup profile и clap.
+- Переход overview↔control локальный; Nano остаётся source of truth, после write приложение reread делает как раньше.
+- Создан native reusable `FocusDialView`:
+  - 270° dial;
+  - brightness 0..255;
+  - large draggable thumb;
+  - percentage rendering;
+  - local preview while moving;
+  - semantic HTTP write only on release.
+- Создан native reusable `RoomHeroView` без bitmap/third-party assets:
+  - LIVING;
+  - MUSIC;
+  - AMBIENT;
+  - NIGHT;
+  - DAWN.
+- Music/Ambient/Night/Alarm получили contextual room hero в утверждённом Home Hub language; существующие smart sliders/selected-state controls сохранены.
+- Никаких новых HTTP endpoints, UART opcodes или firmware changes.
+- Static layout validation after integration: missing IDs = NONE, duplicate IDs = NONE, duplicate functions = NONE.
+- GitHub Actions final run `37062432020`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
+- Следующий Android gate: owner-phone visual smoke `0.14` через stateful ESP mock; после replacement Nano — physical end-to-end.
