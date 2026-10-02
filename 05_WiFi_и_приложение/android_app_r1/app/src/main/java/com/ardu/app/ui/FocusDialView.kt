@@ -125,8 +125,14 @@ class FocusDialView @JvmOverloads constructor(
         canvas.drawCircle(tx, ty, dp(13f), thumbPaint)
         thumbPaint.clearShadowLayer()
 
-        bulbPaint.textSize = dp(31f)
-        canvas.drawText("●", cx, cy - dp(49f), bulbPaint)
+        val bulbY = cy - dp(55f)
+        canvas.drawCircle(cx, bulbY, dp(17f), bulbPaint)
+        canvas.drawRoundRect(
+            RectF(cx - dp(10f), bulbY + dp(13f), cx + dp(10f), bulbY + dp(24f)),
+            dp(4f), dp(4f), bulbPaint
+        )
+        bulbPaint.strokeWidth = dp(3f)
+        canvas.drawLine(cx - dp(8f), bulbY + dp(27f), cx + dp(8f), bulbY + dp(27f), bulbPaint)
 
         valuePaint.textSize = dp(39f)
         canvas.drawText("${percent()}%", cx, cy + dp(8f), valuePaint)
