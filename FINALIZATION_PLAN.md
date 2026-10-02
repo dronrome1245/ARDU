@@ -623,3 +623,23 @@ Source/static/CI gate:
 - debug APK build: PASS (Actions run 37056022090).
 
 Firmware/API remain frozen. Next owner-side software action is visual smoke of all five tabs on the stateful ESP mock; physical end-to-end still waits for replacement Nano.
+
+
+## 17. Owner-approved Android final UI checkpoint — 2026-10-03
+
+Final design direction is frozen by owner:
+`Home Hub + Focus Dial`, mint-dark.
+
+Implementation RC: `0.14-ios-homehub-focus-rc1`.
+
+Source/CI gate:
+- native Home Hub context hero: implemented;
+- native Focus Dial: implemented;
+- Light overview/detail split: implemented;
+- contextual heroes Music/Ambient/Night/Alarm: implemented;
+- HTTP/UART/firmware changes: none;
+- contract tests: PASS;
+- debug APK: PASS;
+- Actions run: 37062432020.
+
+Remaining Android work before hardware end-to-end is visual smoke/polish only. Do not redesign the navigation/interaction model without a new explicit owner decision.
