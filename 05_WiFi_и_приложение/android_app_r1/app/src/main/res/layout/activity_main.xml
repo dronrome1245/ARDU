@@ -334,6 +334,14 @@
                 android:layout_height="wrap_content"
                 android:text="Режим: —" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button android:id="@+id/musicOnButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Включить" />
+                <Button android:id="@+id/musicOffButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Выключить" />
+            </LinearLayout>
+
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -514,6 +522,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Эффект: —" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button android:id="@+id/ambientOnButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Включить" />
+                <Button android:id="@+id/ambientOffButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Выключить" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
