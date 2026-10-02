@@ -92,3 +92,30 @@ R1 сначала пробует локальное имя `ardu.local`, зат�
 - persistence write выполняется только по явной кнопке, не при каждом движении slider.
 
 Backend: `HTTP_BRIDGE_R7`.
+
+
+## Functional v1 release candidate — 2026-10-02
+
+Версия приложения: `0.9-functional-v1-rc1`.
+
+Приложение переведено с временного HTTP_BRIDGE_R7 contract на финальный `ARDU_ESP_V1` API.
+
+Реализовано:
+- startup sync через `/api/ping` + `/api/status` + `/api/settings` + `/api/time`;
+- сохранение последнего рабочего адреса и ручной адрес ARDU; `ardu.local` остаётся fallback, но приложение от него не зависит;
+- Обычный свет: ON/OFF, brightness, Kelvin 1800..6500, presets, RGB, startup profile;
+- clap enable + полный family calibration wizard: quiet baseline → 9 samples → finish → save/cancel;
+- Music: M01/M02/M03/M04/M05/M08/M09, применимые dynamic controls, microphone calibration;
+- Ambient: F01/F02/F03, HSV/brightness/speed/rainbow, auto-cycle/period;
+- Night: manual power, hue/saturation/brightness, schedule enable + HH:MM window;
+- Alarm/Dawn: enable, time, fade duration, max brightness, start/end hue, RTC sync, STOP Dawn;
+- service current limit;
+- semantic async events;
+- Developer Mode использует только frozen numeric UART v1, textual `PING/STATUS` больше не является release interface.
+
+CI:
+- Android debug APK compile PASS;
+- JVM final API contract tests PASS;
+- contract tests используют local mock HTTP server и проверяют реальные release JSON shapes и POST payloads без физического ARDU.
+
+Физическая end-to-end проверка этой версии ожидает новый Nano + финальные Nano/ESP v1 uploads.
