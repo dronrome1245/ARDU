@@ -577,66 +577,85 @@ class MainActivity : Activity() {
         }
 
         val names = mapOf(
-            "M01" to "M01 VU",
-            "M02" to "M02 Радуга",
-            "M03" to "M03 5 полос",
-            "M04" to "M04 3 полосы",
-            "M05" to "M05 Частота",
-            "M08" to "M08 Бегущие",
-            "M09" to "M09 Спектр"
+            "M01" to "VU\nГрадиент",
+            "M02" to "VU\nРадуга",
+            "M03" to "5\nполос",
+            "M04" to "3\nполосы",
+            "M05" to "Частота",
+            "M08" to "Бегущие",
+            "M09" to "Спектр"
         )
+        musicModeButtonMap.clear()
+        musicModeButtons.removeAllViews()
         ArduApiClient.MUSIC_IDS.forEach { id ->
-            val button = Button(this).apply {
+            val button = Button(this, null, 0, R.style.Widget_ARDU_Button_Choice).apply {
                 text = names[id] ?: id
+                layoutParams = LinearLayout.LayoutParams(dp(96), dp(64)).apply {
+                    marginEnd = dp(8)
+                }
                 setOnClickListener {
                     runDeviceAction("Музыкальный режим $id") { api.selectMusicMode(id) }
                 }
             }
+            musicModeButtonMap[id] = button
             musicModeButtons.addView(button)
         }
 
-        bindSeek(musicBrightnessSeek,
-            { musicBrightnessText.text = "Яркость эффекта: $it" },
+        bindSmartSlider(
+            musicBrightnessSeek, 0, 255, SmartSliderView.VisualMode.BRIGHTNESS,
+            { value -> musicBrightnessText.text = "Эффект • ${brightnessPercent(value)}%" },
             { value -> runDeviceAction("Яркость музыки") { api.updateMusicSettings(activeBrightness = value) } }
         )
-        bindSeek(musicBackgroundSeek,
-            { musicBackgroundText.text = "Фоновая яркость: $it" },
+        bindSmartSlider(
+            musicBackgroundSeek, 0, 255, SmartSliderView.VisualMode.BRIGHTNESS,
+            { value -> musicBackgroundText.text = "Фон • ${brightnessPercent(value)}%" },
             { value -> runDeviceAction("Фон музыки") { api.updateMusicSettings(backgroundBrightness = value) } }
         )
-        bindSeek(musicSmoothingSeek,
-            { musicSmoothingText.text = "Плавность: $it" },
+        bindSmartSlider(
+            musicSmoothingSeek, 5, 100, SmartSliderView.VisualMode.ACCENT,
+            { value -> musicSmoothingText.text = "Плавность • $value" },
             { value -> runDeviceAction("Плавность музыки") { api.updateMusicSettings(smoothing = value) } }
         )
-        bindSeek(musicSensitivitySeek,
-            { musicSensitivityText.text = "Чувствительность: $it" },
+        bindSmartSlider(
+            musicSensitivitySeek, 50, 200, SmartSliderView.VisualMode.ACCENT,
+            { value -> musicSensitivityText.text = "Чувствительность • $value" },
             { value -> runDeviceAction("Чувствительность") { api.updateMusicSettings(sensitivity = value) } }
         )
-        bindSeek(musicSpeedSeek,
-            { musicSpeedText.text = "Скорость: $it" },
+        bindSmartSlider(
+            musicSpeedSeek, 1, 255, SmartSliderView.VisualMode.ACCENT,
+            { value -> musicSpeedText.text = "Скорость • $value" },
             { value -> runDeviceAction("Скорость M08") { api.updateMusicSettings(speed = value) } }
         )
-        bindSeek(musicAuxSeek,
-            { updateMusicAuxLabel(it) },
+        bindSmartSlider(
+            musicAuxSeek, 1, 255, SmartSliderView.VisualMode.ACCENT,
+            { value -> updateMusicAuxLabel(value) },
             { value -> applyMusicAux(value) }
         )
-        bindSeek(musicHueStartSeek,
-            { musicHueStartText.text = "Начальный цвет: $it" },
+        bindSmartSlider(
+            musicHueStartSeek, 0, 255, SmartSliderView.VisualMode.HUE,
+            { value -> musicHueStartText.text = "Цвет • $value" },
             { value -> runDeviceAction("Цвет M09") { api.updateMusicSettings(hueStart = value) } }
         )
 
-        findViewById<Button>(R.id.musicSubThree).setOnClickListener { setMusicSubmode("three") }
-        findViewById<Button>(R.id.musicSubLow).setOnClickListener { setMusicSubmode("low") }
-        findViewById<Button>(R.id.musicSubMid).setOnClickListener { setMusicSubmode("mid") }
-        findViewById<Button>(R.id.musicSubHigh).setOnClickListener { setMusicSubmode("high") }
+        musicSubmodeButtonMap = mapOf(
+            0 to findViewById<Button>(R.id.musicSubThree),
+            1 to findViewById<Button>(R.id.musicSubLow),
+            2 to findViewById<Button>(R.id.musicSubMid),
+            3 to findViewById<Button>(R.id.musicSubHigh)
+        )
+        musicSubmodeButtonMap[0]?.setOnClickListener { setMusicSubmode("three") }
+        musicSubmodeButtonMap[1]?.setOnClickListener { setMusicSubmode("low") }
+        musicSubmodeButtonMap[2]?.setOnClickListener { setMusicSubmode("mid") }
+        musicSubmodeButtonMap[3]?.setOnClickListener { setMusicSubmode("high") }
 
         findViewById<Button>(R.id.musicCalibrateButton).setOnClickListener {
-            musicCalibrationText.text = "Калибровка… сохраняйте тишину."
+            musicCalibrationText.text = "Калибровка… тишина"
             worker.execute {
                 try {
                     val result = api.calibrateAudio()
                     runOnUiThread {
                         musicCalibrationText.text =
-                            "Готово: DC=${result.micDc}, VU=${result.vuLowPass}, Spectrum=${result.spectrumLowPass}"
+                            "DC ${result.micDc} • VU ${result.vuLowPass} • Spectrum ${result.spectrumLowPass}"
                         refreshDevice()
                     }
                 } catch (error: Exception) {
@@ -663,9 +682,9 @@ class MainActivity : Activity() {
 
     private fun updateMusicAuxLabel(value: Int) {
         musicAuxText.text = when (latestSettings?.music?.selected) {
-            "M02" -> "Скорость радуги: $value"
-            "M09" -> "Шаг цвета: $value"
-            else -> "Параметр: $value"
+            "M02" -> "Радуга • $value"
+            "M09" -> "Шаг цвета • $value"
+            else -> "Параметр • $value"
         }
     }
 
@@ -676,41 +695,53 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.ambientOffButton).setOnClickListener {
             runDeviceAction("Выключение фона") { api.setMode("off") }
         }
-        findViewById<Button>(R.id.ambientF01Button).setOnClickListener { setAmbientEffect("F01") }
-        findViewById<Button>(R.id.ambientF02Button).setOnClickListener { setAmbientEffect("F02") }
-        findViewById<Button>(R.id.ambientF03Button).setOnClickListener { setAmbientEffect("F03") }
 
-        bindSeek(ambientHueSeek,
+        ambientEffectButtonMap = mapOf(
+            "F01" to findViewById<Button>(R.id.ambientF01Button),
+            "F02" to findViewById<Button>(R.id.ambientF02Button),
+            "F03" to findViewById<Button>(R.id.ambientF03Button)
+        )
+        ambientEffectButtonMap.forEach { (id, button) ->
+            button.setOnClickListener { setAmbientEffect(id) }
+        }
+
+        bindSmartSlider(
+            ambientHueSeek, 0, 255, SmartSliderView.VisualMode.HUE,
             {
-                ambientHueText.text = "Цвет: $it"
+                ambientHueText.text = "Цвет • $it"
                 updateAmbientPreview()
             },
             { value -> runDeviceAction("Цвет фона") { api.updateAmbientSettings(hue = value) } }
         )
-        bindSeek(ambientSaturationSeek,
+        bindSmartSlider(
+            ambientSaturationSeek, 0, 255, SmartSliderView.VisualMode.ACCENT,
             {
-                ambientSaturationText.text = "Насыщенность: $it"
+                ambientSaturationText.text = "Насыщенность • ${brightnessPercent(it)}%"
                 updateAmbientPreview()
             },
             { value -> runDeviceAction("Насыщенность фона") { api.updateAmbientSettings(saturation = value) } }
         )
-        bindSeek(ambientBrightnessSeek,
+        bindSmartSlider(
+            ambientBrightnessSeek, 0, 255, SmartSliderView.VisualMode.BRIGHTNESS,
             {
-                ambientBrightnessText.text = "Яркость: $it"
+                ambientBrightnessText.text = "Яркость • ${brightnessPercent(it)}%"
                 updateAmbientPreview()
             },
             { value -> runDeviceAction("Яркость фона") { api.updateAmbientSettings(brightness = value) } }
         )
-        bindSeek(ambientSpeedSeek,
-            { ambientSpeedText.text = "Скорость: $it" },
+        bindSmartSlider(
+            ambientSpeedSeek, 1, 255, SmartSliderView.VisualMode.ACCENT,
+            { ambientSpeedText.text = "Скорость • $it" },
             { value -> runDeviceAction("Скорость фона") { api.updateAmbientSettings(speed = value) } }
         )
-        bindSeek(ambientRainbowSeek,
-            { ambientRainbowText.text = String.format(Locale.US, "Шаг радуги: %.1f", it / 10.0) },
+        bindSmartSlider(
+            ambientRainbowSeek, 5, 100, SmartSliderView.VisualMode.ACCENT,
+            { ambientRainbowText.text = String.format(Locale.US, "Шаг • %.1f", it / 10.0) },
             { value -> runDeviceAction("Шаг радуги") { api.updateAmbientSettings(rainbowStep = value / 10.0) } }
         )
-        bindSeek(ambientPeriodSeek,
-            { ambientPeriodText.text = "Период: $it с" },
+        bindSmartSlider(
+            ambientPeriodSeek, 1, 255, SmartSliderView.VisualMode.ACCENT,
+            { ambientPeriodText.text = "Период • $it с" },
             { value -> runDeviceAction("Период автоперебора") { api.updateAmbientSettings(autoPeriodSec = value) } }
         )
 
@@ -735,23 +766,26 @@ class MainActivity : Activity() {
             }
         }
 
-        bindSeek(nightHueSeek,
+        bindSmartSlider(
+            nightHueSeek, 0, 255, SmartSliderView.VisualMode.HUE,
             {
-                nightHueText.text = "Цвет: $it"
+                nightHueText.text = "Цвет • $it"
                 updateNightPreview()
             },
             { value -> runDeviceAction("Цвет ночника") { api.updateNightSettings(hue = value) } }
         )
-        bindSeek(nightSaturationSeek,
+        bindSmartSlider(
+            nightSaturationSeek, 0, 255, SmartSliderView.VisualMode.ACCENT,
             {
-                nightSaturationText.text = "Насыщенность: $it"
+                nightSaturationText.text = "Насыщенность • ${brightnessPercent(it)}%"
                 updateNightPreview()
             },
             { value -> runDeviceAction("Насыщенность ночника") { api.updateNightSettings(saturation = value) } }
         )
-        bindSeek(nightBrightnessSeek,
+        bindSmartSlider(
+            nightBrightnessSeek, 0, 255, SmartSliderView.VisualMode.BRIGHTNESS,
             {
-                nightBrightnessText.text = "Яркость: $it"
+                nightBrightnessText.text = "Яркость • ${brightnessPercent(it)}%"
                 updateNightPreview()
             },
             { value -> runDeviceAction("Яркость ночника") { api.updateNightSettings(brightness = value) } }
@@ -783,24 +817,28 @@ class MainActivity : Activity() {
             }
         }
 
-        bindSeek(alarmFadeSeek,
-            { alarmFadeText.text = "Рассвет: $it мин" },
+        bindSmartSlider(
+            alarmFadeSeek, 1, 120, SmartSliderView.VisualMode.ACCENT,
+            { alarmFadeText.text = "$it мин" },
             { value -> runDeviceAction("Длительность рассвета") { api.updateAlarmSettings(fadeMinutes = value) } }
         )
-        bindSeek(alarmBrightnessSeek,
-            { alarmBrightnessText.text = "Макс. яркость: $it" },
+        bindSmartSlider(
+            alarmBrightnessSeek, 1, 255, SmartSliderView.VisualMode.BRIGHTNESS,
+            { alarmBrightnessText.text = "${brightnessPercent(it)}%" },
             { value -> runDeviceAction("Яркость рассвета") { api.updateAlarmSettings(maxBrightness = value) } }
         )
-        bindSeek(alarmStartHueSeek,
+        bindSmartSlider(
+            alarmStartHueSeek, 0, 255, SmartSliderView.VisualMode.HUE,
             {
-                alarmStartHueText.text = "Начальный цвет: $it"
+                alarmStartHueText.text = "Начало • $it"
                 updateAlarmPreviews()
             },
             { value -> runDeviceAction("Начальный цвет рассвета") { api.updateAlarmSettings(startHue = value) } }
         )
-        bindSeek(alarmEndHueSeek,
+        bindSmartSlider(
+            alarmEndHueSeek, 0, 255, SmartSliderView.VisualMode.HUE,
             {
-                alarmEndHueText.text = "Конечный цвет: $it"
+                alarmEndHueText.text = "Финиш • $it"
                 updateAlarmPreviews()
             },
             { value -> runDeviceAction("Конечный цвет рассвета") { api.updateAlarmSettings(endHue = value) } }
@@ -814,7 +852,7 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun bindService() {
+    private fun bindService()    private fun bindService() {
         findViewById<Button>(R.id.saveAddressButton).setOnClickListener {
             val raw = addressInput.text.toString().trim()
             val normalized = if (raw.isBlank()) null else {
@@ -1130,6 +1168,21 @@ class MainActivity : Activity() {
         "music" -> "Светомузыка"
         else -> mode
     }
+
+    private fun bindSmartSlider(
+        slider: SmartSliderView,
+        min: Int,
+        max: Int,
+        mode: SmartSliderView.VisualMode,
+        preview: (Int) -> Unit,
+        commit: (Int) -> Unit
+    ) {
+        slider.configure(min, max, mode)
+        slider.setListener(preview, commit)
+    }
+
+    private fun dp(value: Int): Int =
+        (value * resources.displayMetrics.density).toInt()
 
     private fun bindSeek(
         seek: SeekBar,
