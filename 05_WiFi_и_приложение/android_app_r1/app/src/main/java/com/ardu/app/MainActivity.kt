@@ -2,6 +2,7 @@ package com.ardu.app
 
 import android.app.Activity
 import android.os.Bundle
+import android.graphics.Color
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -21,6 +22,7 @@ class MainActivity : Activity() {
     private val worker = Executors.newSingleThreadExecutor()
     private var rendering = false
     private var latestSettings: ArduSettings? = null
+    private var sectionNavigation: List<Pair<Button, LinearLayout>> = emptyList()
 
     private lateinit var connectionText: TextView
     private lateinit var modeText: TextView
@@ -44,6 +46,7 @@ class MainActivity : Activity() {
     private lateinit var lightRedSeek: SeekBar
     private lateinit var lightGreenSeek: SeekBar
     private lateinit var lightBlueSeek: SeekBar
+    private lateinit var lightColorPreview: View
     private lateinit var clapEnabledSwitch: Switch
     private lateinit var clapStateText: TextView
     private lateinit var clapCalibrationPanel: LinearLayout
@@ -77,6 +80,7 @@ class MainActivity : Activity() {
     private lateinit var musicCalibrationText: TextView
 
     private lateinit var ambientEffectText: TextView
+    private lateinit var ambientColorPreview: View
     private lateinit var ambientHueText: TextView
     private lateinit var ambientHueSeek: SeekBar
     private lateinit var ambientSaturationGroup: LinearLayout
@@ -95,6 +99,7 @@ class MainActivity : Activity() {
     private lateinit var ambientPeriodSeek: SeekBar
 
     private lateinit var nightEnabledSwitch: Switch
+    private lateinit var nightColorPreview: View
     private lateinit var nightHueText: TextView
     private lateinit var nightHueSeek: SeekBar
     private lateinit var nightSaturationText: TextView
@@ -106,6 +111,8 @@ class MainActivity : Activity() {
     private lateinit var nightOffInput: EditText
 
     private lateinit var alarmStateText: TextView
+    private lateinit var alarmStartPreview: View
+    private lateinit var alarmEndPreview: View
     private lateinit var alarmEnabledSwitch: Switch
     private lateinit var alarmHourInput: EditText
     private lateinit var alarmMinuteInput: EditText
@@ -179,6 +186,7 @@ class MainActivity : Activity() {
         lightRedSeek = findViewById(R.id.lightRedSeek)
         lightGreenSeek = findViewById(R.id.lightGreenSeek)
         lightBlueSeek = findViewById(R.id.lightBlueSeek)
+        lightColorPreview = findViewById(R.id.lightColorPreview)
         clapEnabledSwitch = findViewById(R.id.clapEnabledSwitch)
         clapStateText = findViewById(R.id.clapStateText)
         clapCalibrationPanel = findViewById(R.id.clapCalibrationPanel)
@@ -212,6 +220,7 @@ class MainActivity : Activity() {
         musicCalibrationText = findViewById(R.id.musicCalibrationText)
 
         ambientEffectText = findViewById(R.id.ambientEffectText)
+        ambientColorPreview = findViewById(R.id.ambientColorPreview)
         ambientHueText = findViewById(R.id.ambientHueText)
         ambientHueSeek = findViewById(R.id.ambientHueSeek)
         ambientSaturationGroup = findViewById(R.id.ambientSaturationGroup)
@@ -230,6 +239,7 @@ class MainActivity : Activity() {
         ambientPeriodSeek = findViewById(R.id.ambientPeriodSeek)
 
         nightEnabledSwitch = findViewById(R.id.nightEnabledSwitch)
+        nightColorPreview = findViewById(R.id.nightColorPreview)
         nightHueText = findViewById(R.id.nightHueText)
         nightHueSeek = findViewById(R.id.nightHueSeek)
         nightSaturationText = findViewById(R.id.nightSaturationText)
@@ -241,6 +251,8 @@ class MainActivity : Activity() {
         nightOffInput = findViewById(R.id.nightOffInput)
 
         alarmStateText = findViewById(R.id.alarmStateText)
+        alarmStartPreview = findViewById(R.id.alarmStartPreview)
+        alarmEndPreview = findViewById(R.id.alarmEndPreview)
         alarmEnabledSwitch = findViewById(R.id.alarmEnabledSwitch)
         alarmHourInput = findViewById(R.id.alarmHourInput)
         alarmMinuteInput = findViewById(R.id.alarmMinuteInput)
@@ -267,17 +279,33 @@ class MainActivity : Activity() {
     }
 
     private fun bindNavigation() {
-        findViewById<Button>(R.id.navLightButton).setOnClickListener { showSection(lightPanel) }
-        findViewById<Button>(R.id.navMusicButton).setOnClickListener { showSection(musicPanel) }
-        findViewById<Button>(R.id.navAmbientButton).setOnClickListener { showSection(ambientPanel) }
-        findViewById<Button>(R.id.navNightButton).setOnClickListener { showSection(nightPanel) }
-        findViewById<Button>(R.id.navAlarmButton).setOnClickListener { showSection(alarmPanel) }
-        findViewById<Button>(R.id.navServiceButton).setOnClickListener { showSection(servicePanel) }
+        sectionNavigation = listOf(
+            findViewById<Button>(R.id.navLightButton) to lightPanel,
+            findViewById<Button>(R.id.navMusicButton) to musicPanel,
+            findViewById<Button>(R.id.navAmbientButton) to ambientPanel,
+            findViewById<Button>(R.id.navNightButton) to nightPanel,
+            findViewById<Button>(R.id.navAlarmButton) to alarmPanel
+        )
+
+        sectionNavigation.forEach { (button, panel) ->
+            button.setOnClickListener { showSection(panel) }
+        }
+
+        findViewById<Button>(R.id.navServiceButton).setOnClickListener {
+            showSection(servicePanel)
+        }
     }
 
     private fun showSection(target: LinearLayout) {
         listOf(lightPanel, musicPanel, ambientPanel, nightPanel, alarmPanel, servicePanel)
             .forEach { it.visibility = if (it === target) View.VISIBLE else View.GONE }
+
+        sectionNavigation.forEach { (button, panel) ->
+            button.isSelected = panel === target
+            button.setTextColor(
+                getColor(if (button.isSelected) R.color.ardu_accent else R.color.ardu_text_secondary)
+            )
+        }
     }
 
     private fun bindLight() {
@@ -340,6 +368,44 @@ class MainActivity : Activity() {
     private fun updateRgbLabel() {
         lightRgbText.text =
             "RGB: ${lightRedSeek.progress},${lightGreenSeek.progress},${lightBlueSeek.progress}"
+        setPreview(
+            lightColorPreview,
+            Color.rgb(lightRedSeek.progress, lightGreenSeek.progress, lightBlueSeek.progress)
+        )
+    }
+
+    private fun updateAmbientPreview() {
+        val effect = latestSettings?.ambient?.effect ?: "F01"
+        val saturation = if (effect == "F03") 255 else ambientSaturationSeek.progress
+        setPreview(
+            ambientColorPreview,
+            hueColor(ambientHueSeek.progress, saturation, ambientBrightnessSeek.progress)
+        )
+    }
+
+    private fun updateNightPreview() {
+        setPreview(
+            nightColorPreview,
+            hueColor(nightHueSeek.progress, nightSaturationSeek.progress, nightBrightnessSeek.progress)
+        )
+    }
+
+    private fun updateAlarmPreviews() {
+        setPreview(alarmStartPreview, hueColor(alarmStartHueSeek.progress, 255, 255))
+        setPreview(alarmEndPreview, hueColor(alarmEndHueSeek.progress, 255, 255))
+    }
+
+    private fun hueColor(hue: Int, saturation: Int, brightness: Int): Int =
+        Color.HSVToColor(
+            floatArrayOf(
+                hue.coerceIn(0, 255) * 360f / 255f,
+                saturation.coerceIn(0, 255) / 255f,
+                brightness.coerceIn(0, 255).coerceAtLeast(24) / 255f
+            )
+        )
+
+    private fun setPreview(view: View, color: Int) {
+        view.background.mutate().setTint(color)
     }
 
     private fun startClapCalibration() {
@@ -525,15 +591,24 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.ambientF03Button).setOnClickListener { setAmbientEffect("F03") }
 
         bindSeek(ambientHueSeek,
-            { ambientHueText.text = "Цвет: $it" },
+            {
+                ambientHueText.text = "Цвет: $it"
+                updateAmbientPreview()
+            },
             { value -> runDeviceAction("Цвет фона") { api.updateAmbientSettings(hue = value) } }
         )
         bindSeek(ambientSaturationSeek,
-            { ambientSaturationText.text = "Насыщенность: $it" },
+            {
+                ambientSaturationText.text = "Насыщенность: $it"
+                updateAmbientPreview()
+            },
             { value -> runDeviceAction("Насыщенность фона") { api.updateAmbientSettings(saturation = value) } }
         )
         bindSeek(ambientBrightnessSeek,
-            { ambientBrightnessText.text = "Яркость: $it" },
+            {
+                ambientBrightnessText.text = "Яркость: $it"
+                updateAmbientPreview()
+            },
             { value -> runDeviceAction("Яркость фона") { api.updateAmbientSettings(brightness = value) } }
         )
         bindSeek(ambientSpeedSeek,
@@ -571,15 +646,24 @@ class MainActivity : Activity() {
         }
 
         bindSeek(nightHueSeek,
-            { nightHueText.text = "Цвет: $it" },
+            {
+                nightHueText.text = "Цвет: $it"
+                updateNightPreview()
+            },
             { value -> runDeviceAction("Цвет ночника") { api.updateNightSettings(hue = value) } }
         )
         bindSeek(nightSaturationSeek,
-            { nightSaturationText.text = "Насыщенность: $it" },
+            {
+                nightSaturationText.text = "Насыщенность: $it"
+                updateNightPreview()
+            },
             { value -> runDeviceAction("Насыщенность ночника") { api.updateNightSettings(saturation = value) } }
         )
         bindSeek(nightBrightnessSeek,
-            { nightBrightnessText.text = "Яркость: $it" },
+            {
+                nightBrightnessText.text = "Яркость: $it"
+                updateNightPreview()
+            },
             { value -> runDeviceAction("Яркость ночника") { api.updateNightSettings(brightness = value) } }
         )
 
@@ -618,11 +702,17 @@ class MainActivity : Activity() {
             { value -> runDeviceAction("Яркость рассвета") { api.updateAlarmSettings(maxBrightness = value) } }
         )
         bindSeek(alarmStartHueSeek,
-            { alarmStartHueText.text = "Начальный цвет: $it" },
+            {
+                alarmStartHueText.text = "Начальный цвет: $it"
+                updateAlarmPreviews()
+            },
             { value -> runDeviceAction("Начальный цвет рассвета") { api.updateAlarmSettings(startHue = value) } }
         )
         bindSeek(alarmEndHueSeek,
-            { alarmEndHueText.text = "Конечный цвет: $it" },
+            {
+                alarmEndHueText.text = "Конечный цвет: $it"
+                updateAlarmPreviews()
+            },
             { value -> runDeviceAction("Конечный цвет рассвета") { api.updateAlarmSettings(endHue = value) } }
         )
 
@@ -709,6 +799,7 @@ class MainActivity : Activity() {
                     connectionText.text =
                         "Онлайн • ${ping.firmware}" +
                         if (ping.rssi != null) " • ${ping.rssi} dBm" else ""
+                    connectionText.setTextColor(getColor(R.color.ardu_accent))
                     if (!selectedAddress.isNullOrBlank()) {
                         addressInput.setText(selectedAddress.removePrefix("http://"))
                     }
@@ -718,6 +809,7 @@ class MainActivity : Activity() {
             } catch (error: Exception) {
                 runOnUiThread {
                     connectionText.text = "Нет связи"
+                    connectionText.setTextColor(getColor(R.color.ardu_danger))
                     operationText.text = error.message ?: "Ошибка подключения"
                     refreshButton.isEnabled = true
                 }
@@ -878,6 +970,7 @@ class MainActivity : Activity() {
         ambientSaturationGroup.visibility = if (a.effect == "F03") View.GONE else View.VISIBLE
         ambientSpeedGroup.visibility = if (a.effect == "F01") View.GONE else View.VISIBLE
         ambientRainbowGroup.visibility = if (a.effect == "F03") View.VISIBLE else View.GONE
+        updateAmbientPreview()
     }
 
     private fun renderNight(settings: ArduSettings) {
@@ -892,6 +985,7 @@ class MainActivity : Activity() {
         nightHueText.text = "Цвет: ${n.hue}"
         nightSaturationText.text = "Насыщенность: ${n.saturation}"
         nightBrightnessText.text = "Яркость: ${n.brightness}"
+        updateNightPreview()
     }
 
     private fun renderAlarm(settings: ArduSettings) {
@@ -912,6 +1006,7 @@ class MainActivity : Activity() {
             String.format(Locale.US, "%02d:%02d", a.hour, a.minute) +
             " • рассвет ${a.dawnPhase}" +
             if (a.recovered) " • восстановлен после reset" else ""
+        updateAlarmPreviews()
     }
 
     private fun renderService(snapshot: Snapshot) {
