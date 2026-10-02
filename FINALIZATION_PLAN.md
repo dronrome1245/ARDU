@@ -610,3 +610,16 @@ Release candidate: `0.10-design-v1-rc1`.
 CI: contract tests PASS + debug APK PASS.
 
 This does not advance hardware acceptance. When replacement Nano arrives, continue directly with final Nano/ESP upload acceptance and Android end-to-end test; only release-blocker UI/API issues justify further functional changes.
+
+
+## 16. Android unified smart-home UI checkpoint — 2026-10-02
+
+Android `0.13-smart-home-tabs-rc1` propagates the approved Light UI language across all five normal user tabs.
+
+Source/static/CI gate:
+- missing layout IDs: 0;
+- duplicate layout IDs: 0;
+- API contract tests: PASS;
+- debug APK build: PASS (Actions run 37056022090).
+
+Firmware/API remain frozen. Next owner-side software action is visual smoke of all five tabs on the stateful ESP mock; physical end-to-end still waits for replacement Nano.
