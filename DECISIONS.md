@@ -1366,3 +1366,24 @@ R3 не прошивался и не тестировался на железе.
 7. Apply the same interaction language to other sections only after owner visual approval of the Light screen.
 
 **Implementation:** Android `0.11-home-ui-rc1`.
+
+
+---
+
+## D-084 — semantic custom sliders replace default Android SeekBar for primary controls
+
+**Дата:** 2026-10-02  
+**Статус:** ДЕЙСТВУЕТ
+
+**Решение:**
+1. Default Android SeekBar is not used as the primary visual control in polished ARDU user screens.
+2. Primary continuous controls use reusable ARDU smart sliders with a thick rounded track and large touch target.
+3. Visual treatment follows parameter meaning:
+   - brightness: dark→accent/fill;
+   - Kelvin: warm→neutral→cool gradient;
+   - future Hue controls may use rainbow semantics.
+4. Network persistence behavior does not change: local preview during drag, semantic API commit on release.
+5. Fine/service sliders may remain standard until their section receives the same UX pass.
+6. No third-party UI dependency is introduced.
+
+**Implementation:** Android `0.12-smart-slider-rc1`.
