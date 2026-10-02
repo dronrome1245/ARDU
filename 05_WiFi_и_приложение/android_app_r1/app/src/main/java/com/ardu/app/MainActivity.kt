@@ -15,6 +15,7 @@ import com.ardu.app.net.ArduSettings
 import com.ardu.app.net.DeviceStatus
 import com.ardu.app.net.TimeStatus
 import com.ardu.app.ui.ColorWheelView
+import com.ardu.app.ui.SmartSliderView
 import java.util.Locale
 import java.util.concurrent.Executors
 
@@ -42,9 +43,9 @@ class MainActivity : Activity() {
 
     private lateinit var lightStateText: TextView
     private lateinit var lightBrightnessText: TextView
-    private lateinit var lightBrightnessSeek: SeekBar
+    private lateinit var lightBrightnessSeek: SmartSliderView
     private lateinit var lightKelvinText: TextView
-    private lateinit var lightKelvinSeek: SeekBar
+    private lateinit var lightKelvinSeek: SmartSliderView
     private lateinit var lightRgbText: TextView
     private lateinit var lightRedSeek: SeekBar
     private lateinit var lightGreenSeek: SeekBar
@@ -342,13 +343,32 @@ class MainActivity : Activity() {
             changeLightBrightness(26)
         }
 
-        bindSeek(lightBrightnessSeek,
-            { lightBrightnessText.text = "${brightnessPercent(it)}%" },
-            { value -> runDeviceAction("Яркость света") { api.setLightBrightness(value) } }
+        lightBrightnessSeek.configure(
+            min = 0,
+            max = 255,
+            mode = SmartSliderView.VisualMode.BRIGHTNESS
         )
-        bindSeek(lightKelvinSeek,
-            { lightKelvinText.text = "$it K" },
-            { value -> setLightKelvin(value) }
+        lightBrightnessSeek.setListener(
+            preview = { value ->
+                lightBrightnessText.text = "${brightnessPercent(value)}%"
+            },
+            commit = { value ->
+                runDeviceAction("Яркость света") { api.setLightBrightness(value) }
+            }
+        )
+
+        lightKelvinSeek.configure(
+            min = 1800,
+            max = 6500,
+            mode = SmartSliderView.VisualMode.KELVIN
+        )
+        lightKelvinSeek.setListener(
+            preview = { value ->
+                lightKelvinText.text = "$value K"
+            },
+            commit = { value ->
+                setLightKelvin(value)
+            }
         )
 
         val rgbLabel: (Int) -> Unit = { updateRgbLabel() }
@@ -420,8 +440,9 @@ class MainActivity : Activity() {
     }
 
     private fun changeLightBrightness(delta: Int) {
-        val value = (lightBrightnessSeek.progress + delta).coerceIn(0, 255)
-        lightBrightnessSeek.progress = value
+        val value = (lightBrightnessSeek.value() + delta).coerceIn(0, 255)
+        lightBrightnessSeek.setValue(value)
+        lightBrightnessText.text = "${brightnessPercent(value)}%"
         runDeviceAction("Яркость света") { api.setLightBrightness(value) }
     }
 
@@ -931,8 +952,8 @@ class MainActivity : Activity() {
             "${brightnessPercent(l.brightness)}%" +
             if (l.dirty) " • изменения не сохранены" else ""
 
-        lightBrightnessSeek.progress = l.brightness
-        lightKelvinSeek.progress = l.kelvin
+        lightBrightnessSeek.setValue(l.brightness)
+        lightKelvinSeek.setValue(l.kelvin)
         lightRedSeek.progress = l.red
         lightGreenSeek.progress = l.green
         lightBlueSeek.progress = l.blue
