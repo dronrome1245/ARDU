@@ -27,6 +27,9 @@ class MainActivity : Activity() {
     private var sectionNavigation: List<Pair<Button, LinearLayout>> = emptyList()
     private var lastEspFirmware: String = "—"
     private var lastEspRssi: Int? = null
+    private val musicModeButtonMap = linkedMapOf<String, Button>()
+    private var ambientEffectButtonMap: Map<String, Button> = emptyMap()
+    private var musicSubmodeButtonMap: Map<Int, Button> = emptyMap()
 
     private lateinit var connectionText: TextView
     private lateinit var modeText: TextView
@@ -64,54 +67,54 @@ class MainActivity : Activity() {
     private lateinit var musicModeText: TextView
     private lateinit var musicModeButtons: LinearLayout
     private lateinit var musicBrightnessText: TextView
-    private lateinit var musicBrightnessSeek: SeekBar
+    private lateinit var musicBrightnessSeek: SmartSliderView
     private lateinit var musicBackgroundText: TextView
-    private lateinit var musicBackgroundSeek: SeekBar
+    private lateinit var musicBackgroundSeek: SmartSliderView
     private lateinit var musicSmoothingGroup: LinearLayout
     private lateinit var musicSmoothingText: TextView
-    private lateinit var musicSmoothingSeek: SeekBar
+    private lateinit var musicSmoothingSeek: SmartSliderView
     private lateinit var musicSensitivityGroup: LinearLayout
     private lateinit var musicSensitivityText: TextView
-    private lateinit var musicSensitivitySeek: SeekBar
+    private lateinit var musicSensitivitySeek: SmartSliderView
     private lateinit var musicSubmodeGroup: LinearLayout
     private lateinit var musicSpeedGroup: LinearLayout
     private lateinit var musicSpeedText: TextView
-    private lateinit var musicSpeedSeek: SeekBar
+    private lateinit var musicSpeedSeek: SmartSliderView
     private lateinit var musicAuxGroup: LinearLayout
     private lateinit var musicAuxText: TextView
-    private lateinit var musicAuxSeek: SeekBar
+    private lateinit var musicAuxSeek: SmartSliderView
     private lateinit var musicHueStartGroup: LinearLayout
     private lateinit var musicHueStartText: TextView
-    private lateinit var musicHueStartSeek: SeekBar
+    private lateinit var musicHueStartSeek: SmartSliderView
     private lateinit var musicCalibrationText: TextView
 
     private lateinit var ambientEffectText: TextView
     private lateinit var ambientColorPreview: View
     private lateinit var ambientHueText: TextView
-    private lateinit var ambientHueSeek: SeekBar
+    private lateinit var ambientHueSeek: SmartSliderView
     private lateinit var ambientSaturationGroup: LinearLayout
     private lateinit var ambientSaturationText: TextView
-    private lateinit var ambientSaturationSeek: SeekBar
+    private lateinit var ambientSaturationSeek: SmartSliderView
     private lateinit var ambientBrightnessText: TextView
-    private lateinit var ambientBrightnessSeek: SeekBar
+    private lateinit var ambientBrightnessSeek: SmartSliderView
     private lateinit var ambientSpeedGroup: LinearLayout
     private lateinit var ambientSpeedText: TextView
-    private lateinit var ambientSpeedSeek: SeekBar
+    private lateinit var ambientSpeedSeek: SmartSliderView
     private lateinit var ambientRainbowGroup: LinearLayout
     private lateinit var ambientRainbowText: TextView
-    private lateinit var ambientRainbowSeek: SeekBar
+    private lateinit var ambientRainbowSeek: SmartSliderView
     private lateinit var ambientAutoSwitch: Switch
     private lateinit var ambientPeriodText: TextView
-    private lateinit var ambientPeriodSeek: SeekBar
+    private lateinit var ambientPeriodSeek: SmartSliderView
 
     private lateinit var nightEnabledSwitch: Switch
     private lateinit var nightColorPreview: View
     private lateinit var nightHueText: TextView
-    private lateinit var nightHueSeek: SeekBar
+    private lateinit var nightHueSeek: SmartSliderView
     private lateinit var nightSaturationText: TextView
-    private lateinit var nightSaturationSeek: SeekBar
+    private lateinit var nightSaturationSeek: SmartSliderView
     private lateinit var nightBrightnessText: TextView
-    private lateinit var nightBrightnessSeek: SeekBar
+    private lateinit var nightBrightnessSeek: SmartSliderView
     private lateinit var nightScheduleSwitch: Switch
     private lateinit var nightOnInput: EditText
     private lateinit var nightOffInput: EditText
@@ -123,13 +126,13 @@ class MainActivity : Activity() {
     private lateinit var alarmHourInput: EditText
     private lateinit var alarmMinuteInput: EditText
     private lateinit var alarmFadeText: TextView
-    private lateinit var alarmFadeSeek: SeekBar
+    private lateinit var alarmFadeSeek: SmartSliderView
     private lateinit var alarmBrightnessText: TextView
-    private lateinit var alarmBrightnessSeek: SeekBar
+    private lateinit var alarmBrightnessSeek: SmartSliderView
     private lateinit var alarmStartHueText: TextView
-    private lateinit var alarmStartHueSeek: SeekBar
+    private lateinit var alarmStartHueSeek: SmartSliderView
     private lateinit var alarmEndHueText: TextView
-    private lateinit var alarmEndHueSeek: SeekBar
+    private lateinit var alarmEndHueSeek: SmartSliderView
 
     private lateinit var addressInput: EditText
     private lateinit var systemSummaryText: TextView
