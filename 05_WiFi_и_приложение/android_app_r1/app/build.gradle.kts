@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 7
-        versionName = "0.10-design-v1-rc1"
+        versionCode = 8
+        versionName = "0.11-home-ui-rc1"
     }
 
     compileOptions {
