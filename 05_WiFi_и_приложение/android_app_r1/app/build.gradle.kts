@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 8
-        versionName = "0.11-home-ui-rc1"
+        versionCode = 9
+        versionName = "0.12-smart-slider-rc1"
     }
 
     compileOptions {
