@@ -1,10 +1,10 @@
 # Статус проекта ARDU
 
-Дата состояния: 2026-10-01
+Дата состояния: 2026-10-02
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — RELEASE CANDIDATES READY. Полная Nano v1 и полная ESP8266 v1 собраны, compact UART v1 заморожен и обе прошивки проходят CI. Nano: 28024/30720 flash (91%), globals 1070/2048 (52%). ESP8266: RAM 31988/80192 (39%), IRAM 60823/65536 (92%), IROM code 324376 bytes. Физический Nano пока остаётся на FW10 CORE R1, физический ESP — на hardware-tested HTTP_BRIDGE_R7. Следующий и единственный firmware gate — один обслуживаемый hardware session: финальный Nano upload → восстановление UART → финальный ESP v1 OTA → общий acceptance. После PASS firmware freeze и переход к Android functionality/design.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID FUNCTIONAL RC READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Попытка final Nano upload 2026-10-02 сейчас заблокирована физической платой; владелец заказал новую Nano, корневая причина старой платы не подтверждена. Пока замена в пути, Android переведён на final HTTP API v1 и доведён до `0.9-functional-v1-rc1`: пять пользовательских разделов, clap wizard, RTC/Alarm/Dawn, service/events/current-limit, saved/manual address и numeric Developer Mode. Android JVM contract tests PASS и debug APK build PASS. Следующий physical gate после прихода Nano: final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1620,3 +1620,19 @@
 - **Nano после persistence fix CI PASS:** 28024/30720 flash (91%); globals 1070/2048 (52%), free SRAM 978 bytes.
 - Night HUE/SAT/BRIGHT и Dawn parameters теперь имеют RAM live-preview + явные save opcodes 56/77, чтобы slider не писал EEPROM на каждом промежуточном значении.
 - Физические release uploads ещё не выполнялись.
+
+
+### 2026-10-02 — replacement Nano pending; Android functional v1 source/CI complete
+
+- **ФАКТ СО СЛОВ ВЛАДЕЛЬЦА:** final Nano upload на текущую плату пока не удаётся; заказана новая Nano.
+- **НЕ ПОДТВЕРЖДЕНО:** точная аппаратная причина отказа старой Nano. Не считать плату доказанно неисправной до отдельной диагностики.
+- Firmware source не менялся: Nano v1 и ESP v1 остаются release candidates с compile PASS.
+- Android app обновлён до `0.9-functional-v1-rc1`.
+- Android теперь использует final `ARDU_ESP_V1` semantic API, а не HTTP_BRIDGE_R7 response assumptions.
+- Реализованы все пользовательские разделы: Light, Music, Ambient, Night, Alarm/Dawn.
+- Реализованы clap family calibration, microphone calibration, RTC sync, STOP Dawn, events, current limit и numeric Developer UART v1.
+- Подключение: сохранённый/ручной адрес + fallback discovery; приложение не зависит только от `ardu.local`.
+- JVM mock-ESP contract tests PASS.
+- Android debug APK build PASS в GitHub Actions.
+- Physical Android end-to-end test отложен до final Nano+ESP uploads.
+- Acceptance plan: `05_WiFi_и_приложение/ANDROID_V1_FUNCTIONAL_TEST.md`.
