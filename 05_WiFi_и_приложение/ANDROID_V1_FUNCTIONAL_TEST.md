@@ -163,3 +163,17 @@ Android functionality считается закрытой, когда все р�
 - необходимости использовать Developer Mode для обычной функции.
 
 После этого следующий Android этап — визуальный design/UX polish, без изменения firmware/API contract.
+
+
+## Mock-phone smoke result — 2026-10-02
+
+Статус: **PASS** для mock path.
+
+На физическом Android-телефоне:
+- приложение подключилось к `ARDU_ESP_V1_MOCK`;
+- connection header показал Online/firmware/RSSI;
+- semantic mode и RTC time отобразились;
+- section navigation работает;
+- Alarm/Dawn settings отрисованы из mock `/api/settings`.
+
+Это не заменяет финальный hardware acceptance, но подтверждает реальный Android→LAN→HTTP mock path до получения replacement Nano.
