@@ -1681,3 +1681,29 @@
 - Static ID scan: missing/duplicate layout IDs = NONE.
 - GitHub Actions after redesign: JVM API contract tests PASS + debug APK build PASS.
 - Physical visual/UX smoke on owner phone is next software check; real end-to-end remains blocked only by replacement Nano/final firmware upload.
+
+
+### 2026-10-02 — Android smart-home UI v0.11 implemented
+
+- По обратной связи владельца верхняя status-card v0.10 была слишком высокой, а основной control language всё ещё слишком slider-oriented.
+- Создан Android `0.11-home-ui-rc1`.
+- Header сокращён до compact two-row control:
+  - ARDU;
+  - `● Онлайн/Нет связи`;
+  - small refresh;
+  - settings;
+  - current semantic mode;
+  - HH:MM RTC.
+- Firmware/RSSI больше не занимают main header; technical ESP data выводятся в Settings diagnostics.
+- Light screen переработан как smart-home dashboard:
+  - compact power card;
+  - quick scenes: Evening 2200 K / Warm 2700 K / Day 4000 K / Cool 6000 K;
+  - brightness percentage + ± step controls;
+  - slider сохранён только как fine adjustment;
+  - interactive HSV color wheel без сторонних libraries;
+  - precise RGB sliders скрыты под advanced action;
+  - startup profile + clap сгруппированы как behavior.
+- Scene actions используют существующий semantic API; firmware/API contract не менялся.
+- Static layout scan: missing IDs = NONE; duplicate IDs = NONE.
+- Final GitHub Actions for `d78f44dc`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
+- Следующая software проверка: owner-phone visual smoke на stateful ESP mock.
