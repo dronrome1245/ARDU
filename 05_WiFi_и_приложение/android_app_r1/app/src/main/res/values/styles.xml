@@ -1,7 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.ARDU" parent="android:style/Theme.Material.Light.NoActionBar">
-        <item name="android:fontFamily">sans</item>
-        <item name="android:windowLightStatusBar">true</item>
+
+    <style name="Theme.ARDU" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:windowBackground">@color/ardu_bg</item>
+        <item name="android:colorAccent">@color/ardu_accent</item>
+        <item name="android:navigationBarColor">@color/ardu_bg</item>
+        <item name="android:statusBarColor">@color/ardu_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:textColorPrimary">@color/ardu_text</item>
+        <item name="android:textColorSecondary">@color/ardu_text_secondary</item>
+        <item name="android:buttonStyle">@style/Widget.ARDU.Button.Secondary</item>
+        <item name="android:editTextStyle">@style/Widget.ARDU.EditText</item>
     </style>
+
+    <style name="ARDU.Card">
+        <item name="android:background">@drawable/ardu_card</item>
+        <item name="android:padding">18dp</item>
+        <item name="android:layout_marginTop">12dp</item>
+    </style>
+
+    <style name="ARDU.SectionTitle">
+        <item name="android:textColor">@color/ardu_text</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="ARDU.CardTitle">
+        <item name="android:textColor">@color/ardu_text</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="ARDU.Label">
+        <item name="android:textColor">@color/ardu_text_secondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="ARDU.Value">
+        <item name="android:textColor">@color/ardu_text</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="ARDU.Muted">
+        <item name="android:textColor">@color/ardu_text_muted</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="Widget.ARDU.Button.Secondary" parent="@android:style/Widget.Material.Button">
+        <item name="android:background">@drawable/ardu_button_secondary</item>
+        <item name="android:textColor">@color/ardu_text</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+    </style>
+
+    <style name="Widget.ARDU.Button.Primary" parent="Widget.ARDU.Button.Secondary">
+        <item name="android:background">@drawable/ardu_button_primary</item>
+        <item name="android:textColor">@color/ardu_on_accent</item>
+    </style>
+
+    <style name="Widget.ARDU.Button.Nav" parent="Widget.ARDU.Button.Secondary">
+        <item name="android:background">@drawable/ardu_nav_item</item>
+        <item name="android:textColor">@color/ardu_text_secondary</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+    </style>
+
+    <style name="Widget.ARDU.EditText" parent="@android:style/Widget.Material.EditText">
+        <item name="android:background">@drawable/ardu_input</item>
+        <item name="android:textColor">@color/ardu_text</item>
+        <item name="android:textColorHint">@color/ardu_text_muted</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
 </resources>
