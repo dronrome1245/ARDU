@@ -2052,3 +2052,16 @@ R3 экономит относительно R2:
 - Nano repeated compile after change passed: 28024/30720 flash (91%), 1070/2048 globals (52%).
 - Оба physical devices пока не обновлялись до release v1.
 - Следующий этап — единый final upload + acceptance session.
+
+
+## 2026-10-02 — Android functional v1 completed at source/CI level while replacement Nano is pending
+
+- Владелец сообщил, что final Nano upload на текущую плату не получается; заказана новая Nano.
+- Причина проблемы текущей платы не установлена, поэтому зафиксирован только upload blocker, без диагноза.
+- Android network client переписан под final `ARDU_ESP_V1` API.
+- Добавлен полный `/api/settings` parser и release data models.
+- Реализованы Light, clap calibration wizard, Music M01/M02/M03/M04/M05/M08/M09, Ambient F01/F02/F03, Night schedule, Alarm/Dawn/RTC, current limit, events, numeric Developer Mode.
+- Добавлено сохранение/ручной ввод адреса ARDU; mDNS не является единственной точкой подключения.
+- Создан JVM mock HTTP contract test для final ESP JSON и semantic writes.
+- GitHub Actions: contract tests PASS; debug APK assemble PASS.
+- Версия приложения поднята до `0.9-functional-v1-rc1`.
