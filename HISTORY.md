@@ -2065,3 +2065,11 @@ R3 экономит относительно R2:
 - Создан JVM mock HTTP contract test для final ESP JSON и semantic writes.
 - GitHub Actions: contract tests PASS; debug APK assemble PASS.
 - Версия приложения поднята до `0.9-functional-v1-rc1`.
+
+
+## 2026-10-02 — stateful ESP v1 mock added
+
+- Добавлен LAN mock final ESP API для ручной проверки Android до прихода replacement Nano.
+- Mock stateful: semantic writes меняют settings/status, clap wizard и service endpoints работают без hardware.
+- Отдельный GitHub Actions workflow проверяет syntax, ping/settings и stateful Music write/reread.
+- Mock ESP Verify PASS.
