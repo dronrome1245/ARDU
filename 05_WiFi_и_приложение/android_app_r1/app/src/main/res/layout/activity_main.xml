@@ -404,229 +404,35 @@
                         android:visibility="gone">
 
                         <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Красный" />
-                        <SeekBar android:id="@+id/lightRedSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" android:progress="255" />
-
-                        <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Зелёный" />
-                        <SeekBar android:id="@+id/lightGreenSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" android:progress="170" />
-
-                        <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Синий" />
-                        <SeekBar android:id="@+id/lightBlueSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" android:progress="87" />
-
-                        <Button
-                            android:id="@+id/lightApplyRgbButton"
-                            style="@style/Widget.ARDU.Button.Primary"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Применить точный RGB" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    style="@style/ARDU.Card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        style="@style/ARDU.CardTitle"
+                        <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/musicBrightnessSeek"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Поведение" />
-
-                    <Button
-                        android:id="@+id/lightSaveProfileButton"
-                        style="@style/Widget.ARDU.Button.Secondary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Использовать после включения питания" />
-
-                    <Switch
-                        android:id="@+id/clapEnabledSwitch"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Хлопковый выключатель"
-                        android:textColor="@color/ardu_text" />
-
-                    <TextView
-                        android:id="@+id/clapStateText"
-                        style="@style/ARDU.Label"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Калибровка: —" />
-
-                    <Button
-                        android:id="@+id/clapStartButton"
-                        style="@style/Widget.ARDU.Button.Secondary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Калибровать хлопки" />
-
-                    <LinearLayout
-                        android:id="@+id/clapCalibrationPanel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/ardu_input"
-                        android:orientation="vertical"
-                        android:padding="12dp"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:id="@+id/clapCalibrationText"
-                            style="@style/ARDU.Value"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="—" />
-
-                        <Button
-                            android:id="@+id/clapSampleButton"
-                            style="@style/Widget.ARDU.Button.Primary"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:text="Следующая пара хлопков" />
-
-                        <Button
-                            android:id="@+id/clapFinishButton"
-                            style="@style/Widget.ARDU.Button.Secondary"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="Рассчитать порог" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:orientation="horizontal">
-
-                            <Button
-                                android:id="@+id/clapSaveButton"
-                                style="@style/Widget.ARDU.Button.Primary"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="4dp"
-                                android:layout_weight="1"
-                                android:text="Сохранить" />
-
-                            <Button
-                                android:id="@+id/clapCancelButton"
-                                style="@style/Widget.ARDU.Button.Secondary"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="4dp"
-                                android:layout_weight="1"
-                                android:text="Отмена" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- MUSIC -->
-            <LinearLayout
-                android:id="@+id/musicPanel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <TextView
-                    style="@style/ARDU.SectionTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Светомузыка" />
-
-                <TextView
-                    style="@style/ARDU.Label"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Эффекты реагируют на MAX9814" />
-
-                <LinearLayout
-                    style="@style/ARDU.Card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/musicModeText"
-                        style="@style/ARDU.CardTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Режим: —" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/musicOnButton"
-                            style="@style/Widget.ARDU.Button.Primary"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="4dp"
-                            android:layout_weight="1"
-                            android:text="Включить" />
-
-                        <Button
-                            android:id="@+id/musicOffButton"
-                            style="@style/Widget.ARDU.Button.Secondary"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:layout_weight="1"
-                            android:text="Выключить" />
-                    </LinearLayout>
-
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:clipToPadding="false"
-                        android:scrollbars="none">
-
-                        <LinearLayout
-                            android:id="@+id/musicModeButtons"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal" />
-                    </HorizontalScrollView>
-                </LinearLayout>
-
-                <LinearLayout
-                    style="@style/ARDU.Card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        style="@style/ARDU.CardTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Параметры эффекта" />
-
-                    <TextView android:id="@+id/musicBrightnessText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="Яркость эффекта: 128" />
-                    <SeekBar android:id="@+id/musicBrightnessSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
 
                     <TextView android:id="@+id/musicBackgroundText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Фоновая яркость: 20" />
-                    <SeekBar android:id="@+id/musicBackgroundSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/musicBackgroundSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
 
                     <LinearLayout android:id="@+id/musicSmoothingGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                         <TextView android:id="@+id/musicSmoothingText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Плавность: 40" />
-                        <SeekBar android:id="@+id/musicSmoothingSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:min="5" android:max="100" />
+                        <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/musicSmoothingSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <LinearLayout android:id="@+id/musicSensitivityGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                         <TextView android:id="@+id/musicSensitivityText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Чувствительность: 100" />
-                        <SeekBar android:id="@+id/musicSensitivitySeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:min="50" android:max="200" />
+                        <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/musicSensitivitySeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <LinearLayout android:id="@+id/musicSubmodeGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="vertical" android:visibility="gone">
@@ -643,17 +449,29 @@
 
                     <LinearLayout android:id="@+id/musicSpeedGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
                         <TextView android:id="@+id/musicSpeedText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Скорость: 30" />
-                        <SeekBar android:id="@+id/musicSpeedSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:min="1" android:max="255" />
+                        <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/musicSpeedSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <LinearLayout android:id="@+id/musicAuxGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
                         <TextView android:id="@+id/musicAuxText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Параметр: 10" />
-                        <SeekBar android:id="@+id/musicAuxSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                        <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/musicAuxSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <LinearLayout android:id="@+id/musicHueStartGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
                         <TextView android:id="@+id/musicHueStartText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Начальный цвет: 0" />
-                        <SeekBar android:id="@+id/musicHueStartSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                        <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/musicHueStartSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -699,8 +517,8 @@
                     <TextView android:id="@+id/ambientEffectText" style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Эффект: —" />
 
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="horizontal">
-                        <Button android:id="@+id/ambientOnButton" style="@style/Widget.ARDU.Button.Primary" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:layout_weight="1" android:text="Включить" />
-                        <Button android:id="@+id/ambientOffButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="4dp" android:layout_weight="1" android:text="Выключить" />
+                        <Button android:id="@+id/ambientOnButton" style="@style/Widget.ARDU.Button.Icon" android:layout_width="56dp" android:layout_height="48dp" android:contentDescription="Включить фон" android:text="▶" />
+                        <Button android:id="@+id/ambientOffButton" style="@style/Widget.ARDU.Button.Icon" android:layout_width="56dp" android:layout_height="48dp" android:layout_marginStart="8dp" android:contentDescription="Выключить фон" android:text="■" />
                     </LinearLayout>
 
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="horizontal">
@@ -717,24 +535,44 @@
                     </LinearLayout>
 
                     <TextView android:id="@+id/ambientHueText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Цвет: 0" />
-                    <SeekBar android:id="@+id/ambientHueSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/ambientHueSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
 
                     <LinearLayout android:id="@+id/ambientSaturationGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                         <TextView android:id="@+id/ambientSaturationText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Насыщенность: 255" />
-                        <SeekBar android:id="@+id/ambientSaturationSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                        <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/ambientSaturationSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <TextView android:id="@+id/ambientBrightnessText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Яркость: 80" />
-                    <SeekBar android:id="@+id/ambientBrightnessSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/ambientBrightnessSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
 
                     <LinearLayout android:id="@+id/ambientSpeedGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                         <TextView android:id="@+id/ambientSpeedText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Скорость: 30" />
-                        <SeekBar android:id="@+id/ambientSpeedSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:min="1" android:max="255" />
+                        <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/ambientSpeedSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <LinearLayout android:id="@+id/ambientRainbowGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                         <TextView android:id="@+id/ambientRainbowText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Шаг радуги: 0.5" />
-                        <SeekBar android:id="@+id/ambientRainbowSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:min="5" android:max="100" />
+                        <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/ambientRainbowSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -742,7 +580,11 @@
                     <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Автоперебор" />
                     <Switch android:id="@+id/ambientAutoSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Менять эффекты автоматически" android:textColor="@color/ardu_text" />
                     <TextView android:id="@+id/ambientPeriodText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Период: 10 с" />
-                    <SeekBar android:id="@+id/ambientPeriodSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:min="1" android:max="255" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/ambientPeriodSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -770,13 +612,25 @@
                     </LinearLayout>
 
                     <TextView android:id="@+id/nightHueText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Цвет: 24" />
-                    <SeekBar android:id="@+id/nightHueSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/nightHueSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
 
                     <TextView android:id="@+id/nightSaturationText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Насыщенность: 180" />
-                    <SeekBar android:id="@+id/nightSaturationSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/nightSaturationSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
 
                     <TextView android:id="@+id/nightBrightnessText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Яркость: 18" />
-                    <SeekBar android:id="@+id/nightBrightnessSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/nightBrightnessSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
 
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
@@ -830,28 +684,44 @@
                     <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Параметры рассвета" />
 
                     <TextView android:id="@+id/alarmFadeText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Рассвет: 30 мин" />
-                    <SeekBar android:id="@+id/alarmFadeSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:min="1" android:max="120" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/alarmFadeSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
 
                     <TextView android:id="@+id/alarmBrightnessText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Макс. яркость: 120" />
-                    <SeekBar android:id="@+id/alarmBrightnessSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:min="1" android:max="255" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/alarmBrightnessSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
 
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:gravity="center_vertical" android:orientation="horizontal">
                         <View android:id="@+id/alarmStartPreview" android:layout_width="42dp" android:layout_height="42dp" android:background="@drawable/ardu_color_preview" />
                         <TextView android:id="@+id/alarmStartHueText" style="@style/ARDU.Value" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="Начальный цвет: 8" />
                     </LinearLayout>
-                    <SeekBar android:id="@+id/alarmStartHueSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/alarmStartHueSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
 
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center_vertical" android:orientation="horizontal">
                         <View android:id="@+id/alarmEndPreview" android:layout_width="42dp" android:layout_height="42dp" android:background="@drawable/ardu_color_preview" />
                         <TextView android:id="@+id/alarmEndHueText" style="@style/ARDU.Value" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="Конечный цвет: 32" />
                     </LinearLayout>
-                    <SeekBar android:id="@+id/alarmEndHueSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="255" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/alarmEndHueSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
 
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                     <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Сервис будильника" />
-                    <Button android:id="@+id/syncTimeButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Синхронизировать RTC с телефоном" />
-                    <Button android:id="@+id/stopDawnButton" style="@style/Widget.ARDU.Button.Primary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Остановить рассвет" />
+                    <Button android:id="@+id/syncTimeButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="↻  RTC" />
+                    <Button android:id="@+id/stopDawnButton" style="@style/Widget.ARDU.Button.Primary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="■  Рассвет" />
                 </LinearLayout>
             </LinearLayout>
 
