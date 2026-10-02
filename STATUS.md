@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID FUNCTIONAL RC READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Попытка final Nano upload 2026-10-02 сейчас заблокирована физической платой; владелец заказал новую Nano, корневая причина старой платы не подтверждена. Пока замена в пути, Android переведён на final HTTP API v1 и доведён до `0.9-functional-v1-rc1`: пять пользовательских разделов, clap wizard, RTC/Alarm/Dawn, service/events/current-limit, saved/manual address и numeric Developer Mode. Android JVM contract tests PASS и debug APK build PASS. Следующий physical gate после прихода Nano: final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.12-smart-slider-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Пока замена в пути Android доведён до full functional + smart-home UI: compact header, five-section bottom navigation, Light scenes, brightness steps, color wheel и custom semantic sliders. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1707,3 +1707,24 @@
 - Static layout scan: missing IDs = NONE; duplicate IDs = NONE.
 - Final GitHub Actions for `d78f44dc`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
 - Следующая software проверка: owner-phone visual smoke на stateful ESP mock.
+
+
+### 2026-10-02 — custom smart sliders replace primitive Light SeekBars
+
+- Owner accepted Light functionality/smart-home direction but identified standard Android sliders as visually primitive.
+- Created reusable native `SmartSliderView` without third-party libraries.
+- Light brightness slider:
+  - 24dp rounded track;
+  - semantic dark→accent brightness fill;
+  - large draggable thumb;
+  - touch anywhere on track;
+  - API commit only on finger release.
+- Light Kelvin slider:
+  - continuous warm orange → warm white → cool blue gradient;
+  - large thumb tinted by current Kelvin;
+  - range remains 1800..6500 K.
+- Existing ± brightness buttons and quick scenes remain.
+- Component is reusable for Music/Ambient/Night/Alarm after owner visual approval.
+- Android version: `0.12-smart-slider-rc1`.
+- Final GitHub Actions run: contract tests PASS + debug APK build PASS.
+- Firmware/API contract unchanged.
