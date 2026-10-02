@@ -2108,3 +2108,14 @@ R3 экономит относительно R2:
 - ESP firmware/RSSI moved out of primary header into diagnostic summary.
 - API contract and firmware remain frozen/unchanged.
 - Contract tests PASS; debug APK PASS.
+
+
+## 2026-10-02 — standard Light SeekBars replaced by custom smart sliders
+
+- Owner feedback: smart-home Light functionality is good, but default Android sliders still look primitive.
+- Added native `SmartSliderView`.
+- Brightness uses semantic filled rounded track and large thumb.
+- Kelvin uses full warm→neutral→cool gradient and Kelvin-colored thumb.
+- Both controls preserve release behavior: preview is local while dragging, one semantic HTTP write on release.
+- Version bumped to `0.12-smart-slider-rc1`.
+- Contract tests PASS; debug APK build PASS.
