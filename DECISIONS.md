@@ -1417,3 +1417,32 @@ R3 не прошивался и не тестировался на железе.
 8. No third-party UI dependency and no firmware/API changes.
 
 **Implementation:** Android `0.13-smart-home-tabs-rc1`.
+
+
+---
+
+## D-086 — Final Android v1 visual direction = Home Hub + Focus Dial
+
+**Дата:** 2026-10-03  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED
+
+**Последнее явное решение владельца:** после visual concept comparison утверждён единый стиль, объединяющий **Focus Dial** и **Home Hub**.
+
+**Решение:**
+1. Final Android v1 palette remains the approved mint-dark palette.
+2. Home Hub supplies context: room/atmosphere hero, device state, scenes and quick summaries.
+3. Focus Dial is the signature primary interaction for ordinary-light brightness.
+4. Light uses two UI views:
+   - overview/Home Hub;
+   - detailed control/Focus Dial.
+5. Music, Ambient, Night and Alarm/Dawn use contextual Home Hub hero blocks plus their existing semantic controls.
+6. This is an Android presentation/interaction decision only:
+   - HTTP API v1 unchanged;
+   - numeric UART v1 unchanged;
+   - Nano/ESP firmware unchanged.
+7. Native custom views are preferred over third-party UI dependencies.
+8. Device truth always comes from Nano reread; visual preview must not become an independent state source.
+9. Future UI work is polish/release-blocker only unless owner explicitly changes this decision.
+
+**Implementation:** Android `0.14-ios-homehub-focus-rc1`.  
+**CI evidence:** GitHub Actions run `37062432020` PASS.
