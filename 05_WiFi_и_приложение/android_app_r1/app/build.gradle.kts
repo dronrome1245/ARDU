@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10
-        versionName = "0.13-smart-home-tabs-rc1"
+        versionCode = 11
+        versionName = "0.14-ios-homehub-focus-rc1"
     }
 
     compileOptions {
