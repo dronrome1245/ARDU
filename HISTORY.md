@@ -2119,3 +2119,17 @@ R3 экономит относительно R2:
 - Both controls preserve release behavior: preview is local while dragging, one semantic HTTP write on release.
 - Version bumped to `0.12-smart-slider-rc1`.
 - Contract tests PASS; debug APK build PASS.
+
+
+## 2026-10-02 — smart-home UI propagated to Music/Ambient/Night/Alarm
+
+- Owner approved Light smart-home direction and requested the same visual language on other tabs, with better font sizing and icon-only actions where obvious.
+- Added HUE mode to reusable `SmartSliderView`.
+- Replaced primary stock sliders throughout Music, Ambient, Night and Alarm/Dawn.
+- Added selected-state choice cards for Music modes, Music submodes and Ambient effects.
+- Compact action glyphs introduced where meaning is obvious (refresh/settings already present; Music/Ambient start/stop; Alarm save).
+- Typography normalized across all user screens.
+- A static ID check caught a broad XML replacement that had removed neighboring tags; layout was restored from clean v0.12 and the conversion was repeated safely tag-by-tag.
+- Final layout validation: missing IDs = 0; duplicate IDs = 0.
+- Version = `0.13-smart-home-tabs-rc1`.
+- Final CI run 37056022090: unit contract tests PASS, debug APK build PASS.
