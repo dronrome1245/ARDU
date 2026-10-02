@@ -439,10 +439,10 @@
                         <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Подрежим" />
                         <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
                             <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
-                                <Button android:id="@+id/musicSubThree" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3 полосы" />
-                                <Button android:id="@+id/musicSubLow" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Низ" />
-                                <Button android:id="@+id/musicSubMid" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Середина" />
-                                <Button android:id="@+id/musicSubHigh" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Верх" />
+                                <Button android:id="@+id/musicSubThree" style="@style/Widget.ARDU.Button.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3 полосы" />
+                                <Button android:id="@+id/musicSubLow" style="@style/Widget.ARDU.Button.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Низ" />
+                                <Button android:id="@+id/musicSubMid" style="@style/Widget.ARDU.Button.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Середина" />
+                                <Button android:id="@+id/musicSubHigh" style="@style/Widget.ARDU.Button.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Верх" />
                             </LinearLayout>
                         </HorizontalScrollView>
                     </LinearLayout>
@@ -497,7 +497,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="Калибровать микрофон" />
+                        android:text="Калибровать" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -511,7 +511,7 @@
                 android:visibility="gone">
 
                 <TextView style="@style/ARDU.SectionTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Фон" />
-                <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Спокойные цветовые эффекты" />
+                <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Цвет и движение" />
 
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                     <TextView android:id="@+id/ambientEffectText" style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Эффект: —" />
@@ -522,9 +522,9 @@
                     </LinearLayout>
 
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="horizontal">
-                        <Button android:id="@+id/ambientF01Button" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="3dp" android:layout_weight="1" android:text="Цвет" />
-                        <Button android:id="@+id/ambientF02Button" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:layout_weight="1" android:text="Смена" />
-                        <Button android:id="@+id/ambientF03Button" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="3dp" android:layout_weight="1" android:text="Радуга" />
+                        <Button android:id="@+id/ambientF01Button" style="@style/Widget.ARDU.Button.Choice" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="3dp" android:layout_weight="1" android:text="Цвет" />
+                        <Button android:id="@+id/ambientF02Button" style="@style/Widget.ARDU.Button.Choice" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:layout_weight="1" android:text="Смена" />
+                        <Button android:id="@+id/ambientF03Button" style="@style/Widget.ARDU.Button.Choice" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="3dp" android:layout_weight="1" android:text="Радуга" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -598,7 +598,7 @@
                 android:visibility="gone">
 
                 <TextView style="@style/ARDU.SectionTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ночник" />
-                <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Мягкий свет и расписание" />
+                <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Мягкий свет по расписанию" />
 
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                     <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ночник" />
@@ -643,7 +643,7 @@
                     <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Выключение" />
                     <EditText android:id="@+id/nightOffInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="07:00" android:inputType="text" android:maxLines="1" />
 
-                    <Button android:id="@+id/nightSaveScheduleButton" style="@style/Widget.ARDU.Button.Primary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Сохранить расписание" />
+                    <Button android:id="@+id/nightSaveScheduleButton" style="@style/Widget.ARDU.Button.Primary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="✓  Сохранить" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -657,7 +657,7 @@
                 android:visibility="gone">
 
                 <TextView style="@style/ARDU.SectionTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Будильник" />
-                <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Плавный световой рассвет по RTC" />
+                <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Световой рассвет по RTC" />
 
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                     <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Время" />
@@ -676,7 +676,7 @@
                         <EditText android:id="@+id/alarmHourInput" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:layout_weight="1" android:gravity="center" android:hint="07" android:inputType="number" android:maxLines="1" />
                         <TextView style="@style/ARDU.SectionTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=":" android:textSize="24sp" />
                         <EditText android:id="@+id/alarmMinuteInput" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="4dp" android:layout_marginEnd="8dp" android:layout_weight="1" android:gravity="center" android:hint="00" android:inputType="number" android:maxLines="1" />
-                        <Button android:id="@+id/alarmSaveTimeButton" style="@style/Widget.ARDU.Button.Primary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Сохранить" />
+                        <Button android:id="@+id/alarmSaveTimeButton" style="@style/Widget.ARDU.Button.Icon" android:layout_width="52dp" android:layout_height="48dp" android:contentDescription="Сохранить время будильника" android:text="✓" />
                     </LinearLayout>
                 </LinearLayout>
 
