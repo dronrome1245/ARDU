@@ -2259,3 +2259,41 @@ android_smart_slider_v0_12_2026_10_02:
   contract_tests: pass
   debug_apk_ci: pass
   owner_visual_smoke: pending
+
+
+android_smart_home_tabs_v0_13_2026_10_02:
+  version: "0.13-smart-home-tabs-rc1"
+  owner_light_style_approved: true
+  tabs:
+    light: smart_home
+    music: smart_home
+    ambient: smart_home
+    night: smart_home
+    alarm: smart_home
+  smart_slider_modes:
+    brightness: true
+    kelvin: true
+    hue: true
+    accent_generic: true
+  selected_state:
+    music_modes: true
+    music_submodes: true
+    ambient_effects: true
+  typography_sp:
+    section: 24
+    card: 16
+    value: 15
+    secondary: 13
+  icon_compact_actions: true
+  normal_user_stock_seekbars: 0
+  technical_stock_seekbars:
+    - precise_rgb_collapsed
+    - current_limit_service
+  static_layout:
+    missing_ids: 0
+    duplicate_ids: 0
+  final_actions_run: 37056022090
+  contract_tests: pass
+  debug_apk_ci: pass
+  firmware_api_contract_changed: false
+  owner_cross_tab_visual_smoke: pending
