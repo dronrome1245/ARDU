@@ -7,6 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.json.JSONObject
 import java.net.InetSocketAddress
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
@@ -98,13 +99,13 @@ class ArduApiClientContractTest {
 
         val raw = api.sendNanoCommand("1")
 
-        assertTrue(received.getValue("/api/mode").contains(""mode":"music""))
-        assertTrue(received.getValue("/api/ambient/effect").contains(""id":"F02""))
-        assertTrue(received.getValue("/api/night/settings").contains(""hue":24"))
-        assertTrue(received.getValue("/api/alarm/settings").contains(""hour":7"))
-        assertTrue(received.getValue("/api/light/settings").contains(""brightness":64"))
-        assertTrue(received.getValue("/api/music/settings").contains(""active_brightness":120"))
-        assertTrue(received.getValue("/api/system/current-limit").contains(""milliamps":3000"))
+        assertEquals("music", JSONObject(received.getValue("/api/mode")).getString("mode"))
+        assertEquals("F02", JSONObject(received.getValue("/api/ambient/effect")).getString("id"))
+        assertEquals(24, JSONObject(received.getValue("/api/night/settings")).getInt("hue"))
+        assertEquals(7, JSONObject(received.getValue("/api/alarm/settings")).getInt("hour"))
+        assertEquals(64, JSONObject(received.getValue("/api/light/settings")).getInt("brightness"))
+        assertEquals(120, JSONObject(received.getValue("/api/music/settings")).getInt("active_brightness"))
+        assertEquals(3000, JSONObject(received.getValue("/api/system/current-limit")).getInt("milliamps"))
         assertEquals("O 1", raw.nano)
         assertEquals("1", received.getValue("/api/dev/nano"))
     }
