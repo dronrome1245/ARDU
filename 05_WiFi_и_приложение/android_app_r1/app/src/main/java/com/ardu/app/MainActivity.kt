@@ -14,6 +14,7 @@ import com.ardu.app.net.ArduApiClient
 import com.ardu.app.net.ArduSettings
 import com.ardu.app.net.DeviceStatus
 import com.ardu.app.net.TimeStatus
+import com.ardu.app.ui.ColorWheelView
 import java.util.Locale
 import java.util.concurrent.Executors
 
@@ -23,6 +24,8 @@ class MainActivity : Activity() {
     private var rendering = false
     private var latestSettings: ArduSettings? = null
     private var sectionNavigation: List<Pair<Button, LinearLayout>> = emptyList()
+    private var lastEspFirmware: String = "—"
+    private var lastEspRssi: Int? = null
 
     private lateinit var connectionText: TextView
     private lateinit var modeText: TextView
@@ -47,6 +50,8 @@ class MainActivity : Activity() {
     private lateinit var lightGreenSeek: SeekBar
     private lateinit var lightBlueSeek: SeekBar
     private lateinit var lightColorPreview: View
+    private lateinit var lightColorWheel: ColorWheelView
+    private lateinit var lightAdvancedRgbPanel: LinearLayout
     private lateinit var clapEnabledSwitch: Switch
     private lateinit var clapStateText: TextView
     private lateinit var clapCalibrationPanel: LinearLayout
@@ -187,6 +192,8 @@ class MainActivity : Activity() {
         lightGreenSeek = findViewById(R.id.lightGreenSeek)
         lightBlueSeek = findViewById(R.id.lightBlueSeek)
         lightColorPreview = findViewById(R.id.lightColorPreview)
+        lightColorWheel = findViewById(R.id.lightColorWheel)
+        lightAdvancedRgbPanel = findViewById(R.id.lightAdvancedRgbPanel)
         clapEnabledSwitch = findViewById(R.id.clapEnabledSwitch)
         clapStateText = findViewById(R.id.clapStateText)
         clapCalibrationPanel = findViewById(R.id.clapCalibrationPanel)
@@ -315,16 +322,32 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.lightOffButton).setOnClickListener {
             runDeviceAction("Выключение света") { api.setLightEnabled(false) }
         }
-        findViewById<Button>(R.id.light2700Button).setOnClickListener { setLightKelvin(2700) }
-        findViewById<Button>(R.id.light4000Button).setOnClickListener { setLightKelvin(4000) }
-        findViewById<Button>(R.id.light6000Button).setOnClickListener { setLightKelvin(6000) }
+        findViewById<Button>(R.id.lightSceneEveningButton).setOnClickListener {
+            applyLightScene("Вечер", 2200, 76)
+        }
+        findViewById<Button>(R.id.light2700Button).setOnClickListener {
+            applyLightScene("Тёплый свет", 2700, 178)
+        }
+        findViewById<Button>(R.id.light4000Button).setOnClickListener {
+            applyLightScene("Дневной свет", 4000, 204)
+        }
+        findViewById<Button>(R.id.light6000Button).setOnClickListener {
+            applyLightScene("Холодный свет", 6000, 204)
+        }
+
+        findViewById<Button>(R.id.lightBrightnessMinusButton).setOnClickListener {
+            changeLightBrightness(-26)
+        }
+        findViewById<Button>(R.id.lightBrightnessPlusButton).setOnClickListener {
+            changeLightBrightness(26)
+        }
 
         bindSeek(lightBrightnessSeek,
-            { lightBrightnessText.text = "Яркость: $it" },
+            { lightBrightnessText.text = "${brightnessPercent(it)}%" },
             { value -> runDeviceAction("Яркость света") { api.setLightBrightness(value) } }
         )
         bindSeek(lightKelvinSeek,
-            { lightKelvinText.text = "Температура: $it K" },
+            { lightKelvinText.text = "$it K" },
             { value -> setLightKelvin(value) }
         )
 
@@ -332,6 +355,29 @@ class MainActivity : Activity() {
         lightRedSeek.setOnSeekBarChangeListener(labelOnlyListener(rgbLabel))
         lightGreenSeek.setOnSeekBarChangeListener(labelOnlyListener(rgbLabel))
         lightBlueSeek.setOnSeekBarChangeListener(labelOnlyListener(rgbLabel))
+
+        lightColorWheel.setListener(
+            onPreview = { color ->
+                rendering = true
+                lightRedSeek.progress = Color.red(color)
+                lightGreenSeek.progress = Color.green(color)
+                lightBlueSeek.progress = Color.blue(color)
+                rendering = false
+                updateRgbLabel()
+            },
+            onCommit = { color ->
+                runDeviceAction("Цвет света") {
+                    api.setLightRgb(Color.red(color), Color.green(color), Color.blue(color))
+                }
+            }
+        )
+
+        findViewById<Button>(R.id.lightAdvancedRgbButton).setOnClickListener {
+            val show = lightAdvancedRgbPanel.visibility != View.VISIBLE
+            lightAdvancedRgbPanel.visibility = if (show) View.VISIBLE else View.GONE
+            findViewById<Button>(R.id.lightAdvancedRgbButton).text =
+                if (show) "Скрыть точную RGB настройку" else "Точная RGB настройка"
+        }
 
         findViewById<Button>(R.id.lightApplyRgbButton).setOnClickListener {
             val red = lightRedSeek.progress
@@ -365,9 +411,29 @@ class MainActivity : Activity() {
         runDeviceAction("Температура света") { api.setLightKelvin(value) }
     }
 
+    private fun applyLightScene(label: String, kelvin: Int, brightness: Int) {
+        runDeviceAction(label) {
+            api.setLightEnabled(true)
+            api.setLightKelvin(kelvin)
+            api.setLightBrightness(brightness)
+        }
+    }
+
+    private fun changeLightBrightness(delta: Int) {
+        val value = (lightBrightnessSeek.progress + delta).coerceIn(0, 255)
+        lightBrightnessSeek.progress = value
+        runDeviceAction("Яркость света") { api.setLightBrightness(value) }
+    }
+
+    private fun brightnessPercent(value: Int): Int =
+        ((value.coerceIn(0, 255) * 100) + 127) / 255
+
     private fun updateRgbLabel() {
         lightRgbText.text =
             "RGB: ${lightRedSeek.progress},${lightGreenSeek.progress},${lightBlueSeek.progress}"
+        lightColorWheel.setColor(
+            Color.rgb(lightRedSeek.progress, lightGreenSeek.progress, lightBlueSeek.progress)
+        )
         setPreview(
             lightColorPreview,
             Color.rgb(lightRedSeek.progress, lightGreenSeek.progress, lightBlueSeek.progress)
@@ -789,6 +855,8 @@ class MainActivity : Activity() {
         worker.execute {
             try {
                 val ping = api.ping()
+                lastEspFirmware = ping.firmware
+                lastEspRssi = ping.rssi
                 val snapshot = readSnapshot()
                 val selectedAddress = api.selectedAddress()
                 if (!selectedAddress.isNullOrBlank()) {
@@ -796,9 +864,7 @@ class MainActivity : Activity() {
                 }
 
                 runOnUiThread {
-                    connectionText.text =
-                        "Онлайн • ${ping.firmware}" +
-                        if (ping.rssi != null) " • ${ping.rssi} dBm" else ""
+                    connectionText.text = "● Онлайн"
                     connectionText.setTextColor(getColor(R.color.ardu_accent))
                     if (!selectedAddress.isNullOrBlank()) {
                         addressInput.setText(selectedAddress.removePrefix("http://"))
@@ -808,7 +874,7 @@ class MainActivity : Activity() {
                 }
             } catch (error: Exception) {
                 runOnUiThread {
-                    connectionText.text = "Нет связи"
+                    connectionText.text = "● Нет связи"
                     connectionText.setTextColor(getColor(R.color.ardu_danger))
                     operationText.text = error.message ?: "Ошибка подключения"
                     refreshButton.isEnabled = true
@@ -840,11 +906,11 @@ class MainActivity : Activity() {
         rendering = true
         latestSettings = snapshot.settings
 
-        modeText.text = "Режим: ${modeTitle(snapshot.status.mode)}"
+        modeText.text = modeTitle(snapshot.status.mode)
         timeText.text = if (snapshot.time.valid) {
-            "Время ARDU: ${snapshot.time.date ?: ""} ${snapshot.time.time ?: ""}".trim()
+            snapshot.time.time?.take(5) ?: "--:--"
         } else {
-            "Время ARDU: RTC недоступны"
+            "RTC —"
         }
 
         renderLight(snapshot)
@@ -869,8 +935,8 @@ class MainActivity : Activity() {
         lightRedSeek.progress = l.red
         lightGreenSeek.progress = l.green
         lightBlueSeek.progress = l.blue
-        lightBrightnessText.text = "Яркость: ${l.brightness}"
-        lightKelvinText.text = "Температура: ${l.kelvin} K"
+        lightBrightnessText.text = "${brightnessPercent(l.brightness)}%"
+        lightKelvinText.text = "${l.kelvin} K"
         updateRgbLabel()
 
         val clap = snapshot.settings.clap
@@ -1015,6 +1081,8 @@ class MainActivity : Activity() {
         currentLimitSeek.progress = sys.currentLimitMa
         currentLimitText.text = "Лимит тока: ${sys.currentLimitMa} мА"
         systemSummaryText.text = buildString {
+            appendLine("ESP: $lastEspFirmware")
+            lastEspRssi?.let { appendLine("Wi-Fi: $it dBm") }
             appendLine("Nano: ${status.nanoFirmware}")
             appendLine("UART: v${status.uartProtocol}")
             appendLine("RTC: ${if (status.rtcValid) "OK" else "INVALID"}")
