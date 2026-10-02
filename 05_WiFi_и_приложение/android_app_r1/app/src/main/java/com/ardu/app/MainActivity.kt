@@ -15,6 +15,8 @@ import com.ardu.app.net.ArduSettings
 import com.ardu.app.net.DeviceStatus
 import com.ardu.app.net.TimeStatus
 import com.ardu.app.ui.ColorWheelView
+import com.ardu.app.ui.FocusDialView
+import com.ardu.app.ui.RoomHeroView
 import com.ardu.app.ui.SmartSliderView
 import java.util.Locale
 import java.util.concurrent.Executors
@@ -38,6 +40,12 @@ class MainActivity : Activity() {
     private lateinit var refreshButton: Button
 
     private lateinit var lightPanel: LinearLayout
+    private lateinit var lightOverviewPanel: LinearLayout
+    private lateinit var lightControlPanel: LinearLayout
+    private lateinit var lightHeroView: RoomHeroView
+    private lateinit var lightFocusDial: FocusDialView
+    private lateinit var lightOverviewBrightnessText: TextView
+    private lateinit var lightOverviewKelvinText: TextView
     private lateinit var musicPanel: LinearLayout
     private lateinit var ambientPanel: LinearLayout
     private lateinit var nightPanel: LinearLayout
@@ -64,6 +72,7 @@ class MainActivity : Activity() {
     private lateinit var clapFinishButton: Button
     private lateinit var clapSaveButton: Button
 
+    private lateinit var musicHeroView: RoomHeroView
     private lateinit var musicModeText: TextView
     private lateinit var musicModeButtons: LinearLayout
     private lateinit var musicBrightnessText: TextView
@@ -88,6 +97,7 @@ class MainActivity : Activity() {
     private lateinit var musicHueStartSeek: SmartSliderView
     private lateinit var musicCalibrationText: TextView
 
+    private lateinit var ambientHeroView: RoomHeroView
     private lateinit var ambientEffectText: TextView
     private lateinit var ambientColorPreview: View
     private lateinit var ambientHueText: TextView
@@ -107,6 +117,7 @@ class MainActivity : Activity() {
     private lateinit var ambientPeriodText: TextView
     private lateinit var ambientPeriodSeek: SmartSliderView
 
+    private lateinit var nightHeroView: RoomHeroView
     private lateinit var nightEnabledSwitch: Switch
     private lateinit var nightColorPreview: View
     private lateinit var nightHueText: TextView
@@ -119,6 +130,7 @@ class MainActivity : Activity() {
     private lateinit var nightOnInput: EditText
     private lateinit var nightOffInput: EditText
 
+    private lateinit var alarmHeroView: RoomHeroView
     private lateinit var alarmStateText: TextView
     private lateinit var alarmStartPreview: View
     private lateinit var alarmEndPreview: View
@@ -163,7 +175,7 @@ class MainActivity : Activity() {
             addressInput.setText(savedAddress.removePrefix("http://"))
         }
 
-        showSection(lightPanel)
+        showLightOverview()
         refreshDevice()
     }
 
@@ -180,6 +192,12 @@ class MainActivity : Activity() {
         refreshButton = findViewById(R.id.refreshButton)
 
         lightPanel = findViewById(R.id.lightPanel)
+        lightOverviewPanel = findViewById(R.id.lightOverviewPanel)
+        lightControlPanel = findViewById(R.id.lightControlPanel)
+        lightHeroView = findViewById(R.id.lightHeroView)
+        lightFocusDial = findViewById(R.id.lightFocusDial)
+        lightOverviewBrightnessText = findViewById(R.id.lightOverviewBrightnessText)
+        lightOverviewKelvinText = findViewById(R.id.lightOverviewKelvinText)
         musicPanel = findViewById(R.id.musicPanel)
         ambientPanel = findViewById(R.id.ambientPanel)
         nightPanel = findViewById(R.id.nightPanel)
@@ -206,6 +224,7 @@ class MainActivity : Activity() {
         clapFinishButton = findViewById(R.id.clapFinishButton)
         clapSaveButton = findViewById(R.id.clapSaveButton)
 
+        musicHeroView = findViewById(R.id.musicHeroView)
         musicModeText = findViewById(R.id.musicModeText)
         musicModeButtons = findViewById(R.id.musicModeButtons)
         musicBrightnessText = findViewById(R.id.musicBrightnessText)
@@ -230,6 +249,7 @@ class MainActivity : Activity() {
         musicHueStartSeek = findViewById(R.id.musicHueStartSeek)
         musicCalibrationText = findViewById(R.id.musicCalibrationText)
 
+        ambientHeroView = findViewById(R.id.ambientHeroView)
         ambientEffectText = findViewById(R.id.ambientEffectText)
         ambientColorPreview = findViewById(R.id.ambientColorPreview)
         ambientHueText = findViewById(R.id.ambientHueText)
@@ -249,6 +269,7 @@ class MainActivity : Activity() {
         ambientPeriodText = findViewById(R.id.ambientPeriodText)
         ambientPeriodSeek = findViewById(R.id.ambientPeriodSeek)
 
+        nightHeroView = findViewById(R.id.nightHeroView)
         nightEnabledSwitch = findViewById(R.id.nightEnabledSwitch)
         nightColorPreview = findViewById(R.id.nightColorPreview)
         nightHueText = findViewById(R.id.nightHueText)
@@ -261,6 +282,7 @@ class MainActivity : Activity() {
         nightOnInput = findViewById(R.id.nightOnInput)
         nightOffInput = findViewById(R.id.nightOffInput)
 
+        alarmHeroView = findViewById(R.id.alarmHeroView)
         alarmStateText = findViewById(R.id.alarmStateText)
         alarmStartPreview = findViewById(R.id.alarmStartPreview)
         alarmEndPreview = findViewById(R.id.alarmEndPreview)
@@ -299,12 +321,26 @@ class MainActivity : Activity() {
         )
 
         sectionNavigation.forEach { (button, panel) ->
-            button.setOnClickListener { showSection(panel) }
+            button.setOnClickListener {
+                if (panel === lightPanel) showLightOverview() else showSection(panel)
+            }
         }
 
         findViewById<Button>(R.id.navServiceButton).setOnClickListener {
             showSection(servicePanel)
         }
+    }
+
+    private fun showLightOverview() {
+        showSection(lightPanel)
+        lightOverviewPanel.visibility = View.VISIBLE
+        lightControlPanel.visibility = View.GONE
+    }
+
+    private fun showLightControl() {
+        showSection(lightPanel)
+        lightOverviewPanel.visibility = View.GONE
+        lightControlPanel.visibility = View.VISIBLE
     }
 
     private fun showSection(target: LinearLayout) {
@@ -320,6 +356,21 @@ class MainActivity : Activity() {
     }
 
     private fun bindLight() {
+        lightHeroView.setScene(RoomHeroView.Scene.LIVING)
+        findViewById<Button>(R.id.lightOpenControlButton).setOnClickListener { showLightControl() }
+        findViewById<Button>(R.id.lightBackButton).setOnClickListener { showLightOverview() }
+
+        lightFocusDial.setListener(
+            preview = { value ->
+                lightBrightnessSeek.setValue(value)
+                lightBrightnessText.text = "${brightnessPercent(value)}%"
+                lightOverviewBrightnessText.text = "${brightnessPercent(value)}%"
+            },
+            commit = { value ->
+                runDeviceAction("Яркость света") { api.setLightBrightness(value) }
+            }
+        )
+
         findViewById<Button>(R.id.lightOnButton).setOnClickListener {
             runDeviceAction("Включение света") { api.setLightEnabled(true) }
         }
@@ -443,9 +494,11 @@ class MainActivity : Activity() {
     }
 
     private fun changeLightBrightness(delta: Int) {
-        val value = (lightBrightnessSeek.value() + delta).coerceIn(0, 255)
+        val value = (lightFocusDial.value() + delta).coerceIn(0, 255)
+        lightFocusDial.setValue(value)
         lightBrightnessSeek.setValue(value)
         lightBrightnessText.text = "${brightnessPercent(value)}%"
+        lightOverviewBrightnessText.text = "${brightnessPercent(value)}%"
         runDeviceAction("Яркость света") { api.setLightBrightness(value) }
     }
 
@@ -569,6 +622,7 @@ class MainActivity : Activity() {
     }
 
     private fun bindMusic() {
+        musicHeroView.setScene(RoomHeroView.Scene.MUSIC)
         findViewById<Button>(R.id.musicOnButton).setOnClickListener {
             runDeviceAction("Включение светомузыки") { api.setMode("music") }
         }
@@ -689,6 +743,7 @@ class MainActivity : Activity() {
     }
 
     private fun bindAmbient() {
+        ambientHeroView.setScene(RoomHeroView.Scene.AMBIENT)
         findViewById<Button>(R.id.ambientOnButton).setOnClickListener {
             runDeviceAction("Включение фона") { api.setMode("ambient") }
         }
@@ -757,6 +812,7 @@ class MainActivity : Activity() {
     }
 
     private fun bindNight() {
+        nightHeroView.setScene(RoomHeroView.Scene.NIGHT)
         nightEnabledSwitch.setOnCheckedChangeListener { _, checked ->
             if (!rendering) runDeviceAction("Ночник") { api.updateNightSettings(enabled = checked) }
         }
@@ -801,6 +857,7 @@ class MainActivity : Activity() {
     }
 
     private fun bindAlarm() {
+        alarmHeroView.setScene(RoomHeroView.Scene.DAWN)
         alarmEnabledSwitch.setOnCheckedChangeListener { _, checked ->
             if (!rendering) runDeviceAction("Будильник") { api.updateAlarmSettings(enabled = checked) }
         }
@@ -993,8 +1050,11 @@ class MainActivity : Activity() {
             "${brightnessPercent(l.brightness)}%" +
             if (l.dirty) " • изменения не сохранены" else ""
 
+        lightFocusDial.setValue(l.brightness)
         lightBrightnessSeek.setValue(l.brightness)
         lightKelvinSeek.setValue(l.kelvin)
+        lightOverviewBrightnessText.text = "${brightnessPercent(l.brightness)}%"
+        lightOverviewKelvinText.text = "${l.kelvin} K"
         lightRedSeek.progress = l.red
         lightGreenSeek.progress = l.green
         lightBlueSeek.progress = l.blue
