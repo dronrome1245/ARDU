@@ -2094,3 +2094,17 @@ R3 экономит относительно R2:
 - Added active bottom-tab state and Online/Offline visual status.
 - Version bumped to `0.10-design-v1-rc1`.
 - Final CI after style fix: contract tests PASS; debug APK build PASS.
+
+
+## 2026-10-02 — Android Light screen moved to smart-home interaction model
+
+- Owner feedback: v0.10 visual style accepted, but header consumed too much vertical space and controls should feel more like a modern smart-home app than a set of sliders.
+- Implemented `0.11-home-ui-rc1`.
+- Compact header replaces large status block and full-width Refresh button.
+- Added quick Light scenes and ± brightness steps.
+- Added custom native `ColorWheelView` for touch RGB selection; no third-party dependency.
+- Existing RGB channel sliders remain available only as optional precise controls.
+- Current brightness is shown as percent in the primary UI.
+- ESP firmware/RSSI moved out of primary header into diagnostic summary.
+- API contract and firmware remain frozen/unchanged.
+- Contract tests PASS; debug APK PASS.
