@@ -2202,3 +2202,20 @@ nano_final_upload_blocker_2026_10_02:
   old_board_root_cause: unknown
   firmware_source_change_required: false
   next_after_replacement: final_release_upload_acceptance
+
+
+android_design_v1_2026_10_02:
+  version: "0.10-design-v1-rc1"
+  dark_low_glare_theme: true
+  fixed_bottom_navigation:
+    enabled: true
+    sections: [light, music, ambient, night, alarm]
+  settings_in_header: true
+  cards_ui: true
+  color_previews: true
+  developer_mode_nested_in_settings: true
+  horizontal_scroll_primary_navigation: false
+  contract_tests: pass
+  debug_apk_ci: pass
+  physical_visual_smoke: pending
+  physical_end_to_end: pending
