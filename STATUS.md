@@ -1646,3 +1646,19 @@
 - Симулируются Light/Music/Ambient/Night/Alarm, clap calibration, audio calibration, current limit, events и numeric Developer UART.
 - Это только UI/API test double; LED/FHT/RTC/electrical behavior он не подтверждает.
 - Mock ESP Verify CI: Python syntax + HTTP/state smoke PASS.
+
+
+### 2026-10-02 — Android mock device smoke passed on physical phone
+
+- **ФАКТ СО СЛОВ ВЛАДЕЛЬЦА + SCREENSHOT:** Android `0.9-functional-v1-rc1` успешно подключился на физическом телефоне к `ARDU_ESP_V1_MOCK`.
+- На экране подтверждены:
+  - состояние `Онлайн`;
+  - firmware `ARDU_ESP_V1_MOCK`;
+  - RSSI mock;
+  - текущий semantic mode;
+  - RTC/date-time rendering;
+  - section navigation;
+  - Alarm/Dawn controls и значения из `/api/settings`.
+- Это закрывает manual UI/API smoke для mock path.
+- Реальный hardware end-to-end остаётся pending до replacement Nano + final Nano/ESP uploads.
+- Пока replacement Nano в пути следующий software этап: Android design/UX polish без изменения frozen firmware/API.
