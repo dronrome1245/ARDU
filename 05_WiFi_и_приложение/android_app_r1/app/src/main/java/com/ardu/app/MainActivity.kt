@@ -666,7 +666,13 @@ class MainActivity : Activity() {
         ArduApiClient.MUSIC_IDS.forEach { id ->
             val button = Button(this, null, 0, R.style.Widget_ARDU_Button_Choice).apply {
                 text = names[id] ?: id
-                layoutParams = LinearLayout.LayoutParams(dp(96), dp(64)).apply {
+                includeFontPadding = false
+                maxLines = 2
+                minHeight = 0
+                minimumHeight = 0
+                gravity = android.view.Gravity.CENTER
+                setPadding(dp(8), dp(4), dp(8), dp(4))
+                layoutParams = LinearLayout.LayoutParams(dp(100), dp(76)).apply {
                     marginEnd = dp(8)
                 }
                 setOnClickListener {
