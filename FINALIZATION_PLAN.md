@@ -676,3 +676,20 @@ Implemented:
 CI PASS: run 37105664138.
 
 Next software gate is owner-phone visual review. If accepted, generate/integrate matching real photo assets for Music/Ambient/Night/Alarm while preserving their existing functionality.
+
+
+## 20. Contextual photo hero checkpoint — 2026-10-03
+
+Owner-phone visual check Light v0.17: PASS.
+
+Android `0.18-photo-heroes-rc1`:
+- synthetic Canvas room geometry removed from `RoomHeroView`;
+- Music/Ambient/Night/Alarm render from the approved real-photo high-resolution master;
+- each context has an independent focal crop and scene grade;
+- semantic controls/functionality unchanged;
+- HTTP/UART/firmware unchanged;
+- Android Verify run 37111268646 PASS: contract tests + debug APK.
+
+This is a deliberate intermediate visual gate rather than a claim that four unique context photos are already final. Next software action while replacement Nano is pending: owner-phone smoke of all four contextual heroes. If composition passes, replace the shared master with separate optimized generated WebP assets only where the unique room context materially improves the approved Home Hub design.
+
+Physical gate remains replacement Nano → final Nano upload → ESP OTA → firmware acceptance → Android end-to-end acceptance.
