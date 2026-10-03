@@ -2416,3 +2416,23 @@ android_light_layout_polish_v0_17_2026_10_03:
   contract_tests: pass
   debug_apk_ci: pass
   firmware_api_contract_changed: false
+
+
+android_context_photo_heroes_v0_18_2026_10_03:
+  version: "0.18-photo-heroes-rc1"
+  owner_light_v0_17_visual_pass: true
+  room_hero:
+    renderer: real_photo_bitmap
+    common_master: "drawable-nodpi/ardu_light_hero.webp"
+    unique_context_assets: false
+    contexts:
+      music: {focus_x: 0.28, focus_y: 0.48, grade: indigo_teal}
+      ambient: {focus_x: 0.52, focus_y: 0.50, grade: purple_cyan}
+      night: {focus_x: 0.72, focus_y: 0.50, grade: navy_warm}
+      alarm_dawn: {focus_x: 0.60, focus_y: 0.48, grade: sunrise_golden}
+  firmware_api_contract_changed: false
+  android_verify_run: 37111268646
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_cross_tab_visual_smoke: pending
+  next: owner_phone_visual_smoke_music_ambient_night_alarm
