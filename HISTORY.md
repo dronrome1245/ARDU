@@ -2169,3 +2169,12 @@ R3 экономит относительно R2:
 - Existing semantic API, Focus Dial behavior, RGB/clap/startup controls remain unchanged.
 - Android version = `0.16-real-assets-light-rc1`.
 - Final Actions run 37105664138: contract tests PASS, debug APK PASS.
+
+
+## 2026-10-03 — Light hero crop and summary geometry corrected
+
+- Owner phone screenshot showed that standard centerCrop removed the real-photo floor lamp and that the Brightness/Temperature cards had unequal visual geometry.
+- Added `FocalCropImageView`; Light hero uses right-biased focal crop X=0.64.
+- Summary cards fixed to identical 108dp geometry and typography.
+- Initial intermediate CI attempts failed only because the first FocalCrop prototype inherited AppCompatImageView while this app intentionally has no AppCompat dependency; it was immediately replaced with standard Android ImageView.
+- Final Android v0.17 CI run 37110520082 PASS.
