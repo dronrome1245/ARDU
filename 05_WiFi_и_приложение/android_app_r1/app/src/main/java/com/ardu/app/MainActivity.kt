@@ -16,6 +16,7 @@ import com.ardu.app.net.DeviceStatus
 import com.ardu.app.net.TimeStatus
 import com.ardu.app.ui.ColorWheelView
 import com.ardu.app.ui.FocusDialView
+import com.ardu.app.ui.FocalCropImageView
 import com.ardu.app.ui.RoomHeroView
 import com.ardu.app.ui.SceneTileView
 import com.ardu.app.ui.SmartSliderView
@@ -46,6 +47,7 @@ class MainActivity : Activity() {
     private lateinit var lightControlPanel: LinearLayout
     private lateinit var lightConnectionText: TextView
     private lateinit var lightOperationText: TextView
+    private lateinit var lightHeroImage: FocalCropImageView
     private lateinit var lightRefreshButton: Button
     private lateinit var lightServiceButton: Button
     private lateinit var lightFocusDial: FocusDialView
@@ -202,6 +204,7 @@ class MainActivity : Activity() {
         lightControlPanel = findViewById(R.id.lightControlPanel)
         lightConnectionText = findViewById(R.id.lightConnectionText)
         lightOperationText = findViewById(R.id.lightOperationText)
+        lightHeroImage = findViewById(R.id.lightHeroImage)
         lightRefreshButton = findViewById(R.id.lightRefreshButton)
         lightServiceButton = findViewById(R.id.lightServiceButton)
         lightFocusDial = findViewById(R.id.lightFocusDial)
@@ -367,6 +370,9 @@ class MainActivity : Activity() {
     }
 
     private fun bindLight() {
+        // Keep the warm floor lamp inside the nearly-square Home Hub hero crop.
+        lightHeroImage.setFocus(0.64f, 0.50f)
+
         lightRefreshButton.setOnClickListener { refreshDevice() }
         lightServiceButton.setOnClickListener { showSection(servicePanel) }
         findViewById<Button>(R.id.lightOpenControlButton).setOnClickListener { showLightControl() }
