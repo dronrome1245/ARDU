@@ -2436,3 +2436,27 @@ android_context_photo_heroes_v0_18_2026_10_03:
   debug_apk_ci: pass
   owner_cross_tab_visual_smoke: pending
   next: owner_phone_visual_smoke_music_ambient_night_alarm
+
+
+android_music_header_polish_v0_19_2026_10_03:
+  version: "0.19-music-header-polish-rc1"
+  owner_v0_18_feedback:
+    contextual_photo_screens_otherwise_good: true
+    music_two_line_labels_clipped: fixed
+    global_status_outer_frame_unwanted: fixed
+  music_mode_cards:
+    width_dp: 100
+    height_dp: 76
+    max_lines: 2
+    include_font_padding: false
+    centered: true
+  global_header:
+    outer_card_background: false
+    outer_stroke: false
+    light_special_case_hero_overlay_unchanged: true
+  firmware_api_contract_changed: false
+  android_verify_run: 37112061533
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_phone_visual_smoke: pending
+  next: owner_check_music_labels_and_frameless_header
