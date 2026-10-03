@@ -7,6 +7,7 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
+import android.graphics.RadialGradient
 import android.util.AttributeSet
 import android.view.View
 
@@ -118,6 +119,30 @@ class RoomHeroView @JvmOverloads constructor(
             canvas.drawRoundRect(RectF(w * .07f, barY, w * .92f, barY + barH), barH, barH, paint)
             paint.shader = null
         }
+
+        // Plant silhouette adds depth without external bitmap assets.
+        paint.color = Color.rgb(20, 48, 37)
+        canvas.drawRoundRect(RectF(w * .05f, h * .70f, w * .11f, h * .90f), dp(5f), dp(5f), paint)
+        canvas.drawOval(RectF(w * .01f, h * .53f, w * .10f, h * .72f), paint)
+        canvas.drawOval(RectF(w * .07f, h * .47f, w * .16f, h * .68f), paint)
+        canvas.drawOval(RectF(w * .02f, h * .41f, w * .11f, h * .60f), paint)
+
+        // Floor shadow / cinematic vignette.
+        paint.shader = LinearGradient(
+            0f, h * .62f, 0f, h,
+            Color.TRANSPARENT, Color.argb(120, 0, 0, 0),
+            Shader.TileMode.CLAMP
+        )
+        canvas.drawRoundRect(RectF(0f, h * .58f, w, h), r, r, paint)
+        paint.shader = null
+
+        paint.shader = RadialGradient(
+            w * .80f, h * .40f, w * .55f,
+            Color.argb(20, 255, 255, 255), Color.TRANSPARENT,
+            Shader.TileMode.CLAMP
+        )
+        canvas.drawRoundRect(RectF(0f, 0f, w, h), r, r, paint)
+        paint.shader = null
     }
 
     private fun dp(v: Float): Float = v * resources.displayMetrics.density
