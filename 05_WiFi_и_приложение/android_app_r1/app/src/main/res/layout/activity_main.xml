@@ -139,12 +139,11 @@
                         android:background="@drawable/ardu_hero_clip"
                         android:clipToOutline="true">
 
-                        <ImageView
+                        <com.ardu.app.ui.FocalCropImageView
                             android:id="@+id/lightHeroImage"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:contentDescription="Гостиная"
-                            android:scaleType="centerCrop"
                             android:src="@drawable/ardu_light_hero" />
 
                         <View
@@ -354,11 +353,13 @@
                         <LinearLayout
                             style="@style/ARDU.Card"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="108dp"
                             android:layout_marginTop="0dp"
                             android:layout_marginEnd="5dp"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="16dp">
 
                             <TextView style="@style/ARDU.Muted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ЯРКОСТЬ" />
                             <TextView
@@ -369,17 +370,19 @@
                                 android:fontFamily="sans-serif-medium"
                                 android:text="80%"
                                 android:textColor="@color/ardu_accent"
-                                android:textSize="28sp" />
+                                android:textSize="26sp" />
                         </LinearLayout>
 
                         <LinearLayout
                             style="@style/ARDU.Card"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="108dp"
                             android:layout_marginTop="0dp"
                             android:layout_marginStart="5dp"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="16dp">
 
                             <TextView style="@style/ARDU.Muted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ТЕМПЕРАТУРА" />
                             <TextView
@@ -390,7 +393,7 @@
                                 android:fontFamily="sans-serif-medium"
                                 android:text="4000 K"
                                 android:textColor="@color/ardu_text"
-                                android:textSize="22sp" />
+                                android:textSize="26sp" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
