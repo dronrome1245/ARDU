@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.16-real-assets-light-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Владелец утвердил финальное направление Android: mint-dark Unified iPhone Style = Home Hub + Focus Dial. Свет разделён на Home Hub обзор и Focus Dial управление; Music/Ambient/Night/Alarm получили контекстные room-hero блоки в том же стиле. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.17-light-layout-polish-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Владелец утвердил финальное направление Android: mint-dark Unified iPhone Style = Home Hub + Focus Dial. Свет разделён на Home Hub обзор и Focus Dial управление; Music/Ambient/Night/Alarm получили контекстные room-hero блоки в том же стиле. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1838,4 +1838,27 @@
 - Music/Ambient/Night/Alarm пока используют текущие contextual heroes; real-asset propagation откладывается до owner review Light.
 - Static Android contract: missing IDs = 0; duplicate IDs = 0; duplicate functions = 0.
 - GitHub Actions final run `37105664138`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
+- Firmware/API/UART unchanged.
+
+
+### 2026-10-03 — Light real-asset layout polish v0.17
+
+- **OWNER FEEDBACK:** real-photo direction accepted; two visual defects identified:
+  1. hero center-crop cut the warm floor lamp;
+  2. Brightness/Temperature summary cards were not visually equal.
+- Android version: `0.17-light-layout-polish-rc1`.
+- Added dependency-free native `FocalCropImageView`:
+  - same center-crop coverage semantics;
+  - explicit focal point;
+  - Light hero focus = X 0.64 / Y 0.50;
+  - image translation is clamped so no empty area can appear.
+- Result: right-side lamp stays inside the almost-square hero without stretching the image.
+- Brightness/Temperature summary cards now both:
+  - height = 108dp;
+  - equal weight/width;
+  - 16dp padding;
+  - center-vertical content;
+  - primary value = 26sp.
+- Static layout validation: missing IDs = 0; duplicate IDs = 0; duplicate functions = 0.
+- Final GitHub Actions run `37110520082`: contract tests PASS + debug APK build PASS.
 - Firmware/API/UART unchanged.
