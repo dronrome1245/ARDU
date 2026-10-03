@@ -693,3 +693,17 @@ Android `0.18-photo-heroes-rc1`:
 This is a deliberate intermediate visual gate rather than a claim that four unique context photos are already final. Next software action while replacement Nano is pending: owner-phone smoke of all four contextual heroes. If composition passes, replace the shared master with separate optimized generated WebP assets only where the unique room context materially improves the approved Home Hub design.
 
 Physical gate remains replacement Nano → final Nano upload → ESP OTA → firmware acceptance → Android end-to-end acceptance.
+
+
+## 21. Music/header polish checkpoint — 2026-10-03
+
+Owner review of Android v0.18 accepted the contextual photo screens overall and identified two release-polish defects.
+
+Android `0.19-music-header-polish-rc1`:
+- Music two-line mode cards enlarged and text layout normalized to prevent bottom clipping;
+- shared top status/header outer rectangle removed on non-Light normal tabs;
+- Light hero/status treatment unchanged;
+- HTTP/UART/firmware unchanged;
+- Android Verify run 37112061533 PASS.
+
+Next software action: one phone smoke confirming Music labels and frameless top status. Physical gate remains replacement Nano → final Nano upload → ESP OTA → firmware acceptance → Android end-to-end acceptance.
