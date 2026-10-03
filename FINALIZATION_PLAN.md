@@ -643,3 +643,19 @@ Source/CI gate:
 - Actions run: 37062432020.
 
 Remaining Android work before hardware end-to-end is visual smoke/polish only. Do not redesign the navigation/interaction model without a new explicit owner decision.
+
+
+## 18. Premium Light visual gate — 2026-10-03
+
+Android `0.15-premium-light-rc1` is the first product-level implementation of the owner-approved concept.
+
+PASS:
+- visual Light scene tiles implemented;
+- Home Hub hero depth pass implemented;
+- Focus Dial premium rendering implemented;
+- HTTP/UART/firmware unchanged;
+- contract tests PASS;
+- debug APK PASS;
+- Actions run 37102197040.
+
+Next: owner visual smoke. If accepted, propagate this exact quality level to Music/Ambient/Night/Alarm; do not redesign the approved Home Hub + Focus Dial architecture.
