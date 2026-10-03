@@ -205,3 +205,22 @@ Final Actions:
 - debug APK PASS.
 
 Next manual check: Home Hub Light overview + Focus Dial detail on physical phone via stateful ESP mock.
+
+
+## Real-asset Light RC — 2026-10-03
+
+Current Android version: `0.16-real-assets-light-rc1`.
+
+New resources:
+`app/src/main/res/drawable-nodpi/`
+- `ardu_light_hero.webp`
+- `ardu_scene_evening.webp`
+- `ardu_scene_warm.webp`
+- `ardu_scene_day.webp`
+- `ardu_scene_cool.webp`
+
+Total optimized asset size is about 24 KB.
+
+Light Home Hub now renders real room imagery. The Light-specific header lives over the hero image; the old global header is hidden on the Light tab. Scene tiles use real photos.
+
+Final CI: Actions `37105664138` — contract tests PASS, debug APK PASS.
