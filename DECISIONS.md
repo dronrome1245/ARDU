@@ -1446,3 +1446,26 @@ R3 не прошивался и не тестировался на железе.
 
 **Implementation:** Android `0.14-ios-homehub-focus-rc1`.  
 **CI evidence:** GitHub Actions run `37062432020` PASS.
+
+
+---
+
+## D-087 — Real image assets are the final premium Home Hub treatment
+
+**Дата:** 2026-10-03  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED
+
+**Контекст:** владелец сравнил native Canvas room illustrations с утверждённым concept board и выбрал реалистичные мебель/комната hero и scene images.
+
+**Решение:**
+1. Final premium Home Hub uses generated photorealistic image assets where room context materially improves the UI.
+2. Light is the pilot/reference implementation.
+3. Light header is composed over the hero image; it must not appear as a separate large rectangular status card.
+4. Quick-scene tiles use real scene images, not schematic geometry.
+5. Assets are optimized locally (WebP, `drawable-nodpi`) before commit; app-size impact must remain small.
+6. Text/state overlays remain native Android views so actual device state remains dynamic and accessible.
+7. Image assets are presentation only; HTTP/UART/firmware contracts remain frozen.
+8. Propagate real hero assets to Music/Ambient/Night/Alarm only after owner phone review of Light v0.16.
+
+**Implementation:** `0.16-real-assets-light-rc1`.  
+**CI:** Actions run `37105664138` PASS.
