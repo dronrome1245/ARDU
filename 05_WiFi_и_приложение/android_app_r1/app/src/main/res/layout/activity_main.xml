@@ -210,43 +210,35 @@
                         android:layout_marginTop="8dp"
                         android:orientation="horizontal">
 
-                        <Button
+                        <com.ardu.app.ui.SceneTileView
                             android:id="@+id/lightSceneEveningButton"
-                            style="@style/Widget.ARDU.Button.Scene"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="112dp"
                             android:layout_marginEnd="4dp"
-                            android:layout_weight="1"
-                            android:text="☾&#10;Вечер" />
+                            android:layout_weight="1" />
 
-                        <Button
+                        <com.ardu.app.ui.SceneTileView
                             android:id="@+id/light2700Button"
-                            style="@style/Widget.ARDU.Button.Scene"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="112dp"
                             android:layout_marginStart="4dp"
                             android:layout_marginEnd="4dp"
-                            android:layout_weight="1"
-                            android:text="☕&#10;Тёплый" />
+                            android:layout_weight="1" />
 
-                        <Button
+                        <com.ardu.app.ui.SceneTileView
                             android:id="@+id/light4000Button"
-                            style="@style/Widget.ARDU.Button.Scene"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="112dp"
                             android:layout_marginStart="4dp"
                             android:layout_marginEnd="4dp"
-                            android:layout_weight="1"
-                            android:text="☀&#10;Дневной" />
+                            android:layout_weight="1" />
 
-                        <Button
+                        <com.ardu.app.ui.SceneTileView
                             android:id="@+id/light6000Button"
-                            style="@style/Widget.ARDU.Button.Scene"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="112dp"
                             android:layout_marginStart="4dp"
-                            android:layout_weight="1"
-                            android:text="❄&#10;Холодный" />
+                            android:layout_weight="1" />
                     </LinearLayout>
 
                     <LinearLayout
