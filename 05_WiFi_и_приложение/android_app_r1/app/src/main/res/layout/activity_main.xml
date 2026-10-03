@@ -22,6 +22,7 @@
             android:paddingBottom="28dp">
 
             <LinearLayout
+                android:id="@+id/globalHeaderPanel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ardu_header"
@@ -132,70 +133,173 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <TextView
-                        style="@style/ARDU.SectionTitle"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Свет" />
+                        android:layout_height="330dp"
+                        android:background="@drawable/ardu_hero_clip"
+                        android:clipToOutline="true">
 
-                    <TextView
-                        style="@style/ARDU.Label"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Гостиная" />
+                        <ImageView
+                            android:id="@+id/lightHeroImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="Гостиная"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ardu_light_hero" />
 
-                    <com.ardu.app.ui.RoomHeroView
-                        android:id="@+id/lightHeroView"
-                        android:layout_width="match_parent"
-                        android:layout_height="170dp"
-                        android:layout_marginTop="12dp" />
-
-                    <TextView
-                        style="@style/ARDU.Label"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Уютная атмосфера и быстрый доступ к свету" />
-
-                    <LinearLayout
-                        style="@style/ARDU.Card"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/ardu_hero_overlay" />
 
                         <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:padding="14dp">
 
-                            <TextView
-                                style="@style/ARDU.Muted"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="ОБЫЧНЫЙ СВЕТ" />
-
-                            <TextView
-                                android:id="@+id/lightStateText"
+                            <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="sans-serif-medium"
-                                android:text="—"
-                                android:textColor="@color/ardu_text"
-                                android:textSize="17sp" />
-                        </LinearLayout>
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
-                        <Button
-                            android:id="@+id/lightOpenControlButton"
-                            style="@style/Widget.ARDU.Button.Icon"
-                            android:layout_width="52dp"
-                            android:layout_height="52dp"
-                            android:contentDescription="Открыть управление светом"
-                            android:text="›" />
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:text="ARDU"
+                                    android:textColor="@color/ardu_text"
+                                    android:textSize="25sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/lightConnectionText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:background="@drawable/ardu_status_chip"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:text="Проверка…"
+                                    android:textColor="@color/ardu_accent"
+                                    android:textSize="12sp" />
+
+                                <Space
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="1" />
+
+                                <Button
+                                    android:id="@+id/lightRefreshButton"
+                                    style="@style/Widget.ARDU.Button.Icon"
+                                    android:layout_width="42dp"
+                                    android:layout_height="42dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:contentDescription="Обновить состояние"
+                                    android:text="↻" />
+
+                                <Button
+                                    android:id="@+id/lightServiceButton"
+                                    style="@style/Widget.ARDU.Button.Icon"
+                                    android:layout_width="42dp"
+                                    android:layout_height="42dp"
+                                    android:contentDescription="Настройки"
+                                    android:text="⚙" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="Свет"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="25sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Гостиная"
+                                android:textColor="@color/ardu_text_secondary"
+                                android:textSize="14sp" />
+
+                            <Space
+                                android:layout_width="1dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Уютная атмосфера для вашего вечера"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/lightOperationText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                android:text=""
+                                android:textColor="@color/ardu_text_muted"
+                                android:textSize="11sp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/ardu_glass_card"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="11dp">
+
+                                <TextView
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
+                                    android:gravity="center"
+                                    android:text="●"
+                                    android:textColor="@color/ardu_accent"
+                                    android:textSize="28sp" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:text="Обычный свет"
+                                        android:textColor="@color/ardu_text"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/lightStateText"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:maxLines="1"
+                                        android:text="—"
+                                        android:textColor="@color/ardu_text_secondary"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+
+                                <Button
+                                    android:id="@+id/lightOpenControlButton"
+                                    style="@style/Widget.ARDU.Button.Icon"
+                                    android:layout_width="42dp"
+                                    android:layout_height="42dp"
+                                    android:contentDescription="Открыть управление светом"
+                                    android:text="›" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </FrameLayout>
 
                     <TextView
                         style="@style/ARDU.CardTitle"
