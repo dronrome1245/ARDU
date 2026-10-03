@@ -34,6 +34,7 @@ class MainActivity : Activity() {
     private var ambientEffectButtonMap: Map<String, Button> = emptyMap()
     private var musicSubmodeButtonMap: Map<Int, Button> = emptyMap()
 
+    private lateinit var globalHeaderPanel: LinearLayout
     private lateinit var connectionText: TextView
     private lateinit var modeText: TextView
     private lateinit var timeText: TextView
@@ -43,7 +44,10 @@ class MainActivity : Activity() {
     private lateinit var lightPanel: LinearLayout
     private lateinit var lightOverviewPanel: LinearLayout
     private lateinit var lightControlPanel: LinearLayout
-    private lateinit var lightHeroView: RoomHeroView
+    private lateinit var lightConnectionText: TextView
+    private lateinit var lightOperationText: TextView
+    private lateinit var lightRefreshButton: Button
+    private lateinit var lightServiceButton: Button
     private lateinit var lightFocusDial: FocusDialView
     private lateinit var lightOverviewBrightnessText: TextView
     private lateinit var lightOverviewKelvinText: TextView
@@ -186,6 +190,7 @@ class MainActivity : Activity() {
     }
 
     private fun bindViews() {
+        globalHeaderPanel = findViewById(R.id.globalHeaderPanel)
         connectionText = findViewById(R.id.connectionText)
         modeText = findViewById(R.id.modeText)
         timeText = findViewById(R.id.timeText)
@@ -195,7 +200,10 @@ class MainActivity : Activity() {
         lightPanel = findViewById(R.id.lightPanel)
         lightOverviewPanel = findViewById(R.id.lightOverviewPanel)
         lightControlPanel = findViewById(R.id.lightControlPanel)
-        lightHeroView = findViewById(R.id.lightHeroView)
+        lightConnectionText = findViewById(R.id.lightConnectionText)
+        lightOperationText = findViewById(R.id.lightOperationText)
+        lightRefreshButton = findViewById(R.id.lightRefreshButton)
+        lightServiceButton = findViewById(R.id.lightServiceButton)
         lightFocusDial = findViewById(R.id.lightFocusDial)
         lightOverviewBrightnessText = findViewById(R.id.lightOverviewBrightnessText)
         lightOverviewKelvinText = findViewById(R.id.lightOverviewKelvinText)
@@ -348,6 +356,8 @@ class MainActivity : Activity() {
         listOf(lightPanel, musicPanel, ambientPanel, nightPanel, alarmPanel, servicePanel)
             .forEach { it.visibility = if (it === target) View.VISIBLE else View.GONE }
 
+        globalHeaderPanel.visibility = if (target === lightPanel) View.GONE else View.VISIBLE
+
         sectionNavigation.forEach { (button, panel) ->
             button.isSelected = panel === target
             button.setTextColor(
@@ -357,7 +367,8 @@ class MainActivity : Activity() {
     }
 
     private fun bindLight() {
-        lightHeroView.setScene(RoomHeroView.Scene.LIVING)
+        lightRefreshButton.setOnClickListener { refreshDevice() }
+        lightServiceButton.setOnClickListener { showSection(servicePanel) }
         findViewById<Button>(R.id.lightOpenControlButton).setOnClickListener { showLightControl() }
         findViewById<Button>(R.id.lightBackButton).setOnClickListener { showLightOverview() }
 
@@ -971,10 +982,24 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun setOperationStatus(text: String) {
+        operationText.text = text
+        lightOperationText.text = text
+    }
+
+    private fun setConnectionStatus(text: String, colorRes: Int) {
+        connectionText.text = text
+        lightConnectionText.text = text
+        val color = getColor(colorRes)
+        connectionText.setTextColor(color)
+        lightConnectionText.setTextColor(color)
+    }
+
     private fun refreshDevice() {
-        connectionText.text = "Проверка связи…"
+        setConnectionStatus("Проверка…", R.color.ardu_text_secondary)
         refreshButton.isEnabled = false
-        operationText.text = ""
+        lightRefreshButton.isEnabled = false
+        setOperationStatus("")
 
         worker.execute {
             try {
@@ -988,20 +1013,20 @@ class MainActivity : Activity() {
                 }
 
                 runOnUiThread {
-                    connectionText.text = "● Онлайн"
-                    connectionText.setTextColor(getColor(R.color.ardu_accent))
+                    setConnectionStatus("● Онлайн", R.color.ardu_accent)
                     if (!selectedAddress.isNullOrBlank()) {
                         addressInput.setText(selectedAddress.removePrefix("http://"))
                     }
                     renderSnapshot(snapshot)
                     refreshButton.isEnabled = true
+                    lightRefreshButton.isEnabled = true
                 }
             } catch (error: Exception) {
                 runOnUiThread {
-                    connectionText.text = "● Нет связи"
-                    connectionText.setTextColor(getColor(R.color.ardu_danger))
-                    operationText.text = error.message ?: "Ошибка подключения"
+                    setConnectionStatus("● Нет связи", R.color.ardu_danger)
+                    setOperationStatus(error.message ?: "Ошибка подключения")
                     refreshButton.isEnabled = true
+                    lightRefreshButton.isEnabled = true
                 }
             }
         }
@@ -1011,14 +1036,14 @@ class MainActivity : Activity() {
         Snapshot(api.status(), api.settings(), api.time())
 
     private fun runDeviceAction(label: String, action: () -> Unit) {
-        operationText.text = "$label…"
+        setOperationStatus("$label…")
         worker.execute {
             try {
                 action()
                 val snapshot = readSnapshot()
                 runOnUiThread {
                     renderSnapshot(snapshot)
-                    operationText.text = "$label: готово"
+                    setOperationStatus("$label: готово")
                 }
             } catch (error: Exception) {
                 showError(label, error)
@@ -1318,8 +1343,9 @@ class MainActivity : Activity() {
 
     private fun showError(label: String, error: Exception) {
         runOnUiThread {
-            operationText.text = "$label: ${error.message ?: "ошибка"}"
+            setOperationStatus("$label: ${error.message ?: "ошибка"}")
             refreshButton.isEnabled = true
+            lightRefreshButton.isEnabled = true
         }
     }
 
