@@ -129,7 +129,7 @@ ARDU — проект двух синхронных круглых потоло�
 2. ESP release candidate: `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino` — compile PASS, RAM 39%, IRAM 92%, IROM 324376 bytes.
 3. Compact numeric Nano↔ESP UART v1 заморожен: `06_Интерфейс_управления/UART_V1.md`.
 4. **ФАКТ 2026-10-02:** текущая физическая Nano не принимает final upload; владелец заказал замену. Точная причина неисправности старой платы не подтверждена.
-5. Пока новая Nano в пути, Android доведён до утверждённого `0.14-ios-homehub-focus-rc1`: единый mint-dark smart-home стиль, Home Hub контекст на всех пользовательских вкладках и Focus Dial как главный control обычного света; contract tests + debug APK build PASS.
+5. Пока новая Nano в пути, Android доведён до `0.15-premium-light-rc1`: утверждённый Home Hub + Focus Dial сохранён, а Light overview/control получили premium-pass — visual scene tiles, более глубокий contextual hero и polished gradient Focus Dial; contract tests + debug APK build PASS.
 6. Следующий physical gate после прихода платы: финальный Nano upload → восстановить UART → финальный ESP OTA → firmware acceptance → Android end-to-end acceptance.
 7. После PASS — только release-blocker fixes, затем второе кольцо, силовой тест с финальным Class II PSU, потолочный монтаж и release.
 
