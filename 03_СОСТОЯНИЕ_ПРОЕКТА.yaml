@@ -2362,3 +2362,36 @@ android_premium_light_v0_15_2026_10_03:
   contract_tests: pass
   debug_apk_ci: pass
   owner_phone_visual_smoke: pending
+
+
+android_real_assets_light_v0_16_2026_10_03:
+  version: "0.16-real-assets-light-rc1"
+  owner_approved_asset_direction: true
+  hero:
+    type: photorealistic_generated_webp
+    file: ardu_light_hero.webp
+    dimensions: [640, 360]
+    bytes: 12642
+    header_over_image: true
+    separate_light_status_rectangle: false
+  scene_assets:
+    evening: ardu_scene_evening.webp
+    warm: ardu_scene_warm.webp
+    day: ardu_scene_day.webp
+    cool: ardu_scene_cool.webp
+    total_asset_bytes_approx: 23868
+  scene_tile_render:
+    real_bitmap: true
+    center_crop: true
+    readability_gradient: true
+  focus_dial_preserved: true
+  firmware_changed: false
+  api_changed: false
+  static_layout:
+    missing_ids: 0
+    duplicate_ids: 0
+    duplicate_functions: 0
+  actions_run: 37105664138
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_phone_visual_smoke: pending
