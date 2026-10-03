@@ -2190,3 +2190,15 @@ R3 экономит относительно R2:
 - Отдельные уникальные contextual photo files пока не добавлялись: v0.18 — композиционный/crop gate перед возможной заменой master на четыре специализированных WebP.
 - Firmware, HTTP API и numeric UART не менялись.
 - GitHub Actions Android Verify run 37111268646: unit contract tests PASS, debug APK build PASS.
+
+
+## 2026-10-03 — Music label clipping and framed status header corrected
+
+- Owner review of v0.18: contextual photo screens otherwise look good.
+- On Music, the second line of several mode buttons was clipped at the bottom.
+- The common top status/header still had a rounded rectangular outer frame on non-Light tabs, contrary to the approved concept.
+- Music dynamic mode buttons changed from 96×64dp to 100×76dp; two-line text is explicit, centered, with font padding disabled and controlled vertical padding.
+- Removed `@drawable/ardu_header` from `globalHeaderPanel`; reduced its extra inset padding so the header reads as floating page content rather than a separate card.
+- Light hero/status composition unchanged.
+- Android bumped to `0.19-music-header-polish-rc1`.
+- Actions run 37112061533: contract tests PASS, debug APK build PASS.
