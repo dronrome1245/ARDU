@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.17-light-layout-polish-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Владелец утвердил финальное направление Android: mint-dark Unified iPhone Style = Home Hub + Focus Dial. Свет разделён на Home Hub обзор и Focus Dial управление; Music/Ambient/Night/Alarm получили контекстные room-hero блоки в том же стиле. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.18-photo-heroes-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Владелец подтвердил исправленный Light v0.17 на телефоне: focal crop и геометрия summary-карточек приняты. Следующий Android visual pass начат: Music/Ambient/Night/Alarm теперь используют реальный high-resolution photo master вместо схематичного Canvas-hero, с отдельным focal crop и цветовой атмосферой для каждого раздела. HTTP API/UART/firmware не менялись. Android contract tests PASS и debug APK build PASS (run 37111268646). Следующий software gate — owner-phone visual smoke четырёх contextual photo heroes; следующий physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1862,3 +1862,19 @@
 - Static layout validation: missing IDs = 0; duplicate IDs = 0; duplicate functions = 0.
 - Final GitHub Actions run `37110520082`: contract tests PASS + debug APK build PASS.
 - Firmware/API/UART unchanged.
+
+
+### 2026-10-03 — contextual photo heroes propagated to Music/Ambient/Night/Alarm v0.18
+
+- **OWNER PASS:** исправленная геометрия Light `0.17-light-layout-polish-rc1` принята владельцем на телефоне.
+- Android version: `0.18-photo-heroes-rc1`.
+- `RoomHeroView` больше не рисует схематичную комнату Canvas-примитивами.
+- Music / Ambient / Night / Alarm используют существующий утверждённый 640×360 photorealistic hero как общий high-resolution master:
+  - Music — левый focal crop + indigo/teal grade;
+  - Ambient — central crop + purple/cyan grade;
+  - Night — right-biased crop + deep navy/warm-lamp grade;
+  - Alarm/Dawn — warm crop + sunrise/golden grade.
+- Это намеренно маленькая обратимая итерация: общий photo master проверяет композицию/crop/contrast до добавления отдельных уникальных photo assets для каждого раздела.
+- HTTP API v1, numeric UART v1, Nano/ESP firmware и semantic controls не изменены.
+- GitHub Actions Android Verify run `37111268646`: contract tests PASS, debug APK build PASS.
+- Следующий software check: owner-phone visual smoke Music / Ambient / Night / Alarm.
