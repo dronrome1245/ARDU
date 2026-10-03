@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.15-premium-light-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Владелец утвердил финальное направление Android: mint-dark Unified iPhone Style = Home Hub + Focus Dial. Свет разделён на Home Hub обзор и Focus Dial управление; Music/Ambient/Night/Alarm получили контекстные room-hero блоки в том же стиле. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.16-real-assets-light-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Владелец утвердил финальное направление Android: mint-dark Unified iPhone Style = Home Hub + Focus Dial. Свет разделён на Home Hub обзор и Focus Dial управление; Music/Ambient/Night/Alarm получили контекстные room-hero блоки в том же стиле. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1815,3 +1815,27 @@
 - GitHub Actions run `37102197040`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
 - Firmware/API/UART contract unchanged.
 - Следующий software gate: owner-phone visual smoke Light overview + Focus Dial. После approval — тот же premium level распространяется на Music/Ambient/Night/Alarm.
+
+
+### 2026-10-03 — real photo assets integrated into Light Home Hub v0.16
+
+- **РЕШЕНИЕ ВЛАДЕЛЬЦА:** для финального premium UI выбран вариант с реальными hero/image assets, а не canvas-иллюстрациями.
+- Android version: `0.16-real-assets-light-rc1`.
+- В Android repo добавлены оптимизированные generated WebP assets:
+  - `ardu_light_hero.webp` — 640×360, 12.6 KB;
+  - `ardu_scene_evening.webp` — 120×160, 2.1 KB;
+  - `ardu_scene_warm.webp` — 120×160, 2.8 KB;
+  - `ardu_scene_day.webp` — 120×160, 3.5 KB;
+  - `ardu_scene_cool.webp` — 120×160, 2.8 KB.
+- Суммарный photo-asset footprint ≈ 24 KB.
+- Light Home Hub:
+  - canvas `RoomHeroView` для Light заменён реальным hero photo;
+  - ARDU / Online status / Refresh / Settings теперь расположены поверх hero;
+  - отдельная rectangular global status-card скрывается на вкладке Light;
+  - Light title / room context / description / ordinary-light device card собраны внутри hero;
+  - device card использует glass-style overlay.
+- `SceneTileView` теперь center-crop рендерит реальные WebP фото и рисует только readability gradient + labels поверх.
+- Music/Ambient/Night/Alarm пока используют текущие contextual heroes; real-asset propagation откладывается до owner review Light.
+- Static Android contract: missing IDs = 0; duplicate IDs = 0; duplicate functions = 0.
+- GitHub Actions final run `37105664138`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
+- Firmware/API/UART unchanged.
