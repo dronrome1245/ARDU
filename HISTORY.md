@@ -2178,3 +2178,15 @@ R3 экономит относительно R2:
 - Summary cards fixed to identical 108dp geometry and typography.
 - Initial intermediate CI attempts failed only because the first FocalCrop prototype inherited AppCompatImageView while this app intentionally has no AppCompat dependency; it was immediately replaced with standard Android ImageView.
 - Final Android v0.17 CI run 37110520082 PASS.
+
+
+## 2026-10-03 — real-photo contextual heroes propagated after Light approval
+
+- Владелец подтвердил, что исправленный Light v0.17 с видимой правой лампой и равными Brightness/Temperature cards выглядит хорошо.
+- Это закрыло owner visual gate Light.
+- Реализован Android `0.18-photo-heroes-rc1`.
+- `RoomHeroView` переведён с полностью synthetic Canvas room geometry на bitmap rendering утверждённого high-resolution photorealistic hero.
+- Music/Ambient/Night/Alarm получили собственные focal crop и color/light grade поверх общего photo master; существующие semantic controls сохранены.
+- Отдельные уникальные contextual photo files пока не добавлялись: v0.18 — композиционный/crop gate перед возможной заменой master на четыре специализированных WebP.
+- Firmware, HTTP API и numeric UART не менялись.
+- GitHub Actions Android Verify run 37111268646: unit contract tests PASS, debug APK build PASS.
