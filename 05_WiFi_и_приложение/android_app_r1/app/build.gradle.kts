@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 15
-        versionName = "0.18-photo-heroes-rc1"
+        versionCode = 16
+        versionName = "0.19-music-header-polish-rc1"
     }
 
     compileOptions {
