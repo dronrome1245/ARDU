@@ -582,7 +582,7 @@ class MainActivity : Activity() {
                         "Тишина измерена: ${state.quietP99}. Прогресс 0/${state.targetPairs}. " +
                         "Нажмите кнопку и сделайте двойной хлопок."
                     clapSampleButton.isEnabled = true
-                    operationText.text = "Калибровка хлопков запущена"
+                    setOperationStatus("Калибровка хлопков запущена")
                 }
             } catch (error: Exception) {
                 showError("Калибровка хлопков", error)
@@ -628,7 +628,7 @@ class MainActivity : Activity() {
                         "Тишина=${result.quietP99}, P20=${result.clapP20}. " +
                         "Проверьте двойной хлопок и выберите Сохранить или Отмена."
                     clapSaveButton.isEnabled = true
-                    operationText.text = "Порог применён в RAM, ещё не сохранён"
+                    setOperationStatus("Порог применён в RAM, ещё не сохранён")
                 }
             } catch (error: Exception) {
                 showError("Расчёт порога", error)
@@ -882,7 +882,7 @@ class MainActivity : Activity() {
             val hour = alarmHourInput.text.toString().toIntOrNull()
             val minute = alarmMinuteInput.text.toString().toIntOrNull()
             if (hour == null || minute == null || hour !in 0..23 || minute !in 0..59) {
-                operationText.text = "Неверное время будильника"
+                setOperationStatus("Неверное время будильника")
                 return@setOnClickListener
             }
             runDeviceAction("Время будильника") {
