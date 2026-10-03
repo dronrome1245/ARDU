@@ -1,15 +1,21 @@
 package com.ardu.app.ui
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
+import com.ardu.app.R
+import kotlin.math.max
 
 class SceneTileView @JvmOverloads constructor(
     context: Context,
@@ -17,34 +23,38 @@ class SceneTileView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    enum class Scene {
-        EVENING,
-        WARM,
-        DAY,
-        COOL
-    }
+    enum class Scene { EVENING, WARM, DAY, COOL }
 
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val imagePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+    private val overlayPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = dp(1f)
+        color = Color.argb(75, 255, 255, 255)
+    }
     private val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
     }
     private val subtitlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.rgb(190, 198, 207)
+        color = Color.rgb(210, 216, 224)
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create("sans-serif", Typeface.NORMAL)
     }
+
     private var scene = Scene.EVENING
+    private var bitmap: Bitmap = decode(Scene.EVENING)
 
     init {
         isClickable = true
-        foreground = null
+        contentDescription = "Сцена Вечер"
     }
 
     fun setScene(value: Scene) {
         if (scene == value) return
         scene = value
+        bitmap = decode(scene)
         contentDescription = when (scene) {
             Scene.EVENING -> "Сцена Вечер"
             Scene.WARM -> "Сцена Тёплый свет"
@@ -66,66 +76,30 @@ class SceneTileView @JvmOverloads constructor(
         val w = width.toFloat()
         val h = height.toFloat()
         val radius = dp(17f)
-        val imageBottom = h * .66f
+        val bounds = RectF(0f, 0f, w, h)
 
-        val colors = when (scene) {
-            Scene.EVENING -> intArrayOf(Color.rgb(23, 27, 38), Color.rgb(73, 47, 32))
-            Scene.WARM -> intArrayOf(Color.rgb(37, 29, 20), Color.rgb(112, 71, 35))
-            Scene.DAY -> intArrayOf(Color.rgb(23, 43, 45), Color.rgb(56, 96, 88))
-            Scene.COOL -> intArrayOf(Color.rgb(20, 31, 47), Color.rgb(47, 82, 122))
-        }
+        val save = canvas.save()
+        val clip = Path().apply { addRoundRect(bounds, radius, radius, Path.Direction.CW) }
+        canvas.clipPath(clip)
 
-        paint.shader = LinearGradient(0f, 0f, w, imageBottom, colors, null, Shader.TileMode.CLAMP)
-        canvas.drawRoundRect(RectF(0f, 0f, w, h), radius, radius, paint)
-        paint.shader = null
+        val src = centerCropSource(bitmap, width, height)
+        canvas.drawBitmap(bitmap, src, RectF(0f, 0f, w, h), imagePaint)
 
-        // Tiny room/window composition.
-        paint.color = Color.argb(80, 255, 255, 255)
-        canvas.drawRoundRect(
-            RectF(w * .12f, h * .11f, w * .52f, imageBottom * .76f),
-            dp(7f), dp(7f), paint
+        overlayPaint.shader = LinearGradient(
+            0f, h * .30f, 0f, h,
+            intArrayOf(
+                Color.TRANSPARENT,
+                Color.argb(35, 5, 8, 12),
+                Color.argb(225, 7, 10, 14)
+            ),
+            floatArrayOf(0f, .48f, 1f),
+            Shader.TileMode.CLAMP
         )
-        paint.color = when (scene) {
-            Scene.EVENING -> Color.rgb(18, 25, 39)
-            Scene.WARM -> Color.rgb(48, 37, 27)
-            Scene.DAY -> Color.rgb(187, 224, 219)
-            Scene.COOL -> Color.rgb(142, 190, 235)
-        }
-        canvas.drawRoundRect(
-            RectF(w * .14f, h * .13f, w * .50f, imageBottom * .74f),
-            dp(6f), dp(6f), paint
-        )
+        canvas.drawRect(0f, 0f, w, h, overlayPaint)
+        overlayPaint.shader = null
+        canvas.restoreToCount(save)
 
-        // Sofa.
-        paint.color = Color.rgb(36, 45, 51)
-        canvas.drawRoundRect(
-            RectF(w * .18f, imageBottom * .52f, w * .78f, imageBottom * .88f),
-            dp(9f), dp(9f), paint
-        )
-
-        // Lamp + glow.
-        val lamp = when (scene) {
-            Scene.EVENING -> Color.rgb(255, 160, 85)
-            Scene.WARM -> Color.rgb(255, 191, 102)
-            Scene.DAY -> Color.rgb(255, 238, 199)
-            Scene.COOL -> Color.rgb(173, 216, 255)
-        }
-        paint.color = Color.argb(45, Color.red(lamp), Color.green(lamp), Color.blue(lamp))
-        canvas.drawCircle(w * .78f, imageBottom * .44f, dp(24f), paint)
-        paint.color = lamp
-        canvas.drawRoundRect(
-            RectF(w * .69f, imageBottom * .22f, w * .87f, imageBottom * .45f),
-            dp(4f), dp(4f), paint
-        )
-        paint.strokeWidth = dp(3f)
-        canvas.drawLine(w * .78f, imageBottom * .45f, w * .78f, imageBottom * .77f, paint)
-
-        // Label zone darkening.
-        paint.color = Color.argb(85, 0, 0, 0)
-        canvas.drawRoundRect(
-            RectF(0f, imageBottom * .88f, w, h),
-            radius, radius, paint
-        )
+        canvas.drawRoundRect(bounds, radius, radius, borderPaint)
 
         titlePaint.textSize = dp(12f)
         subtitlePaint.textSize = dp(9.5f)
@@ -141,8 +115,31 @@ class SceneTileView @JvmOverloads constructor(
             Scene.DAY -> "4000 K"
             Scene.COOL -> "6000 K"
         }
-        canvas.drawText(title, w / 2f, h - dp(25f), titlePaint)
-        canvas.drawText(subtitle, w / 2f, h - dp(10f), subtitlePaint)
+        canvas.drawText(title, w / 2f, h - dp(24f), titlePaint)
+        canvas.drawText(subtitle, w / 2f, h - dp(9f), subtitlePaint)
+    }
+
+    private fun decode(scene: Scene): Bitmap =
+        BitmapFactory.decodeResource(
+            resources,
+            when (scene) {
+                Scene.EVENING -> R.drawable.ardu_scene_evening
+                Scene.WARM -> R.drawable.ardu_scene_warm
+                Scene.DAY -> R.drawable.ardu_scene_day
+                Scene.COOL -> R.drawable.ardu_scene_cool
+            }
+        )
+
+    private fun centerCropSource(bitmap: Bitmap, targetW: Int, targetH: Int): Rect {
+        val scale = max(
+            targetW.toFloat() / bitmap.width.toFloat(),
+            targetH.toFloat() / bitmap.height.toFloat()
+        )
+        val visibleW = (targetW / scale).toInt().coerceAtMost(bitmap.width)
+        val visibleH = (targetH / scale).toInt().coerceAtMost(bitmap.height)
+        val left = (bitmap.width - visibleW) / 2
+        val top = (bitmap.height - visibleH) / 2
+        return Rect(left, top, left + visibleW, top + visibleH)
     }
 
     private fun dp(v: Float): Float = v * resources.displayMetrics.density
