@@ -2146,3 +2146,14 @@ R3 экономит относительно R2:
 - Existing final functional controls preserved: RGB/color wheel, scenes, clap wizard, Music IDs/settings, Ambient, Night schedule, Alarm/Dawn, service/debug.
 - Static layout contract: zero missing/duplicate IDs.
 - Final Actions run 37062432020: API contract tests PASS; debug APK build PASS.
+
+
+## 2026-10-03 — premium Light visual pass completed
+
+- После утверждения Home Hub + Focus Dial начат final product-level visual pass.
+- Создан `SceneTileView` для визуальных Light scenes вместо текстовых scene buttons.
+- `RoomHeroView` углублён дополнительными native-drawn scene layers.
+- `FocusDialView` получил gradient ring, glow, tick scale и более premium visual depth.
+- No external image dependencies / no third-party UI library.
+- Android bumped to `0.15-premium-light-rc1`.
+- Static contract clean; Actions run 37102197040 PASS (unit contract tests + debug APK).
