@@ -1469,3 +1469,23 @@ R3 не прошивался и не тестировался на железе.
 
 **Implementation:** `0.16-real-assets-light-rc1`.  
 **CI:** Actions run `37105664138` PASS.
+
+
+---
+
+## D-088 — Normal-tab status header is frameless
+
+**Дата:** 2026-10-03  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED
+
+**Основание:** после phone review Android v0.18 владелец повторно указал, что верхний блок со статусом не должен выглядеть как отдельный прямоугольник/карточка. Также двухстрочные подписи Music mode cards не должны обрезаться.
+
+**Решение:**
+1. On Music / Ambient / Night / Alarm the global ARDU / Online / Refresh / Settings / mode / RTC header has no outer card background or border.
+2. Header content is aligned directly to the page background; compact inner status chip may remain.
+3. Light keeps its already-approved special case: status/actions live inside the real-photo hero.
+4. Music mode choice cards must reserve enough vertical space for two complete text lines; text clipping is a release-polish defect.
+5. This is Android-only presentation; HTTP API v1, UART v1 and firmware remain frozen.
+
+**Implementation:** Android `0.19-music-header-polish-rc1`.  
+**CI:** Actions run `37112061533` PASS.
