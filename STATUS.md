@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.14-ios-homehub-focus-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Владелец утвердил финальное направление Android: mint-dark Unified iPhone Style = Home Hub + Focus Dial. Свет разделён на Home Hub обзор и Focus Dial управление; Music/Ambient/Night/Alarm получили контекстные room-hero блоки в том же стиле. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.15-premium-light-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Владелец утвердил финальное направление Android: mint-dark Unified iPhone Style = Home Hub + Focus Dial. Свет разделён на Home Hub обзор и Focus Dial управление; Music/Ambient/Night/Alarm получили контекстные room-hero блоки в том же стиле. Android contract tests PASS и debug APK build PASS. Следующий physical gate: replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1789,3 +1789,29 @@
 - Static layout validation after integration: missing IDs = NONE, duplicate IDs = NONE, duplicate functions = NONE.
 - GitHub Actions final run `37062432020`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
 - Следующий Android gate: owner-phone visual smoke `0.14` через stateful ESP mock; после replacement Nano — physical end-to-end.
+
+
+### 2026-10-03 — premium Light pass v0.15 complete
+
+- Следующий approved-design этап выполнен: Light Home Hub overview + Focus Dial control доведены ближе к утверждённому concept board.
+- Android version: `0.15-premium-light-rc1`.
+- Добавлен native `SceneTileView`:
+  - visual previews для Evening/Warm/Day/Cool;
+  - мини room/window/lamp composition;
+  - без bitmap assets и third-party libraries.
+- Home Hub `RoomHeroView` получил дополнительную глубину:
+  - plant silhouette;
+  - floor shadow;
+  - cinematic vignette/light falloff.
+- `FocusDialView` получил premium polish:
+  - mint→cyan sweep gradient;
+  - outer glow;
+  - radial center glow;
+  - scale ticks;
+  - large white thumb;
+  - сохранена логика local preview + semantic commit on release.
+- Light scene behavior не изменён: scenes по-прежнему compose existing semantic Light calls.
+- Static layout check: missing IDs = NONE; duplicate IDs = NONE; duplicate functions = NONE.
+- GitHub Actions run `37102197040`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
+- Firmware/API/UART contract unchanged.
+- Следующий software gate: owner-phone visual smoke Light overview + Focus Dial. После approval — тот же premium level распространяется на Music/Ambient/Night/Alarm.
