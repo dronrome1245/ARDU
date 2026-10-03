@@ -186,3 +186,22 @@ Final CI:
 
 Phone/mock check:
 `git pull` → run stateful ESP mock → reinstall/run Android → visually review Home Hub overview, Focus Dial detail and contextual heroes.
+
+
+## Premium Light visual RC — 2026-10-03
+
+Current Android version: `0.15-premium-light-rc1`.
+
+Added:
+- `ui/SceneTileView.kt`;
+- deeper native Home Hub room rendering;
+- gradient/glow/tick Focus Dial polish.
+
+No external image package and no third-party visual dependency are required for this pass.
+
+Final Actions:
+- run `37102197040`;
+- contract tests PASS;
+- debug APK PASS.
+
+Next manual check: Home Hub Light overview + Focus Dial detail on physical phone via stateful ESP mock.
