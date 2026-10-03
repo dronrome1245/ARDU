@@ -17,6 +17,7 @@ import com.ardu.app.net.TimeStatus
 import com.ardu.app.ui.ColorWheelView
 import com.ardu.app.ui.FocusDialView
 import com.ardu.app.ui.RoomHeroView
+import com.ardu.app.ui.SceneTileView
 import com.ardu.app.ui.SmartSliderView
 import java.util.Locale
 import java.util.concurrent.Executors
@@ -377,17 +378,21 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.lightOffButton).setOnClickListener {
             runDeviceAction("Выключение света") { api.setLightEnabled(false) }
         }
-        findViewById<Button>(R.id.lightSceneEveningButton).setOnClickListener {
-            applyLightScene("Вечер", 2200, 76)
+        findViewById<SceneTileView>(R.id.lightSceneEveningButton).apply {
+            setScene(SceneTileView.Scene.EVENING)
+            setOnClickListener { applyLightScene("Вечер", 2200, 76) }
         }
-        findViewById<Button>(R.id.light2700Button).setOnClickListener {
-            applyLightScene("Тёплый свет", 2700, 178)
+        findViewById<SceneTileView>(R.id.light2700Button).apply {
+            setScene(SceneTileView.Scene.WARM)
+            setOnClickListener { applyLightScene("Тёплый свет", 2700, 178) }
         }
-        findViewById<Button>(R.id.light4000Button).setOnClickListener {
-            applyLightScene("Дневной свет", 4000, 204)
+        findViewById<SceneTileView>(R.id.light4000Button).apply {
+            setScene(SceneTileView.Scene.DAY)
+            setOnClickListener { applyLightScene("Дневной свет", 4000, 204) }
         }
-        findViewById<Button>(R.id.light6000Button).setOnClickListener {
-            applyLightScene("Холодный свет", 6000, 204)
+        findViewById<SceneTileView>(R.id.light6000Button).apply {
+            setScene(SceneTileView.Scene.COOL)
+            setOnClickListener { applyLightScene("Холодный свет", 6000, 204) }
         }
 
         findViewById<Button>(R.id.lightBrightnessMinusButton).setOnClickListener {
