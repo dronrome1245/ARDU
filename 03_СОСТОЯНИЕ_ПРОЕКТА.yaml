@@ -2395,3 +2395,24 @@ android_real_assets_light_v0_16_2026_10_03:
   contract_tests: pass
   debug_apk_ci: pass
   owner_phone_visual_smoke: pending
+
+
+android_light_layout_polish_v0_17_2026_10_03:
+  version: "0.17-light-layout-polish-rc1"
+  owner_feedback:
+    hero_lamp_cropped: fixed
+    unequal_summary_cards: fixed
+  focal_crop:
+    custom_native_view: true
+    focus_x: 0.64
+    focus_y: 0.50
+    third_party_dependency: false
+  summary_cards:
+    equal_width: true
+    height_dp: 108
+    padding_dp: 16
+    value_text_sp: 26
+  final_actions_run: 37110520082
+  contract_tests: pass
+  debug_apk_ci: pass
+  firmware_api_contract_changed: false
