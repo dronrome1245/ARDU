@@ -2157,3 +2157,15 @@ R3 экономит относительно R2:
 - No external image dependencies / no third-party UI library.
 - Android bumped to `0.15-premium-light-rc1`.
 - Static contract clean; Actions run 37102197040 PASS (unit contract tests + debug APK).
+
+
+## 2026-10-03 — real Home Hub photo assets integrated
+
+- Owner approved generated photorealistic living-room hero and four scene images.
+- Assets optimized to WebP and committed as Android `drawable-nodpi`; total size ≈24 KB.
+- Light standalone status header removed from visual flow; its ARDU/Online/Refresh/Settings controls are now overlaid on the real hero image.
+- Ordinary-light state card moved into the hero composition.
+- Scene tiles switched from native geometric illustration to real photo bitmaps with center-crop + readability gradient.
+- Existing semantic API, Focus Dial behavior, RGB/clap/startup controls remain unchanged.
+- Android version = `0.16-real-assets-light-rc1`.
+- Final Actions run 37105664138: contract tests PASS, debug APK PASS.
