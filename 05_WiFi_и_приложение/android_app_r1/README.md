@@ -224,3 +224,18 @@ Total optimized asset size is about 24 KB.
 Light Home Hub now renders real room imagery. The Light-specific header lives over the hero image; the old global header is hidden on the Light tab. Scene tiles use real photos.
 
 Final CI: Actions `37105664138` — contract tests PASS, debug APK PASS.
+
+
+## Light layout polish — v0.17
+
+Current version: `0.17-light-layout-polish-rc1`.
+
+Phone-review fixes:
+- right-biased focal crop keeps the warm floor lamp visible in the real hero photo;
+- Brightness and Temperature summary cards are now identical in height, padding and value typography.
+
+Implementation:
+- `ui/FocalCropImageView.kt`;
+- no AppCompat/third-party dependency.
+
+Final Actions run `37110520082`: contract tests PASS, debug APK PASS.
