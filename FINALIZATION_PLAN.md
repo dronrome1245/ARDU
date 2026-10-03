@@ -659,3 +659,20 @@ PASS:
 - Actions run 37102197040.
 
 Next: owner visual smoke. If accepted, propagate this exact quality level to Music/Ambient/Night/Alarm; do not redesign the approved Home Hub + Focus Dial architecture.
+
+
+## 19. Real-asset Light gate — 2026-10-03
+
+Android `0.16-real-assets-light-rc1` closes the gap between the native prototype and the approved premium concept for the Light tab.
+
+Implemented:
+- real WebP hero;
+- real WebP scene tiles;
+- hero-overlay status/header controls;
+- glass ordinary-light card;
+- Focus Dial retained;
+- API/firmware unchanged.
+
+CI PASS: run 37105664138.
+
+Next software gate is owner-phone visual review. If accepted, generate/integrate matching real photo assets for Music/Ambient/Night/Alarm while preserving their existing functionality.
