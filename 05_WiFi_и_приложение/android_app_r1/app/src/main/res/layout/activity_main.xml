@@ -25,12 +25,11 @@
                 android:id="@+id/globalHeaderPanel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ardu_header"
                 android:orientation="vertical"
-                android:paddingLeft="16dp"
-                android:paddingTop="14dp"
-                android:paddingRight="16dp"
-                android:paddingBottom="14dp">
+                android:paddingLeft="2dp"
+                android:paddingTop="0dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
