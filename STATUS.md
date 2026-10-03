@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.18-photo-heroes-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Владелец подтвердил исправленный Light v0.17 на телефоне: focal crop и геометрия summary-карточек приняты. Следующий Android visual pass начат: Music/Ambient/Night/Alarm теперь используют реальный high-resolution photo master вместо схематичного Canvas-hero, с отдельным focal crop и цветовой атмосферой для каждого раздела. HTTP API/UART/firmware не менялись. Android contract tests PASS и debug APK build PASS (run 37111268646). Следующий software gate — owner-phone visual smoke четырёх contextual photo heroes; следующий physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.19-music-header-polish-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Owner review v0.18: contextual photo heroes в целом приняты; обнаружены два visual defects — двухстрочные подписи Music mode cards обрезались снизу и верхний global status/header снова был заключён в отдельную рамочную карточку. v0.19 увеличивает/нормализует Music mode buttons и убирает внешнюю рамку global header на обычных вкладках. HTTP API/UART/firmware не менялись. Android Verify run 37112061533 PASS: contract tests + debug APK. Следующий software gate — owner-phone smoke Music labels + frameless top status; следующий physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1878,3 +1878,18 @@
 - HTTP API v1, numeric UART v1, Nano/ESP firmware и semantic controls не изменены.
 - GitHub Actions Android Verify run `37111268646`: contract tests PASS, debug APK build PASS.
 - Следующий software check: owner-phone visual smoke Music / Ambient / Night / Alarm.
+
+
+### 2026-10-03 — Music labels and frameless global header v0.19
+
+- **OWNER REVIEW v0.18:** остальные экраны/контекстные фото выглядят хорошо.
+- Найдены два UI defect:
+  1. двухстрочные Music mode labels (`VU / Градиент`, `VU / Радуга`, `5 / полос`, `3 / полосы`) подрезались снизу;
+  2. верхний общий status/header на Music/Ambient/Night/Alarm был снова заключён в отдельную рамочную карточку.
+- Android version: `0.19-music-header-polish-rc1`.
+- Music mode buttons: 100×76dp, explicit two-line layout, font padding disabled, centered text, controlled inner padding.
+- `globalHeaderPanel`: outer `ardu_header` background/stroke removed; status content sits directly on the page background.
+- Light Home Hub remains unchanged with status/controls inside its hero.
+- Firmware/API/UART unchanged.
+- GitHub Actions Android Verify run `37112061533`: contract tests PASS, debug APK build PASS.
+- Next owner check: Music mode labels are fully visible + no outer rectangle around top status on normal tabs.
