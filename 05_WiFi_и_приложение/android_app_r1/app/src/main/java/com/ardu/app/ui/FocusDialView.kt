@@ -6,6 +6,10 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.graphics.SweepGradient
+import android.graphics.RadialGradient
+import android.graphics.Shader
+import android.graphics.Matrix
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -38,8 +42,10 @@ class FocusDialView @JvmOverloads constructor(
     private val thumbPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
     }
-    private val centerGlow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(35, 93, 226, 197)
+    private val centerGlow = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val tickPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        strokeWidth = dp(1.5f)
+        color = Color.argb(70, 255, 255, 255)
     }
     private val valuePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
@@ -106,16 +112,57 @@ class FocusDialView @JvmOverloads constructor(
         val rect = RectF(cx - radius, cy - radius, cx + radius, cy + radius)
 
         bgPaint.strokeWidth = stroke
-        bgPaint.color = Color.rgb(34, 43, 52)
+        bgPaint.color = Color.rgb(31, 39, 48)
         canvas.drawArc(rect, startAngle, sweepAngle, false, bgPaint)
 
-        glowPaint.strokeWidth = stroke + dp(10f)
+        val ringShader = SweepGradient(
+            cx, cy,
+            intArrayOf(
+                Color.rgb(34, 129, 112),
+                Color.rgb(93, 226, 197),
+                Color.rgb(96, 218, 238),
+                Color.rgb(93, 226, 197),
+                Color.rgb(34, 129, 112)
+            ),
+            null
+        )
+        val matrix = Matrix()
+        matrix.postRotate(startAngle, cx, cy)
+        ringShader.setLocalMatrix(matrix)
+        progressPaint.shader = ringShader
+
+        glowPaint.strokeWidth = stroke + dp(12f)
         canvas.drawArc(rect, startAngle, sweepAngle * fraction(), false, glowPaint)
 
         progressPaint.strokeWidth = stroke
         canvas.drawArc(rect, startAngle, sweepAngle * fraction(), false, progressPaint)
+        progressPaint.shader = null
 
-        canvas.drawCircle(cx, cy, radius * 0.72f, centerGlow)
+        centerGlow.shader = RadialGradient(
+            cx, cy, radius * .78f,
+            intArrayOf(
+                Color.argb(56, 93, 226, 197),
+                Color.argb(22, 28, 70, 65),
+                Color.TRANSPARENT
+            ),
+            floatArrayOf(0f, .5f, 1f),
+            Shader.TileMode.CLAMP
+        )
+        canvas.drawCircle(cx, cy, radius * 0.76f, centerGlow)
+        centerGlow.shader = null
+
+        for (i in 0..10) {
+            val tickAngle = Math.toRadians((startAngle + sweepAngle * (i / 10f)).toDouble())
+            val outer = radius + dp(14f)
+            val inner = radius + dp(if (i % 5 == 0) 5f else 8f)
+            canvas.drawLine(
+                cx + cos(tickAngle).toFloat() * inner,
+                cy + sin(tickAngle).toFloat() * inner,
+                cx + cos(tickAngle).toFloat() * outer,
+                cy + sin(tickAngle).toFloat() * outer,
+                tickPaint
+            )
+        }
 
         val angle = Math.toRadians((startAngle + sweepAngle * fraction()).toDouble())
         val tx = cx + cos(angle).toFloat() * radius
