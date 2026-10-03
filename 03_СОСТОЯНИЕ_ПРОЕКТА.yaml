@@ -2332,3 +2332,33 @@ android_final_ui_v0_14_2026_10_03:
   contract_tests: pass
   debug_apk_ci: pass
   owner_phone_visual_smoke: pending
+
+
+android_premium_light_v0_15_2026_10_03:
+  version: "0.15-premium-light-rc1"
+  final_direction_changed: false
+  visual_reference_screen: light
+  scene_tiles:
+    native_canvas: true
+    scenes: [evening, warm, day, cool]
+    external_assets: false
+  home_hub_hero:
+    depth_pass: true
+    vignette: true
+    environmental_details: true
+  focus_dial:
+    sweep_gradient: true
+    outer_glow: true
+    radial_center_glow: true
+    scale_ticks: true
+    commit_on_release: true
+  firmware_changed: false
+  api_changed: false
+  static_layout:
+    missing_ids: 0
+    duplicate_ids: 0
+    duplicate_functions: 0
+  actions_run: 37102197040
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_phone_visual_smoke: pending
