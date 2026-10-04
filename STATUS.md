@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.21-ambient-homehub-rc1` SOURCE READY. Music v0.20.3 remains the approved Music visual baseline. Ambient/«Фон» is now the next premium Home Hub pass: 250dp contextual hero with ARDU/connection/refresh/settings inside the hero, current ambient effect in the glass summary, illustrated F01/F02/F03 tiles, and full-width ON/OFF actions. HTTP API/UART/firmware semantics are unchanged. Static Android ID/wiring validation is clean; Android Verify for v0.21 has not yet been observed in the connector. Physical state has advanced: replacement Nano answers frozen numeric UART v1 (`1 → O 1`) and final ESP v1 compiles locally; next physical gate is OTA upload of `ARDU_ESP_V1`, then firmware acceptance and Android end-to-end acceptance. Next software gate is owner-phone visual smoke of v0.21.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — ANDROID `0.22-night-alarm-homehub-rc1` SOURCE READY; ALL FIVE NORMAL USER TABS NOW USE THE OWNER-APPROVED PREMIUM LANGUAGE. Light keeps Home Hub + Focus Dial; Music keeps the approved v0.20.3 room hero and illustrated mode tiles; Ambient uses its v0.21 Home Hub/effect tiles; Night and Alarm/Dawn now use 250dp contextual Home Hub heroes with ARDU/connection/refresh/settings and dynamic glass summaries inside the hero. Night keeps color/brightness/schedule semantics; Alarm keeps time/fade/brightness/start/end hue/RTC/stop-dawn semantics and now shows RTC validity/time in its hero. HTTP API v1, numeric UART v1 and Nano/ESP firmware are unchanged by v0.22. Static Android validation: 177 layout IDs, duplicate IDs = 0, missing Night/Alarm bindings = 0, duplicate private functions = 0. Exact v0.22 Android Verify result is not yet observed through the GitHub connector. Physical state is ahead of the previous handoff: final ESP OTA PASS; /api/status + /api/settings PASS on real ESP/Nano; current blocker is DS3231 time validity (/api/time valid=false). Next physical action: time sync, then repeat time/status and continue release acceptance. Next software action: owner-phone visual smoke of Night + Alarm v0.22.**
 
 ## Что подтверждено и решено
 
@@ -2023,3 +2023,29 @@
 - **ФАКТ:** `GET /api/settings` успешно вернул полный schema 1 snapshot Light/Clap/Night/Alarm/Ambient/Music/System. Текущий Light: Kelvin 4000 K, brightness 64; clap enabled threshold 70 timeout 500 ms; current limit 3000 mA; audio calibration state present (`mic_dc=250`, `vu_low_pass=300`, `spectrum_low_pass=40`).
 - Вывод: HTTP↔ESP↔Nano settings/status transport PASS; единственный blocker текущего read-only acceptance — невалидное время DS3231.
 - Следующий шаг: `POST /api/time/sync` с текущим временем ПК, затем повторный `GET /api/time` и `GET /api/status`.
+
+### 2026-10-04 — Night + Alarm Home Hub v0.22
+
+- **OWNER DIRECTION:** remaining normal user pages must follow the same Home Hub format already used on the approved Light/Music/Ambient design.
+- Android version: `0.22-night-alarm-homehub-rc1` (versionCode 22).
+- Night:
+  - 250dp contextual night hero;
+  - ARDU / connection / refresh / settings inside hero;
+  - glass summary shows enabled state, brightness and manual/schedule window;
+  - color/saturation/brightness and schedule semantics unchanged;
+  - schedule time inputs are now a balanced two-column composition.
+- Alarm/Dawn:
+  - 250dp dawn hero;
+  - ARDU / connection / refresh / settings inside hero;
+  - glass summary shows alarm state/time and RTC status;
+  - wake time editor enlarged and simplified;
+  - existing fade / max brightness / start hue / end hue / RTC sync / stop dawn controls retained.
+- Shared global status header is now hidden on all five normal user tabs and remains available for Settings/service.
+- Firmware/API/UART behavior unchanged.
+- Static validation after write:
+  - total layout IDs = 177;
+  - duplicate layout IDs = 0;
+  - Night/Alarm IDs = 41, missing bindings = 0;
+  - duplicate private functions = 0;
+  - Night/Alarm refresh disable/restore wiring is symmetric.
+- Exact v0.22 Android Actions result is not yet visible through the current connector.
