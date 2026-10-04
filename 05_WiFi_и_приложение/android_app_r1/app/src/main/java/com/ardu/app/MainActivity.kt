@@ -57,7 +57,9 @@ class MainActivity : Activity() {
     private lateinit var lightServiceButton: Button
     private lateinit var lightFocusDial: FocusDialView
     private lateinit var lightOverviewBrightnessText: TextView
+    private lateinit var lightOverviewBrightnessSeek: SmartSliderView
     private lateinit var lightOverviewKelvinText: TextView
+    private lateinit var lightOverviewKelvinSeek: SmartSliderView
     private lateinit var musicPanel: LinearLayout
     private lateinit var ambientPanel: LinearLayout
     private lateinit var nightPanel: LinearLayout
@@ -232,7 +234,9 @@ class MainActivity : Activity() {
         lightServiceButton = findViewById(R.id.lightServiceButton)
         lightFocusDial = findViewById(R.id.lightFocusDial)
         lightOverviewBrightnessText = findViewById(R.id.lightOverviewBrightnessText)
+        lightOverviewBrightnessSeek = findViewById(R.id.lightOverviewBrightnessSeek)
         lightOverviewKelvinText = findViewById(R.id.lightOverviewKelvinText)
+        lightOverviewKelvinSeek = findViewById(R.id.lightOverviewKelvinSeek)
         musicPanel = findViewById(R.id.musicPanel)
         ambientPanel = findViewById(R.id.ambientPanel)
         nightPanel = findViewById(R.id.nightPanel)
@@ -467,15 +471,15 @@ class MainActivity : Activity() {
         }
         findViewById<SceneTileView>(R.id.light2700Button).apply {
             setScene(SceneTileView.Scene.WARM)
-            setOnClickListener { applyLightScene("Тёплый свет", 2700, 178) }
+            setOnClickListener { applyLightScene("Кино", 2700, 38) }
         }
         findViewById<SceneTileView>(R.id.light4000Button).apply {
             setScene(SceneTileView.Scene.DAY)
-            setOnClickListener { applyLightScene("Дневной свет", 4000, 204) }
+            setOnClickListener { applyLightScene("Гости", 3500, 178) }
         }
         findViewById<SceneTileView>(R.id.light6000Button).apply {
             setScene(SceneTileView.Scene.COOL)
-            setOnClickListener { applyLightScene("Холодный свет", 6000, 204) }
+            setOnClickListener { applyLightScene("Чтение", 4300, 204) }
         }
 
         findViewById<Button>(R.id.lightBrightnessMinusButton).setOnClickListener {
@@ -484,6 +488,17 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.lightBrightnessPlusButton).setOnClickListener {
             changeLightBrightness(26)
         }
+
+        bindSmartSlider(
+            lightOverviewBrightnessSeek, 0, 255, SmartSliderView.VisualMode.BRIGHTNESS,
+            { value -> lightOverviewBrightnessText.text = "${brightnessPercent(value)}%" },
+            { value -> runDeviceAction("Яркость света") { api.setLightBrightness(value) } }
+        )
+        bindSmartSlider(
+            lightOverviewKelvinSeek, 1800, 6500, SmartSliderView.VisualMode.KELVIN,
+            { value -> lightOverviewKelvinText.text = "${value} K" },
+            { value -> runDeviceAction("Температура света") { api.setLightKelvin(value) } }
+        )
 
         lightBrightnessSeek.configure(
             min = 0,
@@ -745,7 +760,7 @@ class MainActivity : Activity() {
             ids.forEachIndexed { index, id ->
                 val tile = MusicModeTileView(this).apply {
                     configure(id, names[id] ?: id)
-                    layoutParams = LinearLayout.LayoutParams(0, dp(104), 1f).apply {
+                    layoutParams = LinearLayout.LayoutParams(0, dp(82), 1f).apply {
                         if (index > 0) marginStart = dp(4)
                         if (index < ids.lastIndex) marginEnd = dp(4)
                     }
@@ -919,6 +934,11 @@ class MainActivity : Activity() {
                 runDeviceAction("Автоперебор фона") { api.updateAmbientSettings(autoCycle = checked) }
             }
         }
+
+        findViewById<Button>(R.id.ambientAdvancedButton).setOnClickListener {
+            val panel = findViewById<LinearLayout>(R.id.ambientAdvancedPanel)
+            panel.visibility = if (panel.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }
     }
 
     private fun setAmbientEffect(id: String) {
@@ -958,11 +978,22 @@ class MainActivity : Activity() {
         bindSmartSlider(
             nightBrightnessSeek, 0, 255, SmartSliderView.VisualMode.BRIGHTNESS,
             {
-                nightBrightnessText.text = "Яркость • ${brightnessPercent(it)}%"
+                nightBrightnessText.text = "${brightnessPercent(it)}%"
                 updateNightPreview()
             },
             { value -> runDeviceAction("Яркость ночника") { api.updateNightSettings(brightness = value) } }
         )
+
+        findViewById<Button>(R.id.nightBrightnessMinusButton).setOnClickListener {
+            changeNightBrightness(-13)
+        }
+        findViewById<Button>(R.id.nightBrightnessPlusButton).setOnClickListener {
+            changeNightBrightness(13)
+        }
+        findViewById<Button>(R.id.nightAdvancedColorButton).setOnClickListener {
+            val panel = findViewById<LinearLayout>(R.id.nightAdvancedColorPanel)
+            panel.visibility = if (panel.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }
 
         findViewById<Button>(R.id.nightSaveScheduleButton).setOnClickListener {
             val on = nightOnInput.text.toString().trim()
@@ -971,6 +1002,14 @@ class MainActivity : Activity() {
                 api.updateNightSettings(scheduleOn = on, scheduleOff = off)
             }
         }
+    }
+
+    private fun changeNightBrightness(delta: Int) {
+        val current = latestSettings?.night?.brightness ?: nightBrightnessSeek.value()
+        val next = (current + delta).coerceIn(0, 255)
+        nightBrightnessSeek.setValue(next)
+        nightBrightnessText.text = "${brightnessPercent(next)}%"
+        runDeviceAction("Яркость ночника") { api.updateNightSettings(brightness = next) }
     }
 
     private fun bindAlarm() {
@@ -1020,6 +1059,11 @@ class MainActivity : Activity() {
             },
             { value -> runDeviceAction("Конечный цвет рассвета") { api.updateAlarmSettings(endHue = value) } }
         )
+
+        findViewById<Button>(R.id.alarmAdvancedColorButton).setOnClickListener {
+            val panel = findViewById<LinearLayout>(R.id.alarmAdvancedColorPanel)
+            panel.visibility = if (panel.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }
 
         findViewById<Button>(R.id.syncTimeButton).setOnClickListener {
             runDeviceAction("Синхронизация RTC") { api.syncTime() }
@@ -1171,7 +1215,7 @@ class MainActivity : Activity() {
                 val snapshot = readSnapshot()
                 runOnUiThread {
                     renderSnapshot(snapshot)
-                    setOperationStatus("$label: готово")
+                    setOperationStatus("")
                 }
             } catch (error: Exception) {
                 showError(label, error)
@@ -1213,7 +1257,9 @@ class MainActivity : Activity() {
         lightBrightnessSeek.setValue(l.brightness)
         lightKelvinSeek.setValue(l.kelvin)
         lightOverviewBrightnessText.text = "${brightnessPercent(l.brightness)}%"
+        lightOverviewBrightnessSeek.setValue(l.brightness)
         lightOverviewKelvinText.text = "${l.kelvin} K"
+        lightOverviewKelvinSeek.setValue(l.kelvin)
         lightRedSeek.progress = l.red
         lightGreenSeek.progress = l.green
         lightBlueSeek.progress = l.blue
@@ -1354,7 +1400,7 @@ class MainActivity : Activity() {
 
         nightHueText.text = "Цвет • ${n.hue}"
         nightSaturationText.text = "Насыщенность • ${brightnessPercent(n.saturation)}%"
-        nightBrightnessText.text = "Яркость • ${brightnessPercent(n.brightness)}%"
+        nightBrightnessText.text = "${brightnessPercent(n.brightness)}%"
         nightStateText.text = buildString {
             append(if (n.enabled) "Включён" else "Выключен")
             append(" • ${brightnessPercent(n.brightness)}%")
