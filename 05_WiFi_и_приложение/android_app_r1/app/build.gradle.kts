@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 18
-        versionName = "0.20.1-music-visual-hotfix-rc1"
+        versionCode = 19
+        versionName = "0.20.2-music-framing-icon-hotfix-rc1"
     }
 
     compileOptions {
