@@ -2387,3 +2387,12 @@ Physical context at this point:
 Результат `POST /api/time/sync`: `ok=True, applied=True`.
 
 Это подтверждает рабочую запись DS3231 по I²C через release firmware. Следующий шаг — readback `/api/time` и `/api/status`.
+
+
+## 2026-10-04 — physical RTC readback PASS
+
+После time sync выполнен readback на реальном стенде:
+- `GET /api/time` → `valid=true`, корректная дата/время, Nano `D 4 1 ...`;
+- `GET /api/status` → `rtc_valid=true`, режим `off`, numeric UART v1 стабилен.
+
+RTC gate закрыт. Следующий этап — L01 regression через финальный API.
