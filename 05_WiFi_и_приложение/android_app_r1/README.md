@@ -300,3 +300,23 @@ All five normal user tabs now use the approved premium language.
 5. Confirm bottom dock still switches all five user tabs normally.
 
 No API/UART/firmware changes are part of v0.22.
+
+## Concept parity RC — v0.23
+
+Current version: `0.23-concept-parity-rc1`.
+
+Rollback/reference:
+`archive/android-v0.22-homehub-2026-10-04`.
+
+Phone check:
+1. `git pull`.
+2. Android Studio → Run.
+3. Keep the phone on the real ARDU Wi‑Fi network.
+4. Compare Light / Music / Ambient / Night / Alarm with the concept screenshots.
+5. Verify real control smoke:
+   - Light overview brightness and Kelvin;
+   - one Music mode;
+   - one Ambient effect;
+   - Night +/- brightness;
+   - Alarm enable/time display.
+6. If a v0.23 layout is worse, use the archived v0.22 branch as the exact previous baseline.
