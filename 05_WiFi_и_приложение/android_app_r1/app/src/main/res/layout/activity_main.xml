@@ -1237,45 +1237,263 @@
                 android:id="@+id/nightPanel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
+                android:layout_marginTop="18dp"
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <TextView style="@style/ARDU.SectionTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ночник" />
-                <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Мягкий свет по расписанию" />
-
-                <com.ardu.app.ui.RoomHeroView
-                    android:id="@+id/nightHeroView"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginTop="12dp" />
+                    android:layout_height="250dp"
+                    android:background="@drawable/ardu_hero_clip"
+                    android:clipToOutline="true">
 
-                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-                    <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ночник" />
-                    <Switch android:id="@+id/nightEnabledSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Включён" android:textColor="@color/ardu_text" />
+                    <com.ardu.app.ui.RoomHeroView
+                        android:id="@+id/nightHeroView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/ardu_hero_overlay" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="ARDU"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="25sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/nightConnectionText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:background="@drawable/ardu_status_chip"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="Проверка…"
+                                android:textColor="@color/ardu_accent"
+                                android:textSize="12sp" />
+
+                            <Space
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1" />
+
+                            <Button
+                                android:id="@+id/nightRefreshButton"
+                                style="@style/Widget.ARDU.Button.Icon"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:layout_marginEnd="6dp"
+                                android:contentDescription="Обновить состояние"
+                                android:text="↻" />
+
+                            <Button
+                                android:id="@+id/nightServiceButton"
+                                style="@style/Widget.ARDU.Button.Icon"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:contentDescription="Настройки"
+                                android:text="⚙" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Ночь"
+                            android:textColor="@color/ardu_text"
+                            android:textSize="25sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Спальня"
+                            android:textColor="@color/ardu_text_secondary"
+                            android:textSize="14sp" />
+
+                        <Space
+                            android:layout_width="1dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Мягкий свет для вечернего режима"
+                            android:textColor="@color/ardu_text"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/nightOperationText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:maxLines="1"
+                            android:text=""
+                            android:textColor="@color/ardu_text_muted"
+                            android:textSize="11sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/ardu_glass_card"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="11dp">
+
+                            <TextView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:gravity="center"
+                                android:text="☾"
+                                android:textColor="@color/ardu_accent"
+                                android:textSize="27sp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:text="Ночник"
+                                    android:textColor="@color/ardu_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/nightStateText"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:maxLines="1"
+                                    android:text="—"
+                                    android:textColor="@color/ardu_text_secondary"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </FrameLayout>
+
+                <LinearLayout
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/ARDU.CardTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Ночной режим" />
+
+                    <Switch
+                        android:id="@+id/nightEnabledSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Ночник включён"
+                        android:textColor="@color/ardu_text" />
                 </LinearLayout>
 
-                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
-                        <TextView style="@style/ARDU.CardTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Цвет и яркость" />
-                        <View android:id="@+id/nightColorPreview" android:layout_width="54dp" android:layout_height="54dp" android:background="@drawable/ardu_color_preview" />
+                <LinearLayout
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/ARDU.CardTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Цвет и яркость" />
+
+                            <TextView
+                                style="@style/ARDU.Label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="Тихая низкая яркость без резких переходов" />
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/nightColorPreview"
+                            android:layout_width="54dp"
+                            android:layout_height="54dp"
+                            android:background="@drawable/ardu_color_preview" />
                     </LinearLayout>
 
-                    <TextView android:id="@+id/nightHueText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Цвет: 24" />
+                    <TextView
+                        android:id="@+id/nightHueText"
+                        style="@style/ARDU.Value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Цвет • 24" />
+
                     <com.ardu.app.ui.SmartSliderView
                         android:id="@+id/nightHueSeek"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
                         android:layout_marginTop="4dp" />
 
-                    <TextView android:id="@+id/nightSaturationText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Насыщенность: 180" />
+                    <TextView
+                        android:id="@+id/nightSaturationText"
+                        style="@style/ARDU.Value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Насыщенность • 71%" />
+
                     <com.ardu.app.ui.SmartSliderView
                         android:id="@+id/nightSaturationSeek"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
                         android:layout_marginTop="4dp" />
 
-                    <TextView android:id="@+id/nightBrightnessText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Яркость: 18" />
+                    <TextView
+                        android:id="@+id/nightBrightnessText"
+                        style="@style/ARDU.Value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Яркость • 7%" />
+
                     <com.ardu.app.ui.SmartSliderView
                         android:id="@+id/nightBrightnessSeek"
                         android:layout_width="match_parent"
@@ -1283,17 +1501,90 @@
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
 
-                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-                    <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Расписание" />
-                    <Switch android:id="@+id/nightScheduleSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Использовать расписание" android:textColor="@color/ardu_text" />
+                <LinearLayout
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Включение" />
-                    <EditText android:id="@+id/nightOnInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="22:00" android:inputType="text" android:maxLines="1" />
+                    <TextView
+                        style="@style/ARDU.CardTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Расписание" />
 
-                    <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Выключение" />
-                    <EditText android:id="@+id/nightOffInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="07:00" android:inputType="text" android:maxLines="1" />
+                    <Switch
+                        android:id="@+id/nightScheduleSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Использовать расписание"
+                        android:textColor="@color/ardu_text" />
 
-                    <Button android:id="@+id/nightSaveScheduleButton" style="@style/Widget.ARDU.Button.Primary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="✓  Сохранить" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/ARDU.Muted"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="ВКЛЮЧЕНИЕ" />
+
+                            <EditText
+                                android:id="@+id/nightOnInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="56dp"
+                                android:gravity="center"
+                                android:hint="22:00"
+                                android:inputType="text"
+                                android:maxLines="1"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/ARDU.Muted"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="ВЫКЛЮЧЕНИЕ" />
+
+                            <EditText
+                                android:id="@+id/nightOffInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="56dp"
+                                android:gravity="center"
+                                android:hint="07:00"
+                                android:inputType="text"
+                                android:maxLines="1"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/nightSaveScheduleButton"
+                        style="@style/Widget.ARDU.Button.Primary"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Сохранить расписание" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -1302,71 +1593,341 @@
                 android:id="@+id/alarmPanel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
+                android:layout_marginTop="18dp"
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <TextView style="@style/ARDU.SectionTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Будильник" />
-                <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Световой рассвет по RTC" />
-
-                <com.ardu.app.ui.RoomHeroView
-                    android:id="@+id/alarmHeroView"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginTop="12dp" />
+                    android:layout_height="250dp"
+                    android:background="@drawable/ardu_hero_clip"
+                    android:clipToOutline="true">
 
-                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-                    <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Время" />
+                    <com.ardu.app.ui.RoomHeroView
+                        android:id="@+id/alarmHeroView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/ardu_hero_overlay" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="ARDU"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="25sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/alarmConnectionText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:background="@drawable/ardu_status_chip"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="Проверка…"
+                                android:textColor="@color/ardu_accent"
+                                android:textSize="12sp" />
+
+                            <Space
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1" />
+
+                            <Button
+                                android:id="@+id/alarmRefreshButton"
+                                style="@style/Widget.ARDU.Button.Icon"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:layout_marginEnd="6dp"
+                                android:contentDescription="Обновить состояние"
+                                android:text="↻" />
+
+                            <Button
+                                android:id="@+id/alarmServiceButton"
+                                style="@style/Widget.ARDU.Button.Icon"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:contentDescription="Настройки"
+                                android:text="⚙" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Будильник"
+                            android:textColor="@color/ardu_text"
+                            android:textSize="25sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Спальня"
+                            android:textColor="@color/ardu_text_secondary"
+                            android:textSize="14sp" />
+
+                        <Space
+                            android:layout_width="1dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Плавный рассвет к выбранному времени"
+                            android:textColor="@color/ardu_text"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/alarmOperationText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:maxLines="1"
+                            android:text=""
+                            android:textColor="@color/ardu_text_muted"
+                            android:textSize="11sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/ardu_glass_card"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="11dp">
+
+                            <TextView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:gravity="center"
+                                android:text="☀"
+                                android:textColor="@color/ardu_accent"
+                                android:textSize="25sp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:text="Рассвет"
+                                    android:textColor="@color/ardu_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/alarmStateText"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:maxLines="1"
+                                    android:text="—"
+                                    android:textColor="@color/ardu_text_secondary"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/alarmRtcText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="RTC —"
+                                android:textColor="@color/ardu_text_secondary"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </FrameLayout>
+
+                <LinearLayout
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/alarmStateText"
-                        style="@style/ARDU.Label"
+                        style="@style/ARDU.CardTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="—" />
+                        android:text="Время пробуждения" />
 
-                    <Switch android:id="@+id/alarmEnabledSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Будильник включён" android:textColor="@color/ardu_text" />
+                    <Switch
+                        android:id="@+id/alarmEnabledSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Будильник включён"
+                        android:textColor="@color/ardu_text" />
 
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center_vertical" android:orientation="horizontal">
-                        <EditText android:id="@+id/alarmHourInput" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:layout_weight="1" android:gravity="center" android:hint="07" android:inputType="number" android:maxLines="1" />
-                        <TextView style="@style/ARDU.SectionTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=":" android:textSize="24sp" />
-                        <EditText android:id="@+id/alarmMinuteInput" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="4dp" android:layout_marginEnd="8dp" android:layout_weight="1" android:gravity="center" android:hint="00" android:inputType="number" android:maxLines="1" />
-                        <Button android:id="@+id/alarmSaveTimeButton" style="@style/Widget.ARDU.Button.Icon" android:layout_width="52dp" android:layout_height="48dp" android:contentDescription="Сохранить время будильника" android:text="✓" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/alarmHourInput"
+                            android:layout_width="0dp"
+                            android:layout_height="64dp"
+                            android:layout_marginEnd="4dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint="07"
+                            android:inputType="number"
+                            android:maxLines="1"
+                            android:textColor="@color/ardu_text"
+                            android:textSize="30sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:text=":"
+                            android:textColor="@color/ardu_text"
+                            android:textSize="30sp" />
+
+                        <EditText
+                            android:id="@+id/alarmMinuteInput"
+                            android:layout_width="0dp"
+                            android:layout_height="64dp"
+                            android:layout_marginStart="4dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint="00"
+                            android:inputType="number"
+                            android:maxLines="1"
+                            android:textColor="@color/ardu_text"
+                            android:textSize="30sp" />
+
+                        <Button
+                            android:id="@+id/alarmSaveTimeButton"
+                            style="@style/Widget.ARDU.Button.Primary"
+                            android:layout_width="72dp"
+                            android:layout_height="56dp"
+                            android:contentDescription="Сохранить время будильника"
+                            android:text="✓" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-                    <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Параметры рассвета" />
+                <LinearLayout
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <TextView android:id="@+id/alarmFadeText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Рассвет: 30 мин" />
+                    <TextView
+                        style="@style/ARDU.CardTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Параметры рассвета" />
+
+                    <TextView
+                        android:id="@+id/alarmFadeText"
+                        style="@style/ARDU.Value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Длительность • 30 мин" />
+
                     <com.ardu.app.ui.SmartSliderView
                         android:id="@+id/alarmFadeSeek"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
                         android:layout_marginTop="4dp" />
 
-                    <TextView android:id="@+id/alarmBrightnessText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Макс. яркость: 120" />
+                    <TextView
+                        android:id="@+id/alarmBrightnessText"
+                        style="@style/ARDU.Value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Макс. яркость • 47%" />
+
                     <com.ardu.app.ui.SmartSliderView
                         android:id="@+id/alarmBrightnessSeek"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
                         android:layout_marginTop="4dp" />
 
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:gravity="center_vertical" android:orientation="horizontal">
-                        <View android:id="@+id/alarmStartPreview" android:layout_width="42dp" android:layout_height="42dp" android:background="@drawable/ardu_color_preview" />
-                        <TextView android:id="@+id/alarmStartHueText" style="@style/ARDU.Value" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="Начальный цвет: 8" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:id="@+id/alarmStartPreview"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/ardu_color_preview" />
+
+                        <TextView
+                            android:id="@+id/alarmStartHueText"
+                            style="@style/ARDU.Value"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Начало • 8" />
                     </LinearLayout>
+
                     <com.ardu.app.ui.SmartSliderView
                         android:id="@+id/alarmStartHueSeek"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
                         android:layout_marginTop="4dp" />
 
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center_vertical" android:orientation="horizontal">
-                        <View android:id="@+id/alarmEndPreview" android:layout_width="42dp" android:layout_height="42dp" android:background="@drawable/ardu_color_preview" />
-                        <TextView android:id="@+id/alarmEndHueText" style="@style/ARDU.Value" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:text="Конечный цвет: 32" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:id="@+id/alarmEndPreview"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/ardu_color_preview" />
+
+                        <TextView
+                            android:id="@+id/alarmEndHueText"
+                            style="@style/ARDU.Value"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Финиш • 32" />
                     </LinearLayout>
+
                     <com.ardu.app.ui.SmartSliderView
                         android:id="@+id/alarmEndHueSeek"
                         android:layout_width="match_parent"
@@ -1374,10 +1935,40 @@
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
 
-                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-                    <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Сервис будильника" />
-                    <Button android:id="@+id/syncTimeButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="↻  RTC" />
-                    <Button android:id="@+id/stopDawnButton" style="@style/Widget.ARDU.Button.Primary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="■  Рассвет" />
+                <LinearLayout
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/ARDU.CardTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="RTC и активный рассвет" />
+
+                    <TextView
+                        style="@style/ARDU.Label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Синхронизация времени нужна после сброса или невалидного RTC." />
+
+                    <Button
+                        android:id="@+id/syncTimeButton"
+                        style="@style/Widget.ARDU.Button.Secondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="10dp"
+                        android:text="↻  Синхронизировать RTC" />
+
+                    <Button
+                        android:id="@+id/stopDawnButton"
+                        style="@style/Widget.ARDU.Button.Primary"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
+                        android:text="■  Остановить рассвет" />
                 </LinearLayout>
             </LinearLayout>
 
