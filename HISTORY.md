@@ -2340,3 +2340,41 @@ Physical handoff не изменён этим UI-pass: replacement Nano numeric 
 - `/api/time` не прошёл функциональный критерий только по RTC: `valid=false`, Nano `D 4 0`.
 
 Таким образом транспорт и settings parser на реальном ESP/Nano подтверждены; до Night/Alarm acceptance нужно синхронизировать DS3231.
+
+## 2026-10-04 — Android Home Hub completion v0.22
+
+По прямому указанию владельца Home Hub visual language распространён на оставшиеся normal user pages — Night и Alarm/Dawn.
+
+### Night
+- 250dp contextual night hero;
+- ARDU / status / refresh / settings moved inside hero;
+- dynamic summary: enabled state + brightness + manual or schedule window;
+- original Night semantic controls retained;
+- schedule inputs reorganized into balanced ON/OFF columns.
+
+### Alarm/Dawn
+- 250dp dawn hero;
+- ARDU / status / refresh / settings moved inside hero;
+- summary keeps alarm enabled/time/dawn phase;
+- added read-only RTC status/time text from the already-read `Snapshot.time`;
+- wake time editor enlarged;
+- fade, brightness, start/end hue, RTC sync and stop-dawn behavior unchanged.
+
+### Shared UI
+- global status header hidden on Light/Music/Ambient/Night/Alarm;
+- Settings/service remains separate;
+- Android version = `0.22-night-alarm-homehub-rc1`, versionCode 22.
+
+### Static verification
+- 177 layout IDs;
+- duplicate layout IDs = 0;
+- 41 Night/Alarm IDs, missing Kotlin bindings = 0;
+- duplicate private functions = 0;
+- refresh controls restore in both success and error branches.
+
+No firmware/API/UART source change.
+
+Physical context at this point:
+- final ESP v1 OTA already PASS;
+- physical `/api/status` + `/api/settings` PASS;
+- RTC still invalid until time sync.
