@@ -129,7 +129,7 @@ ARDU — проект двух синхронных круглых потоло�
 2. ESP release candidate: `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino` — compile PASS, RAM 39%, IRAM 92%, IROM 324376 bytes.
 3. Compact numeric Nano↔ESP UART v1 заморожен: `06_Интерфейс_управления/UART_V1.md`.
 4. **ФАКТ 2026-10-02:** текущая физическая Nano не принимает final upload; владелец заказал замену. Точная причина неисправности старой платы не подтверждена.
-5. Пока новая Nano в пути, Android доведён до `0.20.1-music-visual-hotfix-rc1`: Music hero больше не дополнительно зумится, семь Music mode cards получили собственные цветные visual illustrations, нижняя навигация центрирована как отдельный icon dock; direct-start/stop-on-leave и SmartSlider edge fix сохранены; contract tests + debug APK PASS.
+5. Пока новая Nano в пути, Android доведён до `0.20.2-music-framing-icon-hotfix-rc1`: из Music hero полностью удалена оставшаяся `centerCrop`-копия фото, высота hero уменьшена до 250dp и основной asset показывается целиком через `fitCenter`; M05 «Частота» визуально отделена от M01 «Градиент» отдельным radio-frequency/beacon symbol; illustrated mode cards, icon dock, direct-start/stop-on-leave и SmartSlider edge fix сохранены; Android Verify run 37204187940 PASS.
 6. Следующий physical gate после прихода платы: финальный Nano upload → восстановить UART → финальный ESP OTA → firmware acceptance → Android end-to-end acceptance.
 7. После PASS — только release-blocker fixes, затем второе кольцо, силовой тест с финальным Class II PSU, потолочный монтаж и release.
 
