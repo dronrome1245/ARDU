@@ -1968,3 +1968,12 @@
 - Остальная Music UI/behavior без изменений.
 - GitHub Actions Android Verify run `37209345952`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
 - Следующий software gate: owner-phone visual smoke v0.20.3 через `git pull` → Run.
+
+
+### 2026-10-04 — replacement Nano numeric UART transport confirmed
+
+- **ФАКТ:** физический ESP всё ещё работает на `HTTP_BRIDGE_R7` и доступен по Wi-Fi/OTA на `192.168.0.4`.
+- **ФАКТ:** старый R7 `GET /api/status` отправляет текстовую `STATUS`, новая Nano отвечает `E 1`, что соответствует parse error frozen numeric UART v1.
+- **ФАКТ:** через raw bridge выполнен `POST /api/dev/nano` с телом `1`; ответ: `nano="O 1"`, `timed_out=false`.
+- Вывод: физический UART ESP→replacement Nano исправен, новая Nano принимает numeric UART v1, opcode 1/PING подтверждён end-to-end через существующий ESP transport.
+- Следующий hardware шаг: OTA загрузка `esp8266_ardu_v1.ino` на текущий ESP, затем первый HTTP gate `/api/ping → fw=ARDU_ESP_V1`.
