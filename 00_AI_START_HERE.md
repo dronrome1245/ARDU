@@ -123,21 +123,16 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Финальные Nano/ESP v1 уже загружены на replacement hardware far enough to pass the real read-only transport gate; Android visual source is now `0.22-night-alarm-homehub-rc1`.
+Final Nano/ESP v1 and the real Wi-Fi transport are now working on the physical assembly.
 
-1. Nano v1: replacement Nano accepts frozen numeric UART v1 and reports `ARDU_V1`.
-2. ESP v1: final `ARDU_ESP_V1` OTA PASS on physical ESP; Wi-Fi/OTA boot gate PASS.
-3. Real read-only API: `/api/status` PASS, `/api/settings` PASS, no UART timeout.
-4. Current physical blocker: DS3231 time invalid; `/api/time` returns `valid=false` / Nano `D 4 0`.
-5. Immediate physical step: sync RTC through final API, repeat `/api/time` + `/api/status`, then continue release acceptance.
-6. Android: all five normal user tabs now share the owner-approved premium language:
-   - Light = Home Hub + Focus Dial;
-   - Music = approved dedicated room hero + illustrated modes;
-   - Ambient = Home Hub + illustrated F01/F02/F03;
-   - Night = Home Hub night hero + dynamic night summary;
-   - Alarm/Dawn = Home Hub dawn hero + alarm/RTC summary.
-7. Immediate software gate: `git pull` → Run → owner-phone visual smoke Night + Alarm v0.22. API/UART/firmware must remain frozen unless a release-blocking defect is found.
-8. After firmware/app PASS — second ring, power test with final Class II PSU, ceiling installation and release.
+1. ESP `ARDU_ESP_V1` online at `192.168.0.4`; `/api/ping` PASS.
+2. Nano `ARDU_V1`, numeric UART v1, status/settings/time readback PASS.
+3. DS3231 RTC sync/readback PASS.
+4. L01 semantic Wi-Fi regression PASS: OFF→readback false → ON→readback true, repeated successfully; final mode = light.
+5. Android source = `0.22-night-alarm-homehub-rc1`.
+6. **Immediate next gate:** install/run Android v0.22 on the physical phone connected to the same home Wi-Fi, open Settings → Connection, set `192.168.0.4`, press “Сохранить и переподключиться”, and confirm Online + real state sync.
+7. After Android connection PASS, continue acceptance through the app in small layers: Light controls → clap → Music → Ambient → Night → Alarm/Dawn → events/persistence.
+8. Keep service current limit at 3000 mA until the second-ring/power acceptance stage.
 
 ## 12. База ColorMusic/FHT
 
