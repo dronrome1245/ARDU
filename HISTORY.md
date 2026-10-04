@@ -2231,3 +2231,23 @@ R3 экономит относительно R2:
 - Firmware/API/UART unchanged.
 - Static validation clean.
 - Android Verify run 37196929089 PASS.
+
+
+## 2026-10-04 — Music framing/icon hotfix v0.20.2
+
+По owner feedback после v0.20.1 выполнена ещё одна маленькая Android-only итерация.
+
+Изменено:
+- удалена оставшаяся фоновая `centerCrop`-копия `ardu_music_hero.webp`, которая визуально возвращала zoom вокруг fit-centered foreground;
+- Music hero уменьшен с 330dp до 250dp и теперь использует только полный `fitCenter` photo layer на тёмной hero surface;
+- M05 «Частота» в `MusicModeTileView` больше не рисуется второй волной: заменена на отдельный radio-frequency/beacon icon с концентрическими дугами и центральным маркером;
+- Android version поднята до `0.20.2-music-framing-icon-hotfix-rc1` (versionCode 19).
+
+Не изменены:
+- HTTP API v1;
+- numeric UART v1;
+- Nano/ESP firmware;
+- Music direct-start и stop-on-leave;
+- bottom navigation dock и SmartSlider semantics.
+
+Проверка: GitHub Actions Android Verify run `37204187940` — unit contract tests PASS, debug APK build PASS.
