@@ -2378,3 +2378,12 @@ Physical context at this point:
 - final ESP v1 OTA already PASS;
 - physical `/api/status` + `/api/settings` PASS;
 - RTC still invalid until time sync.
+
+
+## 2026-10-04 — replacement Nano RTC sync PASS
+
+На новой физической Nano выполнен финальный HTTP→ESP→numeric UART→Nano→DS3231 time sync.
+
+Результат `POST /api/time/sync`: `ok=True, applied=True`.
+
+Это подтверждает рабочую запись DS3231 по I²C через release firmware. Следующий шаг — readback `/api/time` и `/api/status`.
