@@ -2251,3 +2251,19 @@ R3 экономит относительно R2:
 - bottom navigation dock и SmartSlider semantics.
 
 Проверка: GitHub Actions Android Verify run `37204187940` — unit contract tests PASS, debug APK build PASS.
+
+
+## 2026-10-04 — approved wide Music room hero v0.20.3
+
+Владелец отверг предыдущий close-up Music asset и подтвердил композицию раннего эскиза, где одновременно читаются диван и колонка.
+
+Выполнено:
+- подготовлен и утверждён wide 16:9 Music room asset без встроенного UI-текста;
+- asset оптимизирован до 640×360 WebP и записан как `app/src/main/res/drawable-nodpi/ardu_music_hero.webp`;
+- композиция: диван слева, колонка справа, растения/городской фон, blue/amber lighting;
+- существующий Music hero layout оставлен 250dp + `fitCenter` без `centerCrop`, чтобы правая сторона изображения гарантированно помещалась;
+- Android version: `0.20.3-music-room-hero-rc1`, versionCode 20.
+
+Не изменены Music behavior, API/UART и прошивки Nano/ESP.
+
+Проверка: GitHub Actions Android Verify run `37209345952` — unit contract tests PASS, debug APK build PASS.
