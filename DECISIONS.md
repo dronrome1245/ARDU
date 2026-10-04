@@ -1546,3 +1546,24 @@ R3 не прошивался и не тестировался на железе.
    - синхронизацию STATUS/DECISIONS/HISTORY.
 4. Физический final upload по-прежнему выполняется только на replacement Nano по release acceptance procedure.
 5. Frozen UART/API не менять без отдельной фактической необходимости и явного документированного решения.
+
+
+---
+
+## D-091 — Music visual hotfix v0.20.1
+
+**Дата:** 2026-10-04  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED
+
+**Основание:** owner phone review Android v0.20: Music hero visually over-zoomed; mode cards lacked the approved visual illustrations; bottom nav icons were visually off-center and merged into page content.
+
+**Решение:**
+1. Music hero must show the complete dedicated image without additional center-crop magnification; background fill may reuse the same asset softly behind a fit-centered foreground.
+2. Music mode choices are custom visual tiles with mode-specific graphics, not plain text buttons.
+3. Mode tile illustrations: gradient wave / rainbow / 5 bars / 3 bars / frequency wave / running dots / spectrum bars.
+4. Bottom navigation uses real centered `ImageButton` items inside a visually separate rounded dock with border/elevation.
+5. Music behavior from D-089 remains unchanged: card tap starts, leaving via another bottom user tab stops Music.
+6. Firmware/API/UART unchanged.
+
+**Implementation:** Android `0.20.1-music-visual-hotfix-rc1`.  
+**CI:** Actions run `37196929089` PASS.
