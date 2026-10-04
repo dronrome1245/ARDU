@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 17
-        versionName = "0.20-music-homehub-rc1"
+        versionCode = 18
+        versionName = "0.20.1-music-visual-hotfix-rc1"
     }
 
     compileOptions {
