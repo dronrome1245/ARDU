@@ -1987,3 +1987,11 @@
 - IROM/flash code: `324400 / 1048576` = 30%.
 - Compile PASS; значения согласуются с release CI и не показывают нового memory blocker.
 - Следующий шаг: OTA upload финального `ARDU_ESP_V1` на текущий ESP через network port `ardu / 192.168.0.4`.
+
+
+### 2026-10-04 — physical ESP v1 OTA PASS
+
+- **ФАКТ:** финальный `esp8266_ardu_v1.ino` успешно загружен по OTA на физический ESP8266.
+- После reboot `GET /api/ping` вернул: `fw=ARDU_ESP_V1`, `uart_protocol=1`, `wifi_connected=true`, IP `192.168.0.4`, RSSI `-53`, `ota_ready=true`, hostname `ardu`, port `8266`.
+- Вывод: финальный ESP v1 boot/Wi-Fi/OTA gate пройден на реальном железе.
+- Следующий gate: read-only `/api/status` + `/api/settings` + `/api/time`, затем raw opcode 1 regression.
