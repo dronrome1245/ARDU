@@ -2267,3 +2267,15 @@ R3 экономит относительно R2:
 Не изменены Music behavior, API/UART и прошивки Nano/ESP.
 
 Проверка: GitHub Actions Android Verify run `37209345952` — unit contract tests PASS, debug APK build PASS.
+
+
+## 2026-10-04 — replacement Nano numeric UART PING PASS
+
+Владелец загрузил release-скетч на другую Arduino Nano и восстановил реальную сборку.
+
+Проверка через ещё работающий ESP `HTTP_BRIDGE_R7`:
+- `GET /api/ping` → Wi-Fi/OTA ESP исправны, `fw=HTTP_BRIDGE_R7`, IP `192.168.0.4`;
+- `GET /api/status` → Nano вернула `E 1`, поскольку R7 отправляет старую текстовую команду `STATUS`, а replacement Nano уже ожидает numeric UART v1;
+- raw `POST /api/dev/nano` body `1` → `O 1`, без timeout.
+
+**ФАКТ:** физическая линия ESP↔Nano и numeric UART v1 opcode 1 подтверждены на replacement Nano. Следующий шаг — финальный ESP v1 OTA.
