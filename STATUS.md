@@ -1,10 +1,10 @@
 # Статус проекта ARDU
 
-Дата состояния: 2026-10-03
+Дата состояния: 2026-10-04
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.19-music-header-polish-rc1` CURRENT; Music v0.20 plan OWNER APPROVED. Replacement Nano всё ещё ожидается. Новый план: отдельный photorealistic Music hero, без fake player и без больших Play/Stop; tap mode card сразу запускает M01/M02/M03/M04/M05/M08/M09, а уход с Music через нижнюю пользовательскую навигацию отправляет top-level OFF. Music names без `VU`, equal-height non-scroll grid; общий `SmartSliderView` будет исправлен на min/max edge clipping во всех вкладках; bottom navigation перейдёт на icon-only vector items. Для этого существующих HTTP/UART функций достаточно. По новому owner decision firmware source можно менять до прихода replacement Nano, если реально потребуется, с обязательным compile/size/CI gate; физический final upload остаётся только на replacement Nano.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.20-music-homehub-rc1` READY. Replacement Nano всё ещё ожидается. Music Home Hub реализован: отдельный `ardu_music_hero.webp`, статус/controls поверх hero как у Light, fake player отсутствует, большие Play/Stop удалены, tap карточки M01/M02/M03/M04/M05/M08/M09 сразу запускает режим. Названия без `VU`; режимы собраны в две equal-height строки 4+3 без horizontal scroll. При выборе другой нижней пользовательской вкладки активный top-level Music автоматически переводится в OFF; Settings сам Music не выключает. `SmartSliderView` исправлен глобально: thumb center теперь ограничен `thumbRadius + shadow reserve`, поэтому min/max не обрезаются. Нижняя навигация переведена на icon-only native vectors. Firmware/API/UART для этого не менялись. Static ID/function check чистый; Android Verify run 37194558467 PASS: contract tests + debug APK. Следующий software gate — owner-phone visual/function smoke v0.20; physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1907,3 +1907,23 @@
 - Bottom navigation target = icon-only native vector icons.
 - Implementation plan: `05_WiFi_и_приложение/MUSIC_V0_20_PLAN.md`.
 - Firmware source changes are now owner-authorized while replacement Nano is pending, but none are required for the Music v0.20 behavior identified so far.
+
+
+### 2026-10-04 — Music Home Hub v0.20 implemented
+
+- Android version: `0.20-music-homehub-rc1`.
+- Added dedicated generated/optimized `drawable-nodpi/ardu_music_hero.webp`.
+- Music top composition now follows Light Home Hub: ARDU/status/refresh/settings/title/context/state live inside the hero.
+- Fake media player is not implemented.
+- Removed large Music Play/Stop controls.
+- Mode card tap directly calls existing `/api/music/mode`; Nano opcode 80 already activates top-level MUSIC.
+- User labels: `Градиент`, `Радуга`, `5 полос`, `3 полосы`, `Частота`, `Бегущие`, `Спектр`.
+- Music choices are two equal-height rows (4 + 3), no horizontal scrolling.
+- Leaving active Music via another bottom user tab sends existing `mode=off`; target tab is opened but not auto-started.
+- Settings navigation does not stop Music.
+- `SmartSliderView` edge clipping fixed at reusable component level and therefore applies to all normal smart sliders.
+- Bottom navigation switched to five icon-only native vector buttons with selected-state tint and accessibility descriptions.
+- Static validation: missing IDs = 0; duplicate layout IDs = 0; duplicate private functions = 0.
+- Added HTTP contract coverage for Music mode selection + top-level OFF.
+- GitHub Actions Android Verify run `37194558467`: unit contract tests PASS, debug APK build PASS.
+- Nano/ESP source unchanged in this implementation.
