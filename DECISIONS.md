@@ -1587,3 +1587,24 @@ R3 не прошивался и не тестировался на железе.
 
 **Implementation:** Android `0.20.2-music-framing-icon-hotfix-rc1`.  
 **CI:** Actions run `37204187940` PASS (`testDebugUnitTest` + `assembleDebug`).
+
+
+---
+
+## D-093 — Approved wide Music room hero v0.20.3
+
+**Дата:** 2026-10-04  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED
+
+**Основание:** владелец подтвердил, что визуально устраивает композиция раннего Music concept: диван должен быть заметен слева, а колонка — видна справа как часть комнаты, а не занимать почти весь кадр.
+
+**Решение:**
+1. Финальный Music hero asset v1 = широкая photorealistic living-room composition с диваном слева и компактной колонкой справа.
+2. В приложении asset хранить как `drawable-nodpi/ardu_music_hero.webp`, 640×360.
+3. Music hero сохраняет 250dp высоту и один `fitCenter` photo layer; `centerCrop` для этого asset не использовать, чтобы правая сторона изображения и колонка не обрезались.
+4. Overlay-текст/статус остаются native Android UI; сам bitmap не содержит UI-текста.
+5. Остальные решения v0.20.2 по M05 frequency icon, bottom dock, SmartSlider и Music behavior сохраняются.
+6. HTTP API v1, numeric UART v1 и Nano/ESP firmware не изменяются.
+
+**Implementation:** Android `0.20.3-music-room-hero-rc1`.  
+**CI:** Actions run `37209345952` PASS (`testDebugUnitTest` + `assembleDebug`).
