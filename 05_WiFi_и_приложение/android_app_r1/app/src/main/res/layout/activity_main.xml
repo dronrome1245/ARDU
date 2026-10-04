@@ -651,17 +651,9 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="330dp"
+                    android:layout_height="250dp"
                     android:background="@drawable/ardu_hero_clip"
                     android:clipToOutline="true">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:alpha="0.34"
-                        android:contentDescription="@null"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/ardu_music_hero" />
 
                     <ImageView
                         android:id="@+id/musicHeroImage"
