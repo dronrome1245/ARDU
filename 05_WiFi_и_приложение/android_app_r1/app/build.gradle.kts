@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 21
-        versionName = "0.21-ambient-homehub-rc1"
+        versionCode = 22
+        versionName = "0.22-night-alarm-homehub-rc1"
     }
 
     compileOptions {
