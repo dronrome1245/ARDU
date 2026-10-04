@@ -2569,3 +2569,33 @@ android_music_room_hero_v0_20_3_2026_10_04:
   debug_apk_ci: pass
   owner_phone_smoke: pending
   next: owner_phone_music_v0_20_3_visual_smoke
+
+android_ambient_homehub_v0_21_2026_10_04:
+  version: "0.21-ambient-homehub-rc1"
+  version_code: 21
+  ambient_hero:
+    home_hub: true
+    height_dp: 250
+    status_inside_hero: true
+    global_header_hidden: true
+    renderer: RoomHeroView
+  ambient_effect_tiles:
+    custom_view: AmbientEffectTileView
+    illustrated: true
+    effects: [F01, F02, F03]
+    selected_mint_glow: true
+  firmware_api_contract_changed: false
+  static_validation:
+    ambient_id_bindings_clean: true
+    custom_view_present: true
+  android_verify_status: not_observed_via_connector
+  owner_phone_smoke: pending
+  software_next: owner_phone_ambient_v0_21_visual_smoke
+  hardware_next: final_esp_v1_ota_then_acceptance
+
+physical_handoff_2026_10_04_current:
+  replacement_nano_numeric_uart_ping: pass
+  ping_command: "1"
+  ping_response: "O 1"
+  esp_v1_local_compile: pass
+  next: final_esp_v1_ota
