@@ -1,8 +1,8 @@
 # ARDU Android — Music v0.20 implementation plan
 
 Дата: 2026-10-04  
-Статус: OWNER-APPROVED PLAN  
-Целевая версия: `0.20-music-homehub-rc1`
+Статус: IMPLEMENTED / OWNER PHONE SMOKE PENDING  
+Реализованная версия: `0.20-music-homehub-rc1`
 
 ## 1. Цель
 
@@ -197,3 +197,29 @@ PASS если:
 - firmware/API regression отсутствует;
 - contract tests PASS;
 - debug APK build PASS.
+
+
+## 11. Implementation result — 2026-10-04
+
+Implemented in `0.20-music-homehub-rc1`.
+
+Differences from the preliminary geometry proposal:
+- final mode layout is **4 + 3** rather than 3-column rows because it matches the approved concept composition better and keeps all seven choices visible without scroll;
+- all cards still have identical 64dp height.
+
+Completed:
+- dedicated `ardu_music_hero.webp`;
+- Light-like Music Home Hub composition;
+- no player;
+- no Play/Stop row;
+- tap mode card = select + start;
+- stop active Music on bottom-nav leave;
+- simplified labels without `VU`;
+- global SmartSlider edge fix;
+- icon-only bottom navigation;
+- static ID/function validation PASS;
+- API contract tests PASS;
+- debug APK build PASS;
+- Actions run `37194558467`.
+
+Remaining gate: visual/function smoke on owner's physical phone.
