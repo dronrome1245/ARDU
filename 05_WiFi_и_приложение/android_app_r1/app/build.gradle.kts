@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 16
-        versionName = "0.19-music-header-polish-rc1"
+        versionCode = 17
+        versionName = "0.20-music-homehub-rc1"
     }
 
     compileOptions {
