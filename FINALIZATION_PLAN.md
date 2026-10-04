@@ -749,3 +749,18 @@ Android `0.20.1-music-visual-hotfix-rc1` implemented after owner phone review.
 - Android Verify run 37196929089 PASS.
 
 Next software action: owner-phone visual smoke v0.20.1. Physical gate remains replacement Nano → final Nano upload → ESP OTA → firmware acceptance → Android end-to-end acceptance.
+
+## 25. Ambient Home Hub visual checkpoint — 2026-10-04
+
+Android `0.21-ambient-homehub-rc1` advances the approved Home Hub visual language to Ambient without changing firmware/API contracts.
+
+Implemented:
+- Ambient status/actions integrated into 250dp hero;
+- no separate global status header on Ambient;
+- illustrated F01/F02/F03 native tiles;
+- existing semantic ON/OFF/settings behavior retained.
+
+Static source validation is clean. The exact v0.21 GitHub Actions result is not yet visible through the current connector and must not be reported as PASS until observed.
+
+Software next gate: owner-phone visual smoke of Ambient. If accepted, Night is the next small premium-polish iteration.
+Physical next gate: final ESP v1 OTA, then firmware acceptance and Android end-to-end acceptance.
