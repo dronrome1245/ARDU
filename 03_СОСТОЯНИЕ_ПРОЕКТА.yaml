@@ -2599,3 +2599,41 @@ physical_handoff_2026_10_04_current:
   ping_response: "O 1"
   esp_v1_local_compile: pass
   next: final_esp_v1_ota
+
+android_night_alarm_homehub_v0_22_2026_10_04:
+  version: "0.22-night-alarm-homehub-rc1"
+  version_code: 22
+  owner_directive: remaining_pages_same_homehub_format
+  night:
+    hero_height_dp: 250
+    status_inside_hero: true
+    dynamic_summary: [enabled, brightness, schedule_or_manual]
+    semantics_changed: false
+  alarm:
+    hero_height_dp: 250
+    status_inside_hero: true
+    dynamic_summary: [enabled, alarm_time, dawn_phase, rtc]
+    large_time_editor: true
+    semantics_changed: false
+  global_header:
+    hidden_on_all_normal_tabs: true
+    settings_service_unchanged: true
+  static_validation:
+    total_layout_ids: 177
+    duplicate_layout_ids: 0
+    night_alarm_ids: 41
+    missing_night_alarm_bindings: 0
+    duplicate_private_functions: 0
+  firmware_api_contract_changed: false
+  android_verify_status: not_observed_via_connector
+  owner_phone_smoke: pending
+
+physical_handoff_2026_10_04_readonly_gate:
+  final_esp_v1_ota: pass
+  status_api: pass
+  settings_api: pass
+  time_api_valid: false
+  nano_fw: ARDU_V1
+  uart_protocol: 1
+  current_blocker: ds3231_invalid_time
+  next: sync_rtc_then_repeat_time_and_status
