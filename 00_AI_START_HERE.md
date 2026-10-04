@@ -123,15 +123,20 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Обе финальные release-прошивки v1 собраны; canonical acceptance order remains `FINALIZATION_PLAN.md` + `RELEASE_V1_UPLOAD_ACCEPTANCE.md`.
+Финальные Nano/ESP v1 уже загружены на replacement hardware far enough to pass the real read-only transport gate; Android visual source is now `0.22-night-alarm-homehub-rc1`.
 
-1. Nano release candidate: `04_Прошивка/nano_ardu_v1/nano_ardu_v1.ino` — compile PASS, 28024/30720 flash (91%), 1070/2048 globals (52%).
-2. ESP release candidate: `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino` — compile PASS; owner local compile on 2026-10-04 also PASS (RAM 39%, IRAM 92%, IROM about 30%).
-3. Compact numeric Nano↔ESP UART v1 frozen: `06_Интерфейс_управления/UART_V1.md`.
-4. **ФАКТ 2026-10-04:** replacement Nano is installed and the physical ESP↔Nano UART path accepts numeric opcode `1`; raw bridge response is `O 1` without timeout.
-5. Android source is now `0.21-ambient-homehub-rc1`: approved Music v0.20.3 remains unchanged; Ambient received Home Hub hero/status composition plus illustrated F01/F02/F03 tiles. API/UART/firmware semantics did not change.
-6. Immediate physical gate: OTA upload final `ARDU_ESP_V1` to the current ESP → verify `/api/ping` reports `fw=ARDU_ESP_V1` → run release firmware acceptance → Android end-to-end acceptance.
-7. Immediate software gate: owner-phone visual smoke of Ambient v0.21. After acceptance, continue premium polish one tab at a time (Night next), without redesigning frozen interaction/API contracts.
+1. Nano v1: replacement Nano accepts frozen numeric UART v1 and reports `ARDU_V1`.
+2. ESP v1: final `ARDU_ESP_V1` OTA PASS on physical ESP; Wi-Fi/OTA boot gate PASS.
+3. Real read-only API: `/api/status` PASS, `/api/settings` PASS, no UART timeout.
+4. Current physical blocker: DS3231 time invalid; `/api/time` returns `valid=false` / Nano `D 4 0`.
+5. Immediate physical step: sync RTC through final API, repeat `/api/time` + `/api/status`, then continue release acceptance.
+6. Android: all five normal user tabs now share the owner-approved premium language:
+   - Light = Home Hub + Focus Dial;
+   - Music = approved dedicated room hero + illustrated modes;
+   - Ambient = Home Hub + illustrated F01/F02/F03;
+   - Night = Home Hub night hero + dynamic night summary;
+   - Alarm/Dawn = Home Hub dawn hero + alarm/RTC summary.
+7. Immediate software gate: `git pull` → Run → owner-phone visual smoke Night + Alarm v0.22. API/UART/firmware must remain frozen unless a release-blocking defect is found.
 8. After firmware/app PASS — second ring, power test with final Class II PSU, ceiling installation and release.
 
 ## 12. База ColorMusic/FHT
