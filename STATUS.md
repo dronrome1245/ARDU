@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — PHYSICAL WIFI/API BASELINE PASS + ANDROID `0.22-night-alarm-homehub-rc1` READY FOR REAL-DEVICE TEST. Final ESP `ARDU_ESP_V1` is online at `192.168.0.4`; physical `/api/ping`, `/api/status`, `/api/settings`, and `/api/time` PASS; RTC is valid and running. L01 semantic control is reproducible through the final Wi-Fi path: OFF readback PASS, ON readback PASS, current state = LIGHT, 4000 K, brightness 64, clap enabled, current limit 3000 mA. This closes the basic transport/readback/L01 toggle gate. Next software/physical integration step is to run Android v0.22 on the phone, set ARDU address to `192.168.0.4`, confirm Online + real state sync, then continue acceptance from Light controls in the app. Firmware/API/UART remain frozen unless a release blocker appears.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — REAL ANDROID↔ARDU CONNECTION PASS; ANDROID `0.23-concept-parity-rc1` SOURCE READY FOR PHONE REVIEW. Owner confirmed the physical Android app connected to the real `ARDU_ESP_V1` device over Wi‑Fi and showed live user pages. The previously working v0.22 UI is preserved intact in branch `archive/android-v0.22-homehub-2026-10-04` at commit `a9daf3839786414b264f32dfe0a680b68f8a7be3`. New v0.23 is an Android-only concept-parity pass: Light overview gains real brightness/Kelvin controls and concept-like app scenes; Music keeps the real seven modes but is denser; Ambient/Night/Dawn receive distinct contextual hero rendering; advanced technical parameters are collapsed; permanent “...: готово” success text is removed. Firmware, HTTP API v1 and numeric UART v1 are unchanged. Static validation: 187 unique layout IDs, missing Kotlin bindings = 0, duplicate private functions = 0, Kotlin/XML structural balance clean. Exact GitHub Actions status for v0.23 is not visible through the connector. Next gate: `git pull` → Android Studio Run → visual/function smoke on the real phone/device, with rollback available via the archive branch.**
 
 ## Что подтверждено и решено
 
@@ -2096,3 +2096,28 @@ Final observed L01 state: Kelvin 4000 K, brightness 64, clap enabled, current li
 **ФАКТ:** final Wi-Fi → ESP → numeric UART → Nano control/readback path is reproducible for baseline Light control.
 
 Next integration gate: Android v0.22 on the physical phone against `192.168.0.4`.
+
+### 2026-10-04 — real Android connection PASS + v0.23 concept parity source ready
+
+- **ФАКТ владельца + video/screenshots:** physical Android app connected to the real ARDU over home Wi‑Fi; Online state and real user pages were shown from the assembled device.
+- Previous Android v0.22 implementation was archived before visual changes:
+  - branch `archive/android-v0.22-homehub-2026-10-04`;
+  - commit `a9daf3839786414b264f32dfe0a680b68f8a7be3`;
+  - manifest `05_WiFi_и_приложение/ANDROID_V0_22_ARCHIVE.md`.
+- New Android source: `0.23-concept-parity-rc1`.
+- v0.23 changes are presentation/app-composition only:
+  - Light: compact hero, concept-like app scenes, real overview brightness/Kelvin sliders, smaller Focus Dial;
+  - Music: real M01…M09 contract retained, chooser compacted, no fake player;
+  - Ambient: distinct RGB media-wall visual context, compact F01/F02/F03, primary hue/brightness, advanced parameters collapsed;
+  - Night: distinct bedroom/night context, primary moon brightness +/- card, saturation collapsed, compact schedule;
+  - Alarm/Dawn: distinct dawn-bedroom context, primary wake-time card, compact dawn controls, end hue primary, start hue collapsed;
+  - success operation text no longer stays as “готово”.
+- Unsupported concept-only functions were not added: no fake audio volume, no fake sleep presets, no fake media playback.
+- Static validation:
+  - 187 layout IDs;
+  - duplicate IDs 0;
+  - missing Kotlin ID bindings 0;
+  - duplicate private functions 0;
+  - Kotlin braces/parentheses balanced;
+  - XML LinearLayout/FrameLayout/ScrollView container balance clean.
+- CI result for exact v0.23 head is not yet observable through the current connector.
