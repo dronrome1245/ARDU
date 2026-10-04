@@ -707,3 +707,10 @@ Android `0.19-music-header-polish-rc1`:
 - Android Verify run 37112061533 PASS.
 
 Next software action: one phone smoke confirming Music labels and frameless top status. Physical gate remains replacement Nano → final Nano upload → ESP OTA → firmware acceptance → Android end-to-end acceptance.
+
+
+## 22. Temporary firmware-source exception + Music v0.20 plan — 2026-10-04
+
+Latest owner decision temporarily relaxes the source-only firmware freeze while replacement Nano is pending. Nano/ESP source may be changed when justified, but every change must retain exact-target compile/size/regression gates. Physical final upload still waits for the replacement Nano and remains governed by `RELEASE_V1_UPLOAD_ACCEPTANCE.md`. Frozen UART/API should not be changed without a concrete blocker.
+
+Current Android next implementation is documented in `05_WiFi_и_приложение/MUSIC_V0_20_PLAN.md`. The planned Music UX uses existing API/UART capabilities and therefore does not currently require firmware changes.
