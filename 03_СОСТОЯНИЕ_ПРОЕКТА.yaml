@@ -2523,3 +2523,25 @@ android_music_visual_hotfix_v0_20_1_2026_10_04:
   debug_apk_ci: pass
   owner_phone_smoke: pending
   next: owner_phone_music_v0_20_1_visual_smoke
+
+
+android_music_framing_icon_hotfix_v0_20_2_2026_10_04:
+  version: "0.20.2-music-framing-icon-hotfix-rc1"
+  owner_v0_20_1_feedback:
+    hero_still_visually_zoomed: fixed
+    frequency_too_similar_to_gradient: fixed
+  hero:
+    height_dp: 250
+    foreground_scale: fit_center
+    backdrop_photo_copy: false
+    center_crop_music_photo: false
+  music_mode_tiles:
+    gradient_m01: smooth_multicolor_wave
+    frequency_m05: radio_frequency_beacon_arcs
+    frequency_distinct_from_gradient: true
+  firmware_api_contract_changed: false
+  android_verify_run: 37204187940
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_phone_smoke: pending
+  next: owner_phone_music_v0_20_2_visual_smoke
