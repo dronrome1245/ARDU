@@ -2396,3 +2396,15 @@ Physical context at this point:
 - `GET /api/status` → `rtc_valid=true`, режим `off`, numeric UART v1 стабилен.
 
 RTC gate закрыт. Следующий этап — L01 regression через финальный API.
+
+
+## 2026-10-04 — physical L01 ON PASS
+
+На финальной физической связке Android/API backend ESP v1 → numeric UART v1 → replacement Nano выполнено первое включение L01.
+
+Результат:
+- semantic HTTP write `enabled=true` принят;
+- readback `enabled=true`, Kelvin 4000 K, brightness 64;
+- владелец подтвердил, что кольцо физически загорелось.
+
+Следующий шаг — OFF/readback, затем повторный ON.
