@@ -2460,3 +2460,38 @@ android_music_header_polish_v0_19_2026_10_03:
   debug_apk_ci: pass
   owner_phone_visual_smoke: pending
   next: owner_check_music_labels_and_frameless_header
+
+
+android_music_homehub_v0_20_2026_10_04:
+  version: "0.20-music-homehub-rc1"
+  music_hero:
+    file: "drawable-nodpi/ardu_music_hero.webp"
+    dedicated: true
+    status_inside_hero: true
+    fake_player: false
+  music_controls:
+    large_play_stop: false
+    mode_card_direct_start: true
+    labels_without_vu: true
+    layout_rows: [4, 3]
+    card_height_dp: 64
+    horizontal_scroll: false
+    stop_on_other_bottom_tab: true
+    settings_does_not_stop_music: true
+  smart_slider:
+    global_edge_fix: true
+    edge_inset: thumb_radius_plus_shadow_reserve
+  bottom_navigation:
+    icon_only: true
+    native_vectors: true
+    content_descriptions: true
+  static_validation:
+    missing_ids: 0
+    duplicate_layout_ids: 0
+    duplicate_private_functions: 0
+  firmware_api_contract_changed: false
+  android_verify_run: 37194558467
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_phone_smoke: pending
+  next: owner_phone_music_v0_20_smoke
