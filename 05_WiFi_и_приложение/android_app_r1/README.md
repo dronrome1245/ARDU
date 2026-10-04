@@ -276,3 +276,27 @@ Phone check:
 5. confirm ARDU/status/refresh/settings are inside the hero;
 6. confirm Цвет / Смена / Радуга have distinct illustrations and selected mint state follows the selected effect;
 7. re-check ON/OFF, sliders and auto-cycle for obvious regressions.
+
+## Home Hub completion — v0.22
+
+Current Android version: `0.22-night-alarm-homehub-rc1`.
+
+All five normal user tabs now use the approved premium language.
+
+### Phone check
+1. `git pull`.
+2. Android Studio → Run.
+3. Open **Ночь**:
+   - ARDU/status/refresh/settings must be inside the hero;
+   - no separate global status rectangle;
+   - summary must show Night state + brightness + schedule/manual state;
+   - verify color/saturation/brightness and schedule save still work visually.
+4. Open **Будильник**:
+   - ARDU/status/refresh/settings must be inside the dawn hero;
+   - summary must show alarm time/state and RTC status;
+   - HH:MM editor should be large and balanced;
+   - fade/brightness/start/end color controls must remain intact;
+   - RTC sync and Stop Dawn buttons remain available.
+5. Confirm bottom dock still switches all five user tabs normally.
+
+No API/UART/firmware changes are part of v0.22.
