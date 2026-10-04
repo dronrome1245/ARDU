@@ -1489,3 +1489,57 @@ R3 не прошивался и не тестировался на железе.
 
 **Implementation:** Android `0.19-music-header-polish-rc1`.  
 **CI:** Actions run `37112061533` PASS.
+
+
+---
+
+## D-089 — Music v0.20 interaction contract
+
+**Дата:** 2026-10-04  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED
+
+**Основание:** владелец сравнил утверждённый Music concept с физическим Android-приложением и выбрал упрощённую модель без media-player semantics.
+
+**Решение:**
+1. На вкладке Music отдельные большие Play/Stop controls удаляются.
+2. Нажатие карточки M01/M02/M03/M04/M05/M08/M09 сразу:
+   - выбирает этот Music mode;
+   - переводит устройство в top-level `music`;
+   - перечитывает фактическое состояние Nano.
+3. При выборе **любой другой нижней пользовательской вкладки** во время активного top-level `music` приложение обязано отправить `mode=off`. Открытие другой вкладки само по себе не включает её устройство/эффект.
+4. Music mode labels являются пользовательскими именами без технического префикса `VU`:
+   - M01 = Градиент;
+   - M02 = Радуга;
+   - M03 = 5 полос;
+   - M04 = 3 полосы;
+   - M05 = Частота;
+   - M08 = Бегущие;
+   - M09 = Спектр.
+5. Music mode chooser не должен зависеть от горизонтального scroll для базового выбора; карточки имеют одинаковую высоту и не обрезают текст.
+6. Fake media player из concept board не реализуется.
+7. Music получает отдельный photorealistic hero asset и Home Hub composition, аналогичную утверждённому Light screen.
+8. Реализация использует существующий HTTP API v1: `POST /api/music/mode` уже активирует Music, `POST /api/mode {"mode":"off"}` останавливает его. Новый UART/API для этого не нужен.
+
+**Целевая Android версия:** `0.20-music-homehub-rc1`.
+
+
+---
+
+## D-090 — Firmware source changes allowed while replacement Nano is pending
+
+**Дата:** 2026-10-04  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED
+
+**Последнее явное решение владельца:** пока replacement Arduino Nano не пришла, при необходимости разрешено менять исходники Nano/ESP firmware.
+
+**Решение:**
+1. Предыдущий запрет на любые non-blocker firmware source changes временно ослаблен до прихода replacement Nano.
+2. Это разрешение не означает обязательную правку прошивки: если требование корректно решается Android/API уровнем, firmware не меняется без причины.
+3. Любая firmware source change до физической загрузки обязана пройти:
+   - exact-target compile;
+   - flash/SRAM review для Nano;
+   - ESP compile-size gate;
+   - regression/static contract check;
+   - синхронизацию STATUS/DECISIONS/HISTORY.
+4. Физический final upload по-прежнему выполняется только на replacement Nano по release acceptance procedure.
+5. Frozen UART/API не менять без отдельной фактической необходимости и явного документированного решения.
