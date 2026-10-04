@@ -123,16 +123,16 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Final Nano/ESP v1 and the real Wi-Fi transport are now working on the physical assembly.
+Physical Wi‑Fi/API baseline and the first real Android connection are now working.
 
-1. ESP `ARDU_ESP_V1` online at `192.168.0.4`; `/api/ping` PASS.
-2. Nano `ARDU_V1`, numeric UART v1, status/settings/time readback PASS.
-3. DS3231 RTC sync/readback PASS.
-4. L01 semantic Wi-Fi regression PASS: OFF→readback false → ON→readback true, repeated successfully; final mode = light.
-5. Android source = `0.22-night-alarm-homehub-rc1`.
-6. **Immediate next gate:** install/run Android v0.22 on the physical phone connected to the same home Wi-Fi, open Settings → Connection, set `192.168.0.4`, press “Сохранить и переподключиться”, and confirm Online + real state sync.
-7. After Android connection PASS, continue acceptance through the app in small layers: Light controls → clap → Music → Ambient → Night → Alarm/Dawn → events/persistence.
-8. Keep service current limit at 3000 mA until the second-ring/power acceptance stage.
+1. ESP `ARDU_ESP_V1` + Nano `ARDU_V1` + RTC + L01 Wi‑Fi control are physically confirmed.
+2. **ФАКТ:** owner connected the real Android app to the real ARDU and provided video/screenshots of the live pages.
+3. Previous Android UI is preserved at `archive/android-v0.22-homehub-2026-10-04` / commit `a9daf3839786414b264f32dfe0a680b68f8a7be3`.
+4. Current Android source = `0.23-concept-parity-rc1`.
+5. v0.23 tries to move the real app closer to the approved concept boards without introducing fake device capabilities or changing firmware/API/UART.
+6. Immediate next gate: `git pull` → Android Studio Run on the same physical phone → compare all five normal tabs and do a short real-device control smoke.
+7. If v0.23 is worse, rollback is safe via the archived v0.22 branch.
+8. Keep current limit at 3000 mA until second-ring/power acceptance.
 
 ## 12. База ColorMusic/FHT
 
