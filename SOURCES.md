@@ -1019,3 +1019,12 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 - OFF/ON, Refresh, Developer PING regression.
 
 Вывод: L01 profile/persistence через Android→ESP→Nano→EEPROM физически закрыт.
+
+
+## 2026-10-04 — owner-approved generated Music room hero asset
+
+- Source: generated visual asset in the owner/assistant design session, then explicitly approved by the owner for the Android Music hero.
+- Canonical app file: `05_WiFi_и_приложение/android_app_r1/app/src/main/res/drawable-nodpi/ardu_music_hero.webp`.
+- Final prepared size: 640×360 WebP.
+- Composition requirement confirmed by owner: sofa visible on the left and compact speaker visible on the right; room context retained.
+- This is a presentation asset only; no API/UART/firmware evidence is derived from it.
