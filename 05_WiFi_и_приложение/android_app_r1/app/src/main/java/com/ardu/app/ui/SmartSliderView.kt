@@ -42,9 +42,10 @@ class SmartSliderView @JvmOverloads constructor(
     private var onPreview: ((Int) -> Unit)? = null
     private var onCommit: ((Int) -> Unit)? = null
 
-    private val horizontalPadding get() = dp(15f)
     private val trackHeight get() = dp(24f)
     private val thumbRadius get() = dp(17f)
+    private val thumbShadowReserve get() = dp(8f)
+    private val edgeInset get() = thumbRadius + thumbShadowReserve
 
     init {
         isClickable = true
@@ -92,8 +93,8 @@ class SmartSliderView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val left = horizontalPadding
-        val right = width - horizontalPadding
+        val left = edgeInset
+        val right = width - edgeInset
         val centerY = height * 0.5f
         val top = centerY - trackHeight * 0.5f
         val bottom = centerY + trackHeight * 0.5f
@@ -243,8 +244,8 @@ class SmartSliderView @JvmOverloads constructor(
     }
 
     private fun updateFromX(x: Float) {
-        val left = horizontalPadding
-        val right = width - horizontalPadding
+        val left = edgeInset
+        val right = width - edgeInset
         val fraction = ((x - left) / (right - left)).coerceIn(0f, 1f)
         val next = minimumValue + ((maximumValue - minimumValue) * fraction).roundToInt()
         if (next != currentValue) {
