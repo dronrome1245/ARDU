@@ -1106,7 +1106,6 @@ class MainActivity : Activity() {
                     lightRefreshButton.isEnabled = true
                     musicRefreshButton.isEnabled = true
                     ambientRefreshButton.isEnabled = true
-                    ambientRefreshButton.isEnabled = true
                 }
             } catch (error: Exception) {
                 runOnUiThread {
@@ -1115,6 +1114,7 @@ class MainActivity : Activity() {
                     refreshButton.isEnabled = true
                     lightRefreshButton.isEnabled = true
                     musicRefreshButton.isEnabled = true
+                    ambientRefreshButton.isEnabled = true
                 }
             }
         }
