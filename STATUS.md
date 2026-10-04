@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.20.2-music-framing-icon-hotfix-rc1` READY. Owner follow-up after v0.20.1 found two remaining visual defects: Music hero still looked zoomed because the 330dp block retained a full-size `centerCrop` backdrop behind the fit-centered image, and M05 «Частота» remained too similar to M01 «Градиент». v0.20.2 removes the cropped Music-photo backdrop completely, reduces the hero to 250dp and keeps the dedicated asset only as full-image `fitCenter` over the dark hero surface; M05 now uses a distinct radio-frequency beacon/rings illustration. Music direct-start/stop-on-leave, illustrated mode tiles, bottom icon dock, SmartSlider edge fix, HTTP API/UART/firmware remain unchanged. Android Verify run 37204187940 PASS: unit contract tests + debug APK. Следующий software gate — owner-phone visual smoke v0.20.2; physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.20.3-music-room-hero-rc1` READY. Owner approved a new wide Music hero composition matching the original concept: sofa on the left, compact speaker on the right, plants/city context and balanced blue/amber lighting. `ardu_music_hero.webp` is replaced with the approved 640×360 room asset; Music keeps a single `fitCenter` image in the 250dp hero, so the complete right side including the speaker remains visible without center-crop. M05 frequency beacon, illustrated mode tiles, bottom icon dock, SmartSlider edge fix, direct-start/stop-on-leave, HTTP API/UART/firmware remain unchanged. Android Verify run 37209345952 PASS: unit contract tests + debug APK. Следующий software gate — owner-phone visual smoke v0.20.3; physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1957,3 +1957,14 @@
 - Music behavior/API/UART/firmware unchanged.
 - GitHub Actions Android Verify run `37204187940`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
 - Следующий software gate: owner-phone visual smoke v0.20.2.
+
+
+### 2026-10-04 — approved wide Music room hero v0.20.3
+
+- **РЕШЕНИЕ ВЛАДЕЛЬЦА:** утверждён новый Music hero, визуально соответствующий раннему эскизу: диван слева, небольшая колонка справа, растение/городской фон, холодный синий свет слева и тёплый янтарный справа.
+- Android version: `0.20.3-music-room-hero-rc1` (versionCode 20).
+- `drawable-nodpi/ardu_music_hero.webp` заменён на новый оптимизированный 640×360 WebP.
+- Hero layout оставлен безопасным для композиции: 250dp + один `fitCenter` layer, без `centerCrop`; поэтому правая сторона изображения и колонка не должны обрезаться.
+- Остальная Music UI/behavior без изменений.
+- GitHub Actions Android Verify run `37209345952`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
+- Следующий software gate: owner-phone visual smoke v0.20.3 через `git pull` → Run.
