@@ -655,11 +655,21 @@
                     android:background="@drawable/ardu_hero_clip"
                     android:clipToOutline="true">
 
-                    <com.ardu.app.ui.FocalCropImageView
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:alpha="0.34"
+                        android:contentDescription="@null"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ardu_music_hero" />
+
+                    <ImageView
                         android:id="@+id/musicHeroImage"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:background="#071015"
                         android:contentDescription="Музыкальная гостиная"
+                        android:scaleType="fitCenter"
                         android:src="@drawable/ardu_music_hero" />
 
                     <View
@@ -1241,70 +1251,70 @@
     </ScrollView>
 
     <LinearLayout
+        android:id="@+id/bottomNavDock"
         android:layout_width="match_parent"
-        android:layout_height="68dp"
-        android:background="@color/ardu_surface"
+        android:layout_height="72dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/ardu_bottom_dock"
+        android:elevation="10dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingLeft="6dp"
-        android:paddingTop="6dp"
-        android:paddingRight="6dp"
-        android:paddingBottom="8dp">
+        android:paddingLeft="7dp"
+        android:paddingTop="7dp"
+        android:paddingRight="7dp"
+        android:paddingBottom="7dp">
 
-        <Button
+        <ImageButton
             android:id="@+id/navLightButton"
-            style="@style/Widget.ARDU.Button.Nav"
+            style="@style/Widget.ARDU.Button.NavIcon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:contentDescription="Свет"
-            android:drawableTop="@drawable/ic_nav_light"
-            android:drawableTint="@color/ardu_nav_icon_tint"
-            android:text="" />
+            android:src="@drawable/ic_nav_light"
+            android:tint="@color/ardu_nav_icon_tint" />
 
-        <Button
+        <ImageButton
             android:id="@+id/navMusicButton"
-            style="@style/Widget.ARDU.Button.Nav"
+            style="@style/Widget.ARDU.Button.NavIcon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:contentDescription="Музыка"
-            android:drawableTop="@drawable/ic_nav_music"
-            android:drawableTint="@color/ardu_nav_icon_tint"
-            android:text="" />
+            android:src="@drawable/ic_nav_music"
+            android:tint="@color/ardu_nav_icon_tint" />
 
-        <Button
+        <ImageButton
             android:id="@+id/navAmbientButton"
-            style="@style/Widget.ARDU.Button.Nav"
+            style="@style/Widget.ARDU.Button.NavIcon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:contentDescription="Фон"
-            android:drawableTop="@drawable/ic_nav_ambient"
-            android:drawableTint="@color/ardu_nav_icon_tint"
-            android:text="" />
+            android:src="@drawable/ic_nav_ambient"
+            android:tint="@color/ardu_nav_icon_tint" />
 
-        <Button
+        <ImageButton
             android:id="@+id/navNightButton"
-            style="@style/Widget.ARDU.Button.Nav"
+            style="@style/Widget.ARDU.Button.NavIcon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:contentDescription="Ночь"
-            android:drawableTop="@drawable/ic_nav_night"
-            android:drawableTint="@color/ardu_nav_icon_tint"
-            android:text="" />
+            android:src="@drawable/ic_nav_night"
+            android:tint="@color/ardu_nav_icon_tint" />
 
-        <Button
+        <ImageButton
             android:id="@+id/navAlarmButton"
-            style="@style/Widget.ARDU.Button.Nav"
+            style="@style/Widget.ARDU.Button.NavIcon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:contentDescription="Будильник"
-            android:drawableTop="@drawable/ic_nav_alarm"
-            android:drawableTint="@color/ardu_nav_icon_tint"
-            android:text="" />
+            android:src="@drawable/ic_nav_alarm"
+            android:tint="@color/ardu_nav_icon_tint" />
     </LinearLayout>
 
 </LinearLayout>
