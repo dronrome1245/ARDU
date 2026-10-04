@@ -1633,3 +1633,29 @@ R3 не прошивался и не тестировался на железе.
 7. No firmware, HTTP API v1 or numeric UART v1 changes are authorized by this visual decision.
 
 **Implementation:** Android `0.22-night-alarm-homehub-rc1`.
+
+## D-095 — Concept-parity pass with preserved v0.22 rollback
+
+**Дата:** 2026-10-04  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED
+
+**Последнее явное решение владельца:** попробовать приблизить реальное приложение к concept screens, но сохранить предыдущее решение в репозитории.
+
+**Решение:**
+1. Before visual-parity changes archive the complete current implementation:
+   - branch `archive/android-v0.22-homehub-2026-10-04`;
+   - source commit `a9daf3839786414b264f32dfe0a680b68f8a7be3`.
+2. Main may advance to a new Android-only visual RC.
+3. Preserve all real ARDU functions and frozen contracts.
+4. Do not implement concept-only functions not backed by hardware/API:
+   - fake media player;
+   - sound-volume control;
+   - unsupported Night sleep presets/fade.
+5. Prefer:
+   - denser primary layouts;
+   - page-specific visual identity;
+   - progressive disclosure for technical parameters;
+   - actual controls over decorative summaries.
+6. Firmware, HTTP API v1 and numeric UART v1 remain frozen.
+
+**Implementation:** Android `0.23-concept-parity-rc1`.
