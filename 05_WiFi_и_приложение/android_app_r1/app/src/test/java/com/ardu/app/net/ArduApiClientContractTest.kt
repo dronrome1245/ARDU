@@ -31,6 +31,7 @@ class ArduApiClientContractTest {
         applied("/api/night/settings")
         applied("/api/alarm/settings")
         applied("/api/light/settings")
+        applied("/api/music/mode")
         applied("/api/music/settings")
         applied("/api/system/current-limit")
 
@@ -80,6 +81,15 @@ class ArduApiClientContractTest {
         assertTrue(time.valid)
         assertEquals("2026-10-02", time.date)
         assertEquals("20:00:01", time.time)
+    }
+
+    @Test
+    fun selectsMusicModeAndCanStopTopMode() {
+        api.selectMusicMode("M01")
+        assertEquals("M01", JSONObject(received.getValue("/api/music/mode")).getString("id"))
+
+        api.setMode("off")
+        assertEquals("off", JSONObject(received.getValue("/api/mode")).getString("mode"))
     }
 
     @Test
