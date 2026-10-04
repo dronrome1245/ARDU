@@ -764,3 +764,20 @@ Static source validation is clean. The exact v0.21 GitHub Actions result is not 
 
 Software next gate: owner-phone visual smoke of Ambient. If accepted, Night is the next small premium-polish iteration.
 Physical next gate: final ESP v1 OTA, then firmware acceptance and Android end-to-end acceptance.
+
+## 26. Normal-tab Home Hub completion — 2026-10-04
+
+Android `0.22-night-alarm-homehub-rc1` completes the owner-approved premium presentation across all five normal user tabs.
+
+- Light: Home Hub + Focus Dial.
+- Music: approved room hero + illustrated modes.
+- Ambient: Home Hub + illustrated F01/F02/F03.
+- Night: Home Hub + dynamic night/schedule summary.
+- Alarm/Dawn: Home Hub + alarm/RTC summary.
+
+The iteration is presentation-only; frozen HTTP API v1, numeric UART v1 and firmware remain unchanged.
+
+Static source validation is clean. Exact v0.22 CI/Actions status has not yet been observed through the current GitHub connector.
+
+Software gate: owner-phone visual smoke Night + Alarm, then only release-blocker UI polish.
+Physical gate has advanced beyond ESP OTA: real status/settings transport PASS; sync invalid RTC next, then continue firmware + Android acceptance.
