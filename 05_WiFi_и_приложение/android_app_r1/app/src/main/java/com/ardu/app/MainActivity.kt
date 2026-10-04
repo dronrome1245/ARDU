@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.Switch
@@ -17,6 +19,7 @@ import com.ardu.app.net.TimeStatus
 import com.ardu.app.ui.ColorWheelView
 import com.ardu.app.ui.FocusDialView
 import com.ardu.app.ui.FocalCropImageView
+import com.ardu.app.ui.MusicModeTileView
 import com.ardu.app.ui.RoomHeroView
 import com.ardu.app.ui.SceneTileView
 import com.ardu.app.ui.SmartSliderView
@@ -29,10 +32,10 @@ class MainActivity : Activity() {
     private var rendering = false
     private var latestSettings: ArduSettings? = null
     private var latestMode: String? = null
-    private var sectionNavigation: List<Pair<Button, LinearLayout>> = emptyList()
+    private var sectionNavigation: List<Pair<ImageButton, LinearLayout>> = emptyList()
     private var lastEspFirmware: String = "—"
     private var lastEspRssi: Int? = null
-    private val musicModeButtonMap = linkedMapOf<String, Button>()
+    private val musicModeButtonMap = linkedMapOf<String, MusicModeTileView>()
     private var ambientEffectButtonMap: Map<String, Button> = emptyMap()
     private var musicSubmodeButtonMap: Map<Int, Button> = emptyMap()
 
@@ -82,7 +85,7 @@ class MainActivity : Activity() {
 
     private lateinit var musicConnectionText: TextView
     private lateinit var musicOperationText: TextView
-    private lateinit var musicHeroImage: FocalCropImageView
+    private lateinit var musicHeroImage: ImageView
     private lateinit var musicRefreshButton: Button
     private lateinit var musicServiceButton: Button
     private lateinit var musicModeText: TextView
@@ -360,11 +363,11 @@ class MainActivity : Activity() {
 
     private fun bindNavigation() {
         sectionNavigation = listOf(
-            findViewById<Button>(R.id.navLightButton) to lightPanel,
-            findViewById<Button>(R.id.navMusicButton) to musicPanel,
-            findViewById<Button>(R.id.navAmbientButton) to ambientPanel,
-            findViewById<Button>(R.id.navNightButton) to nightPanel,
-            findViewById<Button>(R.id.navAlarmButton) to alarmPanel
+            findViewById<ImageButton>(R.id.navLightButton) to lightPanel,
+            findViewById<ImageButton>(R.id.navMusicButton) to musicPanel,
+            findViewById<ImageButton>(R.id.navAmbientButton) to ambientPanel,
+            findViewById<ImageButton>(R.id.navNightButton) to nightPanel,
+            findViewById<ImageButton>(R.id.navAlarmButton) to alarmPanel
         )
 
         sectionNavigation.forEach { (button, panel) ->
@@ -398,9 +401,6 @@ class MainActivity : Activity() {
 
         sectionNavigation.forEach { (button, panel) ->
             button.isSelected = panel === target
-            button.setTextColor(
-                getColor(if (button.isSelected) R.color.ardu_accent else R.color.ardu_text_secondary)
-            )
         }
     }
 
@@ -679,7 +679,6 @@ class MainActivity : Activity() {
     }
 
     private fun bindMusic() {
-        musicHeroImage.setFocus(0.52f, 0.48f)
         musicRefreshButton.setOnClickListener { refreshDevice() }
         musicServiceButton.setOnClickListener { showSection(servicePanel) }
 
@@ -713,15 +712,9 @@ class MainActivity : Activity() {
             }
 
             ids.forEachIndexed { index, id ->
-                val button = Button(this, null, 0, R.style.Widget_ARDU_Button_Choice).apply {
-                    text = names[id] ?: id
-                    includeFontPadding = false
-                    maxLines = 2
-                    minHeight = 0
-                    minimumHeight = 0
-                    gravity = android.view.Gravity.CENTER
-                    setPadding(dp(5), dp(4), dp(5), dp(4))
-                    layoutParams = LinearLayout.LayoutParams(0, dp(64), 1f).apply {
+                val tile = MusicModeTileView(this).apply {
+                    configure(id, names[id] ?: id)
+                    layoutParams = LinearLayout.LayoutParams(0, dp(104), 1f).apply {
                         if (index > 0) marginStart = dp(4)
                         if (index < ids.lastIndex) marginEnd = dp(4)
                     }
@@ -729,8 +722,8 @@ class MainActivity : Activity() {
                         runDeviceAction("Музыкальный режим $id") { api.selectMusicMode(id) }
                     }
                 }
-                musicModeButtonMap[id] = button
-                row.addView(button)
+                musicModeButtonMap[id] = tile
+                row.addView(tile)
             }
 
             musicModeButtons.addView(row)
@@ -1186,8 +1179,9 @@ class MainActivity : Activity() {
         musicModeText.text =
             if (snapshot.status.mode == "music") "${musicModeTitle(id)} • активно"
             else "${musicModeTitle(id)} • выключено"
-        musicModeButtonMap.forEach { (modeId, button) ->
-            setChoiceState(button, modeId == id)
+        musicModeButtonMap.forEach { (modeId, tile) ->
+            tile.isSelected = modeId == id
+            tile.invalidate()
         }
 
         musicBrightnessSeek.setValue(cfg.brightness)
