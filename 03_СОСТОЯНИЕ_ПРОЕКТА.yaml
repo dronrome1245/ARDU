@@ -2654,3 +2654,35 @@ physical_wifi_android_gate_2026_10_04:
   clap_enabled: true
   current_limit_ma: 3000
   next: android_v0_22_real_device_connection
+
+android_concept_parity_v0_23_2026_10_04:
+  version: "0.23-concept-parity-rc1"
+  version_code: 23
+  real_android_device_connection: pass_owner_video
+  rollback:
+    branch: "archive/android-v0.22-homehub-2026-10-04"
+    commit: "a9daf3839786414b264f32dfe0a680b68f8a7be3"
+    manifest: "05_WiFi_и_приложение/ANDROID_V0_22_ARCHIVE.md"
+  scope: android_visual_only
+  changes:
+    light_interactive_overview_sliders: true
+    light_concept_scenes: true
+    music_compact_real_modes: true
+    ambient_distinct_media_wall_context: true
+    ambient_progressive_disclosure: true
+    night_distinct_bedroom_context: true
+    night_primary_brightness_plus_minus: true
+    alarm_distinct_dawn_bedroom_context: true
+    alarm_primary_wake_color: true
+    success_text_cleared: true
+  unsupported_fake_features_added: false
+  firmware_api_uart_changed: false
+  static_validation:
+    layout_ids: 187
+    duplicate_ids: 0
+    missing_bindings: 0
+    duplicate_private_functions: 0
+    kotlin_balance: clean
+    xml_balance: clean
+  android_verify_status: not_observed_via_connector
+  next: owner_phone_real_device_v0_23_smoke
