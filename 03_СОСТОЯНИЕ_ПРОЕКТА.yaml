@@ -2637,3 +2637,20 @@ physical_handoff_2026_10_04_readonly_gate:
   uart_protocol: 1
   current_blocker: ds3231_invalid_time
   next: sync_rtc_then_repeat_time_and_status
+
+physical_wifi_android_gate_2026_10_04:
+  esp_fw: ARDU_ESP_V1
+  nano_fw: ARDU_V1
+  ip: "192.168.0.4"
+  uart_protocol: 1
+  ping: pass
+  status: pass
+  settings: pass
+  rtc: pass
+  l01_off_on_repeat: pass
+  final_mode: light
+  light_kelvin: 4000
+  light_brightness: 64
+  clap_enabled: true
+  current_limit_ma: 3000
+  next: android_v0_22_real_device_connection
