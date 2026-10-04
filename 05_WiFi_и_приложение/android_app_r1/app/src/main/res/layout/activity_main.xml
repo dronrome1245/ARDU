@@ -667,7 +667,6 @@
                         android:id="@+id/musicHeroImage"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="#071015"
                         android:contentDescription="Музыкальная гостиная"
                         android:scaleType="fitCenter"
                         android:src="@drawable/ardu_music_hero" />
