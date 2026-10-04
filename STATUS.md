@@ -2049,3 +2049,11 @@
   - duplicate private functions = 0;
   - Night/Alarm refresh disable/restore wiring is symmetric.
 - Exact v0.22 Android Actions result is not yet visible through the current connector.
+
+
+### 2026-10-04 — RTC time sync PASS on replacement Nano
+
+- **ФАКТ:** на replacement Nano повторный `POST /api/time/sync` через физический `ARDU_ESP_V1` успешно применён.
+- PowerShell `Invoke-RestMethod` вернул `ok=True, applied=True`.
+- Вывод: opcode 5 ESP→Nano и запись Nano→DS3231 по I²C проходят на новой плате; предыдущий `E 3` относился к прежней физической сборке/подключению, а не к HTTP/API contract.
+- Следующий gate: `GET /api/time` должен вернуть `valid=true`, затем `GET /api/status` должен вернуть `rtc_valid=true`.
