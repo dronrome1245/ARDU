@@ -2014,3 +2014,12 @@
 - Android Verify status for this exact v0.21 head is not yet visible through the current GitHub connector.
 - Software next gate: owner-phone visual smoke v0.21.
 - Physical next gate remains final ESP v1 OTA → firmware acceptance → Android end-to-end acceptance.
+
+
+### 2026-10-04 — physical ESP/Nano read-only gate
+
+- **ФАКТ:** `GET /api/status` на физическом `ARDU_ESP_V1` успешно читает replacement Nano: `nano_fw=ARDU_V1`, `uart_protocol=1`, `mode=light`, `current_limit_ma=3000`, `music_mode=M01`, `ambient_effect=F01`, без timeout.
+- **ФАКТ:** RTC gate пока не пройден: `rtc_valid=false`; `GET /api/time` → `valid=false`, Nano `D 4 0`.
+- **ФАКТ:** `GET /api/settings` успешно вернул полный schema 1 snapshot Light/Clap/Night/Alarm/Ambient/Music/System. Текущий Light: Kelvin 4000 K, brightness 64; clap enabled threshold 70 timeout 500 ms; current limit 3000 mA; audio calibration state present (`mic_dc=250`, `vu_low_pass=300`, `spectrum_low_pass=40`).
+- Вывод: HTTP↔ESP↔Nano settings/status transport PASS; единственный blocker текущего read-only acceptance — невалидное время DS3231.
+- Следующий шаг: `POST /api/time/sync` с текущим временем ПК, затем повторный `GET /api/time` и `GET /api/status`.
