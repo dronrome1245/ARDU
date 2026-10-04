@@ -123,16 +123,16 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Обе финальные release-прошивки v1 собраны и проходят CI. Канонический порядок: `FINALIZATION_PLAN.md` и `RELEASE_V1_UPLOAD_ACCEPTANCE.md`.
+Обе финальные release-прошивки v1 собраны; canonical acceptance order remains `FINALIZATION_PLAN.md` + `RELEASE_V1_UPLOAD_ACCEPTANCE.md`.
 
 1. Nano release candidate: `04_Прошивка/nano_ardu_v1/nano_ardu_v1.ino` — compile PASS, 28024/30720 flash (91%), 1070/2048 globals (52%).
-2. ESP release candidate: `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino` — compile PASS, RAM 39%, IRAM 92%, IROM 324376 bytes.
-3. Compact numeric Nano↔ESP UART v1 заморожен: `06_Интерфейс_управления/UART_V1.md`.
-4. **ФАКТ 2026-10-02:** текущая физическая Nano не принимает final upload; владелец заказал замену. Точная причина неисправности старой платы не подтверждена.
-5. Пока новая Nano в пути, Android доведён до `0.20.3-music-room-hero-rc1`: owner-approved Music hero заменён на широкую 640×360 комнату с диваном слева и компактной колонкой справа; hero остаётся 250dp + `fitCenter` без `centerCrop`, поэтому правая часть кадра не обрезается. M05 «Частота», illustrated mode cards, icon dock, direct-start/stop-on-leave и SmartSlider edge fix сохранены; Android Verify run 37209345952 PASS.
-6. Следующий physical gate после прихода платы: финальный Nano upload → восстановить UART → финальный ESP OTA → firmware acceptance → Android end-to-end acceptance.
-7. После PASS — только release-blocker fixes, затем второе кольцо, силовой тест с финальным Class II PSU, потолочный монтаж и release.
-
+2. ESP release candidate: `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino` — compile PASS; owner local compile on 2026-10-04 also PASS (RAM 39%, IRAM 92%, IROM about 30%).
+3. Compact numeric Nano↔ESP UART v1 frozen: `06_Интерфейс_управления/UART_V1.md`.
+4. **ФАКТ 2026-10-04:** replacement Nano is installed and the physical ESP↔Nano UART path accepts numeric opcode `1`; raw bridge response is `O 1` without timeout.
+5. Android source is now `0.21-ambient-homehub-rc1`: approved Music v0.20.3 remains unchanged; Ambient received Home Hub hero/status composition plus illustrated F01/F02/F03 tiles. API/UART/firmware semantics did not change.
+6. Immediate physical gate: OTA upload final `ARDU_ESP_V1` to the current ESP → verify `/api/ping` reports `fw=ARDU_ESP_V1` → run release firmware acceptance → Android end-to-end acceptance.
+7. Immediate software gate: owner-phone visual smoke of Ambient v0.21. After acceptance, continue premium polish one tab at a time (Night next), without redesigning frozen interaction/API contracts.
+8. After firmware/app PASS — second ring, power test with final Class II PSU, ceiling installation and release.
 
 ## 12. База ColorMusic/FHT
 
