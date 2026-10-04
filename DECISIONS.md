@@ -1608,3 +1608,28 @@ R3 не прошивался и не тестировался на железе.
 
 **Implementation:** Android `0.20.3-music-room-hero-rc1`.  
 **CI:** Actions run `37209345952` PASS (`testDebugUnitTest` + `assembleDebug`).
+
+## D-094 — Complete Home Hub language on remaining normal tabs
+
+**Дата:** 2026-10-04  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED
+
+**Последнее явное решение владельца:** «в таком формате сделай оставшиеся страницы» после реализации Ambient Home Hub v0.21.
+
+**Решение:**
+1. Night and Alarm/Dawn are the remaining normal user tabs to receive the same premium Home Hub composition.
+2. Both tabs use a 250dp contextual hero with:
+   - ARDU;
+   - connection chip;
+   - Refresh;
+   - Settings;
+   - page title/context;
+   - operation feedback;
+   - dynamic glass summary.
+3. The shared global everyday status header is hidden on all five normal user tabs; Settings/service remains the technical destination for global diagnostics.
+4. Night preserves existing behavior: enabled, hue, saturation, brightness, schedule enabled, schedule on/off.
+5. Alarm/Dawn preserves existing behavior: enabled, HH:MM, fade, max brightness, start/end hue, RTC sync, stop active dawn.
+6. Alarm hero may display RTC validity/time already available from the frozen read API; this is presentation only and adds no new device command.
+7. No firmware, HTTP API v1 or numeric UART v1 changes are authorized by this visual decision.
+
+**Implementation:** Android `0.22-night-alarm-homehub-rc1`.
