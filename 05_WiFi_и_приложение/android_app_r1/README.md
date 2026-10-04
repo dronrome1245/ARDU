@@ -239,3 +239,18 @@ Implementation:
 - no AppCompat/third-party dependency.
 
 Final Actions run `37110520082`: contract tests PASS, debug APK PASS.
+
+
+## Music framing/icon hotfix — v0.20.2
+
+Current Android version: `0.20.2-music-framing-icon-hotfix-rc1`.
+
+Owner follow-up fixes:
+- Music hero no longer renders any `centerCrop` copy of the dedicated photo; the 250dp hero uses one complete `fitCenter` image over the dark hero surface;
+- M05 «Частота» uses a distinct radio-frequency/beacon illustration instead of a second waveform similar to M01 «Градиент».
+
+No API/UART/firmware changes.
+
+GitHub Actions Android Verify run `37204187940`: contract tests PASS + debug APK PASS.
+
+Phone check: `git pull` → Android Studio Run → visually confirm full Music hero framing and clear M01/M05 distinction.
