@@ -734,3 +734,18 @@ Android `0.20-music-homehub-rc1` implemented and CI-green.
 - Actions run 37194558467 PASS.
 
 Next software gate: owner-phone visual/function smoke on the stateful mock. Physical gate remains replacement Nano → final Nano upload → ESP OTA → firmware acceptance → Android end-to-end acceptance.
+
+
+## 24. Music visual hotfix checkpoint — 2026-10-04
+
+Android `0.20.1-music-visual-hotfix-rc1` implemented after owner phone review.
+
+- hero over-zoom corrected by fit-centered primary image + subdued full-bleed backdrop;
+- illustrated Music mode tiles implemented;
+- bottom navigation changed to centered ImageButtons inside separate dock;
+- Music behavior from v0.20 unchanged;
+- firmware/API/UART unchanged;
+- static ID/function validation clean;
+- Android Verify run 37196929089 PASS.
+
+Next software action: owner-phone visual smoke v0.20.1. Physical gate remains replacement Nano → final Nano upload → ESP OTA → firmware acceptance → Android end-to-end acceptance.
