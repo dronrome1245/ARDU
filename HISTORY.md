@@ -2279,3 +2279,15 @@ R3 экономит относительно R2:
 - raw `POST /api/dev/nano` body `1` → `O 1`, без timeout.
 
 **ФАКТ:** физическая линия ESP↔Nano и numeric UART v1 opcode 1 подтверждены на replacement Nano. Следующий шаг — финальный ESP v1 OTA.
+
+
+## 2026-10-04 — owner local ESP v1 compile PASS
+
+Локальная Arduino IDE владельца успешно скомпилировала финальный `esp8266_ardu_v1.ino` после открытия правильной папки скетча вместе с `ardu_esp_v1_types.h`.
+
+Фактические размеры:
+- RAM 32020/80192 (39%);
+- IRAM 60823/65536 (92%);
+- IROM 324400/1048576 (30%).
+
+Следующий hardware gate — OTA upload `ARDU_ESP_V1` на физический ESP.
