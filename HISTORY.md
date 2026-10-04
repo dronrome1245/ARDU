@@ -2291,3 +2291,17 @@ R3 экономит относительно R2:
 - IROM 324400/1048576 (30%).
 
 Следующий hardware gate — OTA upload `ARDU_ESP_V1` на физический ESP.
+
+
+## 2026-10-04 — physical ESP v1 OTA PASS
+
+Финальный `ARDU_ESP_V1` успешно загружен по OTA на физический ESP8266.
+
+После reboot:
+- `GET /api/ping` → `ok=true`;
+- `fw=ARDU_ESP_V1`;
+- `uart_protocol=1`;
+- Wi-Fi connected, IP `192.168.0.4`, RSSI `-53`;
+- OTA ready, hostname `ardu`, port `8266`.
+
+Следующий шаг — read-only firmware/API gate через status/settings/time.
