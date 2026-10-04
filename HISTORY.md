@@ -2428,3 +2428,25 @@ Confirmed:
 This closes the minimum network/backend gate needed to move testing from PowerShell to the Android application.
 
 Next: run current Android app on the phone, set address `192.168.0.4` in Settings → Connection, then verify real startup sync and Light controls.
+
+## 2026-10-04 — real Android video review → v0.23 concept parity
+
+Owner connected the current Android app to the real physical ARDU and supplied a video/screenshots. This is the first direct visual review of the final real-device path rather than mock-only rendering.
+
+Before changes:
+- archived v0.22 branch: `archive/android-v0.22-homehub-2026-10-04`;
+- archived source commit: `a9daf3839786414b264f32dfe0a680b68f8a7be3`;
+- archive manifest committed.
+
+Implemented v0.23:
+- `RoomHeroView` now creates distinct Ambient media-wall, Night bedroom and Dawn bedroom contexts over the existing image base;
+- Light overview summary tiles replaced with real SmartSlider brightness/Kelvin controls;
+- Light quick scenes moved toward concept labels: Вечер / Кино / Гости / Чтение;
+- Light Focus Dial reduced from 300dp to 270dp;
+- Music mode tiles reduced to a denser real-mode chooser;
+- Ambient primary control reduced to effect + hue + brightness; detailed effect parameters collapsed;
+- Night brightness becomes a primary moon +/- control; saturation is secondary;
+- Alarm end hue becomes the primary wake color; start hue is secondary;
+- success operation text clears after successful writes.
+
+No Nano/ESP/API/UART source changes.
