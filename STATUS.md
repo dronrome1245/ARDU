@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — ANDROID `0.22-night-alarm-homehub-rc1` SOURCE READY; ALL FIVE NORMAL USER TABS NOW USE THE OWNER-APPROVED PREMIUM LANGUAGE. Light keeps Home Hub + Focus Dial; Music keeps the approved v0.20.3 room hero and illustrated mode tiles; Ambient uses its v0.21 Home Hub/effect tiles; Night and Alarm/Dawn now use 250dp contextual Home Hub heroes with ARDU/connection/refresh/settings and dynamic glass summaries inside the hero. Night keeps color/brightness/schedule semantics; Alarm keeps time/fade/brightness/start/end hue/RTC/stop-dawn semantics and now shows RTC validity/time in its hero. HTTP API v1, numeric UART v1 and Nano/ESP firmware are unchanged by v0.22. Static Android validation: 177 layout IDs, duplicate IDs = 0, missing Night/Alarm bindings = 0, duplicate private functions = 0. Exact v0.22 Android Verify result is not yet observed through the GitHub connector. Physical state is ahead of the previous handoff: final ESP OTA PASS; /api/status + /api/settings PASS on real ESP/Nano; current blocker is DS3231 time validity (/api/time valid=false). Next physical action: time sync, then repeat time/status and continue release acceptance. Next software action: owner-phone visual smoke of Night + Alarm v0.22.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — PHYSICAL WIFI/API BASELINE PASS + ANDROID `0.22-night-alarm-homehub-rc1` READY FOR REAL-DEVICE TEST. Final ESP `ARDU_ESP_V1` is online at `192.168.0.4`; physical `/api/ping`, `/api/status`, `/api/settings`, and `/api/time` PASS; RTC is valid and running. L01 semantic control is reproducible through the final Wi-Fi path: OFF readback PASS, ON readback PASS, current state = LIGHT, 4000 K, brightness 64, clap enabled, current limit 3000 mA. This closes the basic transport/readback/L01 toggle gate. Next software/physical integration step is to run Android v0.22 on the phone, set ARDU address to `192.168.0.4`, confirm Online + real state sync, then continue acceptance from Light controls in the app. Firmware/API/UART remain frozen unless a release blocker appears.**
 
 ## Что подтверждено и решено
 
@@ -2073,3 +2073,26 @@
 - **ФАКТ:** `GET /api/light/status` после команды: `enabled=true`, `color_mode=kelvin`, `kelvin=4000`, `brightness=64`, `clap_enabled=true`.
 - **ФАКТ владельца:** физическое кольцо загорелось.
 - Следующий минимальный gate: L01 OFF → физическое гашение → readback `enabled=false`; затем повторный ON для проверки воспроизводимости.
+
+### 2026-10-04 — physical Wi-Fi/API baseline + L01 OFF/ON regression PASS
+
+Owner repeated the full final Wi-Fi baseline on the real assembled stack.
+
+Read-only:
+- `GET /api/ping` → `fw=ARDU_ESP_V1`, UART v1, Wi-Fi connected, IP `192.168.0.4`, OTA ready;
+- `GET /api/status` → `nano_fw=ARDU_V1`, `rtc_valid=true`, current limit 3000 mA, no timeout;
+- `GET /api/time` → `valid=true`, RTC advancing normally;
+- `GET /api/settings` → schema 1 full snapshot for Light/Clap/Night/Alarm/Ambient/Music/System.
+
+L01 regression:
+- semantic OFF applied → `GET /api/light/status enabled=false`;
+- semantic ON applied → `GET /api/light/status enabled=true`;
+- repeat OFF → `enabled=false`;
+- repeat ON → `enabled=true`;
+- final `GET /api/status` → top-level `mode=light`, `mode_id=1`.
+
+Final observed L01 state: Kelvin 4000 K, brightness 64, clap enabled, current limit 3000 mA.
+
+**ФАКТ:** final Wi-Fi → ESP → numeric UART → Nano control/readback path is reproducible for baseline Light control.
+
+Next integration gate: Android v0.22 on the physical phone against `192.168.0.4`.
