@@ -101,7 +101,7 @@ class MusicModeTileView @JvmOverloads constructor(
             "M02" -> drawRainbow(canvas, b)
             "M03" -> drawBars(canvas, b, intArrayOf(15, 27, 39, 31, 21))
             "M04" -> drawBars(canvas, b, intArrayOf(18, 38, 25))
-            "M05" -> drawFrequencyWave(canvas, b)
+            "M05" -> drawFrequencyBeacon(canvas, b)
             "M08" -> drawRunningDots(canvas, b)
             "M09" -> drawSpectrum(canvas, b)
             else -> drawGradientWave(canvas, b)
@@ -194,37 +194,40 @@ class MusicModeTileView @JvmOverloads constructor(
         }
     }
 
-    private fun drawFrequencyWave(canvas: Canvas, b: RectF) {
-        val p = Path()
-        val mid = b.centerY()
-        p.moveTo(b.left, mid)
-        p.cubicTo(
-            b.left + b.width() * .12f, mid + b.height() * .20f,
-            b.left + b.width() * .18f, b.top,
-            b.left + b.width() * .31f, mid
-        )
-        p.cubicTo(
-            b.left + b.width() * .42f, b.bottom,
-            b.left + b.width() * .48f, b.top,
-            b.left + b.width() * .60f, mid
-        )
-        p.cubicTo(
-            b.left + b.width() * .72f, b.bottom,
-            b.left + b.width() * .78f, b.top + b.height() * .18f,
-            b.right, mid
-        )
+    private fun drawFrequencyBeacon(canvas: Canvas, b: RectF) {
+        val cx = b.centerX()
+        val cy = b.centerY()
+        val maxRadius = min(b.width() * .34f, b.height() * .62f)
+
         iconPaint.style = Paint.Style.STROKE
         iconPaint.strokeCap = Paint.Cap.ROUND
-        iconPaint.strokeJoin = Paint.Join.ROUND
-        iconPaint.strokeWidth = dp(5f)
+        iconPaint.strokeWidth = dp(3.4f)
         iconPaint.shader = LinearGradient(
             b.left, 0f, b.right, 0f,
-            Color.rgb(30, 221, 239),
-            Color.rgb(125, 80, 255),
+            Color.rgb(31, 225, 242),
+            Color.rgb(122, 82, 255),
             Shader.TileMode.CLAMP
         )
-        canvas.drawPath(p, iconPaint)
+
+        floatArrayOf(.42f, .70f, 1f).forEach { fraction ->
+            val radius = maxRadius * fraction
+            val oval = RectF(cx - radius, cy - radius, cx + radius, cy + radius)
+            canvas.drawArc(oval, -52f, 104f, false, iconPaint)
+            canvas.drawArc(oval, 128f, 104f, false, iconPaint)
+        }
+
         iconPaint.shader = null
+        iconPaint.style = Paint.Style.FILL
+        iconPaint.color = Color.rgb(255, 190, 62)
+        canvas.drawCircle(cx, cy, dp(4.6f), iconPaint)
+
+        iconPaint.color = Color.rgb(31, 225, 242)
+        canvas.drawRoundRect(
+            RectF(cx - dp(1.4f), cy - dp(13f), cx + dp(1.4f), cy - dp(6.5f)),
+            dp(1.4f),
+            dp(1.4f),
+            iconPaint
+        )
     }
 
     private fun drawRunningDots(canvas: Canvas, b: RectF) {
