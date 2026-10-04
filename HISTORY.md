@@ -2408,3 +2408,23 @@ RTC gate закрыт. Следующий этап — L01 regression через
 - владелец подтвердил, что кольцо физически загорелось.
 
 Следующий шаг — OFF/readback, затем повторный ON.
+
+## 2026-10-04 — physical baseline repeated; Android real-device gate opened
+
+The owner repeated the final Wi-Fi/API baseline and L01 toggle sequence on the physical device.
+
+Confirmed:
+- ESP firmware = `ARDU_ESP_V1`;
+- IP = `192.168.0.4`;
+- Nano firmware = `ARDU_V1`;
+- numeric UART protocol = 1;
+- RTC valid and advancing;
+- settings schema 1 full read succeeds;
+- L01 OFF → readback false;
+- L01 ON → readback true;
+- repeated OFF/ON also succeeds;
+- final top-level mode = light.
+
+This closes the minimum network/backend gate needed to move testing from PowerShell to the Android application.
+
+Next: run current Android app on the phone, set address `192.168.0.4` in Settings → Connection, then verify real startup sync and Light controls.
