@@ -2057,3 +2057,11 @@
 - PowerShell `Invoke-RestMethod` вернул `ok=True, applied=True`.
 - Вывод: opcode 5 ESP→Nano и запись Nano→DS3231 по I²C проходят на новой плате; предыдущий `E 3` относился к прежней физической сборке/подключению, а не к HTTP/API contract.
 - Следующий gate: `GET /api/time` должен вернуть `valid=true`, затем `GET /api/status` должен вернуть `rtc_valid=true`.
+
+
+### 2026-10-04 — physical RTC readback gate PASS
+
+- **ФАКТ:** после успешного `POST /api/time/sync` физический `GET /api/time` вернул `valid=true`, дату `2026-10-04`, время `20:09:23`, Nano `D 4 1 2026 10 4 20 9 23`.
+- **ФАКТ:** повторный `GET /api/status` вернул `rtc_valid=true`, `mode=off`, `nano_fw=ARDU_V1`, `uart_protocol=1`; RTC time продолжает идти (`20:09:28`).
+- RTC sync/readback gate на replacement Nano полностью пройден.
+- Следующий acceptance слой: реальный L01 через финальный HTTP API при текущем безопасном brightness=64.
