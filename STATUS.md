@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.20-music-homehub-rc1` READY. Replacement Nano всё ещё ожидается. Music Home Hub реализован: отдельный `ardu_music_hero.webp`, статус/controls поверх hero как у Light, fake player отсутствует, большие Play/Stop удалены, tap карточки M01/M02/M03/M04/M05/M08/M09 сразу запускает режим. Названия без `VU`; режимы собраны в две equal-height строки 4+3 без horizontal scroll. При выборе другой нижней пользовательской вкладки активный top-level Music автоматически переводится в OFF; Settings сам Music не выключает. `SmartSliderView` исправлен глобально: thumb center теперь ограничен `thumbRadius + shadow reserve`, поэтому min/max не обрезаются. Нижняя навигация переведена на icon-only native vectors. Firmware/API/UART для этого не менялись. Static ID/function check чистый; Android Verify run 37194558467 PASS: contract tests + debug APK. Следующий software gate — owner-phone visual/function smoke v0.20; physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.20.1-music-visual-hotfix-rc1` READY. Owner phone review v0.20 found three visual defects: Music hero over-zoom, plain mode buttons, and bottom nav icons visually off-center/merged with page content. v0.20.1 fixes all three: dedicated Music image is now presented fit-centered without extra crop, with a soft same-image backdrop; mode choices are custom illustrated `MusicModeTileView` cards; bottom navigation uses centered `ImageButton` items inside a separate rounded/elevated dock. Music direct-start/stop-on-leave behavior, global SmartSlider edge fix, HTTP API/UART/firmware remain unchanged. Static ID/function check clean; Android Verify run 37196929089 PASS: unit contract tests + debug APK. Следующий software gate — owner-phone visual smoke v0.20.1; physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1927,3 +1927,17 @@
 - Added HTTP contract coverage for Music mode selection + top-level OFF.
 - GitHub Actions Android Verify run `37194558467`: unit contract tests PASS, debug APK build PASS.
 - Nano/ESP source unchanged in this implementation.
+
+
+### 2026-10-04 — Music visual hotfix v0.20.1
+
+- Owner screenshot confirmed three v0.20 visual defects: zoomed Music hero, text-only mode cards, bottom navigation blending into page content.
+- Android version: `0.20.1-music-visual-hotfix-rc1`.
+- Music hero now uses two layers: soft center-crop backdrop + uncropped `fitCenter` foreground, keeping the full dedicated asset visible.
+- Added dependency-free custom `MusicModeTileView` with seven mode-specific colorful illustrations.
+- Mode cards now have 104dp height for icon + label composition; selected tile retains mint glow/border.
+- Bottom nav converted from compound-drawable Buttons to centered `ImageButton` controls.
+- Added `ardu_bottom_dock.xml`: rounded separate surface, border, spacing and elevation.
+- Static validation: missing IDs = 0; duplicate IDs = 0; duplicate private functions = 0.
+- Actions run `37196929089`: tests PASS + debug APK build PASS.
+- Firmware/API/UART unchanged.
