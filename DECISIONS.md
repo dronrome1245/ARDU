@@ -1567,3 +1567,23 @@ R3 не прошивался и не тестировался на железе.
 
 **Implementation:** Android `0.20.1-music-visual-hotfix-rc1`.  
 **CI:** Actions run `37196929089` PASS.
+
+
+---
+
+## D-092 — Music framing/icon hotfix v0.20.2
+
+**Дата:** 2026-10-04  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED
+
+**Основание:** после v0.20.1 владелец указал два оставшихся визуальных дефекта: Music hero всё ещё воспринимается как увеличенный, а иллюстрации M05 «Частота» и M01 «Градиент» слишком похожи.
+
+**Решение:**
+1. В Music hero не использовать вторую `centerCrop`-копию dedicated photo asset: она снова создаёт визуальный zoom в высоком почти квадратном контейнере.
+2. Основной Music asset показывать целиком через `fitCenter` на тёмной hero surface; высота Music hero = 250dp вместо 330dp, чтобы пропорции блока были ближе к landscape photo.
+3. M01 «Градиент» остаётся плавной цветной волной.
+4. M05 «Частота» получает принципиально другой symbol language — radio-frequency/beacon arcs + центральный маркер, без второй горизонтальной волны.
+5. Direct-start, stop-on-leave, selected state, bottom dock, SmartSlider, HTTP API v1, numeric UART v1 и firmware не изменять.
+
+**Implementation:** Android `0.20.2-music-framing-icon-hotfix-rc1`.  
+**CI:** Actions run `37204187940` PASS (`testDebugUnitTest` + `assembleDebug`).
