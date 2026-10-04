@@ -1977,3 +1977,13 @@
 - **ФАКТ:** через raw bridge выполнен `POST /api/dev/nano` с телом `1`; ответ: `nano="O 1"`, `timed_out=false`.
 - Вывод: физический UART ESP→replacement Nano исправен, новая Nano принимает numeric UART v1, opcode 1/PING подтверждён end-to-end через существующий ESP transport.
 - Следующий hardware шаг: OTA загрузка `esp8266_ardu_v1.ino` на текущий ESP, затем первый HTTP gate `/api/ping → fw=ARDU_ESP_V1`.
+
+
+### 2026-10-04 — owner local ESP v1 compile PASS
+
+- **ФАКТ:** владелец локально скомпилировал `05_WiFi_и_приложение/esp8266_ardu_v1/esp8266_ardu_v1.ino` с рабочими локальными Wi-Fi/OTA credentials.
+- RAM: `32020 / 80192` = 39%.
+- IRAM: `60823 / 65536` = 92%.
+- IROM/flash code: `324400 / 1048576` = 30%.
+- Compile PASS; значения согласуются с release CI и не показывают нового memory blocker.
+- Следующий шаг: OTA upload финального `ARDU_ESP_V1` на текущий ESP через network port `ardu / 192.168.0.4`.
