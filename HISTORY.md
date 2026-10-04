@@ -2202,3 +2202,19 @@ R3 экономит относительно R2:
 - Light hero/status composition unchanged.
 - Android bumped to `0.19-music-header-polish-rc1`.
 - Actions run 37112061533: contract tests PASS, debug APK build PASS.
+
+
+## 2026-10-04 — Music Home Hub v0.20 completed
+
+- Implemented the owner-approved Music v0.20 plan without firmware/API changes.
+- Generated and committed a dedicated Music hero WebP; Music no longer reuses `RoomHeroView`/Light photo for its main hero.
+- Music header/status/actions moved inside the hero; separate page header hidden while Music is selected.
+- Removed Music Play/Stop row.
+- Music mode names simplified and rebuilt as equal-height 4+3 grid.
+- Existing `/api/music/mode` verified as direct select+start path; existing `/api/mode off` used for stop-on-leave.
+- Bottom user navigation now stops active Music when moving to Light/Ambient/Night/Alarm; Settings is non-stopping.
+- Fixed SmartSliderView min/max thumb clipping globally by increasing usable edge inset to include thumb radius and shadow reserve.
+- Bottom navigation converted from visible words to native vector icons.
+- Contract test now covers `selectMusicMode(M01)` and `setMode(off)` payloads.
+- Static layout/source validation clean.
+- Android Verify run 37194558467 PASS: tests + assembleDebug.
