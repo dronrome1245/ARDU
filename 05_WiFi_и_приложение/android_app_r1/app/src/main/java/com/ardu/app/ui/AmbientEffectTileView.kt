@@ -32,7 +32,7 @@ class AmbientEffectTileView @JvmOverloads constructor(
             "sans-serif-medium",
             android.graphics.Typeface.NORMAL
         )
-        textSize = sp(13f)
+        textSize = sp(11.5f)
     }
 
     private var effectId: String = "F01"
@@ -41,7 +41,7 @@ class AmbientEffectTileView @JvmOverloads constructor(
     init {
         isClickable = true
         isFocusable = true
-        minimumHeight = dp(104f).toInt()
+        minimumHeight = dp(88f).toInt()
         setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
@@ -90,16 +90,16 @@ class AmbientEffectTileView @JvmOverloads constructor(
         canvas.drawRoundRect(bounds, radius, radius, borderPaint)
 
         val iconBounds = RectF(
-            dp(12f),
-            dp(13f),
-            w - dp(12f),
-            h * .62f
+            dp(10f),
+            dp(9f),
+            w - dp(10f),
+            h * .60f
         )
         drawEffectIcon(canvas, iconBounds)
 
         titlePaint.color =
             if (isSelected) Color.rgb(244, 255, 252) else Color.rgb(244, 247, 250)
-        canvas.drawText(title, w * .5f, h - dp(15f), titlePaint)
+        canvas.drawText(title, w * .5f, h - dp(10f), titlePaint)
     }
 
     private fun drawEffectIcon(canvas: Canvas, bounds: RectF) {
