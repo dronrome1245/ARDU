@@ -1522,6 +1522,9 @@ R3 не прошивался и не тестировался на железе.
 
 **Целевая Android версия:** `0.20-music-homehub-rc1`.
 
+**Implementation:** Android `0.20-music-homehub-rc1`.  
+**CI:** Actions run `37194558467` PASS.
+
 
 ---
 
