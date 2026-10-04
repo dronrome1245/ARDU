@@ -28,6 +28,7 @@ class MainActivity : Activity() {
     private val worker = Executors.newSingleThreadExecutor()
     private var rendering = false
     private var latestSettings: ArduSettings? = null
+    private var latestMode: String? = null
     private var sectionNavigation: List<Pair<Button, LinearLayout>> = emptyList()
     private var lastEspFirmware: String = "—"
     private var lastEspRssi: Int? = null
@@ -79,7 +80,11 @@ class MainActivity : Activity() {
     private lateinit var clapFinishButton: Button
     private lateinit var clapSaveButton: Button
 
-    private lateinit var musicHeroView: RoomHeroView
+    private lateinit var musicConnectionText: TextView
+    private lateinit var musicOperationText: TextView
+    private lateinit var musicHeroImage: FocalCropImageView
+    private lateinit var musicRefreshButton: Button
+    private lateinit var musicServiceButton: Button
     private lateinit var musicModeText: TextView
     private lateinit var musicModeButtons: LinearLayout
     private lateinit var musicBrightnessText: TextView
@@ -236,7 +241,11 @@ class MainActivity : Activity() {
         clapFinishButton = findViewById(R.id.clapFinishButton)
         clapSaveButton = findViewById(R.id.clapSaveButton)
 
-        musicHeroView = findViewById(R.id.musicHeroView)
+        musicConnectionText = findViewById(R.id.musicConnectionText)
+        musicOperationText = findViewById(R.id.musicOperationText)
+        musicHeroImage = findViewById(R.id.musicHeroImage)
+        musicRefreshButton = findViewById(R.id.musicRefreshButton)
+        musicServiceButton = findViewById(R.id.musicServiceButton)
         musicModeText = findViewById(R.id.musicModeText)
         musicModeButtons = findViewById(R.id.musicModeButtons)
         musicBrightnessText = findViewById(R.id.musicBrightnessText)
@@ -323,6 +332,32 @@ class MainActivity : Activity() {
         refreshButton.setOnClickListener { refreshDevice() }
     }
 
+    private fun navigateToUserSection(target: LinearLayout) {
+        val stopMusic = latestMode == "music" && target !== musicPanel
+
+        if (target === lightPanel) {
+            showLightOverview()
+        } else {
+            showSection(target)
+        }
+
+        if (!stopMusic) return
+
+        setOperationStatus("Остановка светомузыки…")
+        worker.execute {
+            try {
+                api.setMode("off")
+                val snapshot = readSnapshot()
+                runOnUiThread {
+                    renderSnapshot(snapshot)
+                    setOperationStatus("")
+                }
+            } catch (error: Exception) {
+                showError("Остановка светомузыки", error)
+            }
+        }
+    }
+
     private fun bindNavigation() {
         sectionNavigation = listOf(
             findViewById<Button>(R.id.navLightButton) to lightPanel,
@@ -334,7 +369,7 @@ class MainActivity : Activity() {
 
         sectionNavigation.forEach { (button, panel) ->
             button.setOnClickListener {
-                if (panel === lightPanel) showLightOverview() else showSection(panel)
+                navigateToUserSection(panel)
             }
         }
 
@@ -359,7 +394,7 @@ class MainActivity : Activity() {
         listOf(lightPanel, musicPanel, ambientPanel, nightPanel, alarmPanel, servicePanel)
             .forEach { it.visibility = if (it === target) View.VISIBLE else View.GONE }
 
-        globalHeaderPanel.visibility = if (target === lightPanel) View.GONE else View.VISIBLE
+        globalHeaderPanel.visibility = if (target === lightPanel || target === musicPanel) View.GONE else View.VISIBLE
 
         sectionNavigation.forEach { (button, panel) ->
             button.isSelected = panel === target
@@ -644,43 +679,61 @@ class MainActivity : Activity() {
     }
 
     private fun bindMusic() {
-        musicHeroView.setScene(RoomHeroView.Scene.MUSIC)
-        findViewById<Button>(R.id.musicOnButton).setOnClickListener {
-            runDeviceAction("Включение светомузыки") { api.setMode("music") }
-        }
-        findViewById<Button>(R.id.musicOffButton).setOnClickListener {
-            runDeviceAction("Выключение светомузыки") { api.setMode("off") }
-        }
+        musicHeroImage.setFocus(0.52f, 0.48f)
+        musicRefreshButton.setOnClickListener { refreshDevice() }
+        musicServiceButton.setOnClickListener { showSection(servicePanel) }
 
         val names = mapOf(
-            "M01" to "VU\nГрадиент",
-            "M02" to "VU\nРадуга",
-            "M03" to "5\nполос",
-            "M04" to "3\nполосы",
+            "M01" to "Градиент",
+            "M02" to "Радуга",
+            "M03" to "5 полос",
+            "M04" to "3 полосы",
             "M05" to "Частота",
             "M08" to "Бегущие",
             "M09" to "Спектр"
         )
+
         musicModeButtonMap.clear()
         musicModeButtons.removeAllViews()
-        ArduApiClient.MUSIC_IDS.forEach { id ->
-            val button = Button(this, null, 0, R.style.Widget_ARDU_Button_Choice).apply {
-                text = names[id] ?: id
-                includeFontPadding = false
-                maxLines = 2
-                minHeight = 0
-                minimumHeight = 0
-                gravity = android.view.Gravity.CENTER
-                setPadding(dp(8), dp(4), dp(8), dp(4))
-                layoutParams = LinearLayout.LayoutParams(dp(100), dp(76)).apply {
-                    marginEnd = dp(8)
-                }
-                setOnClickListener {
-                    runDeviceAction("Музыкальный режим $id") { api.selectMusicMode(id) }
+
+        val rows = listOf(
+            ArduApiClient.MUSIC_IDS.take(4),
+            ArduApiClient.MUSIC_IDS.drop(4)
+        )
+
+        rows.forEachIndexed { rowIndex, ids ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    if (rowIndex > 0) topMargin = dp(8)
                 }
             }
-            musicModeButtonMap[id] = button
-            musicModeButtons.addView(button)
+
+            ids.forEachIndexed { index, id ->
+                val button = Button(this, null, 0, R.style.Widget_ARDU_Button_Choice).apply {
+                    text = names[id] ?: id
+                    includeFontPadding = false
+                    maxLines = 2
+                    minHeight = 0
+                    minimumHeight = 0
+                    gravity = android.view.Gravity.CENTER
+                    setPadding(dp(5), dp(4), dp(5), dp(4))
+                    layoutParams = LinearLayout.LayoutParams(0, dp(64), 1f).apply {
+                        if (index > 0) marginStart = dp(4)
+                        if (index < ids.lastIndex) marginEnd = dp(4)
+                    }
+                    setOnClickListener {
+                        runDeviceAction("Музыкальный режим $id") { api.selectMusicMode(id) }
+                    }
+                }
+                musicModeButtonMap[id] = button
+                row.addView(button)
+            }
+
+            musicModeButtons.addView(row)
         }
 
         bindSmartSlider(
@@ -997,20 +1050,24 @@ class MainActivity : Activity() {
     private fun setOperationStatus(text: String) {
         operationText.text = text
         lightOperationText.text = text
+        musicOperationText.text = text
     }
 
     private fun setConnectionStatus(text: String, colorRes: Int) {
         connectionText.text = text
         lightConnectionText.text = text
+        musicConnectionText.text = text
         val color = getColor(colorRes)
         connectionText.setTextColor(color)
         lightConnectionText.setTextColor(color)
+        musicConnectionText.setTextColor(color)
     }
 
     private fun refreshDevice() {
         setConnectionStatus("Проверка…", R.color.ardu_text_secondary)
         refreshButton.isEnabled = false
         lightRefreshButton.isEnabled = false
+        musicRefreshButton.isEnabled = false
         setOperationStatus("")
 
         worker.execute {
@@ -1032,6 +1089,7 @@ class MainActivity : Activity() {
                     renderSnapshot(snapshot)
                     refreshButton.isEnabled = true
                     lightRefreshButton.isEnabled = true
+                    musicRefreshButton.isEnabled = true
                 }
             } catch (error: Exception) {
                 runOnUiThread {
@@ -1039,6 +1097,7 @@ class MainActivity : Activity() {
                     setOperationStatus(error.message ?: "Ошибка подключения")
                     refreshButton.isEnabled = true
                     lightRefreshButton.isEnabled = true
+                    musicRefreshButton.isEnabled = true
                 }
             }
         }
@@ -1066,6 +1125,7 @@ class MainActivity : Activity() {
     private fun renderSnapshot(snapshot: Snapshot) {
         rendering = true
         latestSettings = snapshot.settings
+        latestMode = snapshot.status.mode
 
         modeText.text = modeTitle(snapshot.status.mode)
         timeText.text = if (snapshot.time.valid) {
@@ -1075,7 +1135,7 @@ class MainActivity : Activity() {
         }
 
         renderLight(snapshot)
-        renderMusic(snapshot.settings)
+        renderMusic(snapshot)
         renderAmbient(snapshot.settings)
         renderNight(snapshot.settings)
         renderAlarm(snapshot.settings)
@@ -1118,11 +1178,14 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun renderMusic(settings: ArduSettings) {
+    private fun renderMusic(snapshot: Snapshot) {
+        val settings = snapshot.settings
         val id = settings.music.selected
         val cfg = settings.music.modes[id] ?: return
 
-        musicModeText.text = musicModeTitle(id)
+        musicModeText.text =
+            if (snapshot.status.mode == "music") "${musicModeTitle(id)} • активно"
+            else "${musicModeTitle(id)} • выключено"
         musicModeButtonMap.forEach { (modeId, button) ->
             setChoiceState(button, modeId == id)
         }
@@ -1358,6 +1421,7 @@ class MainActivity : Activity() {
             setOperationStatus("$label: ${error.message ?: "ошибка"}")
             refreshButton.isEnabled = true
             lightRefreshButton.isEnabled = true
+            musicRefreshButton.isEnabled = true
         }
     }
 
