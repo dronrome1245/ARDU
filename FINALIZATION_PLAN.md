@@ -781,3 +781,17 @@ Static source validation is clean. Exact v0.22 CI/Actions status has not yet bee
 
 Software gate: owner-phone visual smoke Night + Alarm, then only release-blocker UI polish.
 Physical gate has advanced beyond ESP OTA: real status/settings transport PASS; sync invalid RTC next, then continue firmware + Android acceptance.
+
+## 27. Real-device visual parity checkpoint — 2026-10-04
+
+Owner confirmed real Android → Wi‑Fi → ESP → Nano connection and supplied live-device video/screenshots.
+
+A reversible visual iteration was authorized:
+- baseline preserved in `archive/android-v0.22-homehub-2026-10-04`;
+- new source = `0.23-concept-parity-rc1`;
+- firmware/API/UART unchanged;
+- unsupported concept-only functions explicitly excluded.
+
+Static source validation is clean. Exact CI result not visible yet.
+
+Next: owner-phone Run against the real device and compare v0.23 to both the concept boards and archived v0.22.
