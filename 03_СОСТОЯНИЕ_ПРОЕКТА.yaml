@@ -2495,3 +2495,31 @@ android_music_homehub_v0_20_2026_10_04:
   debug_apk_ci: pass
   owner_phone_smoke: pending
   next: owner_phone_music_v0_20_smoke
+
+
+android_music_visual_hotfix_v0_20_1_2026_10_04:
+  version: "0.20.1-music-visual-hotfix-rc1"
+  owner_v0_20_feedback:
+    hero_over_zoomed: fixed
+    mode_cards_lacked_visuals: fixed
+    bottom_nav_not_centered_or_separated: fixed
+  hero:
+    foreground_scale: fit_center
+    backdrop_scale: center_crop
+    backdrop_alpha: 0.34
+  music_mode_tiles:
+    custom_view: MusicModeTileView
+    height_dp: 104
+    illustrated: true
+    selected_mint_glow: true
+  bottom_navigation:
+    control_type: ImageButton
+    separate_dock: true
+    centered_icons: true
+    visible_text_labels: false
+  firmware_api_contract_changed: false
+  android_verify_run: 37196929089
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_phone_smoke: pending
+  next: owner_phone_music_v0_20_1_visual_smoke
