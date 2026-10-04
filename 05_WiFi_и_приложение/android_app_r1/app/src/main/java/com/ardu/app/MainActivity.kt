@@ -137,7 +137,12 @@ class MainActivity : Activity() {
     private lateinit var ambientPeriodText: TextView
     private lateinit var ambientPeriodSeek: SmartSliderView
 
+    private lateinit var nightConnectionText: TextView
+    private lateinit var nightOperationText: TextView
     private lateinit var nightHeroView: RoomHeroView
+    private lateinit var nightRefreshButton: Button
+    private lateinit var nightServiceButton: Button
+    private lateinit var nightStateText: TextView
     private lateinit var nightEnabledSwitch: Switch
     private lateinit var nightColorPreview: View
     private lateinit var nightHueText: TextView
@@ -150,8 +155,13 @@ class MainActivity : Activity() {
     private lateinit var nightOnInput: EditText
     private lateinit var nightOffInput: EditText
 
+    private lateinit var alarmConnectionText: TextView
+    private lateinit var alarmOperationText: TextView
     private lateinit var alarmHeroView: RoomHeroView
+    private lateinit var alarmRefreshButton: Button
+    private lateinit var alarmServiceButton: Button
     private lateinit var alarmStateText: TextView
+    private lateinit var alarmRtcText: TextView
     private lateinit var alarmStartPreview: View
     private lateinit var alarmEndPreview: View
     private lateinit var alarmEnabledSwitch: Switch
@@ -302,7 +312,12 @@ class MainActivity : Activity() {
         ambientPeriodText = findViewById(R.id.ambientPeriodText)
         ambientPeriodSeek = findViewById(R.id.ambientPeriodSeek)
 
+        nightConnectionText = findViewById(R.id.nightConnectionText)
+        nightOperationText = findViewById(R.id.nightOperationText)
         nightHeroView = findViewById(R.id.nightHeroView)
+        nightRefreshButton = findViewById(R.id.nightRefreshButton)
+        nightServiceButton = findViewById(R.id.nightServiceButton)
+        nightStateText = findViewById(R.id.nightStateText)
         nightEnabledSwitch = findViewById(R.id.nightEnabledSwitch)
         nightColorPreview = findViewById(R.id.nightColorPreview)
         nightHueText = findViewById(R.id.nightHueText)
@@ -315,8 +330,13 @@ class MainActivity : Activity() {
         nightOnInput = findViewById(R.id.nightOnInput)
         nightOffInput = findViewById(R.id.nightOffInput)
 
+        alarmConnectionText = findViewById(R.id.alarmConnectionText)
+        alarmOperationText = findViewById(R.id.alarmOperationText)
         alarmHeroView = findViewById(R.id.alarmHeroView)
+        alarmRefreshButton = findViewById(R.id.alarmRefreshButton)
+        alarmServiceButton = findViewById(R.id.alarmServiceButton)
         alarmStateText = findViewById(R.id.alarmStateText)
+        alarmRtcText = findViewById(R.id.alarmRtcText)
         alarmStartPreview = findViewById(R.id.alarmStartPreview)
         alarmEndPreview = findViewById(R.id.alarmEndPreview)
         alarmEnabledSwitch = findViewById(R.id.alarmEnabledSwitch)
@@ -406,7 +426,9 @@ class MainActivity : Activity() {
         listOf(lightPanel, musicPanel, ambientPanel, nightPanel, alarmPanel, servicePanel)
             .forEach { it.visibility = if (it === target) View.VISIBLE else View.GONE }
 
-        globalHeaderPanel.visibility = if (target === lightPanel || target === musicPanel || target === ambientPanel) View.GONE else View.VISIBLE
+        globalHeaderPanel.visibility =
+            if (target in listOf(lightPanel, musicPanel, ambientPanel, nightPanel, alarmPanel)) View.GONE
+            else View.VISIBLE
 
         sectionNavigation.forEach { (button, panel) ->
             button.isSelected = panel === target
@@ -905,6 +927,9 @@ class MainActivity : Activity() {
 
     private fun bindNight() {
         nightHeroView.setScene(RoomHeroView.Scene.NIGHT)
+        nightRefreshButton.setOnClickListener { refreshDevice() }
+        nightServiceButton.setOnClickListener { showSection(servicePanel) }
+
         nightEnabledSwitch.setOnCheckedChangeListener { _, checked ->
             if (!rendering) runDeviceAction("Ночник") { api.updateNightSettings(enabled = checked) }
         }
@@ -950,6 +975,9 @@ class MainActivity : Activity() {
 
     private fun bindAlarm() {
         alarmHeroView.setScene(RoomHeroView.Scene.DAWN)
+        alarmRefreshButton.setOnClickListener { refreshDevice() }
+        alarmServiceButton.setOnClickListener { showSection(servicePanel) }
+
         alarmEnabledSwitch.setOnCheckedChangeListener { _, checked ->
             if (!rendering) runDeviceAction("Будильник") { api.updateAlarmSettings(enabled = checked) }
         }
@@ -1063,6 +1091,8 @@ class MainActivity : Activity() {
         lightOperationText.text = text
         musicOperationText.text = text
         ambientOperationText.text = text
+        nightOperationText.text = text
+        alarmOperationText.text = text
     }
 
     private fun setConnectionStatus(text: String, colorRes: Int) {
@@ -1070,11 +1100,15 @@ class MainActivity : Activity() {
         lightConnectionText.text = text
         musicConnectionText.text = text
         ambientConnectionText.text = text
+        nightConnectionText.text = text
+        alarmConnectionText.text = text
         val color = getColor(colorRes)
         connectionText.setTextColor(color)
         lightConnectionText.setTextColor(color)
         musicConnectionText.setTextColor(color)
         ambientConnectionText.setTextColor(color)
+        nightConnectionText.setTextColor(color)
+        alarmConnectionText.setTextColor(color)
     }
 
     private fun refreshDevice() {
@@ -1083,6 +1117,8 @@ class MainActivity : Activity() {
         lightRefreshButton.isEnabled = false
         musicRefreshButton.isEnabled = false
         ambientRefreshButton.isEnabled = false
+        nightRefreshButton.isEnabled = false
+        alarmRefreshButton.isEnabled = false
         setOperationStatus("")
 
         worker.execute {
@@ -1106,6 +1142,8 @@ class MainActivity : Activity() {
                     lightRefreshButton.isEnabled = true
                     musicRefreshButton.isEnabled = true
                     ambientRefreshButton.isEnabled = true
+                    nightRefreshButton.isEnabled = true
+                    alarmRefreshButton.isEnabled = true
                 }
             } catch (error: Exception) {
                 runOnUiThread {
@@ -1115,6 +1153,8 @@ class MainActivity : Activity() {
                     lightRefreshButton.isEnabled = true
                     musicRefreshButton.isEnabled = true
                     ambientRefreshButton.isEnabled = true
+                    nightRefreshButton.isEnabled = true
+                    alarmRefreshButton.isEnabled = true
                 }
             }
         }
@@ -1155,7 +1195,7 @@ class MainActivity : Activity() {
         renderMusic(snapshot)
         renderAmbient(snapshot.settings)
         renderNight(snapshot.settings)
-        renderAlarm(snapshot.settings)
+        renderAlarm(snapshot)
         renderService(snapshot)
 
         rendering = false
@@ -1315,11 +1355,17 @@ class MainActivity : Activity() {
         nightHueText.text = "Цвет • ${n.hue}"
         nightSaturationText.text = "Насыщенность • ${brightnessPercent(n.saturation)}%"
         nightBrightnessText.text = "Яркость • ${brightnessPercent(n.brightness)}%"
+        nightStateText.text = buildString {
+            append(if (n.enabled) "Включён" else "Выключен")
+            append(" • ${brightnessPercent(n.brightness)}%")
+            if (n.scheduleEnabled) append(" • ${n.scheduleOn}–${n.scheduleOff}")
+            else append(" • вручную")
+        }
         updateNightPreview()
     }
 
-    private fun renderAlarm(settings: ArduSettings) {
-        val a = settings.alarm
+    private fun renderAlarm(snapshot: Snapshot) {
+        val a = snapshot.settings.alarm
 
         alarmEnabledSwitch.isChecked = a.enabled
         alarmHourInput.setText(a.hour.toString().padStart(2, '0'))
@@ -1329,14 +1375,18 @@ class MainActivity : Activity() {
         alarmStartHueSeek.setValue(a.startHue)
         alarmEndHueSeek.setValue(a.endHue)
 
-        alarmFadeText.text = "${a.fadeMinutes} мин"
-        alarmBrightnessText.text = "${brightnessPercent(a.maxBrightness)}%"
+        alarmFadeText.text = "Длительность • ${a.fadeMinutes} мин"
+        alarmBrightnessText.text = "Макс. яркость • ${brightnessPercent(a.maxBrightness)}%"
         alarmStartHueText.text = "Начало • ${a.startHue}"
         alarmEndHueText.text = "Финиш • ${a.endHue}"
         alarmStateText.text =
             "${if (a.enabled) "Включён" else "Выключен"} • " +
             String.format(Locale.US, "%02d:%02d", a.hour, a.minute) +
             if (a.dawnPhase != "idle") " • ${a.dawnPhase}" else ""
+
+        alarmRtcText.text =
+            if (snapshot.time.valid) "RTC ${snapshot.time.time?.take(5) ?: "--:--"}"
+            else "RTC —"
 
         updateAlarmPreviews()
     }
