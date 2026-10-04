@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.19-music-header-polish-rc1` READY. Nano v1 и ESP8266 v1 проходят CI, compact UART v1 frozen. Final Nano upload временно заблокирован текущей физической платой; replacement Nano заказана. Owner review v0.18: contextual photo heroes в целом приняты; обнаружены два visual defects — двухстрочные подписи Music mode cards обрезались снизу и верхний global status/header снова был заключён в отдельную рамочную карточку. v0.19 увеличивает/нормализует Music mode buttons и убирает внешнюю рамку global header на обычных вкладках. HTTP API/UART/firmware не менялись. Android Verify run 37112061533 PASS: contract tests + debug APK. Следующий software gate — owner-phone smoke Music labels + frameless top status; следующий physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.19-music-header-polish-rc1` CURRENT; Music v0.20 plan OWNER APPROVED. Replacement Nano всё ещё ожидается. Новый план: отдельный photorealistic Music hero, без fake player и без больших Play/Stop; tap mode card сразу запускает M01/M02/M03/M04/M05/M08/M09, а уход с Music через нижнюю пользовательскую навигацию отправляет top-level OFF. Music names без `VU`, equal-height non-scroll grid; общий `SmartSliderView` будет исправлен на min/max edge clipping во всех вкладках; bottom navigation перейдёт на icon-only vector items. Для этого существующих HTTP/UART функций достаточно. По новому owner decision firmware source можно менять до прихода replacement Nano, если реально потребуется, с обязательным compile/size/CI gate; физический final upload остаётся только на replacement Nano.**
 
 ## Что подтверждено и решено
 
@@ -1893,3 +1893,17 @@
 - Firmware/API/UART unchanged.
 - GitHub Actions Android Verify run `37112061533`: contract tests PASS, debug APK build PASS.
 - Next owner check: Music mode labels are fully visible + no outer rectangle around top status on normal tabs.
+
+
+### 2026-10-04 — Music v0.20 owner plan approved
+
+- Owner selected Music interaction variant A: no large Play/Stop.
+- Tap on a Music mode card starts that mode immediately.
+- Leaving Music through another bottom user tab must stop active Music with top-level OFF.
+- Dedicated Music photorealistic hero asset will be created; fake media player is explicitly excluded.
+- Music labels: Градиент / Радуга / 5 полос / 3 полосы / Частота / Бегущие / Спектр.
+- Music chooser target = equal-height grid, no horizontal scroll dependency.
+- SmartSliderView min/max clipping will be fixed once in the reusable component and regressed across all tabs.
+- Bottom navigation target = icon-only native vector icons.
+- Implementation plan: `05_WiFi_и_приложение/MUSIC_V0_20_PLAN.md`.
+- Firmware source changes are now owner-authorized while replacement Nano is pending, but none are required for the Music v0.20 behavior identified so far.
