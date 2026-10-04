@@ -254,3 +254,25 @@ No API/UART/firmware changes.
 GitHub Actions Android Verify run `37204187940`: contract tests PASS + debug APK PASS.
 
 Phone check: `git pull` → Android Studio Run → visually confirm full Music hero framing and clear M01/M05 distinction.
+
+## Ambient Home Hub — v0.21
+
+Current Android version: `0.21-ambient-homehub-rc1`.
+
+Ambient/«Фон» now follows the premium Home Hub visual language:
+- contextual 250dp hero with connection/status/actions inside;
+- current effect summary inside the hero;
+- illustrated F01/F02/F03 tiles via `ui/AmbientEffectTileView.kt`;
+- mint selected-state border/glow;
+- full-width existing ON/OFF actions.
+
+No API/UART/firmware behavior changed.
+
+Phone check:
+1. `git pull`;
+2. Android Studio → Run;
+3. open **Фон**;
+4. confirm there is no separate top status rectangle above the Ambient hero;
+5. confirm ARDU/status/refresh/settings are inside the hero;
+6. confirm Цвет / Смена / Радуга have distinct illustrations and selected mint state follows the selected effect;
+7. re-check ON/OFF, sliders and auto-cycle for obvious regressions.
