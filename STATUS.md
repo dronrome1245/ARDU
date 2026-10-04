@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.20.1-music-visual-hotfix-rc1` READY. Owner phone review v0.20 found three visual defects: Music hero over-zoom, plain mode buttons, and bottom nav icons visually off-center/merged with page content. v0.20.1 fixes all three: dedicated Music image is now presented fit-centered without extra crop, with a soft same-image backdrop; mode choices are custom illustrated `MusicModeTileView` cards; bottom navigation uses centered `ImageButton` items inside a separate rounded/elevated dock. Music direct-start/stop-on-leave behavior, global SmartSlider edge fix, HTTP API/UART/firmware remain unchanged. Static ID/function check clean; Android Verify run 37196929089 PASS: unit contract tests + debug APK. Следующий software gate — owner-phone visual smoke v0.20.1; physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.20.2-music-framing-icon-hotfix-rc1` READY. Owner follow-up after v0.20.1 found two remaining visual defects: Music hero still looked zoomed because the 330dp block retained a full-size `centerCrop` backdrop behind the fit-centered image, and M05 «Частота» remained too similar to M01 «Градиент». v0.20.2 removes the cropped Music-photo backdrop completely, reduces the hero to 250dp and keeps the dedicated asset only as full-image `fitCenter` over the dark hero surface; M05 now uses a distinct radio-frequency beacon/rings illustration. Music direct-start/stop-on-leave, illustrated mode tiles, bottom icon dock, SmartSlider edge fix, HTTP API/UART/firmware remain unchanged. Android Verify run 37204187940 PASS: unit contract tests + debug APK. Следующий software gate — owner-phone visual smoke v0.20.2; physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
 
 ## Что подтверждено и решено
 
@@ -1941,3 +1941,19 @@
 - Static validation: missing IDs = 0; duplicate IDs = 0; duplicate private functions = 0.
 - Actions run `37196929089`: tests PASS + debug APK build PASS.
 - Firmware/API/UART unchanged.
+
+
+### 2026-10-04 — Music framing/icon hotfix v0.20.2
+
+- **OWNER FEEDBACK v0.20.1:** верхняя Music-картинка всё ещё выглядела увеличенной; «Частота» и «Градиент» визуально были слишком похожи.
+- Android version: `0.20.2-music-framing-icon-hotfix-rc1`.
+- Music hero:
+  - удалён оставшийся `centerCrop` backdrop того же фото;
+  - hero height уменьшен с 330dp до 250dp, чтобы геометрия лучше соответствовала landscape asset;
+  - единственный photo layer использует `fitCenter`, поэтому кадр не обрезается и не увеличивается второй копией изображения.
+- `MusicModeTileView`:
+  - M01 «Градиент» остаётся цветной плавной волной;
+  - M05 «Частота» заменена на отдельную radio-frequency/beacon композицию с концентрическими дугами и центральным маркером.
+- Music behavior/API/UART/firmware unchanged.
+- GitHub Actions Android Verify run `37204187940`: `testDebugUnitTest` PASS + `assembleDebug` PASS.
+- Следующий software gate: owner-phone visual smoke v0.20.2.
