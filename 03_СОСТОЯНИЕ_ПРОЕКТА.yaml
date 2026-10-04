@@ -2545,3 +2545,27 @@ android_music_framing_icon_hotfix_v0_20_2_2026_10_04:
   debug_apk_ci: pass
   owner_phone_smoke: pending
   next: owner_phone_music_v0_20_2_visual_smoke
+
+
+android_music_room_hero_v0_20_3_2026_10_04:
+  version: "0.20.3-music-room-hero-rc1"
+  version_code: 20
+  owner_approved: true
+  hero:
+    file: "drawable-nodpi/ardu_music_hero.webp"
+    size_px: [640, 360]
+    composition:
+      sofa_left: true
+      compact_speaker_right: true
+      plants_and_city_context: true
+      lighting: blue_amber
+    container_height_dp: 250
+    scale_type: fit_center
+    center_crop_layer: false
+    right_edge_preserved: true
+  firmware_api_contract_changed: false
+  android_verify_run: 37209345952
+  contract_tests: pass
+  debug_apk_ci: pass
+  owner_phone_smoke: pending
+  next: owner_phone_music_v0_20_3_visual_smoke
