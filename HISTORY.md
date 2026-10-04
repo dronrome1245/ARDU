@@ -2305,3 +2305,26 @@ R3 экономит относительно R2:
 - OTA ready, hostname `ardu`, port `8266`.
 
 Следующий шаг — read-only firmware/API gate через status/settings/time.
+
+## 2026-10-04 — Android Ambient Home Hub v0.21
+
+Продолжен design/UX pass после approved Music v0.20.3.
+
+Реализовано:
+- Android version `0.21-ambient-homehub-rc1` / versionCode 21;
+- Ambient/«Фон» получил 250dp Home Hub hero с ARDU/status/actions внутри hero;
+- отдельный global status header на Ambient больше не используется;
+- current effect перенесён в glass summary внутри hero;
+- F01/F02/F03 заменены с plain text Buttons на custom `AmbientEffectTileView` с различимыми native Canvas illustrations и mint selected state;
+- ON/OFF оставлены семантически прежними;
+- Ambient settings sliders/auto-cycle/API behavior не изменены.
+
+Статическая проверка после записи в GitHub:
+- новые Ambient IDs присутствуют в layout ровно по одному;
+- Kotlin bindings для новых IDs присутствуют ровно по одному;
+- custom view class и import присутствуют;
+- version = `0.21-ambient-homehub-rc1`.
+
+GitHub connector пока не показывает Actions/check status для exact v0.21 head, поэтому CI PASS не заявляется до отдельного подтверждения.
+
+Physical handoff не изменён этим UI-pass: replacement Nano numeric UART PING уже PASS; следующий hardware step — final ESP v1 OTA.
