@@ -2218,3 +2218,16 @@ R3 экономит относительно R2:
 - Contract test now covers `selectMusicMode(M01)` and `setMode(off)` payloads.
 - Static layout/source validation clean.
 - Android Verify run 37194558467 PASS: tests + assembleDebug.
+
+
+## 2026-10-04 — Music v0.20.1 visual hotfix completed
+
+- Owner phone screenshot of v0.20 showed hero crop too aggressive, mode cards visually under-designed, and icon bottom navigation not centered/separated enough.
+- Music hero rendering changed to uncropped fit-centered foreground over a subdued full-bleed backdrop of the same asset.
+- Added `MusicModeTileView`: native Canvas illustrations for all seven Music modes with selected mint glow.
+- Music mode tile height raised to 104dp to make room for illustration + label.
+- Bottom nav items changed to actual `ImageButton`; created separate rounded/elevated dock background.
+- App version bumped to `0.20.1-music-visual-hotfix-rc1`.
+- Firmware/API/UART unchanged.
+- Static validation clean.
+- Android Verify run 37196929089 PASS.
