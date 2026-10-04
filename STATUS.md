@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.20.3-music-room-hero-rc1` READY. Owner approved a new wide Music hero composition matching the original concept: sofa on the left, compact speaker on the right, plants/city context and balanced blue/amber lighting. `ardu_music_hero.webp` is replaced with the approved 640×360 room asset; Music keeps a single `fitCenter` image in the 250dp hero, so the complete right side including the speaker remains visible without center-crop. M05 frequency beacon, illustrated mode tiles, bottom icon dock, SmartSlider edge fix, direct-start/stop-on-leave, HTTP API/UART/firmware remain unchanged. Android Verify run 37209345952 PASS: unit contract tests + debug APK. Следующий software gate — owner-phone visual smoke v0.20.3; physical gate — replacement Nano → final Nano upload → final ESP OTA → firmware acceptance → Android end-to-end acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — FIRMWARE RC + ANDROID `0.21-ambient-homehub-rc1` SOURCE READY. Music v0.20.3 remains the approved Music visual baseline. Ambient/«Фон» is now the next premium Home Hub pass: 250dp contextual hero with ARDU/connection/refresh/settings inside the hero, current ambient effect in the glass summary, illustrated F01/F02/F03 tiles, and full-width ON/OFF actions. HTTP API/UART/firmware semantics are unchanged. Static Android ID/wiring validation is clean; Android Verify for v0.21 has not yet been observed in the connector. Physical state has advanced: replacement Nano answers frozen numeric UART v1 (`1 → O 1`) and final ESP v1 compiles locally; next physical gate is OTA upload of `ARDU_ESP_V1`, then firmware acceptance and Android end-to-end acceptance. Next software gate is owner-phone visual smoke of v0.21.**
 
 ## Что подтверждено и решено
 
@@ -1995,3 +1995,22 @@
 - После reboot `GET /api/ping` вернул: `fw=ARDU_ESP_V1`, `uart_protocol=1`, `wifi_connected=true`, IP `192.168.0.4`, RSSI `-53`, `ota_ready=true`, hostname `ardu`, port `8266`.
 - Вывод: финальный ESP v1 boot/Wi-Fi/OTA gate пройден на реальном железе.
 - Следующий gate: read-only `/api/status` + `/api/settings` + `/api/time`, затем raw opcode 1 regression.
+
+### 2026-10-04 — Ambient Home Hub v0.21
+
+- Android version: `0.21-ambient-homehub-rc1` (versionCode 21).
+- «Фон» переведён в тот же Home Hub visual language, что Light/Music:
+  - 250dp contextual RoomHeroView;
+  - ARDU / connection / refresh / settings inside hero;
+  - current ambient effect shown in the glass summary;
+  - old separate global header hidden on Ambient.
+- F01/F02/F03 plain text choices replaced by dependency-free `AmbientEffectTileView`:
+  - F01 «Цвет» — glowing color orb;
+  - F02 «Смена» — flowing color paths;
+  - F03 «Радуга» — rainbow arcs;
+  - selected effect retains mint border/glow.
+- ON/OFF remain the existing semantic actions; API/UART/firmware behavior is unchanged.
+- Static validation: all new Ambient XML IDs map 1:1 to Kotlin bindings; duplicate/new missing Ambient IDs = 0.
+- Android Verify status for this exact v0.21 head is not yet visible through the current GitHub connector.
+- Software next gate: owner-phone visual smoke v0.21.
+- Physical next gate remains final ESP v1 OTA → firmware acceptance → Android end-to-end acceptance.
