@@ -714,3 +714,23 @@ Next software action: one phone smoke confirming Music labels and frameless top 
 Latest owner decision temporarily relaxes the source-only firmware freeze while replacement Nano is pending. Nano/ESP source may be changed when justified, but every change must retain exact-target compile/size/regression gates. Physical final upload still waits for the replacement Nano and remains governed by `RELEASE_V1_UPLOAD_ACCEPTANCE.md`. Frozen UART/API should not be changed without a concrete blocker.
 
 Current Android next implementation is documented in `05_WiFi_и_приложение/MUSIC_V0_20_PLAN.md`. The planned Music UX uses existing API/UART capabilities and therefore does not currently require firmware changes.
+
+
+## 23. Music Home Hub implementation checkpoint — 2026-10-04
+
+Android `0.20-music-homehub-rc1` implemented and CI-green.
+
+- dedicated Music hero asset;
+- Home Hub header/status inside hero;
+- no fake player;
+- no separate Play/Stop;
+- mode card = direct select/start;
+- leave active Music through another bottom user tab = existing top-level OFF;
+- mode chooser = equal-height 4+3 grid, labels without VU;
+- reusable SmartSlider endpoint clipping fix;
+- icon-only bottom navigation;
+- firmware/API/UART unchanged;
+- static ID/function validation clean;
+- Actions run 37194558467 PASS.
+
+Next software gate: owner-phone visual/function smoke on the stateful mock. Physical gate remains replacement Nano → final Nano upload → ESP OTA → firmware acceptance → Android end-to-end acceptance.
