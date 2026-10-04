@@ -2065,3 +2065,11 @@
 - **ФАКТ:** повторный `GET /api/status` вернул `rtc_valid=true`, `mode=off`, `nano_fw=ARDU_V1`, `uart_protocol=1`; RTC time продолжает идти (`20:09:28`).
 - RTC sync/readback gate на replacement Nano полностью пройден.
 - Следующий acceptance слой: реальный L01 через финальный HTTP API при текущем безопасном brightness=64.
+
+
+### 2026-10-04 — physical L01 ON PASS
+
+- **ФАКТ:** на реальном стенде через финальный `ARDU_ESP_V1` выполнен `POST /api/light/settings {"enabled":true}` → `ok=true, applied=true`.
+- **ФАКТ:** `GET /api/light/status` после команды: `enabled=true`, `color_mode=kelvin`, `kelvin=4000`, `brightness=64`, `clap_enabled=true`.
+- **ФАКТ владельца:** физическое кольцо загорелось.
+- Следующий минимальный gate: L01 OFF → физическое гашение → readback `enabled=false`; затем повторный ON для проверки воспроизводимости.
