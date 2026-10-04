@@ -645,28 +645,168 @@
                 android:id="@+id/musicPanel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
+                android:layout_marginTop="18dp"
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <TextView
-                    style="@style/ARDU.SectionTitle"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Музыка" />
+                    android:layout_height="330dp"
+                    android:background="@drawable/ardu_hero_clip"
+                    android:clipToOutline="true">
 
-                <TextView
-                    style="@style/ARDU.Label"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Реакция света на звук" />
+                    <com.ardu.app.ui.FocalCropImageView
+                        android:id="@+id/musicHeroImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="Музыкальная гостиная"
+                        android:src="@drawable/ardu_music_hero" />
 
-                <com.ardu.app.ui.RoomHeroView
-                    android:id="@+id/musicHeroView"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginTop="12dp" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/ardu_hero_overlay" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="ARDU"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="25sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/musicConnectionText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:background="@drawable/ardu_status_chip"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="Проверка…"
+                                android:textColor="@color/ardu_accent"
+                                android:textSize="12sp" />
+
+                            <Space
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1" />
+
+                            <Button
+                                android:id="@+id/musicRefreshButton"
+                                style="@style/Widget.ARDU.Button.Icon"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:layout_marginEnd="6dp"
+                                android:contentDescription="Обновить состояние"
+                                android:text="↻" />
+
+                            <Button
+                                android:id="@+id/musicServiceButton"
+                                style="@style/Widget.ARDU.Button.Icon"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:contentDescription="Настройки"
+                                android:text="⚙" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Музыка"
+                            android:textColor="@color/ardu_text"
+                            android:textSize="25sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Гостиная"
+                            android:textColor="@color/ardu_text_secondary"
+                            android:textSize="14sp" />
+
+                        <Space
+                            android:layout_width="1dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Свет реагирует на музыку"
+                            android:textColor="@color/ardu_text"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/musicOperationText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:maxLines="1"
+                            android:text=""
+                            android:textColor="@color/ardu_text_muted"
+                            android:textSize="11sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/ardu_glass_card"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="11dp">
+
+                            <TextView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:gravity="center"
+                                android:text="♪"
+                                android:textColor="@color/ardu_accent"
+                                android:textSize="26sp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:text="Светомузыка"
+                                    android:textColor="@color/ardu_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/musicModeText"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:maxLines="1"
+                                    android:text="—"
+                                    android:textColor="@color/ardu_text_secondary"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </FrameLayout>
 
                 <LinearLayout
                     style="@style/ARDU.Card"
@@ -675,49 +815,17 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/musicModeText"
                         style="@style/ARDU.CardTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Режим: —" />
+                        android:text="Режимы светомузыки" />
 
                     <LinearLayout
+                        android:id="@+id/musicModeButtons"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/musicOnButton"
-                            style="@style/Widget.ARDU.Button.Icon"
-                            android:layout_width="56dp"
-                            android:layout_height="48dp"
-                            android:contentDescription="Включить светомузыку"
-                            android:text="▶" />
-
-                        <Button
-                            android:id="@+id/musicOffButton"
-                            style="@style/Widget.ARDU.Button.Icon"
-                            android:layout_width="56dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="8dp"
-                            android:contentDescription="Выключить светомузыку"
-                            android:text="■" />
-                    </LinearLayout>
-
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:clipToPadding="false"
-                        android:scrollbars="none">
-
-                        <LinearLayout
-                            android:id="@+id/musicModeButtons"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal" />
-                    </HorizontalScrollView>
+                        android:orientation="vertical" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -1149,7 +1257,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Свет" />
+            android:contentDescription="Свет"
+            android:drawableTop="@drawable/ic_nav_light"
+            android:drawableTint="@color/ardu_nav_icon_tint"
+            android:text="" />
 
         <Button
             android:id="@+id/navMusicButton"
@@ -1157,7 +1268,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Музыка" />
+            android:contentDescription="Музыка"
+            android:drawableTop="@drawable/ic_nav_music"
+            android:drawableTint="@color/ardu_nav_icon_tint"
+            android:text="" />
 
         <Button
             android:id="@+id/navAmbientButton"
@@ -1165,7 +1279,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Фон" />
+            android:contentDescription="Фон"
+            android:drawableTop="@drawable/ic_nav_ambient"
+            android:drawableTint="@color/ardu_nav_icon_tint"
+            android:text="" />
 
         <Button
             android:id="@+id/navNightButton"
@@ -1173,7 +1290,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Ночь" />
+            android:contentDescription="Ночь"
+            android:drawableTop="@drawable/ic_nav_night"
+            android:drawableTint="@color/ardu_nav_icon_tint"
+            android:text="" />
 
         <Button
             android:id="@+id/navAlarmButton"
@@ -1181,7 +1301,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Будильник" />
+            android:contentDescription="Будильник"
+            android:drawableTop="@drawable/ic_nav_alarm"
+            android:drawableTint="@color/ardu_nav_icon_tint"
+            android:text="" />
     </LinearLayout>
 
 </LinearLayout>
