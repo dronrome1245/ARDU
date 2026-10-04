@@ -2328,3 +2328,15 @@ R3 экономит относительно R2:
 GitHub connector пока не показывает Actions/check status для exact v0.21 head, поэтому CI PASS не заявляется до отдельного подтверждения.
 
 Physical handoff не изменён этим UI-pass: replacement Nano numeric UART PING уже PASS; следующий hardware step — final ESP v1 OTA.
+
+
+## 2026-10-04 — physical read-only API gate
+
+После финального ESP OTA выполнены первые реальные read-only запросы.
+
+Результаты:
+- `/api/status` PASS: `nano_fw=ARDU_V1`, numeric UART v1, mode light, current limit 3000 mA, без timeout;
+- `/api/settings` PASS: полный schema 1 snapshot всех подсистем;
+- `/api/time` не прошёл функциональный критерий только по RTC: `valid=false`, Nano `D 4 0`.
+
+Таким образом транспорт и settings parser на реальном ESP/Nano подтверждены; до Night/Alarm acceptance нужно синхронизировать DS3231.
