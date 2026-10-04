@@ -16,6 +16,7 @@ import com.ardu.app.net.ArduApiClient
 import com.ardu.app.net.ArduSettings
 import com.ardu.app.net.DeviceStatus
 import com.ardu.app.net.TimeStatus
+import com.ardu.app.ui.AmbientEffectTileView
 import com.ardu.app.ui.ColorWheelView
 import com.ardu.app.ui.FocusDialView
 import com.ardu.app.ui.FocalCropImageView
@@ -36,7 +37,7 @@ class MainActivity : Activity() {
     private var lastEspFirmware: String = "—"
     private var lastEspRssi: Int? = null
     private val musicModeButtonMap = linkedMapOf<String, MusicModeTileView>()
-    private var ambientEffectButtonMap: Map<String, Button> = emptyMap()
+    private var ambientEffectButtonMap: Map<String, AmbientEffectTileView> = emptyMap()
     private var musicSubmodeButtonMap: Map<Int, Button> = emptyMap()
 
     private lateinit var globalHeaderPanel: LinearLayout
@@ -112,7 +113,11 @@ class MainActivity : Activity() {
     private lateinit var musicHueStartSeek: SmartSliderView
     private lateinit var musicCalibrationText: TextView
 
+    private lateinit var ambientConnectionText: TextView
+    private lateinit var ambientOperationText: TextView
     private lateinit var ambientHeroView: RoomHeroView
+    private lateinit var ambientRefreshButton: Button
+    private lateinit var ambientServiceButton: Button
     private lateinit var ambientEffectText: TextView
     private lateinit var ambientColorPreview: View
     private lateinit var ambientHueText: TextView
@@ -273,7 +278,11 @@ class MainActivity : Activity() {
         musicHueStartSeek = findViewById(R.id.musicHueStartSeek)
         musicCalibrationText = findViewById(R.id.musicCalibrationText)
 
+        ambientConnectionText = findViewById(R.id.ambientConnectionText)
+        ambientOperationText = findViewById(R.id.ambientOperationText)
         ambientHeroView = findViewById(R.id.ambientHeroView)
+        ambientRefreshButton = findViewById(R.id.ambientRefreshButton)
+        ambientServiceButton = findViewById(R.id.ambientServiceButton)
         ambientEffectText = findViewById(R.id.ambientEffectText)
         ambientColorPreview = findViewById(R.id.ambientColorPreview)
         ambientHueText = findViewById(R.id.ambientHueText)
@@ -397,7 +406,7 @@ class MainActivity : Activity() {
         listOf(lightPanel, musicPanel, ambientPanel, nightPanel, alarmPanel, servicePanel)
             .forEach { it.visibility = if (it === target) View.VISIBLE else View.GONE }
 
-        globalHeaderPanel.visibility = if (target === lightPanel || target === musicPanel) View.GONE else View.VISIBLE
+        globalHeaderPanel.visibility = if (target === lightPanel || target === musicPanel || target === ambientPanel) View.GONE else View.VISIBLE
 
         sectionNavigation.forEach { (button, panel) ->
             button.isSelected = panel === target
@@ -818,6 +827,9 @@ class MainActivity : Activity() {
 
     private fun bindAmbient() {
         ambientHeroView.setScene(RoomHeroView.Scene.AMBIENT)
+        ambientRefreshButton.setOnClickListener { refreshDevice() }
+        ambientServiceButton.setOnClickListener { showSection(servicePanel) }
+
         findViewById<Button>(R.id.ambientOnButton).setOnClickListener {
             runDeviceAction("Включение фона") { api.setMode("ambient") }
         }
@@ -826,12 +838,18 @@ class MainActivity : Activity() {
         }
 
         ambientEffectButtonMap = mapOf(
-            "F01" to findViewById<Button>(R.id.ambientF01Button),
-            "F02" to findViewById<Button>(R.id.ambientF02Button),
-            "F03" to findViewById<Button>(R.id.ambientF03Button)
+            "F01" to findViewById<AmbientEffectTileView>(R.id.ambientF01Button),
+            "F02" to findViewById<AmbientEffectTileView>(R.id.ambientF02Button),
+            "F03" to findViewById<AmbientEffectTileView>(R.id.ambientF03Button)
         )
-        ambientEffectButtonMap.forEach { (id, button) ->
-            button.setOnClickListener { setAmbientEffect(id) }
+        val ambientNames = mapOf(
+            "F01" to "Цвет",
+            "F02" to "Смена",
+            "F03" to "Радуга"
+        )
+        ambientEffectButtonMap.forEach { (id, tile) ->
+            tile.configure(id, ambientNames[id] ?: id)
+            tile.setOnClickListener { setAmbientEffect(id) }
         }
 
         bindSmartSlider(
@@ -1044,16 +1062,19 @@ class MainActivity : Activity() {
         operationText.text = text
         lightOperationText.text = text
         musicOperationText.text = text
+        ambientOperationText.text = text
     }
 
     private fun setConnectionStatus(text: String, colorRes: Int) {
         connectionText.text = text
         lightConnectionText.text = text
         musicConnectionText.text = text
+        ambientConnectionText.text = text
         val color = getColor(colorRes)
         connectionText.setTextColor(color)
         lightConnectionText.setTextColor(color)
         musicConnectionText.setTextColor(color)
+        ambientConnectionText.setTextColor(color)
     }
 
     private fun refreshDevice() {
@@ -1061,6 +1082,7 @@ class MainActivity : Activity() {
         refreshButton.isEnabled = false
         lightRefreshButton.isEnabled = false
         musicRefreshButton.isEnabled = false
+        ambientRefreshButton.isEnabled = false
         setOperationStatus("")
 
         worker.execute {
@@ -1083,6 +1105,8 @@ class MainActivity : Activity() {
                     refreshButton.isEnabled = true
                     lightRefreshButton.isEnabled = true
                     musicRefreshButton.isEnabled = true
+                    ambientRefreshButton.isEnabled = true
+                    ambientRefreshButton.isEnabled = true
                 }
             } catch (error: Exception) {
                 runOnUiThread {
@@ -1241,9 +1265,12 @@ class MainActivity : Activity() {
         val a = settings.ambient
         val cfg = a.effects[a.effect] ?: return
 
-        ambientEffectText.text = ambientEffectTitle(a.effect)
-        ambientEffectButtonMap.forEach { (id, button) ->
-            setChoiceState(button, id == a.effect)
+        ambientEffectText.text =
+            "${ambientEffectTitle(a.effect)} • " +
+            if (latestMode == "ambient") "активно" else "выключено"
+        ambientEffectButtonMap.forEach { (id, tile) ->
+            tile.isSelected = id == a.effect
+            tile.invalidate()
         }
 
         ambientHueSeek.setValue(cfg.hue)
