@@ -35,11 +35,13 @@
 | Позиция | Требование | Статус | Комментарий |
 |---|---|---|---|
 | S-30-5 | 5 В, 6 А | ✅ ЕСТЬ / ⛔ ТОЛЬКО СТЕНД | металлический корпус, L/N/⏚/-V/+V; PE на потолке отсутствует, поэтому в финальную установку не ставить. Использовать для разработки/нагрузочных тестов |
+| Class II финальный PSU | Mean Well IRM-30-5ST, 5 V / 6 A / 30 W | 🟢 ДОКУПИТЬ | screw-terminal encapsulated Class II module; финальный потолочный источник вместо S-30-5 |
 | Внешний `BACKUP / USB-C PD` вход | PD 15 V / ≥2 A; предпочтительно 15 V / 3 A | 🟢 УСТАНОВИТЬ ДО ПОТОЛКА | доступный снаружи корпуса A USB-C PD вход; позволяет позже подключить powerbank без снятия ARDU |
 | USB-C PD trigger | фиксированный запрос 15 V / 3 A | 🟢 ДОКУПИТЬ | предпочтительный кандидат: Adafruit HUSB238 USB Type-C PD breakout, jumper-config 15 V / 3 A; ставится внутри корпуса A за доступным USB-C входом |
 | DC/DC 15→5 V | стабильные 5 V, ≥5 A continuous class | 🟢 ДОКУПИТЬ | резервная ветвь общей 5-V шины; кандидат класса Pololu D36V50F5 5 V/5.5 A |
-| Переключение NORMAL / BACKUP | 2-полюсный ручной selector, break-before-make, достаточный DC current rating | 🟢 ДОКУПИТЬ ПОСЛЕ ВЫБОРА МЕХАНИКИ | переключатель должен быть доступен без снятия лампы; исключает прямое параллельное соединение источников |
+| Автоматическое MAIN/BACKUP switching | relay SPDT 5 V, ≥5 A DC path | ✅ ЕСТЬ / 🔵 НАГРУЗОЧНЫЙ ТЕСТ | использовать INV-051 SRD-05VDC-SL-C: COM→common +5V, NO→MAIN_5V, NC→BACKUP_5V; ручной selector больше не нужен |
 | Предохранитель BACKUP | ориентир 3 A на 15-V входе; финал по trigger/cable/converter | 🟢 ПРЕДУСМОТРЕТЬ | устанавливать после PD trigger максимально близко к резервному входному тракту |
+| MAINS_SENSE D8 | MAIN_5V→1.5 kΩ→D8; D8→4.7 kΩ→GND | ✅ ДЕТАЛИ ЕСТЬ | HIGH=normal, LOW=backup; программно выбирает normal/emergency ring profile |
 | Внешний аккумуляторный блок | USB-C PD с 15 V / 3 A профилем; ориентир 20 Ah / ~72 Wh | ⚪ ПОСЛЕ ЗАВЕРШЕНИЯ V1 | ARDU его не заряжает и не хранит; кандидат UGREEN Nexode 20000 mAh 100 W (SKU 25188), final purchase не блокирует сборку |
 | YP-8 AMS1117-3.3 | 5 В → 3,3 В для ESP8266 | ✅ ЕСТЬ / 🔵 ИЗМЕРИТЬ | проверить VOUT и Wi‑Fi нагрузку |
 | Электролит 100 мкФ 10 В | ≥1 у ESP/питания | ✅ ЕСТЬ / ИСПОЛЬЗУЕТСЯ | установлен непосредственно между ESP VCC/GND на стенде; оставить для дальнейших тестов |
@@ -63,6 +65,7 @@
 | ESP8266 UART | D0 RX / D1 TX |
 | WS2812B корпус A | D6 |
 | WS2812B корпус B | D7 |
+| Выбор колец A/B/BOTH | normal + emergency profiles | ✅ SOURCE READY / 🔵 PHYSICAL PASS | persistent profile; defaults normal=BOTH, emergency=A; selection applies to all light modes |
 | MAX9814 VU/FHT path | A0 напрямую от Out; Gain→Vdd (40 dB), AR floating; DEFAULT AREF; software DC subtraction для FHT |
 | A2/A3 | свободны в финальном аудиотракте D-040 |
 | DS3231 SDA/SCL | A4/A5 |
