@@ -4,6 +4,8 @@ data class PingResponse(
     val device: String,
     val firmware: String,
     val wifiConnected: Boolean,
+    val networkMode: String,
+    val softApActive: Boolean,
     val ip: String,
     val rssi: Int?,
     val otaReady: Boolean,
