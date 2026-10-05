@@ -2686,3 +2686,25 @@ android_concept_parity_v0_23_2026_10_04:
     xml_balance: clean
   android_verify_status: not_observed_via_connector
   next: owner_phone_real_device_v0_23_smoke
+
+routerless_reserve_ready_2026_10_05:
+  station_primary: true
+  softap_fallback:
+    implemented_in_source: true
+    physical_pass: false
+    ssid: "ARDU-DIRECT"
+    ip: "192.168.4.1"
+    password_local_only: true
+    ota_over_softap: false
+  android_direct_probe:
+    implemented_in_source: true
+    ip: "192.168.4.1"
+    validates_device: true
+    validates_uart_protocol: true
+  backup_power:
+    battery_installed_in_v1: false
+    accessible_usb_c_pd_input_required_before_ceiling: true
+    requested_pd: "15V_3A"
+    path: "USB-C_PD -> HUSB238 -> fuse -> 15to5V_DC_DC -> NORMAL_BACKUP_selector -> common_5V_bus"
+    external_battery_optional_later: true
+  next_gate: "v0.23 phone smoke -> ESP compile/OTA -> ARDU-DIRECT physical smoke -> reserve hardware load test"
