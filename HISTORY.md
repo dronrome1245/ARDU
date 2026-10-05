@@ -2488,3 +2488,12 @@ Hardware target refined:
 - battery purchase is optional after v1 completion.
 
 Current state: source implemented and documented; new ESP direct-mode compile/OTA/hardware smoke and reserve power hardware acceptance are still pending.
+
+### 2026-10-05 — direct-mode Android UX refinement
+
+- Android validates direct discovery by `device=ARDU-ESP8266` and UART protocol v1 before accepting `192.168.4.1`.
+- Ping model now carries `network_mode` and `softap_active`.
+- UI shows `Прямое подключение` / `ARDU-DIRECT` when operating through SoftAP.
+- Temporary direct IP is not written over the saved home preferred address.
+- Static delimiter validation is clean for ESP `.ino`, `Models.kt`, `ArduApiClient.kt`, and `MainActivity.kt`.
+- Exact Arduino/Gradle compile was not available through the current connector/runtime; physical/IDE compile remains an acceptance gate.
