@@ -37,8 +37,11 @@ class ArduApiClient {
             try {
                 val json = getJson(baseUrl, "/api/ping")
                 val response = parsePing(json)
-                selectedBaseUrl = baseUrl
-                return response
+                if (response.device == "ARDU-ESP8266" && response.uartProtocol == 1) {
+                    selectedBaseUrl = baseUrl
+                    return response
+                }
+                lastError = IOException("Ответ получен не от совместимого ARDU")
             } catch (error: Exception) {
                 lastError = error
             }
