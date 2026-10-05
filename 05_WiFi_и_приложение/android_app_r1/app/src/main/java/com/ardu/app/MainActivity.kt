@@ -15,6 +15,7 @@ import android.widget.TextView
 import com.ardu.app.net.ArduApiClient
 import com.ardu.app.net.ArduSettings
 import com.ardu.app.net.DeviceStatus
+import com.ardu.app.net.RingProfile
 import com.ardu.app.net.TimeStatus
 import com.ardu.app.ui.AmbientEffectTileView
 import com.ardu.app.ui.ColorWheelView
@@ -32,6 +33,7 @@ class MainActivity : Activity() {
     private val worker = Executors.newSingleThreadExecutor()
     private var rendering = false
     private var latestSettings: ArduSettings? = null
+    private var latestRingProfile: RingProfile? = null
     private var latestMode: String? = null
     private var sectionNavigation: List<Pair<ImageButton, LinearLayout>> = emptyList()
     private var lastEspFirmware: String = "—"
@@ -181,6 +183,7 @@ class MainActivity : Activity() {
 
     private lateinit var addressInput: EditText
     private lateinit var systemSummaryText: TextView
+    private lateinit var ringProfileText: TextView
     private lateinit var currentLimitText: TextView
     private lateinit var currentLimitSeek: SeekBar
     private lateinit var eventsText: TextView
@@ -358,6 +361,7 @@ class MainActivity : Activity() {
 
         addressInput = findViewById(R.id.addressInput)
         systemSummaryText = findViewById(R.id.systemSummaryText)
+        ringProfileText = findViewById(R.id.ringProfileText)
         currentLimitText = findViewById(R.id.currentLimitText)
         currentLimitSeek = findViewById(R.id.currentLimitSeek)
         eventsText = findViewById(R.id.eventsText)
@@ -1085,6 +1089,23 @@ class MainActivity : Activity() {
             refreshDevice()
         }
 
+        fun updateRingProfile(normal: String? = null, emergency: String? = null) {
+            val current = latestRingProfile ?: return
+            runDeviceAction("Выбор колец") {
+                api.setRingProfile(
+                    normal = normal ?: current.normal,
+                    emergency = emergency ?: current.emergency
+                )
+            }
+        }
+
+        findViewById<Button>(R.id.ringNormalBothButton).setOnClickListener { updateRingProfile(normal = "both") }
+        findViewById<Button>(R.id.ringNormalAButton).setOnClickListener { updateRingProfile(normal = "a") }
+        findViewById<Button>(R.id.ringNormalBButton).setOnClickListener { updateRingProfile(normal = "b") }
+        findViewById<Button>(R.id.ringEmergencyBothButton).setOnClickListener { updateRingProfile(emergency = "both") }
+        findViewById<Button>(R.id.ringEmergencyAButton).setOnClickListener { updateRingProfile(emergency = "a") }
+        findViewById<Button>(R.id.ringEmergencyBButton).setOnClickListener { updateRingProfile(emergency = "b") }
+
         bindSeek(currentLimitSeek,
             { currentLimitText.text = "Лимит тока: $it мА" },
             { value -> runDeviceAction("Лимит тока") { api.setCurrentLimit(value) } }
@@ -1211,7 +1232,7 @@ class MainActivity : Activity() {
     }
 
     private fun readSnapshot(): Snapshot =
-        Snapshot(api.status(), api.settings(), api.time())
+        Snapshot(api.status(), api.settings(), api.time(), api.ringProfile())
 
     private fun runDeviceAction(label: String, action: () -> Unit) {
         setOperationStatus("$label…")
@@ -1232,6 +1253,7 @@ class MainActivity : Activity() {
     private fun renderSnapshot(snapshot: Snapshot) {
         rendering = true
         latestSettings = snapshot.settings
+        latestRingProfile = snapshot.rings
         latestMode = snapshot.status.mode
 
         modeText.text = modeTitle(snapshot.status.mode)
@@ -1448,6 +1470,11 @@ class MainActivity : Activity() {
         val sys = snapshot.settings.system
         currentLimitSeek.progress = sys.currentLimitMa
         currentLimitText.text = "Лимит тока: ${sys.currentLimitMa} мА"
+        ringProfileText.text =
+            "Обычно: ${ringSelectionTitle(snapshot.rings.normal)} • " +
+            "Авария: ${ringSelectionTitle(snapshot.rings.emergency)}\n" +
+            "Сейчас: ${ringSelectionTitle(snapshot.rings.active)} • " +
+            if (snapshot.rings.powerSource == "backup") "резервное питание" else "сеть"
         systemSummaryText.text = buildString {
             appendLine("ESP: $lastEspFirmware")
             appendLine(
@@ -1469,6 +1496,12 @@ class MainActivity : Activity() {
             appendLine("Audio: ${if (sys.audioCalibrated) "CALIBRATED" else "NOT CALIBRATED"}")
             append("Uptime: ${status.uptimeMs} ms")
         }
+    }
+
+    private fun ringSelectionTitle(value: String): String = when (value) {
+        "a" -> "A"
+        "b" -> "B"
+        else -> "оба"
     }
 
     private fun musicModeTitle(id: String): String = when (id) {
@@ -1561,7 +1594,8 @@ class MainActivity : Activity() {
     private data class Snapshot(
         val status: DeviceStatus,
         val settings: ArduSettings,
-        val time: TimeStatus
+        val time: TimeStatus,
+        val rings: RingProfile
     )
 
     companion object {
