@@ -26,6 +26,7 @@ class ArduApiClient {
         val candidates = buildList {
             preferredBaseUrl?.let(::add)
             selectedBaseUrl?.let { if (it !in this) add(it) }
+            add("http://192.168.4.1")
             add("http://ardu.local")
             add("http://192.168.0.4")
         }.distinct()
@@ -36,17 +37,14 @@ class ArduApiClient {
             try {
                 val json = getJson(baseUrl, "/api/ping")
                 val response = parsePing(json)
-                if (response.wifiConnected) {
-                    selectedBaseUrl = baseUrl
-                    return response
-                }
-                lastError = IOException("ARDU Wi-Fi не подключён")
+                selectedBaseUrl = baseUrl
+                return response
             } catch (error: Exception) {
                 lastError = error
             }
         }
 
-        throw IOException("ARDU не найден в локальной сети", lastError)
+        throw IOException("ARDU не найден в домашней сети или ARDU-DIRECT", lastError)
     }
 
     fun status(): DeviceStatus =
