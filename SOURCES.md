@@ -1028,3 +1028,27 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 - Final prepared size: 640×360 WebP.
 - Composition requirement confirmed by owner: sofa visible on the left and compact speaker visible on the right; room context retained.
 - This is a presentation asset only; no API/UART/firmware evidence is derived from it.
+
+## 2026-10-05 — direct Wi-Fi and reserve power component sources
+
+### ESP8266 SoftAP API
+- Official ESP8266 Arduino documentation: SoftAP supports WPA2-PSK, default/direct IP 192.168.4.1, `softAPConfig`, `softAPIP`, `softAPdisconnect`, and combined `WIFI_AP_STA` mode.
+- https://github.com/esp8266/Arduino/blob/master/doc/esp8266wifi/soft-access-point-class.rst
+- https://github.com/esp8266/Arduino/blob/master/doc/esp8266wifi/generic-class.rst
+
+### Preferred USB-C PD sink/trigger
+- Adafruit HUSB238 USB Type-C Power Delivery Dummy Breakout.
+- Fixed jumper configuration supports 15 V and 3 A request without a host MCU.
+- https://www.adafruit.com/product/5807
+- https://learn.adafruit.com/adafruit-husb238-usb-type-c-power-delivery-breakout
+
+### Preferred reserve 15→5 V regulator class
+- Pololu D36V50F5: fixed 5 V, nominal 5.5 A class, input 5.5–50 V, reverse-voltage protection; actual continuous current depends on thermal/input conditions and therefore still requires ARDU load testing.
+- https://www.pololu.com/product/4091
+
+### Candidate external battery
+- UGREEN Nexode Power Bank 20000 mAh 100 W, SKU 25188.
+- Official specification: 72 Wh total; USB-C1 includes 15 V / 3 A PD profile; suitable power class for the ARDU 15-V reserve input.
+- https://eu.ugreen.com/de/products/25188
+
+These sources define candidate hardware only. Final acceptance remains a physical ARDU load/temperature/backfeed test.
