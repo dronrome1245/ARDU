@@ -1052,3 +1052,23 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 - https://eu.ugreen.com/de/products/25188
 
 These sources define candidate hardware only. Final acceptance remains a physical ARDU load/temperature/backfeed test.
+
+## 2026-10-05 — final battery-free v1 purchase sources
+
+### Final mains PSU
+- Mean Well IRM-30-5ST official IRM-30 datasheet: 5 V / 6 A / 30 W; IRM-30 entire series = Class II design, no FG pin; ST = screw-terminal style.
+- https://www.meanwell.com/Upload/PDF/IRM-30/IRM-30-SPEC.PDF
+- German retail confirmation: Reichelt IRM-30-5ST, Isolationklasse II, 5 V / 6 A / 30 W.
+
+### Existing relay candidate
+- Songle SRD-05VDC-SL-C datasheet family: 5 V coil; Form C contact rating in the 7 A @ 28/30 VDC class depending exact approved variant.
+- This supports candidate use at ARDU 5 V load, but actual INV-051 board/traces/terminals still require physical load/temperature test before ceiling use.
+
+### Reserve PD path
+- Adafruit HUSB238 breakout: jumper-configurable PD sink; 15 V selectable, 3 A selected with both current jumpers open.
+- Pololu D36V50F5: fixed 5 V output, 5.5 A class; actual continuous output depends on thermal/input conditions.
+
+### Future battery (not purchased for v1)
+- UGREEN Nexode 20000 mAh 100 W SKU 25188: 72 Wh, USB-C1 supports 15 V / 3 A.
+
+All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-drop, current and temperature acceptance before ceiling installation.
