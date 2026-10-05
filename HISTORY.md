@@ -2497,3 +2497,24 @@ Current state: source implemented and documented; new ESP direct-mode compile/OT
 - Temporary direct IP is not written over the saved home preferred address.
 - Static delimiter validation is clean for ESP `.ino`, `Models.kt`, `ArduApiClient.kt`, and `MainActivity.kt`.
 - Exact Arduino/Gradle compile was not available through the current connector/runtime; physical/IDE compile remains an acceptance gate.
+
+## 2026-10-05 — selectable normal/emergency ring profiles implemented
+
+Owner kept the previously selected future battery class and requested selectable rings in both normal and emergency operation.
+
+Implemented source:
+- Nano: persistent normal/emergency ring profiles, values BOTH/A/B; defaults BOTH/A;
+- Nano D8 = MAINS_SENSE; current limiter now scales by active ring count;
+- Nano uses separate D6/D7 FastLED buffers while retaining one renderer frame; B-only restores the animation frame after output;
+- UART 121 read / 122 set;
+- ESP semantic `/api/system/rings` GET/POST;
+- Android Settings card with independent Normal and Emergency A/B/Both buttons;
+- ring profile is included in app refresh/reread after writes.
+
+Hardware decision:
+- no manual source selector;
+- candidate automatic source switch = existing INV-051 SRD-05VDC-SL-C relay module, subject to contact/load test;
+- MAINS_SENSE divider uses existing 1.5 kOhm + 4.7 kOhm;
+- battery remains optional/later.
+
+Static delimiter checks are clean for Nano/ESP/Kotlin; Android XML IDs have no duplicates and LinearLayout nesting balances when self-closing tags are handled. No commit-associated Actions run is visible through the connector yet, so compile/memory gate remains pending.
