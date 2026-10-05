@@ -3,7 +3,8 @@
   Built from hardware-tested ARDU subsystems.
 
   v1 scope:
-  - 2 x 44 WS2812B, mirrored frame: D6 + D7
+  - 2 x 44 WS2812B, D6 + D7 with persisted ring profile: A / B / BOTH
+  - separate normal/emergency ring selections; emergency source sensed on D8
   - L01 + persisted Kelvin/RGB profile
   - local double-clap + family CLAPCAL
   - DS3231 + Night schedule + Alarm/Dawn recovery
@@ -32,6 +33,7 @@
 namespace Pins {
 constexpr uint8_t RING_A = 6;
 constexpr uint8_t RING_B = 7;
+constexpr uint8_t MAINS_SENSE = 8;  // HIGH=normal PSU present, LOW=backup/emergency
 constexpr uint8_t MIC_IN = A0;
 }
 
@@ -58,6 +60,7 @@ constexpr int NIGHT_BASE = 64;      // 64..76
 constexpr int LIGHT_BASE = 128;     // L01 R2/R3 compatible
 constexpr int CLAP_BASE = 192;      // threshold/timeout
 constexpr int CORE_BASE = 224;      // current mode + clap enable
+constexpr int RING_BASE = 232;      // normal/emergency ring profile
 constexpr int EXT_BASE = 256;       // v1 Music/Ambient/audio/service block
 
 constexpr uint16_t EXT_MAGIC = 0xA1D1;
@@ -77,6 +80,8 @@ constexpr uint16_t CLAP_MAGIC = 0x4343;
 constexpr uint8_t CLAP_VER = 1;
 constexpr uint16_t CORE_MAGIC = 0xC010;
 constexpr uint8_t CORE_VER = 1;
+constexpr uint16_t RING_MAGIC = 0x5247;  // "RG"
+constexpr uint8_t RING_VER = 1;
 
 constexpr uint8_t DEFAULT_ALARM_HOUR = 7;
 constexpr uint8_t DEFAULT_ALARM_MINUTE = 0;
@@ -137,6 +142,12 @@ enum class SystemMode : uint8_t {
 enum class ColorMode : uint8_t {
   KELVIN = 0,
   RGB = 1
+};
+
+enum class RingSelection : uint8_t {
+  BOTH = 0,
+  A = 1,
+  B = 2
 };
 
 enum class DawnPhase : uint8_t {
@@ -305,6 +316,20 @@ struct __attribute__((packed)) ExtendedPersist {
   uint8_t sum;
 };
 
+struct RingProfileSettings {
+  RingSelection normal = RingSelection::BOTH;
+  RingSelection emergency = RingSelection::A;
+  bool storageValid = false;
+};
+
+struct __attribute__((packed)) RingProfilePersist {
+  uint16_t magic;
+  uint8_t version;
+  uint8_t normal;
+  uint8_t emergency;
+  uint8_t sum;
+};
+
 struct VuRuntime {
   uint16_t filtered;
   uint16_t averageLevel;
@@ -353,6 +378,8 @@ DawnPhase dawnPhase = DawnPhase::IDLE;
 bool dawnRecoveredAtBoot = false;
 
 CRGB leds[Cfg::LED_COUNT];
+CRGB ringBLeds[Cfg::LED_COUNT];
+RingProfileSettings ringProfile;
 
 char rxBuffer[Cfg::RX_BUFFER_SIZE];
 size_t rxLength = 0;
@@ -993,6 +1020,50 @@ void loadExtended(){
   extCfg.storageValid=true; extCfg.dirty=false;
 }
 
+uint8_t ringProfileChecksum(const RingProfilePersist& d){
+  return checksum(reinterpret_cast<const uint8_t*>(&d),static_cast<uint8_t>(sizeof(RingProfilePersist)-1));
+}
+
+void setRingProfileDefaults(){
+  ringProfile.normal=RingSelection::BOTH;
+  ringProfile.emergency=RingSelection::A;
+  ringProfile.storageValid=false;
+}
+
+void saveRingProfile(){
+  RingProfilePersist d{};
+  d.magic=Cfg::RING_MAGIC;
+  d.version=Cfg::RING_VER;
+  d.normal=static_cast<uint8_t>(ringProfile.normal);
+  d.emergency=static_cast<uint8_t>(ringProfile.emergency);
+  d.sum=0; d.sum=ringProfileChecksum(d);
+  EEPROM.put(Cfg::RING_BASE,d);
+  ringProfile.storageValid=true;
+}
+
+void loadRingProfile(){
+  RingProfilePersist d{};
+  EEPROM.get(Cfg::RING_BASE,d);
+  const bool ok=d.magic==Cfg::RING_MAGIC && d.version==Cfg::RING_VER &&
+      d.sum==ringProfileChecksum(d) && d.normal<=2 && d.emergency<=2;
+  if(!ok){setRingProfileDefaults();return;}
+  ringProfile.normal=static_cast<RingSelection>(d.normal);
+  ringProfile.emergency=static_cast<RingSelection>(d.emergency);
+  ringProfile.storageValid=true;
+}
+
+bool emergencyPowerActive(){
+  return digitalRead(Pins::MAINS_SENSE)==LOW;
+}
+
+RingSelection activeRingSelection(){
+  return emergencyPowerActive()?ringProfile.emergency:ringProfile.normal;
+}
+
+uint8_t activeRingCount(){
+  return activeRingSelection()==RingSelection::BOTH?2:1;
+}
+
 // -------------------- Light color/render --------------------
 
 
@@ -1098,17 +1169,39 @@ uint8_t limitedBrightness(){
   for(uint8_t i=0;i<Cfg::LED_COUNT;++i)
     sum+=static_cast<uint16_t>(leds[i].r)+leds[i].g+leds[i].b;
   if(!sum)return requestedBrightness;
-  // Two mirrored 44-LED rings, approx. 20 mA per RGB channel at value 255.
-  const uint32_t denom=sum*40UL;
+  // Approx. 20 mA per RGB channel at value 255, scaled by active ring count.
+  const uint32_t denom=sum*20UL*activeRingCount();
   uint32_t safe=static_cast<uint32_t>(extCfg.currentLimitMa)*65025UL/denom;
   if(safe>255)safe=255;
   return requestedBrightness<safe?requestedBrightness:static_cast<uint8_t>(safe);
 }
 
+void showPreparedFrame(){
+  const RingSelection selection=activeRingSelection();
+  const uint8_t brightness=limitedBrightness();
+
+  if(selection==RingSelection::BOTH){
+    memcpy(ringBLeds,leds,sizeof(leds));
+  }else if(selection==RingSelection::A){
+    fill_solid(ringBLeds,Cfg::LED_COUNT,CRGB::Black);
+  }else{
+    memcpy(ringBLeds,leds,sizeof(leds));
+    fill_solid(leds,Cfg::LED_COUNT,CRGB::Black);
+  }
+
+  FastLED.setBrightness(brightness);
+  FastLED.show();
+
+  // B-only temporarily blanks the A output buffer for show(); restore the
+  // animation frame immediately afterwards so stateful effects keep running.
+  if(selection==RingSelection::B){
+    memcpy(leds,ringBLeds,sizeof(leds));
+  }
+}
+
 void showIfSafe(){
   if(!frameDirty || serialGuard()) return;
-  FastLED.setBrightness(limitedBrightness());
-  FastLED.show(); frameDirty=false;
+  showPreparedFrame(); frameDirty=false;
 }
 
 
@@ -1437,7 +1530,7 @@ void updateMusic(){
 }
 
 void calibrateAudio(){
-  prepareOff(); FastLED.show(); frameDirty=false; delay(120);
+  prepareOff(); showPreparedFrame(); frameDirty=false; delay(120);
   audioDefaultPrescaler();
   uint32_t sum=0;uint16_t quietMax=0;
   for(uint16_t i=0;i<256;++i){const uint16_t v=analogRead(Pins::MIC_IN);sum+=v;if(v>quietMax)quietMax=v;}
@@ -2164,6 +2257,17 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
     case 120:
       if(n!=1||!argRange(a[0],Cfg::MIN_CURRENT_LIMIT_MA,Cfg::HARD_CURRENT_LIMIT_MA))return uartErr(UE_RANGE);
       extCfg.currentLimitMa=a[0];extCfg.dirty=true;saveExtended();uartAck(op);return;
+    case 121:
+      if(n)return uartErr(UE_PARSE);
+      dataPrefix(121,static_cast<uint8_t>(ringProfile.normal));
+      Serial.print(static_cast<uint8_t>(ringProfile.emergency));Serial.print(' ');
+      Serial.print(static_cast<uint8_t>(activeRingSelection()));Serial.print(' ');
+      Serial.println(emergencyPowerActive()?1:0);return;
+    case 122:
+      if(n!=2||a[0]>2||a[1]>2)return uartErr(UE_RANGE);
+      ringProfile.normal=static_cast<RingSelection>(a[0]);
+      ringProfile.emergency=static_cast<RingSelection>(a[1]);
+      saveRingProfile();frameDirty=true;uartAck(op);return;
     default:uartErr(UE_PARSE);return;
   }
 }
@@ -2198,13 +2302,16 @@ void setup(){
 
   Serial.begin(Cfg::SERIAL_BAUD);
   analogReference(DEFAULT);
+  pinMode(Pins::MAINS_SENSE,INPUT);
 
   loadExtended();
+  loadRingProfile();
 
   FastLED.addLeds<WS2812B,Pins::RING_A,GRB>(leds,Cfg::LED_COUNT);
-  FastLED.addLeds<WS2812B,Pins::RING_B,GRB>(leds,Cfg::LED_COUNT);
+  FastLED.addLeds<WS2812B,Pins::RING_B,GRB>(ringBLeds,Cfg::LED_COUNT);
   prepareOff();
-  FastLED.show();
+  fill_solid(ringBLeds,Cfg::LED_COUNT,CRGB::Black);
+  showPreparedFrame();
 
   twiMasterInit();
   delay(80);
