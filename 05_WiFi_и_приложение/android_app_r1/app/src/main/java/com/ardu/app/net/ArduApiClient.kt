@@ -402,6 +402,10 @@ class ArduApiClient {
             device = json.optString("device", "ARDU-ESP8266"),
             firmware = json.optString("fw", "UNKNOWN"),
             wifiConnected = json.optBoolean("wifi_connected"),
+            networkMode = json.optString("network_mode").ifBlank {
+                if (json.optBoolean("wifi_connected")) "station" else "unknown"
+            },
+            softApActive = json.optBoolean("softap_active"),
             ip = json.optString("ip"),
             rssi = if (json.has("rssi")) json.optInt("rssi") else null,
             otaReady = json.optBoolean("ota_ready"),
