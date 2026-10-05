@@ -1433,6 +1433,7 @@ const char* eventName(uint32_t code) {
     case 7:return "clap_toggle";
     case 8:return "cold_power_on";
     case 9:return "warm_reset";
+    case 10:return "power_source";
     default:return "unknown";
   }
 }
