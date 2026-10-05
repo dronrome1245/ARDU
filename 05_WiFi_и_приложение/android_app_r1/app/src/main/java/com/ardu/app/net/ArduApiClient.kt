@@ -347,6 +347,27 @@ class ArduApiClient {
         )
     }
 
+    fun ringProfile(): RingProfile {
+        val json = getJson(requireBaseUrl(), "/api/system/rings")
+        requireOk(json)
+        return RingProfile(
+            normal = json.requiredString("normal"),
+            emergency = json.requiredString("emergency"),
+            active = json.requiredString("active"),
+            powerSource = json.requiredString("power_source")
+        )
+    }
+
+    fun setRingProfile(normal: String, emergency: String) {
+        require(normal in RING_SELECTIONS && emergency in RING_SELECTIONS)
+        postApplied(
+            "/api/system/rings",
+            JSONObject()
+                .put("normal", normal)
+                .put("emergency", emergency)
+        )
+    }
+
     fun events(): List<ArduEvent> {
         val json = getJson(requireBaseUrl(), "/api/events")
         requireOk(json)
@@ -659,5 +680,6 @@ class ArduApiClient {
     companion object {
         val MUSIC_IDS = listOf("M01", "M02", "M03", "M04", "M05", "M08", "M09")
         val AMBIENT_IDS = listOf("F01", "F02", "F03")
+        val RING_SELECTIONS = setOf("both", "a", "b")
     }
 }
