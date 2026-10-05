@@ -36,6 +36,7 @@ class MainActivity : Activity() {
     private var sectionNavigation: List<Pair<ImageButton, LinearLayout>> = emptyList()
     private var lastEspFirmware: String = "—"
     private var lastEspRssi: Int? = null
+    private var lastNetworkMode: String = "unknown"
     private val musicModeButtonMap = linkedMapOf<String, MusicModeTileView>()
     private var ambientEffectButtonMap: Map<String, AmbientEffectTileView> = emptyMap()
     private var musicSubmodeButtonMap: Map<Int, Button> = emptyMap()
@@ -1170,14 +1171,19 @@ class MainActivity : Activity() {
                 val ping = api.ping()
                 lastEspFirmware = ping.firmware
                 lastEspRssi = ping.rssi
+                lastNetworkMode = ping.networkMode
                 val snapshot = readSnapshot()
                 val selectedAddress = api.selectedAddress()
-                if (!selectedAddress.isNullOrBlank()) {
+                if (!selectedAddress.isNullOrBlank() &&
+                    selectedAddress != "http://192.168.4.1") {
                     preferences().edit().putString(PREF_ADDRESS, selectedAddress).apply()
                 }
 
                 runOnUiThread {
-                    setConnectionStatus("● Онлайн", R.color.ardu_accent)
+                    val connectionLabel =
+                        if (ping.networkMode == "softap") "● Прямое подключение"
+                        else "● Онлайн"
+                    setConnectionStatus(connectionLabel, R.color.ardu_accent)
                     if (!selectedAddress.isNullOrBlank()) {
                         addressInput.setText(selectedAddress.removePrefix("http://"))
                     }
@@ -1444,6 +1450,13 @@ class MainActivity : Activity() {
         currentLimitText.text = "Лимит тока: ${sys.currentLimitMa} мА"
         systemSummaryText.text = buildString {
             appendLine("ESP: $lastEspFirmware")
+            appendLine(
+                "Network: " + when (lastNetworkMode) {
+                    "softap" -> "ARDU-DIRECT"
+                    "station" -> "Home Wi-Fi"
+                    else -> lastNetworkMode
+                }
+            )
             lastEspRssi?.let { appendLine("Wi-Fi: $it dBm") }
             appendLine("Nano: ${status.nanoFirmware}")
             appendLine("UART: v${status.uartProtocol}")
