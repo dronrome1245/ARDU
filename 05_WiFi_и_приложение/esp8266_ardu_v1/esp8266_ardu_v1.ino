@@ -11,8 +11,10 @@
     data:     D <group> ...
     event:    V <event> [args...]
 
-  This sketch preserves the proven ARDU Station-only Wi-Fi + ArduinoOTA transport.
-  Real WIFI_SSID / WIFI_PASSWORD / OTA_PASSWORD must remain local and uncommitted.
+  This sketch preserves the proven ARDU Station Wi-Fi + ArduinoOTA transport and
+  adds a protected SoftAP fallback for router-less local control.
+  Real WIFI_SSID / WIFI_PASSWORD / OTA_PASSWORD / SOFTAP_PASSWORD must remain
+  local and uncommitted.
 */
 
 #include <Arduino.h>
@@ -29,16 +31,18 @@
 const char* WIFI_SSID = "PUT_YOUR_WIFI_SSID_HERE";
 const char* WIFI_PASSWORD = "PUT_YOUR_WIFI_PASSWORD_HERE";
 const char* OTA_PASSWORD = "PUT_A_STRONG_OTA_PASSWORD_HERE";
+const char* SOFTAP_PASSWORD = "PUT_A_STRONG_AP_PASSWORD_HERE";
 
 namespace Cfg {
 constexpr unsigned long NANO_BAUD = 115200UL;
 constexpr uint16_t HTTP_PORT = 80;
 constexpr uint16_t OTA_PORT = 8266;
 constexpr char HOSTNAME[] = "ardu";
+constexpr char SOFTAP_SSID[] = "ARDU-DIRECT";
 constexpr char FW_NAME[] = "ARDU_ESP_V1";
 constexpr uint8_t UART_PROTOCOL = 1;
 
-constexpr unsigned long WIFI_CONNECT_TIMEOUT_MS = 20000UL;
+constexpr unsigned long WIFI_CONNECT_TIMEOUT_MS = 15000UL;
 constexpr unsigned long WIFI_RETRY_MS = 10000UL;
 
 constexpr unsigned long NANO_NORMAL_TIMEOUT_MS = 1800UL;
@@ -64,6 +68,7 @@ size_t asyncLength = 0;
 
 unsigned long lastWifiRetryMs = 0;
 bool networkServicesStarted = false;
+bool softApActive = false;
 bool otaInProgress = false;
 
 // ---------------------------------------------------------------------------
@@ -636,14 +641,26 @@ void handlePing() {
   body += Cfg::FW_NAME;
   body += F("\",\"uart_protocol\":");
   body += Cfg::UART_PROTOCOL;
+  const bool staConnected = WiFi.status() == WL_CONNECTED;
   body += F(",\"wifi_connected\":");
-  body += WiFi.status() == WL_CONNECTED ? F("true") : F("false");
+  body += staConnected ? F("true") : F("false");
+  body += F(",\"network_mode\":\"");
+  body += staConnected ? F("station") : (softApActive ? F("softap") : F("offline"));
+  body += '"';
+  body += F(",\"softap_active\":");
+  body += softApActive ? F("true") : F("false");
 
-  if (WiFi.status() == WL_CONNECTED) {
+  if (staConnected) {
     body += F(",\"ip\":\"");
     body += WiFi.localIP().toString();
     body += F("\",\"rssi\":");
     body += WiFi.RSSI();
+  } else if (softApActive) {
+    body += F(",\"ip\":\"");
+    body += WiFi.softAPIP().toString();
+    body += F("\",\"softap_ssid\":\"");
+    body += Cfg::SOFTAP_SSID;
+    body += '"';
   }
 
   body += F(",\"ota_ready\":");
@@ -1505,17 +1522,44 @@ void setupHttp() {
 // Wi-Fi / OTA
 // ---------------------------------------------------------------------------
 
-bool credentialsLookConfigured() {
+bool stationCredentialsLookConfigured() {
   return strcmp(WIFI_SSID,"PUT_YOUR_WIFI_SSID_HERE")!=0 &&
          strcmp(WIFI_PASSWORD,"PUT_YOUR_WIFI_PASSWORD_HERE")!=0 &&
-         strcmp(OTA_PASSWORD,"PUT_A_STRONG_OTA_PASSWORD_HERE")!=0 &&
          strlen(WIFI_SSID)>0 &&
-         strlen(WIFI_PASSWORD)>0 &&
+         strlen(WIFI_PASSWORD)>0;
+}
+
+bool otaPasswordLooksConfigured() {
+  return strcmp(OTA_PASSWORD,"PUT_A_STRONG_OTA_PASSWORD_HERE")!=0 &&
          strlen(OTA_PASSWORD)>=8;
 }
 
+bool softApPasswordLooksConfigured() {
+  return strcmp(SOFTAP_PASSWORD,"PUT_A_STRONG_AP_PASSWORD_HERE")!=0 &&
+         strlen(SOFTAP_PASSWORD)>=8;
+}
+
+void startSoftAp() {
+  if(softApActive || !softApPasswordLooksConfigured())return;
+
+  WiFi.mode(WIFI_AP_STA);
+  const IPAddress ip(192,168,4,1);
+  const IPAddress mask(255,255,255,0);
+  if(!WiFi.softAPConfig(ip,ip,mask))return;
+
+  softApActive=WiFi.softAP(Cfg::SOFTAP_SSID,SOFTAP_PASSWORD);
+}
+
+void stopSoftAp() {
+  if(!softApActive)return;
+  WiFi.softAPdisconnect(false);
+  softApActive=false;
+  WiFi.mode(WIFI_STA);
+  WiFi.hostname(Cfg::HOSTNAME);
+}
+
 bool connectWifiBlocking() {
-  if(!credentialsLookConfigured())return false;
+  if(!stationCredentialsLookConfigured())return false;
 
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
@@ -1533,6 +1577,7 @@ bool connectWifiBlocking() {
 
 void startNetworkServicesIfPossible() {
   if(networkServicesStarted||WiFi.status()!=WL_CONNECTED)return;
+  if(!otaPasswordLooksConfigured())return;
 
   ArduinoOTA.setPort(Cfg::OTA_PORT);
   ArduinoOTA.setHostname(Cfg::HOSTNAME);
@@ -1555,13 +1600,23 @@ void stopNetworkServices() {
 }
 
 void maintainWifi() {
-  if(!credentialsLookConfigured()){stopNetworkServices();return;}
-  if(WiFi.status()==WL_CONNECTED){startNetworkServicesIfPossible();return;}
+  if(WiFi.status()==WL_CONNECTED){
+    if(softApActive)stopSoftAp();
+    startNetworkServicesIfPossible();
+    return;
+  }
 
   stopNetworkServices();
+  startSoftAp();
+
+  if(!stationCredentialsLookConfigured())return;
+
   const unsigned long now=millis();
   if(now-lastWifiRetryMs<Cfg::WIFI_RETRY_MS)return;
   lastWifiRetryMs=now;
+
+  WiFi.mode(softApActive?WIFI_AP_STA:WIFI_STA);
+  WiFi.hostname(Cfg::HOSTNAME);
   WiFi.disconnect();
   WiFi.begin(WIFI_SSID,WIFI_PASSWORD);
 }
@@ -1578,7 +1633,8 @@ void setup() {
   Serial.setTimeout(50);
   delay(250);
 
-  (void)connectWifiBlocking();
+  const bool stationConnected=connectWifiBlocking();
+  if(!stationConnected)startSoftAp();
   resyncNanoAfterEspBoot();
 
   startNetworkServicesIfPossible();
