@@ -2467,3 +2467,24 @@ No Nano/ESP/API/UART source changes.
 - cold boot от резервных 5 V должен штатно приводить к L01, поэтому базовое освещение не зависит от наличия Wi-Fi во время отключения сети.
 
 Физическая реализация и закупка конкретного разъёма/переключателя отложены до final power/two-ring gate. Firmware/API/UART не менялись.
+
+## 2026-10-05 — reserve-ready v1 + routerless source implemented
+
+Owner clarified the target: finish and install the first complete ARDU **without a battery**, but make later backup use possible without removing the ceiling unit.
+
+Source changes:
+- ESP v1 now uses Station primary + protected `ARDU-DIRECT` fallback;
+- direct address = `192.168.4.1`;
+- separate local SoftAP password is required;
+- HTTP API remains the same; ping reports network mode/direct status;
+- OTA remains Station-only;
+- Android discovery now includes `192.168.4.1` and accepts a valid direct ARDU ping when home Station is absent;
+- Nano firmware and numeric UART v1 unchanged.
+
+Hardware target refined:
+- external accessible USB-C PD BACKUP input must be installed before ceiling mounting;
+- reserve path = 15 V PD → fuse → 5 V high-current DC/DC → accessible NORMAL/BACKUP source selector → common 5 V bus;
+- no battery is installed or charged by ARDU;
+- battery purchase is optional after v1 completion.
+
+Current state: source implemented and documented; new ESP direct-mode compile/OTA/hardware smoke and reserve power hardware acceptance are still pending.
