@@ -380,6 +380,7 @@ bool dawnRecoveredAtBoot = false;
 CRGB leds[Cfg::LED_COUNT];
 CRGB ringBLeds[Cfg::LED_COUNT];
 RingProfileSettings ringProfile;
+bool lastEmergencyPowerActive = false;
 
 char rxBuffer[Cfg::RX_BUFFER_SIZE];
 size_t rxLength = 0;
@@ -2306,6 +2307,7 @@ void setup(){
 
   loadExtended();
   loadRingProfile();
+  lastEmergencyPowerActive=emergencyPowerActive();
 
   FastLED.addLeds<WS2812B,Pins::RING_A,GRB>(leds,Cfg::LED_COUNT);
   FastLED.addLeds<WS2812B,Pins::RING_B,GRB>(ringBLeds,Cfg::LED_COUNT);
@@ -2356,6 +2358,14 @@ void setup(){
 
 void loop(){
   pollSerial();
+
+  const bool emergencyNow=emergencyPowerActive();
+  if(emergencyNow!=lastEmergencyPowerActive){
+    lastEmergencyPowerActive=emergencyNow;
+    frameDirty=true;
+    emitEvent2(10,emergencyNow?1:0);
+  }
+
   updateAlarm();
   updateDawn();
   updateClap();
