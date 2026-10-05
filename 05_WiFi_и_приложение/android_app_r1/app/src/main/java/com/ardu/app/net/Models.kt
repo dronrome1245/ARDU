@@ -176,6 +176,13 @@ data class CurrentLimit(
     val hardMaxMa: Int
 )
 
+data class RingProfile(
+    val normal: String,
+    val emergency: String,
+    val active: String,
+    val powerSource: String
+)
+
 data class ArduEvent(
     val type: String,
     val code: Int,
