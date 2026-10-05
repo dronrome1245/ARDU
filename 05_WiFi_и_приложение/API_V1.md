@@ -5,7 +5,7 @@
 
 ## 1. Общие правила
 
-- только домашняя локальная Wi-Fi сеть, без SoftAP и без облака; доступ в Интернет не требуется;
+- домашний Station — основной transport; при недоступном роутере доступен защищённый SoftAP `ARDU-DIRECT` на `192.168.4.1`; облако/Интернет не требуются;
 - JSON UTF-8;
 - ESP8266 — HTTP-шлюз;
 - Nano — источник истины по состоянию света;
@@ -20,6 +20,10 @@
 
 В R3 `GET /api/ping` дополнительно возвращает:
 - `ota_ready` — OTA service запущен после успешного Wi-Fi connect;
+- `network_mode` — `station`, `softap` или `offline`;
+- `softap_active` — активен ли direct fallback;
+- в SoftAP mode поле `ip` = `192.168.4.1`, дополнительно возвращается `softap_ssid`;
+- `wifi_connected` сохраняет прежний смысл: это именно состояние домашнего Station, поэтому в рабочем direct mode может быть `false`;
 - `ota_hostname` — `ardu`;
 - `ota_port` — `8266`.
 
