@@ -2708,3 +2708,26 @@ routerless_reserve_ready_2026_10_05:
     path: "USB-C_PD -> HUSB238 -> fuse -> 15to5V_DC_DC -> NORMAL_BACKUP_selector -> common_5V_bus"
     external_battery_optional_later: true
   next_gate: "v0.23 phone smoke -> ESP compile/OTA -> ARDU-DIRECT physical smoke -> reserve hardware load test"
+
+ring_profiles_v1_2026_10_05:
+  implemented_in_source: true
+  compile_pass: false
+  physical_pass: false
+  normal_default: both
+  emergency_default: a
+  selections: [both, a, b]
+  mains_sense:
+    pin: D8
+    high: normal
+    low: backup
+    wiring: "MAIN_5V -> 1.5k -> D8; D8 -> 4.7k -> GND"
+  uart:
+    get: 121
+    set: 122
+  http: "/api/system/rings"
+  android_settings: true
+  source_switch:
+    manual_switch: false
+    candidate: "INV-051 SRD-05VDC-SL-C"
+    load_test_required: true
+  battery_required_for_v1: false
