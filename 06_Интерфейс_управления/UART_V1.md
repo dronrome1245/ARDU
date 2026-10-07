@@ -1,7 +1,7 @@
 # ARDU Nano ↔ ESP8266 UART v1
 
 Дата: 2026-10-01  
-Статус: ЗАМОРОЖЕННЫЙ INTERNAL CONTRACT ДЛЯ RELEASE v1
+Статус: RELEASE v1 CONTRACT; backward-compatible owner-requested extension 2026-10-07
 
 Этот протокол используется только внутри устройства между ESP8266 и Arduino Nano. Android-приложение его не знает и работает только с semantic HTTP API ESP8266.
 
@@ -46,6 +46,7 @@ ESP фильтрует `V ...` из синхронных транзакций и
 | 5 | Y M D h m s | `O 5` | установить RTC |
 | 10 | mode | `O 10` | top mode: 0 off, 1 light, 2 night, 3 ambient, 4 music |
 | 120 | mA | `O 120` | service current limit, 500..4500 mA, persistent |
+| 130 | — | `O 130` | сброс пользовательских настроек к v1 defaults; RTC и audio calibration сохраняются |
 
 ## 4. L01 / clap
 
@@ -136,7 +137,7 @@ Effect mapping: 0=F01, 1=F02, 2=F03.
 | 105 | hue 0..255 | `O 105` |
 | 106 | saturation 0..255 | `O 106`, not F03 |
 | 107 | brightness 0..255 | `O 107` |
-| 108 | speed 1..255 | `O 108`, F02/F03 |
+| 108 | speed 1..255 | `O 108`, F02/F03; большее значение = быстрее |
 | 109 | step10 5..100 | `O 109`, F03 |
 | 110 | — | `O 110` — commit Ambient settings |
 
@@ -192,3 +193,10 @@ This is the source for `GET /api/settings`.
 ## 12. Freeze rule
 
 Этот контракт считается frozen для ARDU v1 после compile PASS Nano+ESP. До физической загрузки допускается только исправление найденного release-blocker. Android не должен формировать эти opcodes напрямую.
+
+
+### Extension rule 2026-10-07
+
+Opcode 130 добавлен по прямому запросу владельца на пользовательскую кнопку «Сброс настроек по умолчанию». Это backward-compatible extension: существующие opcodes и их значения не изменены, `uart_protocol` остаётся `1`.
+
+Одновременно исправлена только внутренняя интерпретация Ambient `speed` для F02/F03: wire range `1..255` не изменён; ранее F03 использовал raw 8-bit hue step и мог alias-иться (например 247 ≈ -9), теперь значение монотонно управляет интервалом кадра.
