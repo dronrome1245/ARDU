@@ -2731,3 +2731,26 @@ ring_profiles_v1_2026_10_05:
     candidate: "INV-051 SRD-05VDC-SL-C"
     load_test_required: true
   battery_required_for_v1: false
+
+backup_branch_cancelled_2026_10_07:
+  owner_approved: true
+  decision: D-100
+  battery_backup: cancelled
+  ext_power_input: false
+  husb238: not_in_bom
+  reserve_dc_dc: not_in_bom
+  source_selector_relay: not_in_bom
+  mains_sense: false
+  emergency_ring_profiles: false
+  ring_profile_api: false
+  nano_usb_c_role: service_only
+  rings:
+    ring_a: D6
+    ring_b: D7
+    behavior: mirrored
+  ardu_direct:
+    retained: true
+    physical_pass: false
+    ssid: "ARDU-DIRECT"
+    ip: "192.168.4.1"
+  next: "v0.23 phone smoke -> ARDU-DIRECT compile/physical smoke -> normal two-ring power acceptance"
