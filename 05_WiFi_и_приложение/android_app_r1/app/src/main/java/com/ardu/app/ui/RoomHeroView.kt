@@ -33,11 +33,22 @@ class RoomHeroView @JvmOverloads constructor(
         strokeWidth = dp(1f)
         color = Color.argb(58, 255, 255, 255)
     }
-    private val roomBitmap: Bitmap by lazy(LazyThreadSafetyMode.NONE) {
-        BitmapFactory.decodeResource(resources, R.drawable.ardu_light_hero)
-    }
+    private val bitmapCache = mutableMapOf<Int, Bitmap>()
 
     private var scene = Scene.LIVING
+
+    private fun roomBitmap(): Bitmap {
+        val resourceId = when (scene) {
+            Scene.LIVING -> R.drawable.ardu_light_hero
+            Scene.MUSIC -> R.drawable.ardu_light_hero
+            Scene.AMBIENT -> R.drawable.ardu_ambient_hero
+            Scene.NIGHT -> R.drawable.ardu_night_hero
+            Scene.DAWN -> R.drawable.ardu_alarm_hero
+        }
+        return bitmapCache.getOrPut(resourceId) {
+            BitmapFactory.decodeResource(resources, resourceId)
+        }
+    }
 
     fun setScene(value: Scene) {
         if (scene == value) return
@@ -75,15 +86,16 @@ class RoomHeroView @JvmOverloads constructor(
         }
         canvas.clipPath(clip)
 
+        val bitmap = roomBitmap()
         val focus = focalPoint(scene)
         val source = focalCropSource(
-            roomBitmap,
+            bitmap,
             width,
             height,
             focus.first,
             focus.second
         )
-        canvas.drawBitmap(roomBitmap, source, bounds, imagePaint)
+        canvas.drawBitmap(bitmap, source, bounds, imagePaint)
 
         drawSceneGrade(canvas, w, h)
         drawReadabilityVignette(canvas, w, h)
@@ -216,9 +228,9 @@ class RoomHeroView @JvmOverloads constructor(
     private fun focalPoint(value: Scene): Pair<Float, Float> = when (value) {
         Scene.LIVING -> .64f to .50f
         Scene.MUSIC -> .28f to .48f
-        Scene.AMBIENT -> .52f to .50f
-        Scene.NIGHT -> .72f to .50f
-        Scene.DAWN -> .60f to .48f
+        Scene.AMBIENT -> .50f to .50f
+        Scene.NIGHT -> .50f to .50f
+        Scene.DAWN -> .50f to .50f
     }
 
     private fun focalCropSource(
