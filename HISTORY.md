@@ -2537,3 +2537,23 @@ Current result:
 Important: `ARDU-DIRECT` is retained. Router-less local Wi-Fi was requested separately and remains useful without any battery.
 
 The historical 2026-10-05 backup design records remain in HISTORY/DECISIONS/SOURCES for traceability but are not current requirements.
+
+## 2026-10-07 — v0.23 rejected; canonical Android UI restored to v0.22
+
+Owner tested/reviewed the attempted concept-parity direction and rejected it, then switched locally to:
+`archive/android-v0.22-homehub-2026-10-04`.
+
+To make that owner choice canonical without discarding later valid network work:
+- restored v0.22 layout and all affected visual custom views to `main`;
+- rebuilt `MainActivity` from the v0.22 UI version and retained only later ARDU-DIRECT/network-mode behavior;
+- kept current Android API client direct fallback changes;
+- version set to `0.22.1-homehub-restored-rc1` / versionCode 24.
+
+Restore validation:
+- layout IDs 177;
+- duplicate IDs 0;
+- missing MainActivity bindings 0;
+- duplicate private functions 0;
+- visual source files exactly match archived v0.22.
+
+v0.23 remains in Git history/documentation but is no longer the active design.
