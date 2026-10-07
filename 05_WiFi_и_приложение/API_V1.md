@@ -449,25 +449,3 @@ Ambient effect selection `POST /api/ambient/effect` сохраняется ср�
 - `persist`.
 
 Внутренний numeric UART описан отдельно: `06_Интерфейс_управления/UART_V1.md`.
-
-### Ring profiles — 2026-10-05
-
-`GET /api/system/rings`
-
-Response:
-```json
-{"ok":true,"normal":"both","emergency":"a","active":"both","power_source":"normal"}
-```
-
-Selections: `both`, `a`, `b`.
-
-`POST /api/system/rings`
-```json
-{"normal":"both","emergency":"a"}
-```
-
-- both fields are required in v1;
-- Nano persists both profiles;
-- `active` is selected automatically from D8 MAINS_SENSE;
-- normal source = D8 HIGH; backup/emergency = D8 LOW;
-- selection applies centrally to all rendered light modes.
