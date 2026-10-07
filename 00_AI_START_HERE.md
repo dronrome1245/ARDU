@@ -123,23 +123,19 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Current visual baseline remains v0.22 Home Hub; targeted owner polish is now `0.22.2-homehub-owner-polish-rc1`.
+Current Android visual source = `0.22.4-generated-heroes-rc1`.
 
-1. Real Android→ARDU home-Wi-Fi baseline remains PASS on the previously uploaded firmware.
-2. v0.23 remains rejected; do not revive its global redesign.
-3. Android v0.22.2 implements the owner's eight concrete UI/behavior requests.
-4. Nano/ESP **source** also contains two requested functional fixes:
-   - Ambient speed monotonic semantics;
-   - reset-defaults opcode/API.
-5. Those firmware changes are not physically uploaded yet.
-6. Immediate next step = visual review only:
-   `git pull` → Android Studio → Pixel emulator → Run.
-7. Owner reports page-by-page visual defects; fix in small UI iterations.
-8. After visual acceptance:
-   - compile/size gate Nano + ESP;
-   - upload Nano/ESP;
-   - physical ARDU-DIRECT + reset-defaults + Ambient speed acceptance.
-9. Then continue two-ring power acceptance. Battery/backup remains cancelled.
+1. v0.22 Home Hub remains the canonical visual baseline; v0.23 remains rejected.
+2. Owner approved and repo now uses new dedicated wide hero scenes for Ambient / Night / Alarm-Dawn.
+3. Immediate visual gate: `git pull` → Pixel emulator → Run → check those three hero scenes in the actual overlay/layout.
+4. Ambient preset design is intentionally open:
+   - current 4 presets are provisional;
+   - owner wants more than four;
+   - agree physical light behavior first, then implement stable preset layer.
+5. Do not add more preset code/IDs before that agreement.
+6. Nano/ESP reset-defaults + Ambient speed source changes remain not physically uploaded.
+7. After visual/preset design acceptance: compile/size gate → firmware upload → physical ARDU-DIRECT/reset/speed/preset acceptance.
+8. Battery/backup remains cancelled.
 
 ## 12. База ColorMusic/FHT
 
