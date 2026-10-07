@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — OWNER REJECTED ANDROID v0.23 VISUAL PASS; v0.22 HOME HUB UI RESTORED AS CANONICAL. Current Android source is `0.22.1-homehub-restored-rc1` (versionCode 24). The visible UI/layout/custom visual components are restored exactly from `archive/android-v0.22-homehub-2026-10-04`; post-v0.22 network improvements are retained, including Android awareness/probing for `ARDU-DIRECT`. Android↔real ARDU over home Wi‑Fi already PASS; ESP `ARDU_ESP_V1`, Nano `ARDU_V1`, RTC and L01 Wi‑Fi baseline are confirmed. v0.23 remains only as rejected history/reference and must not be used as the design baseline. Battery/backup-power branch remains cancelled by D-100. Next software gate: build/run restored v0.22.1 from `main`; next network gate: physical `ARDU-DIRECT` smoke; then normal two-ring power acceptance.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — ANDROID `0.22.2-homehub-owner-polish-rc1` SOURCE READY FOR EMULATOR VISUAL REVIEW. v0.22 Home Hub remains the canonical baseline (v0.23 stays rejected). Owner-requested targeted polish is implemented: ARDU-DIRECT help in Settings; icon+label bottom navigation; explicit Settings Back; reset-defaults UI/API/UART extension; Light overview ON/OFF and four differentiated scenes; active-state styling for Light/Ambient/Music; bottom-tab mode activation; dedicated Ambient/Night/Alarm hero assets; Ambient presets (Aurora/Sunset/Ocean/Cosmos); and monotonic Ambient speed semantics fixing the F03 8-bit alias bug. Static Android validation: 195 unique layout IDs, duplicate IDs 0, missing Kotlin bindings 0, duplicate private functions 0, XML/Kotlin structure clean. Firmware source includes Ambient speed fix + opcode 130 reset; ESP source includes `POST /api/system/reset-defaults`. These firmware changes are SOURCE-READY ONLY and are not yet physically uploaded/accepted. Existing physical v1 baseline remains the previously confirmed firmware. Immediate gate: `git pull` → Android Studio emulator Run → owner visual review; only after visual acceptance compile/upload the small Nano/ESP firmware extension and test ARDU-DIRECT/reset/speed on hardware.**
 
 ## Что подтверждено и решено
 
@@ -2157,3 +2157,43 @@ Next integration gate: Android v0.22 on the physical phone against `192.168.0.4`
 - This removes the recurring `git pull` conflict caused by local credentials in the tracked sketch.
 - Android remains `0.22.1-homehub-restored-rc1`; ARDU-DIRECT support remains.
 - Current repository cleanup gate is closed. Next practical gate returns to real Android functional acceptance.
+
+### 2026-10-07 — owner polish v0.22.2 source ready
+
+**Owner-requested targeted changes implemented on top of D-101 v0.22 baseline:**
+
+1. Direct Wi-Fi:
+   - existing Station→`ARDU-DIRECT` source retained;
+   - Settings now explains direct mode and opens Android Wi-Fi settings;
+   - Android already probes `192.168.4.1`.
+2. Bottom dock:
+   - each icon now has a short label.
+3. Settings:
+   - explicit Back button;
+   - “Сбросить настройки по умолчанию” with confirmation.
+4. Light:
+   - overview gets ON/OFF;
+   - quick scenes = Вечер / Кино / Гости / Чтение with strongly different brightness/Kelvin profiles.
+5. Active state:
+   - Light ON/OFF, overview ON/OFF and Ambient ON/OFF use selected-state visuals after real reread;
+   - Music mode tile is highlighted only while Music is actually active.
+6. Navigation behavior:
+   - Light/Music/Ambient/Night tab immediately activates corresponding runtime mode;
+   - Alarm tab stops the current runtime mode (`off`) and opens alarm configuration.
+7. Ambient:
+   - dedicated TV/RGB hero;
+   - existing F01/F02/F03 retained;
+   - new Android presets: Северное сияние / Закат / Океан / Космос;
+   - presets are macros over existing effects, not new firmware IDs;
+   - F02/F03 speed semantics changed to monotonic frame interval: higher = faster; raw hue-step wrap alias removed.
+8. Night/Alarm:
+   - dedicated bedroom-night and dawn-bedroom hero assets from approved concept references.
+
+Android version: `0.22.2-homehub-owner-polish-rc1`, versionCode 25.
+
+Reset extension:
+- HTTP: `POST /api/system/reset-defaults`;
+- UART: opcode 130;
+- resets user settings/current limit, preserves RTC and hardware audio calibration.
+
+**Important physical state:** Nano/ESP source changes from this iteration have NOT been uploaded yet. Physical hardware still runs the previously accepted v1 firmware until a later explicit upload gate.
