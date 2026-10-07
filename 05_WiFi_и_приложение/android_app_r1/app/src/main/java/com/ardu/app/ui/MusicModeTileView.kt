@@ -28,7 +28,7 @@ class MusicModeTileView @JvmOverloads constructor(
         color = Color.rgb(244, 247, 250)
         textAlign = Paint.Align.CENTER
         typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
-        textSize = sp(11.2f)
+        textSize = sp(12.5f)
     }
 
     private var modeId: String = "M01"
@@ -37,7 +37,7 @@ class MusicModeTileView @JvmOverloads constructor(
     init {
         isClickable = true
         isFocusable = true
-        minimumHeight = dp(78f).toInt()
+        minimumHeight = dp(96f).toInt()
         setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
@@ -80,17 +80,17 @@ class MusicModeTileView @JvmOverloads constructor(
         backgroundPaint.clearShadowLayer()
         canvas.drawRoundRect(bounds, radius, radius, borderPaint)
 
-        val iconTop = dp(8f)
-        val iconBottom = h * 0.58f
+        val iconTop = dp(13f)
+        val iconBottom = h * 0.62f
         val iconBounds = RectF(
-            dp(9f),
+            dp(11f),
             iconTop,
-            w - dp(9f),
+            w - dp(11f),
             iconBottom
         )
         drawModeIcon(canvas, iconBounds)
 
-        val textY = h - dp(10f)
+        val textY = h - dp(15f)
         titlePaint.color = if (isSelected) Color.rgb(244, 255, 252) else Color.rgb(244, 247, 250)
         canvas.drawText(title, w * 0.5f, textY, titlePaint)
     }
@@ -124,7 +124,7 @@ class MusicModeTileView @JvmOverloads constructor(
         )
         iconPaint.style = Paint.Style.STROKE
         iconPaint.strokeCap = Paint.Cap.ROUND
-        iconPaint.strokeWidth = dp(4.8f)
+        iconPaint.strokeWidth = dp(6f)
         iconPaint.shader = LinearGradient(
             b.left, 0f, b.right, 0f,
             intArrayOf(
