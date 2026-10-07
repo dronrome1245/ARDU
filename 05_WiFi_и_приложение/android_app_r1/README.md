@@ -320,3 +320,21 @@ Phone check:
    - Night +/- brightness;
    - Alarm enable/time display.
 6. If a v0.23 layout is worse, use the archived v0.22 branch as the exact previous baseline.
+
+## Restored visual baseline — v0.22.1
+
+Current Android version: `0.22.1-homehub-restored-rc1`.
+
+Owner rejected v0.23 and selected the previous Home Hub implementation.
+
+The canonical `main` now contains the restored v0.22 visual UI while retaining newer ARDU-DIRECT network behavior.
+
+If currently on the archive branch:
+```powershell
+git switch main
+git pull
+```
+
+Then Android Studio → Run.
+
+Expected appearance = the previous v0.22 version the owner returned to manually.
