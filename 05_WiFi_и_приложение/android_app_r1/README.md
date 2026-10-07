@@ -321,6 +321,16 @@ Phone check:
    - Alarm enable/time display.
 6. If a v0.23 layout is worse, use the archived v0.22 branch as the exact previous baseline.
 
+## ESP8266 v1 local credentials
+
+Final ESP source no longer requires editing the tracked `esp8266_ardu_v1.ino`.
+
+For the next ESP compile/OTA only, keep real Wi-Fi/OTA/ARDU-DIRECT values in:
+
+`05_WiFi_и_приложение/esp8266_ardu_v1/wifi_secrets.h`
+
+Create it locally from `wifi_secrets.example.h`. The real file is ignored by Git. Therefore `git pull` and branch changes do not overwrite credentials and the tracked sketch remains clean.
+
 ## Restored visual baseline — v0.22.1
 
 Current Android version: `0.22.1-homehub-restored-rc1`.
