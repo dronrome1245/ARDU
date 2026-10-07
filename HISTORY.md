@@ -2518,3 +2518,22 @@ Hardware decision:
 - battery remains optional/later.
 
 Static delimiter checks are clean for Nano/ESP/Kotlin; Android XML IDs have no duplicates and LinearLayout nesting balances when self-closing tags are handled. No commit-associated Actions run is visible through the connector yet, so compile/memory gate remains pending.
+
+## 2026-10-07 — owner cancelled backup battery branch
+
+Owner explicitly abandoned the accumulator/emergency backup-power idea.
+
+Current result:
+- D-096, D-098 and D-099 marked superseded by D-100;
+- backup/EXT/USB-C PD power input removed from current architecture;
+- HUSB238, reserve DC/DC, source-selector relay, backup fuse and D8 MAINS_SENSE removed from current BOM;
+- Nano emergency ring-profile source reverted to the pre-backup release baseline;
+- ESP `/api/system/rings` and UART 121/122 removed by source rollback;
+- Android ring-profile model/client/UI removed by source rollback;
+- INV-051 relay returned to non-core inventory;
+- Nano USB-C remains service/programming only;
+- final v1 returns to two mirrored D6/D7 rings on the normal Class II 5-V PSU.
+
+Important: `ARDU-DIRECT` is retained. Router-less local Wi-Fi was requested separately and remains useful without any battery.
+
+The historical 2026-10-05 backup design records remain in HISTORY/DECISIONS/SOURCES for traceability but are not current requirements.
