@@ -2571,3 +2571,24 @@ Implemented:
 Result: normal branch switching/pulling no longer requires modifying the tracked final ESP sketch for credentials.
 
 No runtime API/UART behavior changed.
+
+## 2026-10-07 — targeted Home Hub owner-polish v0.22.2
+
+After owner rejected broad v0.23 redesign, a new iteration was implemented strictly as local corrections to v0.22.
+
+Android:
+- labels restored under bottom-nav icons;
+- Settings Back/direct-Wi-Fi/reset-defaults UX;
+- Light overview ON/OFF and differentiated scenes;
+- selected-state feedback fixed for Light/Ambient, Music highlight tied to active runtime;
+- navigation now activates selected runtime mode;
+- dedicated Ambient/Night/Dawn photo assets;
+- Ambient concept presets added without adding new firmware mode IDs.
+
+Firmware source:
+- F02/F03 speed fixed from ambiguous/raw 8-bit behavior to monotonic higher= faster semantics;
+- reset-defaults opcode 130 added;
+- ESP endpoint added.
+
+Contracts documented in D-102, API_V1 and UART_V1.
+Physical upload is deliberately deferred until emulator visual acceptance.
