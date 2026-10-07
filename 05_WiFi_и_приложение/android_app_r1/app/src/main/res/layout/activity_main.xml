@@ -299,6 +299,31 @@
                         </LinearLayout>
                     </FrameLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/lightOverviewOnButton"
+                            style="@style/Widget.ARDU.Button.Choice"
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:text="Вкл" />
+
+                        <Button
+                            android:id="@+id/lightOverviewOffButton"
+                            style="@style/Widget.ARDU.Button.Choice"
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="1"
+                            android:text="Выкл" />
+                    </LinearLayout>
+
                     <TextView
                         style="@style/ARDU.CardTitle"
                         android:layout_width="match_parent"
@@ -454,7 +479,7 @@
 
                         <Button
                             android:id="@+id/lightOnButton"
-                            style="@style/Widget.ARDU.Button.Primary"
+                            style="@style/Widget.ARDU.Button.Choice"
                             android:layout_width="0dp"
                             android:layout_height="56dp"
                             android:layout_marginStart="10dp"
@@ -464,7 +489,7 @@
 
                         <Button
                             android:id="@+id/lightOffButton"
-                            style="@style/Widget.ARDU.Button.Secondary"
+                            style="@style/Widget.ARDU.Button.Choice"
                             android:layout_width="0dp"
                             android:layout_height="56dp"
                             android:layout_marginStart="5dp"
@@ -1154,7 +1179,7 @@
 
                         <Button
                             android:id="@+id/ambientOnButton"
-                            style="@style/Widget.ARDU.Button.Primary"
+                            style="@style/Widget.ARDU.Button.Choice"
                             android:layout_width="0dp"
                             android:layout_height="52dp"
                             android:layout_marginEnd="5dp"
@@ -1163,7 +1188,7 @@
 
                         <Button
                             android:id="@+id/ambientOffButton"
-                            style="@style/Widget.ARDU.Button.Secondary"
+                            style="@style/Widget.ARDU.Button.Choice"
                             android:layout_width="0dp"
                             android:layout_height="52dp"
                             android:layout_marginStart="5dp"
@@ -1217,6 +1242,89 @@
                             android:layout_width="match_parent"
                             android:layout_height="54dp"
                             android:layout_marginTop="4dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/ARDU.CardTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Популярные сцены" />
+
+                    <TextView
+                        style="@style/ARDU.Muted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Готовые сочетания существующих эффектов" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="3dp" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageButton
+                                android:id="@+id/ambientPresetAurora"
+                                android:layout_width="match_parent"
+                                android:layout_height="76dp"
+                                android:background="@drawable/ardu_preset_thumb"
+                                android:clipToOutline="true"
+                                android:contentDescription="Северное сияние"
+                                android:padding="0dp"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/ardu_preset_aurora" />
+                            <TextView android:id="@+id/ambientPresetAuroraLabel" style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:maxLines="2" android:text="Северное\nсияние" android:textAlignment="center" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
+                        </LinearLayout>
+
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageButton
+                                android:id="@+id/ambientPresetSunset"
+                                android:layout_width="match_parent"
+                                android:layout_height="76dp"
+                                android:background="@drawable/ardu_preset_thumb"
+                                android:clipToOutline="true"
+                                android:contentDescription="Закат на Бали"
+                                android:padding="0dp"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/ardu_preset_sunset" />
+                            <TextView android:id="@+id/ambientPresetSunsetLabel" style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:maxLines="2" android:text="Закат" android:textAlignment="center" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
+                        </LinearLayout>
+
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageButton
+                                android:id="@+id/ambientPresetOcean"
+                                android:layout_width="match_parent"
+                                android:layout_height="76dp"
+                                android:background="@drawable/ardu_preset_thumb"
+                                android:clipToOutline="true"
+                                android:contentDescription="Океан"
+                                android:padding="0dp"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/ardu_preset_ocean" />
+                            <TextView android:id="@+id/ambientPresetOceanLabel" style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:maxLines="2" android:text="Океан" android:textAlignment="center" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
+                        </LinearLayout>
+
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="3dp" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageButton
+                                android:id="@+id/ambientPresetCosmos"
+                                android:layout_width="match_parent"
+                                android:layout_height="76dp"
+                                android:background="@drawable/ardu_preset_thumb"
+                                android:clipToOutline="true"
+                                android:contentDescription="Космос"
+                                android:padding="0dp"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/ardu_preset_cosmos" />
+                            <TextView android:id="@+id/ambientPresetCosmosLabel" style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:maxLines="2" android:text="Космос" android:textAlignment="center" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -1981,14 +2089,42 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <TextView style="@style/ARDU.SectionTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Настройки" />
-                <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Подключение и диагностика" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/serviceBackButton"
+                        style="@style/Widget.ARDU.Button.Icon"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="Назад"
+                        android:text="‹" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView style="@style/ARDU.SectionTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Настройки" />
+                        <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Подключение и диагностика" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                     <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Подключение" />
                     <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Последний рабочий адрес сохраняется на телефоне" />
                     <EditText android:id="@+id/addressInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:hint="192.168.0.4 или ardu.local" android:inputType="textUri" android:maxLines="1" />
                     <Button android:id="@+id/saveAddressButton" style="@style/Widget.ARDU.Button.Primary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Сохранить и переподключиться" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                    <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Без роутера" />
+                    <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Если домашний Wi‑Fi недоступен, ARDU создаёт защищённую сеть ARDU-DIRECT. Подключитесь к ней — приложение автоматически проверит 192.168.4.1." />
+                    <Button android:id="@+id/openWifiSettingsButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp" android:text="Открыть Wi‑Fi телефона" />
                 </LinearLayout>
 
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
@@ -2007,6 +2143,12 @@
                     <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="События" />
                     <Button android:id="@+id/eventsButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Обновить события" />
                     <TextView android:id="@+id/eventsText" style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="monospace" android:text="—" android:textIsSelectable="true" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                    <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Сброс настроек" />
+                    <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Вернуть настройки света, хлопка, музыки, фона, ночника, будильника и лимит тока к заводским значениям ARDU. Время RTC не сбрасывается." />
+                    <Button android:id="@+id/resetDefaultsButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp" android:text="Сбросить настройки по умолчанию" />
                 </LinearLayout>
 
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
@@ -2035,7 +2177,7 @@
     <LinearLayout
         android:id="@+id/bottomNavDock"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="80dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="8dp"
@@ -2043,60 +2185,35 @@
         android:elevation="10dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingLeft="7dp"
-        android:paddingTop="7dp"
-        android:paddingRight="7dp"
-        android:paddingBottom="7dp">
+        android:paddingLeft="5dp"
+        android:paddingTop="4dp"
+        android:paddingRight="5dp"
+        android:paddingBottom="4dp">
 
-        <ImageButton
-            android:id="@+id/navLightButton"
-            style="@style/Widget.ARDU.Button.NavIcon"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:contentDescription="Свет"
-            android:src="@drawable/ic_nav_light"
-            android:tint="@color/ardu_nav_icon_tint" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageButton android:id="@+id/navLightButton" style="@style/Widget.ARDU.Button.NavIcon" android:layout_width="46dp" android:layout_height="46dp" android:contentDescription="Свет" android:src="@drawable/ic_nav_light" android:tint="@color/ardu_nav_icon_tint" />
+            <TextView android:id="@+id/navLightLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:text="Свет" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
+        </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/navMusicButton"
-            style="@style/Widget.ARDU.Button.NavIcon"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:contentDescription="Музыка"
-            android:src="@drawable/ic_nav_music"
-            android:tint="@color/ardu_nav_icon_tint" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageButton android:id="@+id/navMusicButton" style="@style/Widget.ARDU.Button.NavIcon" android:layout_width="46dp" android:layout_height="46dp" android:contentDescription="Музыка" android:src="@drawable/ic_nav_music" android:tint="@color/ardu_nav_icon_tint" />
+            <TextView android:id="@+id/navMusicLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:text="Музыка" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
+        </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/navAmbientButton"
-            style="@style/Widget.ARDU.Button.NavIcon"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:contentDescription="Фон"
-            android:src="@drawable/ic_nav_ambient"
-            android:tint="@color/ardu_nav_icon_tint" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageButton android:id="@+id/navAmbientButton" style="@style/Widget.ARDU.Button.NavIcon" android:layout_width="46dp" android:layout_height="46dp" android:contentDescription="Фон" android:src="@drawable/ic_nav_ambient" android:tint="@color/ardu_nav_icon_tint" />
+            <TextView android:id="@+id/navAmbientLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:text="Фон" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
+        </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/navNightButton"
-            style="@style/Widget.ARDU.Button.NavIcon"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:contentDescription="Ночь"
-            android:src="@drawable/ic_nav_night"
-            android:tint="@color/ardu_nav_icon_tint" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageButton android:id="@+id/navNightButton" style="@style/Widget.ARDU.Button.NavIcon" android:layout_width="46dp" android:layout_height="46dp" android:contentDescription="Ночь" android:src="@drawable/ic_nav_night" android:tint="@color/ardu_nav_icon_tint" />
+            <TextView android:id="@+id/navNightLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:text="Ночь" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
+        </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/navAlarmButton"
-            style="@style/Widget.ARDU.Button.NavIcon"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:contentDescription="Будильник"
-            android:src="@drawable/ic_nav_alarm"
-            android:tint="@color/ardu_nav_icon_tint" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+            <ImageButton android:id="@+id/navAlarmButton" style="@style/Widget.ARDU.Button.NavIcon" android:layout_width="46dp" android:layout_height="46dp" android:contentDescription="Будильник" android:src="@drawable/ic_nav_alarm" android:tint="@color/ardu_nav_icon_tint" />
+            <TextView android:id="@+id/navAlarmLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:text="Будильник" android:textColor="@color/ardu_nav_icon_tint" android:textSize="9sp" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
