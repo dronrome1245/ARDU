@@ -94,14 +94,15 @@ OTA password никогда не возвращается через HTTP.
 {"mode":"music"}
 ```
 
-Допустимые разделы v1:
+Допустимые runtime-режимы v1:
 
 - `light`
 - `music`
 - `ambient`
 - `night`
-- `alarm`
 - `off`
+
+`alarm` не является отдельным постоянно активным top-level режимом: вкладка будильника настраивает Alarm/Dawn, а сам Dawn запускается по RTC. При переходе приложения на вкладку «Будильник» текущий декоративный/световой режим переводится в `off`, но будильник остаётся настроенным.
 
 ## 4. Обычный свет
 
@@ -390,8 +391,37 @@ R7 сохраняет уже реализованные atomic `enabled` и `bri
 - `POST /api/alarm/settings`
 - `POST /api/alarm/stop-dawn`
 - `GET/POST /api/system/current-limit`
+- `POST /api/system/reset-defaults`
 - `GET /api/events`
 - `POST /api/dev/nano`
+
+### System reset defaults — extension 2026-10-07
+
+`POST /api/system/reset-defaults`
+
+Без обязательного payload. Успех:
+
+```json
+{"ok":true,"applied":true}
+```
+
+Семантика:
+- Light → 4000 K / brightness 64 / startup profile defaults;
+- clap threshold/timeout + enable → defaults;
+- Music modes/settings → v1 defaults;
+- Ambient effects/settings → v1 defaults;
+- Night → defaults, schedule OFF;
+- Alarm/Dawn → defaults, alarm OFF;
+- current limit → 3000 mA;
+- top-level runtime после reset → `light`;
+- RTC/date/time **не сбрасываются**;
+- аппаратная MAX9814 audio calibration сохраняется, потому что это calibration конкретного устройства, а не пользовательская настройка.
+
+Mapping: numeric UART opcode `130`.
+
+### Ambient app presets — 2026-10-07
+
+«Северное сияние / Закат / Океан / Космос» — это Android presets поверх существующих F01/F02/F03 и их параметров. Новые firmware effect IDs не создаются.
 
 ### Persistence/live-preview
 
@@ -425,7 +455,7 @@ Ambient effect selection `POST /api/ambient/effect` сохраняется ср�
 - `hue`;
 - `saturation` (F01/F02);
 - `brightness`;
-- `speed` (F02/F03);
+- `speed` (F02/F03): диапазон 1..255, **большее число всегда означает более быстрое движение**;
 - `rainbow_step` 0.5..10.0 (F03);
 - `persist`.
 
