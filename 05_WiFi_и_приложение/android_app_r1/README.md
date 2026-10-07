@@ -369,3 +369,9 @@ For this gate do **not** upload Nano/ESP yet.
 4. Report visual issues page by page.
 
 Firmware source also contains reset-defaults + Ambient speed fix, but these are intentionally not a requirement for emulator visual review.
+
+## Hero scale hotfix — v0.22.3
+
+Ambient / Night / Alarm hero photos are intentionally shown farther away than v0.22.2 while preserving the same 250dp card and all overlay controls.
+
+Phone/emulator check: `git pull` → Run → compare only Фон / Ночь / Будильник first.
