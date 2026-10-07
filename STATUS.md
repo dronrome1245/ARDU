@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — REAL ANDROID↔ARDU CONNECTION PASS; ANDROID `0.23-concept-parity-rc1` SOURCE READY FOR PHONE REVIEW. Owner confirmed the physical Android app connected to the real `ARDU_ESP_V1` device over Wi‑Fi and showed live user pages. The previously working v0.22 UI is preserved intact in branch `archive/android-v0.22-homehub-2026-10-04` at commit `a9daf3839786414b264f32dfe0a680b68f8a7be3`. New v0.23 is an Android-only concept-parity pass: Light overview gains real brightness/Kelvin controls and concept-like app scenes; Music keeps the real seven modes but is denser; Ambient/Night/Dawn receive distinct contextual hero rendering; advanced technical parameters are collapsed; permanent “...: готово” success text is removed. Firmware, HTTP API v1 and numeric UART v1 are unchanged. Static validation: 187 unique layout IDs, missing Kotlin bindings = 0, duplicate private functions = 0, Kotlin/XML structural balance clean. Exact GitHub Actions status for v0.23 is not visible through the connector. Next gate: `git pull` → Android Studio Run → visual/function smoke on the real phone/device, with rollback available via the archive branch. In addition, source includes Station→`ARDU-DIRECT` routerless fallback, which remains in scope and still requires physical acceptance. The previously explored battery/backup-power branch was explicitly cancelled by owner decision D-100 on 2026-10-07 and its source changes were reverted.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — OWNER REJECTED ANDROID v0.23 VISUAL PASS; v0.22 HOME HUB UI RESTORED AS CANONICAL. Current Android source is `0.22.1-homehub-restored-rc1` (versionCode 24). The visible UI/layout/custom visual components are restored exactly from `archive/android-v0.22-homehub-2026-10-04`; post-v0.22 network improvements are retained, including Android awareness/probing for `ARDU-DIRECT`. Android↔real ARDU over home Wi‑Fi already PASS; ESP `ARDU_ESP_V1`, Nano `ARDU_V1`, RTC and L01 Wi‑Fi baseline are confirmed. v0.23 remains only as rejected history/reference and must not be used as the design baseline. Battery/backup-power branch remains cancelled by D-100. Next software gate: build/run restored v0.22.1 from `main`; next network gate: physical `ARDU-DIRECT` smoke; then normal two-ring power acceptance.**
 
 ## Что подтверждено и решено
 
@@ -2123,3 +2123,25 @@ Next integration gate: Android v0.22 on the physical phone against `192.168.0.4`
   - Kotlin braces/parentheses balanced;
   - XML LinearLayout/FrameLayout/ScrollView container balance clean.
 - CI result for exact v0.23 head is not yet observable through the current connector.
+
+### 2026-10-07 — owner rejected v0.23; v0.22 Home Hub restored
+
+- **РЕШЕНИЕ ВЛАДЕЛЬЦА:** v0.23 concept-parity redesign «не пойдёт».
+- Owner manually returned to `archive/android-v0.22-homehub-2026-10-04`.
+- Canonical `main` was then restored to the v0.22 visual implementation instead of requiring development to continue on the archive branch.
+- Current Android version: `0.22.1-homehub-restored-rc1`, versionCode 24.
+- Exact restored visual files:
+  - `activity_main.xml`;
+  - `RoomHeroView.kt`;
+  - `SceneTileView.kt`;
+  - `MusicModeTileView.kt`;
+  - `AmbientEffectTileView.kt`.
+- Those files match the archived v0.22 branch exactly.
+- `MainActivity.kt` uses the v0.22 UI behavior plus only later valid network additions:
+  - `network_mode` awareness;
+  - “Прямое подключение” label;
+  - ARDU-DIRECT service summary;
+  - do not persist 192.168.4.1 as the normal home address.
+- `ArduApiClient` / ESP `ARDU-DIRECT` work remains in scope.
+- v0.23 is historical/rejected, not a candidate for further polish.
+- Static restore validation: 177 IDs, duplicate IDs 0, missing bindings 0, duplicate private functions 0.
