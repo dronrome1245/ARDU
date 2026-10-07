@@ -1813,3 +1813,25 @@ R3 не прошивался и не тестировался на железе.
 9. Ambient/Night/Alarm получают отдельные hero photo assets на основе утверждённых owner concept references.
 10. Для reset defaults разрешено backward-compatible расширение UART/API: opcode 130 + `POST /api/system/reset-defaults`; RTC и hardware audio calibration сохраняются.
 11. Это не отменяет D-101: v0.23 остаётся rejected, текущая работа — локальная полировка v0.22 baseline.
+
+## D-103 — dedicated generated heroes accepted; Ambient presets remain open
+
+**Дата:** 2026-10-07  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED  
+**Уточняет:** D-101, D-102.
+
+**Решение владельца:**
+1. Принять новые сгенерированные background scenes для:
+   - Фон;
+   - Ночь;
+   - Будильник/рассвет.
+2. Использовать широкую композицию сцены в hero; не возвращаться к v0.22.3 «картинка внутри картинки».
+3. Не менять утверждённый v0.22 Home Hub layout целиком.
+4. Текущие четыре Ambient presets не считать окончательным набором.
+5. До следующей реализации отдельно согласовать:
+   - количество presets;
+   - визуальный характер свечения;
+   - движение/скорость;
+   - базовый цвет/градиент;
+   - нужен ли каждому preset отдельный firmware algorithm или достаточно параметров существующих F01/F02/F03.
+6. Новые stable preset IDs/API/UART не вводить до этого согласования.
