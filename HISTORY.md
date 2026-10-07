@@ -2592,3 +2592,7 @@ Firmware source:
 
 Contracts documented in D-102, API_V1 and UART_V1.
 Physical upload is deliberately deferred until emulator visual acceptance.
+
+## 2026-10-07 — dedicated hero image scale reduced
+
+Owner reported Ambient/Night/Alarm hero photos felt excessively large. RoomHeroView was adjusted only for AMBIENT/NIGHT/DAWN: the actual scene is fit-centered at reduced scale over a dark subdued full-bleed copy. Light/Music unchanged.
