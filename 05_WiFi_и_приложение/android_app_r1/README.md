@@ -348,3 +348,24 @@ git pull
 Then Android Studio → Run.
 
 Expected appearance = the previous v0.22 version the owner returned to manually.
+
+## Owner polish — v0.22.2 emulator review
+
+Current source version: `0.22.2-homehub-owner-polish-rc1`.
+
+For this gate do **not** upload Nano/ESP yet.
+
+1. `git pull`.
+2. Android Studio → select Pixel emulator → Run.
+3. Review visually:
+   - bottom menu labels;
+   - Свет overview ON/OFF + scenes;
+   - Light detail active ON/OFF state;
+   - Settings Back / ARDU-DIRECT / reset-defaults card;
+   - Music active-state behavior;
+   - Фон dedicated hero + F01/F02/F03 + four presets;
+   - Ночь dedicated hero;
+   - Будильник dedicated hero.
+4. Report visual issues page by page.
+
+Firmware source also contains reset-defaults + Ambient speed fix, but these are intentionally not a requirement for emulator visual review.
