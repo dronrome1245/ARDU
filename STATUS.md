@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — ANDROID `0.22.2-homehub-owner-polish-rc1` SOURCE READY FOR EMULATOR VISUAL REVIEW. v0.22 Home Hub remains the canonical baseline (v0.23 stays rejected). Owner-requested targeted polish is implemented: ARDU-DIRECT help in Settings; icon+label bottom navigation; explicit Settings Back; reset-defaults UI/API/UART extension; Light overview ON/OFF and four differentiated scenes; active-state styling for Light/Ambient/Music; bottom-tab mode activation; dedicated Ambient/Night/Alarm hero assets; Ambient presets (Aurora/Sunset/Ocean/Cosmos); and monotonic Ambient speed semantics fixing the F03 8-bit alias bug. Static Android validation: 195 unique layout IDs, duplicate IDs 0, missing Kotlin bindings 0, duplicate private functions 0, XML/Kotlin structure clean. Firmware source includes Ambient speed fix + opcode 130 reset; ESP source includes `POST /api/system/reset-defaults`. These firmware changes are SOURCE-READY ONLY and are not yet physically uploaded/accepted. Existing physical v1 baseline remains the previously confirmed firmware. Immediate gate: `git pull` → Android Studio emulator Run → owner visual review; only after visual acceptance compile/upload the small Nano/ESP firmware extension and test ARDU-DIRECT/reset/speed on hardware.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — ANDROID `0.22.3-hero-scale-polish-rc1` SOURCE READY FOR EMULATOR VISUAL REVIEW. v0.22 Home Hub remains the canonical baseline (v0.23 stays rejected). Owner-requested targeted polish is implemented: ARDU-DIRECT help in Settings; icon+label bottom navigation; explicit Settings Back; reset-defaults UI/API/UART extension; Light overview ON/OFF and four differentiated scenes; active-state styling for Light/Ambient/Music; bottom-tab mode activation; dedicated Ambient/Night/Alarm hero assets; Ambient presets (Aurora/Sunset/Ocean/Cosmos); and monotonic Ambient speed semantics fixing the F03 8-bit alias bug. Static Android validation: 195 unique layout IDs, duplicate IDs 0, missing Kotlin bindings 0, duplicate private functions 0, XML/Kotlin structure clean. Firmware source includes Ambient speed fix + opcode 130 reset; ESP source includes `POST /api/system/reset-defaults`. These firmware changes are SOURCE-READY ONLY and are not yet physically uploaded/accepted. Existing physical v1 baseline remains the previously confirmed firmware. Immediate gate: `git pull` → Android Studio emulator Run → owner visual review; only after visual acceptance compile/upload the small Nano/ESP firmware extension and test ARDU-DIRECT/reset/speed on hardware.**
 
 ## Что подтверждено и решено
 
@@ -2197,3 +2197,16 @@ Reset extension:
 - resets user settings/current limit, preserves RTC and hardware audio calibration.
 
 **Important physical state:** Nano/ESP source changes from this iteration have NOT been uploaded yet. Physical hardware still runs the previously accepted v1 firmware until a later explicit upload gate.
+
+### 2026-10-07 — hero scale polish v0.22.3
+
+Owner feedback: dedicated Ambient/Night/Alarm background scenes looked too large/zoomed.
+
+Android-only correction:
+- hero container size and internal text layout unchanged;
+- Ambient/Night/Dawn dedicated images now render as a smaller fit-centered foreground scene;
+- a subdued full-bleed copy remains behind it so the card does not become letterboxed/empty;
+- Light and Music hero rendering are unchanged.
+
+Version: `0.22.3-hero-scale-polish-rc1` / versionCode 26.
+Static validation: 195 unique IDs, missing bindings 0, RoomHeroView structure clean.
