@@ -538,15 +538,15 @@ class MainActivity : Activity() {
         }
         findViewById<SceneTileView>(R.id.light2700Button).apply {
             setScene(SceneTileView.Scene.WARM)
-            setOnClickListener { applyLightScene("Тёплый свет", 2700, 115) }
+            setOnClickListener { applyLightScene("Кино", 2700, 90) }
         }
         findViewById<SceneTileView>(R.id.light4000Button).apply {
             setScene(SceneTileView.Scene.DAY)
-            setOnClickListener { applyLightScene("Дневной свет", 4000, 204) }
+            setOnClickListener { applyLightScene("Гости", 3500, 178) }
         }
         findViewById<SceneTileView>(R.id.light6000Button).apply {
             setScene(SceneTileView.Scene.COOL)
-            setOnClickListener { applyLightScene("Холодный свет", 6000, 255) }
+            setOnClickListener { applyLightScene("Чтение", 4300, 230) }
         }
 
         findViewById<Button>(R.id.lightBrightnessMinusButton).setOnClickListener {
