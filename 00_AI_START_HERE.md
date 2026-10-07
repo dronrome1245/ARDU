@@ -123,18 +123,17 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Physical Wi‑Fi/API and real Android connection are working. Owner rejected the v0.23 visual experiment and selected the previous v0.22 Home Hub UI.
+Repository and Android visual baseline are now canonical again.
 
-1. ESP `ARDU_ESP_V1` + Nano `ARDU_V1` + RTC + L01 real Wi‑Fi baseline: PASS.
-2. Real Android → real ARDU connection over home Wi‑Fi: PASS.
-3. Android canonical source is now `0.22.1-homehub-restored-rc1`:
-   - v0.22 visual UI restored;
-   - later `ARDU-DIRECT` Android/network support retained.
-4. D-095/v0.23 is rejected and replaced by D-101.
-5. Immediate software gate: `git switch main` → `git pull` → Android Studio Run and confirm restored UI.
-6. Router-less fallback source remains: next dedicated network gate is physical `ARDU-DIRECT` smoke.
-7. After that continue normal two-ring power acceptance; battery/backup-power branch remains cancelled by D-100.
-8. Do not initiate another broad redesign without a new explicit owner decision.
+1. Android = `0.22.1-homehub-restored-rc1`; v0.23 rejected.
+2. Real Android → real ARDU over home Wi-Fi already PASS.
+3. ESP `ARDU_ESP_V1`, Nano `ARDU_V1`, RTC and L01 Wi-Fi baseline already PASS.
+4. ESP credentials no longer belong in tracked `.ino`; local `wifi_secrets.h` is ignored by Git.
+5. Immediate local sync: discard the old tracked ESP-sketch edit, switch/pull `main`, then Run Android.
+6. Continue real app functional acceptance in small layers:
+   Light profile → clap → Music → Ambient → Night → Alarm/Dawn → events/persistence.
+7. ARDU-DIRECT physical smoke remains a later dedicated network gate.
+8. Battery/backup branch remains cancelled; no broad Android redesign.
 
 ## 12. База ColorMusic/FHT
 
