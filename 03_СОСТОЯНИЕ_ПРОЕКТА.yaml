@@ -2802,3 +2802,21 @@ android_owner_polish_v0_22_2_2026_10_07:
     reset_defaults_http: "/api/system/reset-defaults"
     physical_upload: pending
   next: emulator_visual_review_then_firmware_compile_upload_gate
+
+android_generated_heroes_v0_22_4_2026_10_07:
+  decision: D-103
+  owner_approved: true
+  version: "0.22.4-generated-heroes-rc1"
+  version_code: 27
+  hero_assets:
+    ambient_blob: "22aae69892044ecf3e1a8ab01a3e450a40de3e70"
+    night_blob: "8b0f4441efa75113eacec86b60298d15723693ba"
+    alarm_blob: "ec59069783d9566861712bb0f418aed0c2004f41"
+  render: full_wide_scene_with_subdued_fill
+  v0_22_3_inset_scale_workaround: retired
+  ambient_presets:
+    current_four: provisional
+    owner_requires_more_than_four: true
+    behavior_design: pending_owner_discussion
+    stable_ids_not_frozen: true
+  next: emulator_hero_check_then_ambient_preset_behavior_design
