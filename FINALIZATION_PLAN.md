@@ -811,3 +811,11 @@ Next gates:
 3. normal two-ring power acceptance.
 
 No broad Android redesign is planned.
+
+## 29. Owner polish v0.22.2 visual gate — 2026-10-07
+
+Targeted UI corrections requested by owner are source-complete. This is not a new design direction; D-101 v0.22 remains baseline.
+
+Immediate gate is emulator visual review before any new firmware upload.
+
+Firmware-affecting items (Ambient speed + reset defaults) are staged in source and require a separate compile/size/upload acceptance after UI approval.
