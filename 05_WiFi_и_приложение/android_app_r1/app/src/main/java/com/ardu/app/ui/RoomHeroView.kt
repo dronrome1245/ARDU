@@ -87,21 +87,77 @@ class RoomHeroView @JvmOverloads constructor(
         canvas.clipPath(clip)
 
         val bitmap = roomBitmap()
+        if (scene in setOf(Scene.AMBIENT, Scene.NIGHT, Scene.DAWN)) {
+            drawInsetHero(canvas, bitmap, bounds, w, h)
+        } else {
+            val focus = focalPoint(scene)
+            val source = focalCropSource(
+                bitmap,
+                width,
+                height,
+                focus.first,
+                focus.second
+            )
+            canvas.drawBitmap(bitmap, source, bounds, imagePaint)
+        }
+
+        drawSceneGrade(canvas, w, h)
+        drawReadabilityVignette(canvas, w, h)
+
+        imagePaint.alpha = 255
+        canvas.restoreToCount(save)
+        canvas.drawRoundRect(bounds, radius, radius, borderPaint)
+    }
+
+    private fun drawInsetHero(
+        canvas: Canvas,
+        bitmap: Bitmap,
+        bounds: RectF,
+        w: Float,
+        h: Float
+    ) {
+        // Keep a subdued full-bleed copy behind the main image so the hero
+        // remains visually full while the actual room scene reads less zoomed.
         val focus = focalPoint(scene)
-        val source = focalCropSource(
+        val backdropSource = focalCropSource(
             bitmap,
             width,
             height,
             focus.first,
             focus.second
         )
-        canvas.drawBitmap(bitmap, source, bounds, imagePaint)
+        imagePaint.alpha = 105
+        canvas.drawBitmap(bitmap, backdropSource, bounds, imagePaint)
 
-        drawSceneGrade(canvas, w, h)
-        drawReadabilityVignette(canvas, w, h)
+        overlayPaint.color = Color.argb(78, 3, 9, 14)
+        canvas.drawRect(bounds, overlayPaint)
 
-        canvas.restoreToCount(save)
-        canvas.drawRoundRect(bounds, radius, radius, borderPaint)
+        val availableW = w * .91f
+        val availableH = h * .82f
+        val bitmapRatio = bitmap.width.toFloat() / bitmap.height.toFloat()
+        val boxRatio = availableW / availableH
+
+        val drawW: Float
+        val drawH: Float
+        if (bitmapRatio >= boxRatio) {
+            drawW = availableW
+            drawH = drawW / bitmapRatio
+        } else {
+            drawH = availableH
+            drawW = drawH * bitmapRatio
+        }
+
+        val left = (w - drawW) * .5f
+        val top = (h - drawH) * .50f
+        val dest = RectF(left, top, left + drawW, top + drawH)
+
+        imagePaint.alpha = 255
+        canvas.drawBitmap(
+            bitmap,
+            Rect(0, 0, bitmap.width, bitmap.height),
+            dest,
+            imagePaint
+        )
     }
 
     private fun drawSceneGrade(canvas: Canvas, w: Float, h: Float) {
