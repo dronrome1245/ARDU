@@ -375,3 +375,20 @@ Firmware source also contains reset-defaults + Ambient speed fix, but these are 
 Ambient / Night / Alarm hero photos are intentionally shown farther away than v0.22.2 while preserving the same 250dp card and all overlay controls.
 
 Phone/emulator check: `git pull` → Run → compare only Фон / Ночь / Будильник first.
+
+## Generated heroes — v0.22.4
+
+Version: `0.22.4-generated-heroes-rc1`.
+
+Owner-approved new scenes are installed for:
+- Фон;
+- Ночь;
+- Будильник.
+
+Check:
+1. `git pull`;
+2. Android Studio → Pixel emulator → Run;
+3. open only **Фон → Ночь → Будильник** first;
+4. verify the room compositions feel natural behind the existing text/status overlay.
+
+Ambient preset behavior is a separate design task; the current four choices are not final.
