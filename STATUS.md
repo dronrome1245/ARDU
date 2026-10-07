@@ -2145,3 +2145,15 @@ Next integration gate: Android v0.22 on the physical phone against `192.168.0.4`
 - `ArduApiClient` / ESP `ARDU-DIRECT` work remains in scope.
 - v0.23 is historical/rejected, not a candidate for further polish.
 - Static restore validation: 177 IDs, duplicate IDs 0, missing bindings 0, duplicate private functions 0.
+
+### 2026-10-07 — repository cleanup: ESP credentials no longer modify tracked sketch
+
+- Final ESP v1 source no longer requires editing tracked `esp8266_ardu_v1.ino` for Wi-Fi/OTA credentials.
+- Added ignored local file:
+  `05_WiFi_и_приложение/esp8266_ardu_v1/wifi_secrets.h`.
+- Added tracked template:
+  `wifi_secrets.example.h`.
+- The tracked sketch compiles source-only with non-secret placeholders when no local header exists; real hardware values remain local.
+- This removes the recurring `git pull` conflict caused by local credentials in the tracked sketch.
+- Android remains `0.22.1-homehub-restored-rc1`; ARDU-DIRECT support remains.
+- Current repository cleanup gate is closed. Next practical gate returns to real Android functional acceptance.
