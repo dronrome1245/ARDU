@@ -123,17 +123,23 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Repository and Android visual baseline are now canonical again.
+Current visual baseline remains v0.22 Home Hub; targeted owner polish is now `0.22.2-homehub-owner-polish-rc1`.
 
-1. Android = `0.22.1-homehub-restored-rc1`; v0.23 rejected.
-2. Real Android → real ARDU over home Wi-Fi already PASS.
-3. ESP `ARDU_ESP_V1`, Nano `ARDU_V1`, RTC and L01 Wi-Fi baseline already PASS.
-4. ESP credentials no longer belong in tracked `.ino`; local `wifi_secrets.h` is ignored by Git.
-5. Immediate local sync: discard the old tracked ESP-sketch edit, switch/pull `main`, then Run Android.
-6. Continue real app functional acceptance in small layers:
-   Light profile → clap → Music → Ambient → Night → Alarm/Dawn → events/persistence.
-7. ARDU-DIRECT physical smoke remains a later dedicated network gate.
-8. Battery/backup branch remains cancelled; no broad Android redesign.
+1. Real Android→ARDU home-Wi-Fi baseline remains PASS on the previously uploaded firmware.
+2. v0.23 remains rejected; do not revive its global redesign.
+3. Android v0.22.2 implements the owner's eight concrete UI/behavior requests.
+4. Nano/ESP **source** also contains two requested functional fixes:
+   - Ambient speed monotonic semantics;
+   - reset-defaults opcode/API.
+5. Those firmware changes are not physically uploaded yet.
+6. Immediate next step = visual review only:
+   `git pull` → Android Studio → Pixel emulator → Run.
+7. Owner reports page-by-page visual defects; fix in small UI iterations.
+8. After visual acceptance:
+   - compile/size gate Nano + ESP;
+   - upload Nano/ESP;
+   - physical ARDU-DIRECT + reset-defaults + Ambient speed acceptance.
+9. Then continue two-ring power acceptance. Battery/backup remains cancelled.
 
 ## 12. База ColorMusic/FHT
 
