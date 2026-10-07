@@ -347,6 +347,10 @@ class ArduApiClient {
         )
     }
 
+    fun resetDefaults() {
+        postApplied("/api/system/reset-defaults", JSONObject())
+    }
+
     fun events(): List<ArduEvent> {
         val json = getJson(requireBaseUrl(), "/api/events")
         requireOk(json)
