@@ -57,9 +57,9 @@ class SceneTileView @JvmOverloads constructor(
         bitmap = decode(scene)
         contentDescription = when (scene) {
             Scene.EVENING -> "Сцена Вечер"
-            Scene.WARM -> "Сцена Тёплый свет"
-            Scene.DAY -> "Сцена Дневной свет"
-            Scene.COOL -> "Сцена Холодный свет"
+            Scene.WARM -> "Сцена Кино"
+            Scene.DAY -> "Сцена Гости"
+            Scene.COOL -> "Сцена Чтение"
         }
         invalidate()
     }
@@ -105,15 +105,15 @@ class SceneTileView @JvmOverloads constructor(
         subtitlePaint.textSize = dp(9.5f)
         val title = when (scene) {
             Scene.EVENING -> "Вечер"
-            Scene.WARM -> "Тёплый"
-            Scene.DAY -> "Дневной"
-            Scene.COOL -> "Холодный"
+            Scene.WARM -> "Кино"
+            Scene.DAY -> "Гости"
+            Scene.COOL -> "Чтение"
         }
         val subtitle = when (scene) {
-            Scene.EVENING -> "2200 K"
-            Scene.WARM -> "2700 K"
-            Scene.DAY -> "4000 K"
-            Scene.COOL -> "6000 K"
+            Scene.EVENING -> "15%"
+            Scene.WARM -> "35%"
+            Scene.DAY -> "70%"
+            Scene.COOL -> "90%"
         }
         canvas.drawText(title, w / 2f, h - dp(24f), titlePaint)
         canvas.drawText(subtitle, w / 2f, h - dp(9f), subtitlePaint)
