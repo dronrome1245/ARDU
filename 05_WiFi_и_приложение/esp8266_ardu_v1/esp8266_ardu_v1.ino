@@ -1371,53 +1371,6 @@ void handleCurrentLimitSet() {
   sendJson(200,F("{\"ok\":true,\"applied\":true}"));
 }
 
-const char* ringSelectionName(uint32_t value) {
-  switch(value){
-    case 0:return "both";
-    case 1:return "a";
-    case 2:return "b";
-    default:return "unknown";
-  }
-}
-
-int ringSelectionCode(const String& value) {
-  if(value=="both")return 0;
-  if(value=="a")return 1;
-  if(value=="b")return 2;
-  return -1;
-}
-
-void handleRingProfileGet() {
-  const NanoResult r=nanoData(121,F("121"));
-  if(!r.ok){sendNanoFailure(r);return;}
-  uint32_t v[4];uint8_t n=0;
-  if(!parseDataLine(r.response,121,-1,v,4,n)||n<4||v[0]>2||v[1]>2||v[2]>2){
-    sendError(502,F("BAD_RING_PROFILE"));return;
-  }
-  String body=F("{\"ok\":true,\"normal\":\"");
-  body+=ringSelectionName(v[0]);
-  body+=F("\",\"emergency\":\"");body+=ringSelectionName(v[1]);
-  body+=F("\",\"active\":\"");body+=ringSelectionName(v[2]);
-  body+=F("\",\"power_source\":\"");body+=v[3]?F("backup"):F("normal");
-  body+=F("\"}");
-  sendJson(200,body);
-}
-
-void handleRingProfileSet() {
-  if(!server.hasArg(F("plain"))){sendError(400,F("BODY_REQUIRED"));return;}
-  String normal,emergency;
-  const String body=server.arg(F("plain"));
-  if(jsonString(body,"normal",normal)!=JSON_OK ||
-     jsonString(body,"emergency",emergency)!=JSON_OK){
-    sendError(400,F("BAD_RING_PROFILE"));return;
-  }
-  const int normalCode=ringSelectionCode(normal);
-  const int emergencyCode=ringSelectionCode(emergency);
-  if(normalCode<0||emergencyCode<0){sendError(400,F("BAD_RING_PROFILE"));return;}
-  if(!runAck(122,makeCommand(122,normalCode,emergencyCode)))return;
-  sendJson(200,F("{\"ok\":true,\"applied\":true}"));
-}
-
 // ---------------------------------------------------------------------------
 // Events
 // ---------------------------------------------------------------------------
@@ -1433,7 +1386,6 @@ const char* eventName(uint32_t code) {
     case 7:return "clap_toggle";
     case 8:return "cold_power_on";
     case 9:return "warm_reset";
-    case 10:return "power_source";
     default:return "unknown";
   }
 }
@@ -1545,8 +1497,6 @@ void setupHttp() {
 
   server.on("/api/system/current-limit",HTTP_GET,handleCurrentLimitGet);
   server.on("/api/system/current-limit",HTTP_POST,handleCurrentLimitSet);
-  server.on("/api/system/rings",HTTP_GET,handleRingProfileGet);
-  server.on("/api/system/rings",HTTP_POST,handleRingProfileSet);
 
   server.on("/api/events",HTTP_GET,handleEvents);
   server.on("/api/dev/nano",HTTP_POST,handleDevNano);
@@ -1560,7 +1510,7 @@ void setupHttp() {
     "/api/music/mode","/api/music/settings","/api/music/calibrate",
     "/api/ambient/effect","/api/ambient/settings","/api/night/settings",
     "/api/alarm/settings","/api/alarm/stop-dawn",
-    "/api/system/current-limit","/api/system/rings","/api/events","/api/dev/nano"
+    "/api/system/current-limit","/api/events","/api/dev/nano"
   };
   for(const char* route:optionsRoutes)server.on(route,HTTP_OPTIONS,handleOptions);
 
