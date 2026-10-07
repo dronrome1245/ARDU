@@ -2557,3 +2557,17 @@ Restore validation:
 - visual source files exactly match archived v0.22.
 
 v0.23 remains in Git history/documentation but is no longer the active design.
+
+## 2026-10-07 — final ESP credentials isolated from Git-tracked sketch
+
+Repository hygiene fix after owner's pull was blocked by local edits in `esp8266_ardu_v1.ino`.
+
+Implemented:
+- optional local `wifi_secrets.h`;
+- tracked `wifi_secrets.example.h`;
+- v1 local secrets path added to `.gitignore`;
+- tracked sketch uses local macros when the header exists and safe placeholders otherwise.
+
+Result: normal branch switching/pulling no longer requires modifying the tracked final ESP sketch for credentials.
+
+No runtime API/UART behavior changed.
