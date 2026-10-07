@@ -123,18 +123,18 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Physical Wi‑Fi/API baseline and the first real Android connection are now working.
+Physical Wi‑Fi/API and real Android connection are working. Owner rejected the v0.23 visual experiment and selected the previous v0.22 Home Hub UI.
 
-1. ESP `ARDU_ESP_V1` + Nano `ARDU_V1` + RTC + L01 Wi‑Fi control are physically confirmed.
-2. **ФАКТ:** owner connected the real Android app to the real ARDU and provided video/screenshots of the live pages.
-3. Previous Android UI is preserved at `archive/android-v0.22-homehub-2026-10-04` / commit `a9daf3839786414b264f32dfe0a680b68f8a7be3`.
-4. Current Android source = `0.23-concept-parity-rc1`.
-5. v0.23 tries to move the real app closer to the approved concept boards without introducing fake device capabilities or changing firmware/API/UART.
-6. Immediate next gate: `git pull` → Android Studio Run on the same physical phone → compare all five normal tabs and do a short real-device control smoke.
-7. If v0.23 is worse, rollback is safe via the archived v0.22 branch.
-8. Keep current limit at 3000 mA until second-ring/power acceptance.
-9. 2026-10-05 source adds router-less `ARDU-DIRECT`; physical direct-mode smoke remains pending.
-10. 2026-10-07 owner cancelled the battery/backup-power branch (D-100). Do not add BACKUP/EXT power hardware or emergency ring-profile logic to v1.
+1. ESP `ARDU_ESP_V1` + Nano `ARDU_V1` + RTC + L01 real Wi‑Fi baseline: PASS.
+2. Real Android → real ARDU connection over home Wi‑Fi: PASS.
+3. Android canonical source is now `0.22.1-homehub-restored-rc1`:
+   - v0.22 visual UI restored;
+   - later `ARDU-DIRECT` Android/network support retained.
+4. D-095/v0.23 is rejected and replaced by D-101.
+5. Immediate software gate: `git switch main` → `git pull` → Android Studio Run and confirm restored UI.
+6. Router-less fallback source remains: next dedicated network gate is physical `ARDU-DIRECT` smoke.
+7. After that continue normal two-ring power acceptance; battery/backup-power branch remains cancelled by D-100.
+8. Do not initiate another broad redesign without a new explicit owner decision.
 
 ## 12. База ColorMusic/FHT
 
