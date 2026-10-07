@@ -88,7 +88,7 @@ class RoomHeroView @JvmOverloads constructor(
 
         val bitmap = roomBitmap()
         if (scene in setOf(Scene.AMBIENT, Scene.NIGHT, Scene.DAWN)) {
-            drawInsetHero(canvas, bitmap, bounds, w, h)
+            drawWideHero(canvas, bitmap, bounds, w, h)
         } else {
             val focus = focalPoint(scene)
             val source = focalCropSource(
@@ -109,15 +109,16 @@ class RoomHeroView @JvmOverloads constructor(
         canvas.drawRoundRect(bounds, radius, radius, borderPaint)
     }
 
-    private fun drawInsetHero(
+    private fun drawWideHero(
         canvas: Canvas,
         bitmap: Bitmap,
         bounds: RectF,
         w: Float,
         h: Float
     ) {
-        // Keep a subdued full-bleed copy behind the main image so the hero
-        // remains visually full while the actual room scene reads less zoomed.
+        // New dedicated scene assets are composed as wide 16:9 room views.
+        // Keep the complete scene visible instead of center-cropping it.
+        // A subdued full-bleed copy fills the taller hero behind the main image.
         val focus = focalPoint(scene)
         val backdropSource = focalCropSource(
             bitmap,
@@ -126,14 +127,14 @@ class RoomHeroView @JvmOverloads constructor(
             focus.first,
             focus.second
         )
-        imagePaint.alpha = 105
+        imagePaint.alpha = 88
         canvas.drawBitmap(bitmap, backdropSource, bounds, imagePaint)
 
-        overlayPaint.color = Color.argb(78, 3, 9, 14)
+        overlayPaint.color = Color.argb(70, 3, 9, 14)
         canvas.drawRect(bounds, overlayPaint)
 
-        val availableW = w * .91f
-        val availableH = h * .82f
+        val availableW = w
+        val availableH = h
         val bitmapRatio = bitmap.width.toFloat() / bitmap.height.toFloat()
         val boxRatio = availableW / availableH
 
