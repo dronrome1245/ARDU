@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — ANDROID `0.22.3-hero-scale-polish-rc1` SOURCE READY FOR EMULATOR VISUAL REVIEW. v0.22 Home Hub remains the canonical baseline (v0.23 stays rejected). Owner-requested targeted polish is implemented: ARDU-DIRECT help in Settings; icon+label bottom navigation; explicit Settings Back; reset-defaults UI/API/UART extension; Light overview ON/OFF and four differentiated scenes; active-state styling for Light/Ambient/Music; bottom-tab mode activation; dedicated Ambient/Night/Alarm hero assets; Ambient presets (Aurora/Sunset/Ocean/Cosmos); and monotonic Ambient speed semantics fixing the F03 8-bit alias bug. Static Android validation: 195 unique layout IDs, duplicate IDs 0, missing Kotlin bindings 0, duplicate private functions 0, XML/Kotlin structure clean. Firmware source includes Ambient speed fix + opcode 130 reset; ESP source includes `POST /api/system/reset-defaults`. These firmware changes are SOURCE-READY ONLY and are not yet physically uploaded/accepted. Existing physical v1 baseline remains the previously confirmed firmware. Immediate gate: `git pull` → Android Studio emulator Run → owner visual review; only after visual acceptance compile/upload the small Nano/ESP firmware extension and test ARDU-DIRECT/reset/speed on hardware.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — ANDROID `0.22.4-generated-heroes-rc1` SOURCE READY FOR EMULATOR VISUAL REVIEW. v0.22 Home Hub remains the canonical baseline; v0.23 remains rejected. Owner explicitly approved the newly generated dedicated hero scenes for Ambient / Night / Alarm-Dawn. The previous v0.22.3 scale workaround is removed: these 16:9 scenes are rendered as complete wide compositions over a subdued full-bleed backdrop. Targeted v0.22.2 UX work remains: ARDU-DIRECT help, icon+label bottom navigation, Settings Back/reset-defaults, Light overview ON/OFF and distinct scenes, active-state styling, tab→runtime mode activation, Ambient presets placeholder block, and monotonic Ambient speed semantics. Preset design is NOT frozen: owner explicitly wants more than four presets and wants to agree their actual light behavior before implementation. Firmware reset/speed changes remain SOURCE-READY ONLY and are not yet physically uploaded. Immediate gate: `git pull` → emulator Run → verify the three approved hero scenes, then define the expanded Ambient preset catalog/algorithms before coding it.**
 
 ## Что подтверждено и решено
 
@@ -2210,3 +2210,23 @@ Android-only correction:
 
 Version: `0.22.3-hero-scale-polish-rc1` / versionCode 26.
 Static validation: 195 unique IDs, missing bindings 0, RoomHeroView structure clean.
+
+### 2026-10-07 — generated hero scenes approved and applied (v0.22.4)
+
+**РЕШЕНИЕ владельца:** новые сгенерированные сцены для Фон / Ночь / Будильник приняты («Да огонь. Применяй»).
+
+Applied Android assets:
+- `ardu_ambient_hero.webp` — wide night living room / TV / cyan-magenta ambient glow;
+- `ardu_night_hero.webp` — wide moonlit bedroom with warm bedside light;
+- `ardu_alarm_hero.webp` — wide sunrise bedroom.
+
+Rendering:
+- removed v0.22.3 small-inset workaround;
+- main 16:9 scene is displayed complete across available hero width;
+- subdued full-bleed copy only fills the taller card behind it;
+- Light and Music rendering unchanged.
+
+Android version: `0.22.4-generated-heroes-rc1`, versionCode 27.
+Static validation: 195 unique layout IDs, duplicate IDs 0, missing Kotlin bindings 0, RoomHeroView structure clean.
+
+**Ambient presets:** current four-item block is provisional. Owner explicitly requires more presets and separate agreement on how each preset physically lights/moves before the preset layer is finalized.
