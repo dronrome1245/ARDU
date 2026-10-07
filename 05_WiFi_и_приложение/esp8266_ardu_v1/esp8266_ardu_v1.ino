@@ -26,12 +26,41 @@
 #include "ardu_esp_v1_types.h"
 
 // ---------------------------------------------------------------------------
-// LOCAL VALUES ONLY. Never commit real credentials to the public repository.
+// Local credentials.
+//
+// For a real device, create wifi_secrets.h next to this sketch from
+// wifi_secrets.example.h. The local header is ignored by Git, so normal
+// pulls/branch switches never touch the tracked .ino.
+//
+// CI / source-only builds still compile without the local header and use
+// non-secret placeholders. Do not flash those placeholder values to hardware.
 // ---------------------------------------------------------------------------
-const char* WIFI_SSID = "PUT_YOUR_WIFI_SSID_HERE";
-const char* WIFI_PASSWORD = "PUT_YOUR_WIFI_PASSWORD_HERE";
-const char* OTA_PASSWORD = "PUT_A_STRONG_OTA_PASSWORD_HERE";
-const char* SOFTAP_PASSWORD = "PUT_A_STRONG_AP_PASSWORD_HERE";
+#if defined(__has_include)
+#  if __has_include("wifi_secrets.h")
+#    include "wifi_secrets.h"
+#  endif
+#endif
+
+#ifndef ARDU_WIFI_SSID
+#define ARDU_WIFI_SSID "PUT_YOUR_WIFI_SSID_HERE"
+#endif
+
+#ifndef ARDU_WIFI_PASSWORD
+#define ARDU_WIFI_PASSWORD "PUT_YOUR_WIFI_PASSWORD_HERE"
+#endif
+
+#ifndef ARDU_OTA_PASSWORD
+#define ARDU_OTA_PASSWORD "PUT_A_STRONG_OTA_PASSWORD_HERE"
+#endif
+
+#ifndef ARDU_SOFTAP_PASSWORD
+#define ARDU_SOFTAP_PASSWORD "PUT_A_STRONG_AP_PASSWORD_HERE"
+#endif
+
+const char* WIFI_SSID = ARDU_WIFI_SSID;
+const char* WIFI_PASSWORD = ARDU_WIFI_PASSWORD;
+const char* OTA_PASSWORD = ARDU_OTA_PASSWORD;
+const char* SOFTAP_PASSWORD = ARDU_SOFTAP_PASSWORD;
 
 namespace Cfg {
 constexpr unsigned long NANO_BAUD = 115200UL;
