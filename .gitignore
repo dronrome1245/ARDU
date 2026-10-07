@@ -42,3 +42,6 @@ local.properties
 
 # Final ESP8266 v1 local credentials
 05_WiFi_и_приложение/esp8266_ardu_v1/wifi_secrets.h
+
+# Android Studio / Gradle generated JVM criteria
+**/gradle-daemon-jvm.properties
