@@ -2754,3 +2754,24 @@ backup_branch_cancelled_2026_10_07:
     ssid: "ARDU-DIRECT"
     ip: "192.168.4.1"
   next: "v0.23 phone smoke -> ARDU-DIRECT compile/physical smoke -> normal two-ring power acceptance"
+
+android_visual_rollback_2026_10_07:
+  owner_approved: true
+  decision: D-101
+  rejected:
+    version: "0.23-concept-parity-rc1"
+    reason: "owner: не пойдет"
+  canonical:
+    version: "0.22.1-homehub-restored-rc1"
+    version_code: 24
+    visual_source: "archive/android-v0.22-homehub-2026-10-04"
+    exact_archive_visual_files: true
+  retained_post_v0_22:
+    ardu_direct_android_probe: true
+    network_mode_status: true
+  static_validation:
+    layout_ids: 177
+    duplicate_ids: 0
+    missing_bindings: 0
+    duplicate_private_functions: 0
+  next: "restored_main_phone_smoke -> ARDU_DIRECT_physical_smoke -> two_ring_power_acceptance"
