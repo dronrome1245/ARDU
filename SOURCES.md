@@ -1031,6 +1031,10 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 
 ## 2026-10-05 — direct Wi-Fi and reserve power component sources
 
+### D-100 cancellation note
+
+As of 2026-10-07, all battery/backup-power component candidates in this section (HUSB238, reserve DC/DC, external battery) are **historical only** and are not part of the current ARDU v1 BOM. The ESP8266 SoftAP references remain current for `ARDU-DIRECT`.
+
 ### ESP8266 SoftAP API
 - Official ESP8266 Arduino documentation: SoftAP supports WPA2-PSK, default/direct IP 192.168.4.1, `softAPConfig`, `softAPIP`, `softAPdisconnect`, and combined `WIFI_AP_STA` mode.
 - https://github.com/esp8266/Arduino/blob/master/doc/esp8266wifi/soft-access-point-class.rst
@@ -1054,6 +1058,8 @@ Adafruit для типичного MAX4466 breakout указывает DC-couple
 These sources define candidate hardware only. Final acceptance remains a physical ARDU load/temperature/backfeed test.
 
 ## 2026-10-05 — final battery-free v1 purchase sources
+
+**Historical note:** backup-power-related parts below were cancelled by D-100 on 2026-10-07. The Mean Well Class II PSU remains current because it is required by the ceiling installation independently of any battery.
 
 ### Final mains PSU
 - Mean Well IRM-30-5ST official IRM-30 datasheet: 5 V / 6 A / 30 W; IRM-30 entire series = Class II design, no FG pin; ST = screw-terminal style.
