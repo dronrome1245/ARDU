@@ -1400,6 +1400,11 @@ void handleCurrentLimitSet() {
   sendJson(200,F("{\"ok\":true,\"applied\":true}"));
 }
 
+void handleResetDefaults() {
+  if(!runAck(130,F("130")))return;
+  sendJson(200,F("{\"ok\":true,\"applied\":true}"));
+}
+
 // ---------------------------------------------------------------------------
 // Events
 // ---------------------------------------------------------------------------
@@ -1526,6 +1531,7 @@ void setupHttp() {
 
   server.on("/api/system/current-limit",HTTP_GET,handleCurrentLimitGet);
   server.on("/api/system/current-limit",HTTP_POST,handleCurrentLimitSet);
+  server.on("/api/system/reset-defaults",HTTP_POST,handleResetDefaults);
 
   server.on("/api/events",HTTP_GET,handleEvents);
   server.on("/api/dev/nano",HTTP_POST,handleDevNano);
@@ -1539,7 +1545,8 @@ void setupHttp() {
     "/api/music/mode","/api/music/settings","/api/music/calibrate",
     "/api/ambient/effect","/api/ambient/settings","/api/night/settings",
     "/api/alarm/settings","/api/alarm/stop-dawn",
-    "/api/system/current-limit","/api/events","/api/dev/nano"
+    "/api/system/current-limit","/api/system/reset-defaults",
+    "/api/events","/api/dev/nano"
   };
   for(const char* route:optionsRoutes)server.on(route,HTTP_OPTIONS,handleOptions);
 
