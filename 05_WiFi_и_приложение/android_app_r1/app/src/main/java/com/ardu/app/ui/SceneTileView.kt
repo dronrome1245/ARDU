@@ -57,9 +57,9 @@ class SceneTileView @JvmOverloads constructor(
         bitmap = decode(scene)
         contentDescription = when (scene) {
             Scene.EVENING -> "Сцена Вечер"
-            Scene.WARM -> "Сцена Кино"
-            Scene.DAY -> "Сцена Гости"
-            Scene.COOL -> "Сцена Чтение"
+            Scene.WARM -> "Сцена Тёплый свет"
+            Scene.DAY -> "Сцена Дневной свет"
+            Scene.COOL -> "Сцена Холодный свет"
         }
         invalidate()
     }
@@ -67,7 +67,7 @@ class SceneTileView @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         setMeasuredDimension(
             resolveSize(dp(86f).toInt(), widthMeasureSpec),
-            resolveSize(dp(96f).toInt(), heightMeasureSpec)
+            resolveSize(dp(112f).toInt(), heightMeasureSpec)
         )
     }
 
@@ -101,22 +101,22 @@ class SceneTileView @JvmOverloads constructor(
 
         canvas.drawRoundRect(bounds, radius, radius, borderPaint)
 
-        titlePaint.textSize = dp(11.2f)
-        subtitlePaint.textSize = dp(8.8f)
+        titlePaint.textSize = dp(12f)
+        subtitlePaint.textSize = dp(9.5f)
         val title = when (scene) {
             Scene.EVENING -> "Вечер"
-            Scene.WARM -> "Кино"
-            Scene.DAY -> "Гости"
-            Scene.COOL -> "Чтение"
+            Scene.WARM -> "Тёплый"
+            Scene.DAY -> "Дневной"
+            Scene.COOL -> "Холодный"
         }
         val subtitle = when (scene) {
-            Scene.EVENING -> "30%"
-            Scene.WARM -> "15%"
-            Scene.DAY -> "70%"
-            Scene.COOL -> "80%"
+            Scene.EVENING -> "2200 K"
+            Scene.WARM -> "2700 K"
+            Scene.DAY -> "4000 K"
+            Scene.COOL -> "6000 K"
         }
-        canvas.drawText(title, w / 2f, h - dp(21f), titlePaint)
-        canvas.drawText(subtitle, w / 2f, h - dp(7f), subtitlePaint)
+        canvas.drawText(title, w / 2f, h - dp(24f), titlePaint)
+        canvas.drawText(subtitle, w / 2f, h - dp(9f), subtitlePaint)
     }
 
     private fun decode(scene: Scene): Bitmap =
