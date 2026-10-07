@@ -2775,3 +2775,30 @@ android_visual_rollback_2026_10_07:
     missing_bindings: 0
     duplicate_private_functions: 0
   next: "restored_main_phone_smoke -> ARDU_DIRECT_physical_smoke -> two_ring_power_acceptance"
+
+android_owner_polish_v0_22_2_2026_10_07:
+  decision: D-102
+  version: "0.22.2-homehub-owner-polish-rc1"
+  version_code: 25
+  visual_baseline: v0_22_homehub
+  v0_23_rejected: true
+  android:
+    bottom_nav_labels: true
+    settings_back: true
+    settings_direct_wifi_help: true
+    settings_reset_defaults: true
+    light_overview_power: true
+    light_distinct_scenes: [evening, cinema, guests, reading]
+    actual_active_button_state: true
+    tab_switch_activates_runtime_mode: true
+    ambient_presets: [aurora, sunset, ocean, cosmos]
+    dedicated_heroes: [ambient, night, alarm_dawn]
+    layout_ids: 195
+    duplicate_ids: 0
+    missing_bindings: 0
+  firmware_source:
+    ambient_speed_monotonic: true
+    reset_defaults_uart_opcode: 130
+    reset_defaults_http: "/api/system/reset-defaults"
+    physical_upload: pending
+  next: emulator_visual_review_then_firmware_compile_upload_gate
