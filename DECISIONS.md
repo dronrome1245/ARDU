@@ -1791,3 +1791,25 @@ R3 не прошивался и не тестировался на железе.
 7. Новые крупные визуальные переработки не выполнять без отдельного решения владельца. Следующие UI-изменения — только локальные дефекты/полировка выбранного v0.22 baseline.
 
 **Firmware/API/UART:** этим решением не меняются.
+
+
+## D-102 — owner polish v0.22.2: targeted UI fixes + reset/speed extension
+
+**Дата:** 2026-10-07  
+**Статус:** ДЕЙСТВУЕТ / OWNER APPROVED  
+**Уточняет:** D-101.
+
+**Последнее явное решение владельца:** сохранить выбранный v0.22 Home Hub baseline и точечно исправить конкретные UX/visual defects, без нового общего редизайна.
+
+**Решение:**
+1. `ARDU-DIRECT` остаётся обязательным fallback без роутера; Settings объясняет сценарий и открывает Wi-Fi настройки телефона.
+2. Нижняя навигация = icon + короткая подпись режима.
+3. Settings получает явную Back и подтверждаемый «Сброс настроек по умолчанию».
+4. Light overview получает ON/OFF; quick scenes становятся различимыми: Вечер / Кино / Гости / Чтение.
+5. Light/Ambient ON/OFF и Music active tile обязаны отображать фактический active state после reread.
+6. Переход между Light/Music/Ambient/Night немедленно активирует выбранный runtime mode; переход в Alarm останавливает текущий runtime mode (`off`) и открывает конфигурацию будильника.
+7. Ambient сохраняет F01/F02/F03 и получает app-side presets: Северное сияние / Закат / Океан / Космос.
+8. Ambient speed 1..255 трактуется монотонно: больше = быстрее; 8-bit hue-step aliasing запрещён.
+9. Ambient/Night/Alarm получают отдельные hero photo assets на основе утверждённых owner concept references.
+10. Для reset defaults разрешено backward-compatible расширение UART/API: opcode 130 + `POST /api/system/reset-defaults`; RTC и hardware audio calibration сохраняются.
+11. Это не отменяет D-101: v0.23 остаётся rejected, текущая работа — локальная полировка v0.22 baseline.
