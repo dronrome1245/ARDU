@@ -2596,3 +2596,16 @@ Physical upload is deliberately deferred until emulator visual acceptance.
 ## 2026-10-07 — dedicated hero image scale reduced
 
 Owner reported Ambient/Night/Alarm hero photos felt excessively large. RoomHeroView was adjusted only for AMBIENT/NIGHT/DAWN: the actual scene is fit-centered at reduced scale over a dark subdued full-bleed copy. Light/Music unchanged.
+
+## 2026-10-07 — owner approved regenerated Ambient/Night/Alarm hero art
+
+The scale-only v0.22.3 correction was abandoned. Three new wide scene assets were generated specifically for the Home Hub hero composition and explicitly approved by the owner.
+
+Repo replacement:
+- Ambient asset blob: `22aae69892044ecf3e1a8ab01a3e450a40de3e70`;
+- Night asset blob: `8b0f4441efa75113eacec86b60298d15723693ba`;
+- Alarm/Dawn asset blob: `ec59069783d9566861712bb0f418aed0c2004f41`.
+
+RoomHeroView now preserves the full wide scene instead of using the v0.22.3 inset scale trick.
+
+Preset follow-up intentionally deferred: owner wants an expanded catalog (>4) and explicit behavior design before more firmware/app preset work.
