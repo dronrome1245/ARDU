@@ -134,7 +134,7 @@ Physical Wi‑Fi/API baseline and the first real Android connection are now work
 7. If v0.23 is worse, rollback is safe via the archived v0.22 branch.
 8. Keep current limit at 3000 mA until second-ring/power acceptance.
 9. 2026-10-05 source adds router-less `ARDU-DIRECT`; physical direct-mode smoke remains pending.
-10. Final v1 is reserve-ready but battery-free: accessible USB-C PD BACKUP input + internal 15→5 V reserve path must be installed before ceiling mounting.
+10. 2026-10-07 owner cancelled the battery/backup-power branch (D-100). Do not add BACKUP/EXT power hardware or emergency ring-profile logic to v1.
 
 ## 12. База ColorMusic/FHT
 
