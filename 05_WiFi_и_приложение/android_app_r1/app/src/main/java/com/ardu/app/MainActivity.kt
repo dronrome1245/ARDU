@@ -1,8 +1,12 @@
 package com.ardu.app
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.graphics.Color
+import android.provider.Settings
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -34,6 +38,8 @@ class MainActivity : Activity() {
     private var latestSettings: ArduSettings? = null
     private var latestMode: String? = null
     private var sectionNavigation: List<Pair<ImageButton, LinearLayout>> = emptyList()
+    private var sectionLabels: List<Pair<TextView, LinearLayout>> = emptyList()
+    private var lastUserPanel: LinearLayout? = null
     private var lastEspFirmware: String = "—"
     private var lastEspRssi: Int? = null
     private var lastNetworkMode: String = "unknown"
@@ -59,6 +65,10 @@ class MainActivity : Activity() {
     private lateinit var lightFocusDial: FocusDialView
     private lateinit var lightOverviewBrightnessText: TextView
     private lateinit var lightOverviewKelvinText: TextView
+    private lateinit var lightOverviewOnButton: Button
+    private lateinit var lightOverviewOffButton: Button
+    private lateinit var lightOnButton: Button
+    private lateinit var lightOffButton: Button
     private lateinit var musicPanel: LinearLayout
     private lateinit var ambientPanel: LinearLayout
     private lateinit var nightPanel: LinearLayout
@@ -137,6 +147,10 @@ class MainActivity : Activity() {
     private lateinit var ambientAutoSwitch: Switch
     private lateinit var ambientPeriodText: TextView
     private lateinit var ambientPeriodSeek: SmartSliderView
+    private lateinit var ambientOnButton: Button
+    private lateinit var ambientOffButton: Button
+    private lateinit var ambientPresetButtons: Map<String, ImageButton>
+    private lateinit var ambientPresetLabels: Map<String, TextView>
 
     private lateinit var nightConnectionText: TextView
     private lateinit var nightOperationText: TextView
@@ -234,6 +248,10 @@ class MainActivity : Activity() {
         lightFocusDial = findViewById(R.id.lightFocusDial)
         lightOverviewBrightnessText = findViewById(R.id.lightOverviewBrightnessText)
         lightOverviewKelvinText = findViewById(R.id.lightOverviewKelvinText)
+        lightOverviewOnButton = findViewById(R.id.lightOverviewOnButton)
+        lightOverviewOffButton = findViewById(R.id.lightOverviewOffButton)
+        lightOnButton = findViewById(R.id.lightOnButton)
+        lightOffButton = findViewById(R.id.lightOffButton)
         musicPanel = findViewById(R.id.musicPanel)
         ambientPanel = findViewById(R.id.ambientPanel)
         nightPanel = findViewById(R.id.nightPanel)
@@ -312,6 +330,8 @@ class MainActivity : Activity() {
         ambientAutoSwitch = findViewById(R.id.ambientAutoSwitch)
         ambientPeriodText = findViewById(R.id.ambientPeriodText)
         ambientPeriodSeek = findViewById(R.id.ambientPeriodSeek)
+        ambientOnButton = findViewById(R.id.ambientOnButton)
+        ambientOffButton = findViewById(R.id.ambientOffButton)
 
         nightConnectionText = findViewById(R.id.nightConnectionText)
         nightOperationText = findViewById(R.id.nightOperationText)
@@ -366,7 +386,7 @@ class MainActivity : Activity() {
     }
 
     private fun navigateToUserSection(target: LinearLayout) {
-        val stopMusic = latestMode == "music" && target !== musicPanel
+        lastUserPanel = target
 
         if (target === lightPanel) {
             showLightOverview()
@@ -374,19 +394,38 @@ class MainActivity : Activity() {
             showSection(target)
         }
 
-        if (!stopMusic) return
+        val targetMode = when (target) {
+            lightPanel -> "light"
+            musicPanel -> "music"
+            ambientPanel -> "ambient"
+            nightPanel -> "night"
+            alarmPanel -> "off"
+            else -> null
+        }
 
-        setOperationStatus("Остановка светомузыки…")
+        if (targetMode == null || latestMode == targetMode) return
+
+        setOperationStatus(
+            when (target) {
+                lightPanel -> "Включение света…"
+                musicPanel -> "Запуск светомузыки…"
+                ambientPanel -> "Запуск фона…"
+                nightPanel -> "Переход в ночной режим…"
+                alarmPanel -> "Остановка текущего режима…"
+                else -> "Переключение режима…"
+            }
+        )
+
         worker.execute {
             try {
-                api.setMode("off")
+                api.setMode(targetMode)
                 val snapshot = readSnapshot()
                 runOnUiThread {
                     renderSnapshot(snapshot)
                     setOperationStatus("")
                 }
             } catch (error: Exception) {
-                showError("Остановка светомузыки", error)
+                showError("Переключение режима", error)
             }
         }
     }
@@ -399,6 +438,13 @@ class MainActivity : Activity() {
             findViewById<ImageButton>(R.id.navNightButton) to nightPanel,
             findViewById<ImageButton>(R.id.navAlarmButton) to alarmPanel
         )
+        sectionLabels = listOf(
+            findViewById<TextView>(R.id.navLightLabel) to lightPanel,
+            findViewById<TextView>(R.id.navMusicLabel) to musicPanel,
+            findViewById<TextView>(R.id.navAmbientLabel) to ambientPanel,
+            findViewById<TextView>(R.id.navNightLabel) to nightPanel,
+            findViewById<TextView>(R.id.navAlarmLabel) to alarmPanel
+        )
 
         sectionNavigation.forEach { (button, panel) ->
             button.setOnClickListener {
@@ -407,8 +453,23 @@ class MainActivity : Activity() {
         }
 
         findViewById<Button>(R.id.navServiceButton).setOnClickListener {
-            showSection(servicePanel)
+            openService()
         }
+        findViewById<Button>(R.id.serviceBackButton).setOnClickListener {
+            closeService()
+        }
+    }
+
+    private fun openService() {
+        val visible = listOf(lightPanel, musicPanel, ambientPanel, nightPanel, alarmPanel)
+            .firstOrNull { it.visibility == View.VISIBLE }
+        if (visible != null) lastUserPanel = visible
+        showSection(servicePanel)
+    }
+
+    private fun closeService() {
+        val target = lastUserPanel ?: lightPanel
+        if (target === lightPanel) showLightOverview() else showSection(target)
     }
 
     private fun showLightOverview() {
@@ -434,6 +495,9 @@ class MainActivity : Activity() {
         sectionNavigation.forEach { (button, panel) ->
             button.isSelected = panel === target
         }
+        sectionLabels.forEach { (label, panel) ->
+            label.isSelected = panel === target
+        }
     }
 
     private fun bindLight() {
@@ -441,7 +505,7 @@ class MainActivity : Activity() {
         lightHeroImage.setFocus(0.64f, 0.50f)
 
         lightRefreshButton.setOnClickListener { refreshDevice() }
-        lightServiceButton.setOnClickListener { showSection(servicePanel) }
+        lightServiceButton.setOnClickListener { openService() }
         findViewById<Button>(R.id.lightOpenControlButton).setOnClickListener { showLightControl() }
         findViewById<Button>(R.id.lightBackButton).setOnClickListener { showLightOverview() }
 
@@ -456,19 +520,25 @@ class MainActivity : Activity() {
             }
         )
 
-        findViewById<Button>(R.id.lightOnButton).setOnClickListener {
+        lightOnButton.setOnClickListener {
             runDeviceAction("Включение света") { api.setLightEnabled(true) }
         }
-        findViewById<Button>(R.id.lightOffButton).setOnClickListener {
+        lightOffButton.setOnClickListener {
+            runDeviceAction("Выключение света") { api.setLightEnabled(false) }
+        }
+        lightOverviewOnButton.setOnClickListener {
+            runDeviceAction("Включение света") { api.setLightEnabled(true) }
+        }
+        lightOverviewOffButton.setOnClickListener {
             runDeviceAction("Выключение света") { api.setLightEnabled(false) }
         }
         findViewById<SceneTileView>(R.id.lightSceneEveningButton).apply {
             setScene(SceneTileView.Scene.EVENING)
-            setOnClickListener { applyLightScene("Вечер", 2200, 76) }
+            setOnClickListener { applyLightScene("Вечер", 2200, 38) }
         }
         findViewById<SceneTileView>(R.id.light2700Button).apply {
             setScene(SceneTileView.Scene.WARM)
-            setOnClickListener { applyLightScene("Тёплый свет", 2700, 178) }
+            setOnClickListener { applyLightScene("Тёплый свет", 2700, 115) }
         }
         findViewById<SceneTileView>(R.id.light4000Button).apply {
             setScene(SceneTileView.Scene.DAY)
@@ -476,7 +546,7 @@ class MainActivity : Activity() {
         }
         findViewById<SceneTileView>(R.id.light6000Button).apply {
             setScene(SceneTileView.Scene.COOL)
-            setOnClickListener { applyLightScene("Холодный свет", 6000, 204) }
+            setOnClickListener { applyLightScene("Холодный свет", 6000, 255) }
         }
 
         findViewById<Button>(R.id.lightBrightnessMinusButton).setOnClickListener {
@@ -712,7 +782,7 @@ class MainActivity : Activity() {
 
     private fun bindMusic() {
         musicRefreshButton.setOnClickListener { refreshDevice() }
-        musicServiceButton.setOnClickListener { showSection(servicePanel) }
+        musicServiceButton.setOnClickListener { openService() }
 
         val names = mapOf(
             "M01" to "Градиент",
@@ -851,13 +921,29 @@ class MainActivity : Activity() {
     private fun bindAmbient() {
         ambientHeroView.setScene(RoomHeroView.Scene.AMBIENT)
         ambientRefreshButton.setOnClickListener { refreshDevice() }
-        ambientServiceButton.setOnClickListener { showSection(servicePanel) }
+        ambientServiceButton.setOnClickListener { openService() }
 
-        findViewById<Button>(R.id.ambientOnButton).setOnClickListener {
+        ambientOnButton.setOnClickListener {
             runDeviceAction("Включение фона") { api.setMode("ambient") }
         }
-        findViewById<Button>(R.id.ambientOffButton).setOnClickListener {
+        ambientOffButton.setOnClickListener {
             runDeviceAction("Выключение фона") { api.setMode("off") }
+        }
+
+        ambientPresetButtons = mapOf(
+            "aurora" to findViewById(R.id.ambientPresetAurora),
+            "sunset" to findViewById(R.id.ambientPresetSunset),
+            "ocean" to findViewById(R.id.ambientPresetOcean),
+            "cosmos" to findViewById(R.id.ambientPresetCosmos)
+        )
+        ambientPresetLabels = mapOf(
+            "aurora" to findViewById(R.id.ambientPresetAuroraLabel),
+            "sunset" to findViewById(R.id.ambientPresetSunsetLabel),
+            "ocean" to findViewById(R.id.ambientPresetOceanLabel),
+            "cosmos" to findViewById(R.id.ambientPresetCosmosLabel)
+        )
+        ambientPresetButtons.forEach { (id, button) ->
+            button.setOnClickListener { applyAmbientPreset(id) }
         }
 
         ambientEffectButtonMap = mapOf(
@@ -923,13 +1009,73 @@ class MainActivity : Activity() {
     }
 
     private fun setAmbientEffect(id: String) {
+        setAmbientPresetSelection(null)
         runDeviceAction("Фоновый эффект $id") { api.selectAmbientEffect(id) }
+    }
+
+    private fun applyAmbientPreset(id: String) {
+        val label = when (id) {
+            "aurora" -> "Северное сияние"
+            "sunset" -> "Закат"
+            "ocean" -> "Океан"
+            "cosmos" -> "Космос"
+            else -> return
+        }
+        setAmbientPresetSelection(id)
+        runDeviceAction(label) {
+            when (id) {
+                "aurora" -> {
+                    api.selectAmbientEffect("F02")
+                    api.updateAmbientSettings(
+                        hue = 105,
+                        saturation = 235,
+                        brightness = 128,
+                        speed = 190
+                    )
+                }
+                "sunset" -> {
+                    api.selectAmbientEffect("F01")
+                    api.updateAmbientSettings(
+                        hue = 10,
+                        saturation = 245,
+                        brightness = 145
+                    )
+                }
+                "ocean" -> {
+                    api.selectAmbientEffect("F02")
+                    api.updateAmbientSettings(
+                        hue = 142,
+                        saturation = 255,
+                        brightness = 135,
+                        speed = 125
+                    )
+                }
+                "cosmos" -> {
+                    api.selectAmbientEffect("F03")
+                    api.updateAmbientSettings(
+                        hue = 185,
+                        brightness = 100,
+                        speed = 72,
+                        rainbowStep = 1.2
+                    )
+                }
+            }
+        }
+    }
+
+    private fun setAmbientPresetSelection(selectedId: String?) {
+        ambientPresetButtons.forEach { (id, button) ->
+            button.isSelected = id == selectedId
+        }
+        ambientPresetLabels.forEach { (id, label) ->
+            label.isSelected = id == selectedId
+        }
     }
 
     private fun bindNight() {
         nightHeroView.setScene(RoomHeroView.Scene.NIGHT)
         nightRefreshButton.setOnClickListener { refreshDevice() }
-        nightServiceButton.setOnClickListener { showSection(servicePanel) }
+        nightServiceButton.setOnClickListener { openService() }
 
         nightEnabledSwitch.setOnCheckedChangeListener { _, checked ->
             if (!rendering) runDeviceAction("Ночник") { api.updateNightSettings(enabled = checked) }
@@ -977,7 +1123,7 @@ class MainActivity : Activity() {
     private fun bindAlarm() {
         alarmHeroView.setScene(RoomHeroView.Scene.DAWN)
         alarmRefreshButton.setOnClickListener { refreshDevice() }
-        alarmServiceButton.setOnClickListener { showSection(servicePanel) }
+        alarmServiceButton.setOnClickListener { openService() }
 
         alarmEnabledSwitch.setOnCheckedChangeListener { _, checked ->
             if (!rendering) runDeviceAction("Будильник") { api.updateAlarmSettings(enabled = checked) }
@@ -1031,6 +1177,19 @@ class MainActivity : Activity() {
     }
 
     private fun bindService() {
+        findViewById<Button>(R.id.openWifiSettingsButton).setOnClickListener {
+            val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                Intent(Settings.Panel.ACTION_WIFI)
+            } else {
+                Intent(Settings.ACTION_WIFI_SETTINGS)
+            }
+            startActivity(intent)
+        }
+
+        findViewById<Button>(R.id.resetDefaultsButton).setOnClickListener {
+            confirmResetDefaults()
+        }
+
         findViewById<Button>(R.id.saveAddressButton).setOnClickListener {
             val raw = addressInput.text.toString().trim()
             val normalized = if (raw.isBlank()) null else {
@@ -1085,6 +1244,20 @@ class MainActivity : Activity() {
                 }
             }
         }
+    }
+
+    private fun confirmResetDefaults() {
+        AlertDialog.Builder(this)
+            .setTitle("Сбросить настройки?")
+            .setMessage(
+                "Будут восстановлены значения света, хлопка, музыки, фона, ночника, " +
+                    "будильника и лимита тока. Время RTC останется без изменений."
+            )
+            .setNegativeButton("Отмена", null)
+            .setPositiveButton("Сбросить") { _, _ ->
+                runDeviceAction("Сброс настроек") { api.resetDefaults() }
+            }
+            .show()
     }
 
     private fun setOperationStatus(text: String) {
@@ -1220,6 +1393,11 @@ class MainActivity : Activity() {
         lightKelvinSeek.setValue(l.kelvin)
         lightOverviewBrightnessText.text = "${brightnessPercent(l.brightness)}%"
         lightOverviewKelvinText.text = "${l.kelvin} K"
+        val lightActive = snapshot.status.mode == "light"
+        setChoiceState(lightOnButton, lightActive)
+        setChoiceState(lightOffButton, !lightActive)
+        setChoiceState(lightOverviewOnButton, lightActive)
+        setChoiceState(lightOverviewOffButton, !lightActive)
         lightRedSeek.progress = l.red
         lightGreenSeek.progress = l.green
         lightBlueSeek.progress = l.blue
@@ -1250,7 +1428,7 @@ class MainActivity : Activity() {
             if (snapshot.status.mode == "music") "${musicModeTitle(id)} • активно"
             else "${musicModeTitle(id)} • выключено"
         musicModeButtonMap.forEach { (modeId, tile) ->
-            tile.isSelected = modeId == id
+            tile.isSelected = snapshot.status.mode == "music" && modeId == id
             tile.invalidate()
         }
 
@@ -1314,8 +1492,11 @@ class MainActivity : Activity() {
         ambientEffectText.text =
             "${ambientEffectTitle(a.effect)} • " +
             if (latestMode == "ambient") "активно" else "выключено"
+        val ambientActive = latestMode == "ambient"
+        setChoiceState(ambientOnButton, ambientActive)
+        setChoiceState(ambientOffButton, !ambientActive)
         ambientEffectButtonMap.forEach { (id, tile) ->
-            tile.isSelected = id == a.effect
+            tile.isSelected = ambientActive && id == a.effect
             tile.invalidate()
         }
 
