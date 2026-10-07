@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 23
-        versionName = "0.23-concept-parity-rc1"
+        versionCode = 24
+        versionName = "0.22.1-homehub-restored-rc1"
     }
 
     compileOptions {
