@@ -1474,6 +1474,13 @@ void nextAmbient(int8_t dir){
   extCfg.ambient.effect=static_cast<uint8_t>(e);extCfg.dirty=true;prepareAmbient();
 }
 
+uint16_t ambientFrameIntervalMs(uint8_t speed){
+  // Public/API range remains 1..255. Higher value must always mean faster.
+  // Mapping to frame interval avoids 8-bit hue-step aliasing (for example
+  // 247 previously behaved like -9 hue units per frame).
+  return static_cast<uint16_t>(260U-static_cast<uint16_t>(speed));
+}
+
 void updateAmbient(){
   if(currentMode!=SystemMode::AMBIENT)return;
   AmbientSettingsV1& a=extCfg.ambient;
@@ -1487,12 +1494,13 @@ void updateAmbient(){
     requestedBrightness=static_cast<uint8_t>(a.f01Brightness);frameDirty=true;return;
   }
   if(e==AmbientEffect::F02){
-    const uint8_t speedMs=a.f02Speed?a.f02Speed:1;
-    if(now-lastAmbientFrameMs>=speedMs){lastAmbientFrameMs=now;++ambientRuntimeHue;}
+    const uint16_t interval=ambientFrameIntervalMs(a.f02Speed?a.f02Speed:1);
+    if(now-lastAmbientFrameMs>=interval){lastAmbientFrameMs=now;++ambientRuntimeHue;}
     fill_solid(leds,Cfg::LED_COUNT,CHSV(static_cast<uint8_t>(a.f02Hue+ambientRuntimeHue),a.f02Sat,255));
     requestedBrightness=static_cast<uint8_t>(a.f02Brightness);frameDirty=true;return;
   }
-  if(now-lastAmbientFrameMs>=30UL){lastAmbientFrameMs=now;ambientRuntimeHue=static_cast<uint8_t>(ambientRuntimeHue+a.f03Speed);}
+  const uint16_t interval=ambientFrameIntervalMs(a.f03Speed?a.f03Speed:1);
+  if(now-lastAmbientFrameMs>=interval){lastAmbientFrameMs=now;++ambientRuntimeHue;}
   for(uint8_t i=0;i<Cfg::LED_COUNT;++i){
     const uint8_t h=static_cast<uint8_t>(a.f03Hue+ambientRuntimeHue+
         (static_cast<uint16_t>(i)*a.f03Step10)/10U);
@@ -1881,6 +1889,49 @@ void applyMode(SystemMode m,bool persist){
   if(persist && m!=SystemMode::DAWN)saveCore();
 }
 
+void resetUserSettingsToDefaults(){
+  // RTC is intentionally preserved. Audio calibration is hardware-specific and
+  // is also preserved; user-facing mode/settings values return to v1 defaults.
+  const uint16_t micDc=extCfg.micDcOffset;
+  const uint16_t vuLowPass=extCfg.vuLowPass;
+  const uint8_t spectrumLowPass=extCfg.spectrumLowPass;
+  const uint8_t audioCalibrated=extCfg.audioCalibrated;
+
+  setDawnRuntimeIdle();
+  dawnPhase=DawnPhase::IDLE;
+  dawnDurationMs=0;
+  dawnStartMs=0;
+  dawnRecoveredAtBoot=false;
+
+  lightCfg=LightSettings();
+  clapCfg=ClapSettings();
+  nightCfg=NightSettings();
+  alarmCfg=AlarmSettings();
+  dawnCfg=DawnSettings();
+  coreCfg=CoreState();
+  setExtendedDefaults();
+
+  extCfg.micDcOffset=micDc;
+  extCfg.vuLowPass=vuLowPass;
+  extCfg.spectrumLowPass=spectrumLowPass;
+  extCfg.audioCalibrated=audioCalibrated;
+
+  currentMode=SystemMode::LIGHT;
+  nightEffectivePower=false;
+  nightWindowActive=false;
+  resetClapCalibration();
+  resetMusicRuntime();
+
+  saveLight();
+  saveClap();
+  saveNight();
+  saveAlarm();
+  saveDawnSettings();
+  saveExtended();
+  saveCore();
+  prepareLight();
+}
+
 void classifyReset(){
   rawResetFlags=MCUSR;
   MCUSR=0;
@@ -2164,6 +2215,9 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
     case 120:
       if(n!=1||!argRange(a[0],Cfg::MIN_CURRENT_LIMIT_MA,Cfg::HARD_CURRENT_LIMIT_MA))return uartErr(UE_RANGE);
       extCfg.currentLimitMa=a[0];extCfg.dirty=true;saveExtended();uartAck(op);return;
+    case 130:
+      if(n!=0)return uartErr(UE_PARSE);
+      resetUserSettingsToDefaults();uartAck(op);return;
     default:uartErr(UE_PARSE);return;
   }
 }
