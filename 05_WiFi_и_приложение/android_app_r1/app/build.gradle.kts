@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 26
-        versionName = "0.22.3-hero-scale-polish-rc1"
+        versionCode = 27
+        versionName = "0.22.4-generated-heroes-rc1"
     }
 
     compileOptions {
