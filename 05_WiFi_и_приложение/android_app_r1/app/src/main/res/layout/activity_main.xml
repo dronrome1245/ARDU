@@ -1615,26 +1615,6 @@
                 </LinearLayout>
 
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-                    <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Кольца" />
-                    <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Отдельный выбор для обычного и резервного питания." />
-                    <TextView android:id="@+id/ringProfileText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Обычно: оба • Авария: A" />
-
-                    <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Обычный режим" />
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:orientation="horizontal">
-                        <Button android:id="@+id/ringNormalBothButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:text="Оба" />
-                        <Button android:id="@+id/ringNormalAButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="0dp" android:layout_height="44dp" android:layout_marginStart="5dp" android:layout_weight="1" android:text="A" />
-                        <Button android:id="@+id/ringNormalBButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="0dp" android:layout_height="44dp" android:layout_marginStart="5dp" android:layout_weight="1" android:text="B" />
-                    </LinearLayout>
-
-                    <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Аварийный режим" />
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:orientation="horizontal">
-                        <Button android:id="@+id/ringEmergencyBothButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:text="Оба" />
-                        <Button android:id="@+id/ringEmergencyAButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="0dp" android:layout_height="44dp" android:layout_marginStart="5dp" android:layout_weight="1" android:text="A" />
-                        <Button android:id="@+id/ringEmergencyBButton" style="@style/Widget.ARDU.Button.Secondary" android:layout_width="0dp" android:layout_height="44dp" android:layout_marginStart="5dp" android:layout_weight="1" android:text="B" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                     <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Лимит тока" />
                     <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Сервисная настройка. До двухкольцевого силового теста оставить 3000 мА." />
                     <TextView android:id="@+id/currentLimitText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Лимит тока: 3000 мА" />
