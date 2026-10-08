@@ -1,10 +1,10 @@
 # Статус проекта ARDU
 
-Дата состояния: 2026-10-07
+Дата состояния: 2026-10-08
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — Android `0.22.5-ambient-hero-hotfix-rc1` source-ready for emulator review. Owner found broken/noisy image on Ambient («Фон») while Night and Alarm-Dawn heroes render correctly. Only `ardu_ambient_hero.webp` was replaced with a verified 640×360 RGB-room WebP derived from the approved cinematic source; Android versionCode is now 28. Asset blob SHA = `667b6bac57b4c32ff29cea9e6f18513bcae4db6a` and matches local verified source; the visual result still needs owner emulator check. Layout, RoomHeroView, Night, Alarm and Ambient presets are unchanged. Preset design remains pending owner discussion and must not be changed now. Nano/ESP hardware remains on previously accepted firmware; staged reset/speed source changes have not been uploaded. Next: `git pull` → Android Studio Emulator Run → check only «Фон» image; if bad, send emulator screenshot.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — Android `0.22.5-ambient-hero-hotfix-rc1` source-ready for emulator review. Owner found broken/noisy image on Ambient («Фон») while Night and Alarm-Dawn heroes render correctly. Only `ardu_ambient_hero.webp` was replaced with a verified 640×360 RGB-room WebP derived from the approved cinematic source; Android versionCode is now 28. Asset blob SHA = `667b6bac57b4c32ff29cea9e6f18513bcae4db6a` and matches local verified source; the visual result still needs owner emulator check. Layout, RoomHeroView, Night, Alarm and Ambient presets are unchanged. D-104 owner decision: F01 remains the target manual Ambient effect; F02/F03 are not needed in the FUTURE user-facing Ambient model. The proposed 12-scene catalog / four-family engine is recorded as IDEA ONLY in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md`, with no stable IDs or protocol approval. Current app/firmware still contain F02/F03 for compatibility; no behavior/code changes were made by this decision. Nano/ESP hardware remains on previously accepted firmware; staged reset/speed source changes have not been uploaded. Next: `git pull` → Android Studio Emulator Run → check only «Фон» image; if bad, send emulator screenshot.**
 
 ## Что подтверждено и решено
 
@@ -2244,3 +2244,19 @@ Implemented narrow Android-only fix:
 
 Source asset integrity PASS; actual Android emulator appearance still pending owner smoke.
 Next: `git pull` → Emulator Run → check only Ambient hero.
+
+### 2026-10-08 — D-104: F02/F03 not required; 12-scene proposal archived as idea
+
+Owner explicitly stated that F02 and F03 are unnecessary and asked to save the rest of the 12-preset proposal as an idea.
+
+**DECISION:**
+- future Ambient user-facing model: **F01 retained, F02/F03 excluded**;
+- do not reuse F02/F03 IDs casually;
+- no firmware/ESP/Android deletion now; currently deployed and source versions still carry F02/F03.
+
+**IDEA ONLY:**
+- 12 candidate scenes (working P01…P12), four compact renderer families;
+- per-scene brightness/dynamics, persistent choice, local animation;
+- detailed colors/movement/memory/implementation gates in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md`.
+
+The 12 IDs, API route, UART commands and EEPROM format are **NOT approved or frozen**. No changes to Android app version (`0.22.5-ambient-hero-hotfix-rc1`), firmware, protocols or hardware in this documentation-only step.
