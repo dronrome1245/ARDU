@@ -1,3 +1,9 @@
+# ВАЖНО: RC1 заменена на RC2
+
+Владелец сообщил ошибку компиляции RC1 `ambient_preset_probe.h: No such file or directory` при наличии заголовка в той же папке. Причина обработки файлов на его ПК не подтверждена. **Для следующей попытки используй [nano_ambient_preview_rc2](../nano_ambient_preview_rc2/README.md)** — все алгоритмы встроены в один `.ino`, второй файл не нужен. RC1 сохранена только для истории и не рекомендуется для дальнейшей загрузки.
+
+---
+
 # ARDU Ambient preview RC1 — полный Nano-скетч
 
 - Открыть `nano_ambient_preview_rc1.ino` из этой папки в Arduino IDE. `ambient_preset_probe.h` должен находиться рядом.
