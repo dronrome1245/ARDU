@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 27
-        versionName = "0.22.4-generated-heroes-rc1"
+        versionCode = 28
+        versionName = "0.22.5-ambient-hero-hotfix-rc1"
     }
 
     compileOptions {
