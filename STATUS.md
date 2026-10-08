@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — ANDROID `0.22.4-generated-heroes-rc1` SOURCE READY FOR EMULATOR VISUAL REVIEW. v0.22 Home Hub remains the canonical baseline; v0.23 remains rejected. Owner explicitly approved the newly generated dedicated hero scenes for Ambient / Night / Alarm-Dawn. The previous v0.22.3 scale workaround is removed: these 16:9 scenes are rendered as complete wide compositions over a subdued full-bleed backdrop. Targeted v0.22.2 UX work remains: ARDU-DIRECT help, icon+label bottom navigation, Settings Back/reset-defaults, Light overview ON/OFF and distinct scenes, active-state styling, tab→runtime mode activation, Ambient presets placeholder block, and monotonic Ambient speed semantics. Preset design is NOT frozen: owner explicitly wants more than four presets and wants to agree their actual light behavior before implementation. Firmware reset/speed changes remain SOURCE-READY ONLY and are not yet physically uploaded. Immediate gate: `git pull` → emulator Run → verify the three approved hero scenes, then define the expanded Ambient preset catalog/algorithms before coding it.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — Android `0.22.5-ambient-hero-hotfix-rc1` source-ready for emulator review. Owner found broken/noisy image on Ambient («Фон») while Night and Alarm-Dawn heroes render correctly. Only `ardu_ambient_hero.webp` was replaced with a verified 640×360 RGB-room WebP derived from the approved cinematic source; Android versionCode is now 28. Asset blob SHA = `667b6bac57b4c32ff29cea9e6f18513bcae4db6a` and matches local verified source; the visual result still needs owner emulator check. Layout, RoomHeroView, Night, Alarm and Ambient presets are unchanged. Preset design remains pending owner discussion and must not be changed now. Nano/ESP hardware remains on previously accepted firmware; staged reset/speed source changes have not been uploaded. Next: `git pull` → Android Studio Emulator Run → check only «Фон» image; if bad, send emulator screenshot.**
 
 ## Что подтверждено и решено
 
@@ -2230,3 +2230,17 @@ Android version: `0.22.4-generated-heroes-rc1`, versionCode 27.
 Static validation: 195 unique layout IDs, duplicate IDs 0, missing Kotlin bindings 0, RoomHeroView structure clean.
 
 **Ambient presets:** current four-item block is provisional. Owner explicitly requires more presets and separate agreement on how each preset physically lights/moves before the preset layer is finalized.
+
+### 2026-10-08 — Ambient hero asset repair v0.22.5
+
+Owner screenshot showed corrupted gray noise instead of the approved cinema-room photo in the Ambient hero. Night/Alarm heroes were visually accepted.
+
+Implemented narrow Android-only fix:
+- replaced only `app/src/main/res/drawable-nodpi/ardu_ambient_hero.webp`;
+- generated fresh 640×360 lossy WebP from the approved `cinematic_nighttime_smart_home_living_room.png`;
+- Pillow decode verification PASS; Git blob SHA `667b6bac57b4c32ff29cea9e6f18513bcae4db6a` matches the verified local output;
+- `RoomHeroView.kt`, XML, Night/Alarm images and all presets unchanged;
+- Android version = `0.22.5-ambient-hero-hotfix-rc1`, versionCode 28.
+
+Source asset integrity PASS; actual Android emulator appearance still pending owner smoke.
+Next: `git pull` → Emulator Run → check only Ambient hero.
