@@ -60,6 +60,20 @@ struct NanoResult {
 #  endif
 static_assert(sizeof(ARDU_SOFTAP_PASSWORD)>=9,"ARDU-DIRECT password must be at least 8 characters");
 static_assert(sizeof(ARDU_OTA_PASSWORD)>=9,"OTA password must be at least 8 characters");
+// OTA is the only normal maintenance path once ESP is mounted. Reject the
+// tracked example placeholders even if a private header incorrectly sets
+// ARDU_CREDENTIALS_CONFIGURED to 1.
+constexpr bool arduSameLiteral(const char* a,const char* b) {
+  return (*a==*b) && ((*a=='\0') || arduSameLiteral(a+1,b+1));
+}
+static_assert(!arduSameLiteral(ARDU_WIFI_SSID,"PUT_YOUR_WIFI_SSID_HERE"),
+              "Replace home Wi-Fi SSID before a real OTA build");
+static_assert(!arduSameLiteral(ARDU_WIFI_PASSWORD,"PUT_YOUR_WIFI_PASSWORD_HERE"),
+              "Replace home Wi-Fi password before a real OTA build");
+static_assert(!arduSameLiteral(ARDU_OTA_PASSWORD,"PUT_A_STRONG_OTA_PASSWORD_HERE"),
+              "Replace OTA password before a real OTA build");
+static_assert(!arduSameLiteral(ARDU_SOFTAP_PASSWORD,"PUT_A_STRONG_AP_PASSWORD_HERE"),
+              "Replace ARDU-DIRECT password before a real OTA build");
 #endif
 
 #ifndef ARDU_WIFI_SSID
