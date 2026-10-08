@@ -200,3 +200,7 @@ This is the source for `GET /api/settings`.
 Opcode 130 добавлен по прямому запросу владельца на пользовательскую кнопку «Сброс настроек по умолчанию». Это backward-compatible extension: существующие opcodes и их значения не изменены, `uart_protocol` остаётся `1`.
 
 Одновременно исправлена только внутренняя интерпретация Ambient `speed` для F02/F03: wire range `1..255` не изменён; ранее F03 использовал raw 8-bit hue step и мог alias-иться (например 247 ≈ -9), теперь значение монотонно управляет интервалом кадра.
+
+### D-104: No UART change for proposed Ambient presets (2026-10-08)
+
+Future Ambient UI will keep F01 and omit F02/F03 (owner decision). The current v1 numeric UART still supports their existing mappings, and no firmware/source changes were made in this documentation-only step. Proposed `P01…P12`, UART opcodes, persisted schema and any new statuses are **IDEAS / NOT FROZEN**. See `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md`.
