@@ -2317,3 +2317,9 @@ The 12 IDs, API route, UART commands and EEPROM format are **NOT approved or fro
 - ESP v2 R2 — **один `esp8266_ardu_v2.ino`**, четыре явных `#define` в начале: домашняя Wi-Fi сеть/пароль, новый OTA пароль, WPA2 пароль `ARDU-DIRECT`. Дополнительные .h/флаги не нужны; v2 headers-примеры удалены, ESP v1 сохранён.
 - **[CI 37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) PASS:** compile отдельного одного .ino с фиктивными тестовыми данными и отрицательный тест, где незаменённые шаблонные пароли отклоняются компилятором. Реальная физическая OTA / ARDU-DIRECT пока не загружены/не проверены.
 - Настоящие credentials хранить только в личной копии вне Git, не публиковать. Порядок OTA и rollback исправлен в `ARDU_AMBIENT12_RELEASE_CANDIDATE.md`.
+
+### 2026-10-08 — первая физическая попытка OTA ESP v2 R2: результат НЕИЗВЕСТЕН
+
+- **ФАКТ из вывода Arduino IDE владельца:** ESP v2 R2 прошла сборку (RAM 32208/80192, IRAM 60823/65536, IROM 329120/1048576); на этапе OTA получено `Authenticating...OK`, затем `Uploading...` с точками. **Финальная строка `Done uploading` / `Failed uploading` в предоставленном фрагменте отсутствует.**
+- Отдельное сообщение IDE: `No monitor available for the port protocol network. Could not connect to 192.168.0.4 network port.` Это попытка открыть **Serial Monitor через сетевой OTA-порт**, а не доказательство неуспешной передачи бинарника. Закрыть вкладку Serial Monitor, дождаться завершения текущего Upload.
+- **Gate ещё не закрыт:** до повторной OTA, перезагрузок или Nano USB нужен реальный `curl.exe http://192.168.0.4/api/ping` (после завершения Upload): `fw=ARDU_ESP_V2_AMBIENT12` подтверждает запуск нового ESP; прежняя версия/таймаут требуют отдельной диагностики. Текущий физический ESP firmware **не определён** данным фрагментом.

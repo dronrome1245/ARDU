@@ -2673,3 +2673,7 @@ No code/firmware/application assets changed and no hardware retest claimed.
 ## 2026-10-08 — ESP v2 R2 one-file manual Wi-Fi fields, CI PASS
 
 По запросу владельца из `esp8266_ardu_v2.ino` удалён внешний `wifi_secrets.h`. В начале скетча четыре вручную редактируемые строки: Station SSID/password, новый OTA password, отдельный `ARDU-DIRECT` WPA2 password. Удалены ненужные ESP v2 header и template; source v1 не менялся. Без замены placeholders real Verify специально останавливается. [ESP8266 Verify CI 37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) PASS: отрицательный тест шаблонов, положительная сборка один .ino с четырьмя фиктивными значениями, compile ESP v1. Реальные OTA/ARDU-DIRECT/физические команды не тестировались. Исправлены ESP README и `ARDU_AMBIENT12_RELEASE_CANDIDATE.md`.
+
+## 2026-10-08 — Owner started ESP v2 R2 OTA; Auth OK, upload result not shown
+
+Владелец сообщил об OTA-попытке на IP 192.168.0.4. IDE компилирует ESP v2: 32208/80192 bytes static RAM, 60823/65536 IRAM, 329120/1048576 IROM. Вывод `Authenticating...OK`, затем `Uploading...` и точки. Одновременно окно `No monitor available for the port protocol network` — это IDE Serial Monitor для network-порта, не самостоятельный OTA-failure verdict. **Полного лога с завершающим результатом пока нет, модель ESP на железе не подтверждена.** Следующий минимальный gate после окончания текущей загрузки: закрыть Serial Monitor, `curl.exe --max-time 8 http://192.168.0.4/api/ping` и прочитать поле `fw`; до результата не менять Nano и не делать вторую загрузку ESP.
