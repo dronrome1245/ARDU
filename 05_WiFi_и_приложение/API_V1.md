@@ -479,3 +479,9 @@ Ambient effect selection `POST /api/ambient/effect` сохраняется ср�
 - `persist`.
 
 Внутренний numeric UART описан отдельно: `06_Интерфейс_управления/UART_V1.md`.
+
+### D-104: Ambient future target vs existing HTTP API (2026-10-08)
+
+Owner decision: F02 and F03 are unnecessary in the **future user-facing** Ambient experience; F01 remains. All F02/F03 mappings above describe the **existing** v1 API and still apply to current Android/Nano/ESP source. D-104 does **not** remove these endpoints, retire any wire identifiers, or authorize a new protocol.
+
+The twelve atmospheric preset candidates are documented in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md` as an **idea only**. A possible `POST /api/ambient/preset` is not implemented, approved or frozen.
