@@ -31,7 +31,7 @@ struct NanoResult {
   bool timedOut=false;
   uint8_t errorCode=0;
   String response;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Local credentials.
