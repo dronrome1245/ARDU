@@ -2669,3 +2669,7 @@ No code/firmware/application assets changed and no hardware retest claimed.
 ## 2026-10-08 — Nano Ambient12 Flash optimization regression PASS
 
 Итерация `db752733ec964b908c4e065b9a74408401146521`: в новом полном `nano_ambient12_v1.ino` устаревшие F02/F03/auto действия 103/104/108/109 возвращают ошибку применимости; F01 продолжает принимать ручные hue/saturation/brightness через 105/106/107. [Arduino Verify 37820974644](https://github.com/dronrome1245/ARDU/actions/runs/37820974644) PASS. Размер уменьшился с 29560 до **29306 байт Flash** (−254); globals SRAM **1282/2048**. Это остаётся на 122 B выше мягкого ориентира 95% и пока не испытано на устройстве. [Актуальный полный HEX](https://github.com/dronrome1245/ARDU/actions/runs/37820974644/artifacts/11568284647).
+
+## 2026-10-08 — ESP v2 R2 one-file manual Wi-Fi fields, CI PASS
+
+По запросу владельца из `esp8266_ardu_v2.ino` удалён внешний `wifi_secrets.h`. В начале скетча четыре вручную редактируемые строки: Station SSID/password, новый OTA password, отдельный `ARDU-DIRECT` WPA2 password. Удалены ненужные ESP v2 header и template; source v1 не менялся. Без замены placeholders real Verify специально останавливается. [ESP8266 Verify CI 37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) PASS: отрицательный тест шаблонов, положительная сборка один .ino с четырьмя фиктивными значениями, compile ESP v1. Реальные OTA/ARDU-DIRECT/физические команды не тестировались. Исправлены ESP README и `ARDU_AMBIENT12_RELEASE_CANDIDATE.md`.

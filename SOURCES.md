@@ -1108,3 +1108,7 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 
 - After removing the unneeded legacy F02/F03/auto controls from the **new Nano v2 only**, [Arduino Verify 37820974644](https://github.com/dronrome1245/ARDU/actions/runs/37820974644) **PASS**. Latest full Nano12: **29306/30720 bytes Flash**; globals **1282/2048 SRAM**. Free: 1414 Flash bytes, 766 SRAM bytes for stack/locals; the latter is not an observed worst-case stack measurement. Soft 95% Flash guideline (29184) still exceeded by **122 bytes**.
 - [Updated compiled Nano12 HEX 11568284647](https://github.com/dronrome1245/ARDU/actions/runs/37820974644/artifacts/11568284647) replaces the earlier unoptimized artifact for future bench acceptance; both remain Git history, no actual hardware upload in this conversation.
+
+## 2026-10-08 — ESP v2 R2 single INO evidence
+
+[ESP8266 Verify run 37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) completed successfully. One `esp8266_ardu_v2.ino` copied into isolated directory with **four fake CI values** and compiled without `wifi_secrets.h` or other local headers. Explicit negative test: unchanged placeholders rejected at compile. ESP RAM statics 32256/80192 B (40%), IRAM 60823/65536 (92%), IROM 329096 B. The test does not imply OTA or SoftAP physically works. Local real credentials must never be committed or sent in chat.

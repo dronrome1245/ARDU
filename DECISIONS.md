@@ -1929,3 +1929,13 @@ R3 не прошивался и не тестировался на железе.
 5. Использовать `ARDU_AMBIENT12_RELEASE_CANDIDATE.md` как обязательный сценарий + rollback; ни один исходник не считается окончательной проверенной прошивкой по одному CI. Внутренний ориентир Nano Flash ≤95% не достигнут, stack/two-ring current/scene visual PASS pending.
 
 **ФАКТ:** [Nano CI](https://github.com/dronrome1245/ARDU/actions/runs/37818601346), [ESP CI](https://github.com/dronrome1245/ARDU/actions/runs/37820404281), [Android CI](https://github.com/dronrome1245/ARDU/actions/runs/37819918951) — PASS. Физических обновлений этим GitHub-коммитом не делалось.
+
+## D-110 — ESP v2 R2 credentials inside one sketch; wifi_secrets.h not required
+
+**Дата:** 2026-10-08. **Статус:** действует, заменяет схему отдельных secrets headers только для ESP v2; D-109 и функциональный набор F01+P01..P12 сохраняются.
+
+**Явный запрос владельца:** «сделай скетч без этого. я вручную впишу ssid и пароль и загружу» (выделено `wifi_secrets.h`).
+
+**РЕШЕНИЕ:** один полный ESP v2 `esp8266_ardu_v2.ino` с четырьмя вручную заполняемыми строками `ARDU_WIFI_SSID`, `ARDU_WIFI_PASSWORD`, `ARDU_OTA_PASSWORD`, `ARDU_SOFTAP_PASSWORD`. Никакого `wifi_secrets.h`, `ARDU_CI_BUILD`, `ARDU_CREDENTIALS_CONFIGURED`. Компилятор должен блокировать исходник с незаменёнными шаблонами, пароль SoftAP 8..63 символа. Пароли не коммитить; редактировать личную копию .ino вне Git. ESP v1 не менять.
+
+**ФАКТ:** [ESP CI 37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) PASS — полный one-file AVR? **ESP8266** build и тест отказа placeholder. Физический OTA не выполнялся. При OTA загрузке вводить пароль старой установленной ESP; новый пароль из скетча вступает в силу после reboot.

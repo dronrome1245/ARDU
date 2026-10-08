@@ -123,11 +123,10 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-1. Владелец **утвердил функциональный scope**: F01 ручной + двенадцать P01..P12. Новые scene names/внешние API реализованы в source, физическое визуальное качество ещё требуется проверить. F02/F03 не нужны для будущего user-facing набора, их numeric IDs остаются зарезервированными.
-2. Готовы три слоя: Nano `04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino`, ESP `05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino`, Android `android_app_r1` v0.22.6. GitHub Actions: [Nano](https://github.com/dronrome1245/ARDU/actions/runs/37818601346), [ESP](https://github.com/dronrome1245/ARDU/actions/runs/37820404281), [Android APK](https://github.com/dronrome1245/ARDU/actions/runs/37819918951) — PASS; **hardware нет**.
-3. Ближайший hardware gate строго по `ARDU_AMBIENT12_RELEASE_CANDIDATE.md`: `git pull` → создать игнорируемый `esp8266_ardu_v2/wifi_secrets.h` из шаблона и вписать 4 секрета, установить `ARDU_CREDENTIALS_CONFIGURED 1` → ESP v2 Arduino IDE Verify и **одно OTA обновление при работающем домашнем роутере**. Проверить новый `/api/ping`/`/api/status` с пока старой Nano. Только при PASS — полная Nano v2 Old Bootloader/USB-C с ESP TX→Nano D0 изолированным при выключенном питании; затем восстановить UART.
-4. Android Studio `git pull`→Run или [готовый APK](https://github.com/dronrome1245/ARDU/actions/runs/37819918951/artifacts/11568856875), проверить реальные 12 сцен и per-scene параметры; затем отдельно отключить роутер и проверить WPA2 ARDU-DIRECT/192.168.4.1 и возврат в Station.
-5. Не объявлять «окончательно прошито» до физического OTA+Nano+2×44 LED+current+RTC/FHT/clap+EEPROM+direct-mode PASS. Nano Flash 29560/30720 > soft 29184, SRAM globals 1282/2048. ESP IRAM 60823/65536. Аккумулятор/backup отменены.
+1. **ESP v2 R2 теперь один `.ino`.** В `05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino` вручную заполнить четыре строки `ARDU_WIFI_SSID`, `ARDU_WIFI_PASSWORD`, `ARDU_OTA_PASSWORD`, `ARDU_SOFTAP_PASSWORD`. `wifi_secrets.h` и другие локальные заголовки не нужны. Настоящие пароли не публиковать и не коммитить; лучше скачивать Raw .ino в Downloads вне Git.
+2. **CI [37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) PASS:** только один .ino с тестовыми непубличными значениями компилируется, незаменённые placeholders отвергаются компилятором. Следующий шаг — собственный Verify/OTA Upload по домашней сети с паролем **старой установленной ESP** (новый OTA пароль в .ino будет действовать после reboot).
+3. Проверить `/api/ping` с `fw=ARDU_ESP_V2_AMBIENT12` и обычные функции со старой Nano. После PASS — полная Nano `nano_ambient12_v1.ino` по безопасному USB/Old Bootloader, Android 0.22.6, реальный ARDU-DIRECT/192.168.4.1 и два кольца. [Полная инструкция](ARDU_AMBIENT12_RELEASE_CANDIDATE.md).
+4. Прошивки на реальном оборудовании пока НЕ обновлены; аппаратные тесты сценариев, тока, EEPROM, Wi-Fi failover/stack остаются открытыми. Nano Flash 29306/30720, globals SRAM 1282/2048. Батарея отменена.
 
 ## 12. База ColorMusic/FHT
 
