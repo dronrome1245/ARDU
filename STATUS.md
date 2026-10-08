@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 + первый SOURCE-PROTOTYPE фоновых сцен (2026-10-08).** После принятия владельцем всех Android hero-изображений выполнена отдельная кодовая итерация G1/часть G2 из `04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md`. Реализованы компактные P01 «Северное сияние», P04 «Космос», P05 «Камин» в `nano_ardu_v1/ambient_preset_probe.h` и экспериментальное включение только по `ARDU_AMBIENT_PRESET_PROBE=1`. CI Arduino Verify run 37807204353: host test PASS; стандартная полная Nano 28690 Flash / 1234 SRAM; полная Nano с тремя сценами 29312 Flash / 1234 SRAM, **компиляция PASS**. Прототип ниже hard flash limit 30720, но на 128 B выше проектного ориентира 29184 (95%), требуется оптимизация перед release. В обычной сборке F01/F02/F03, numeric UART/API, EEPROM, ESP и Android (source `0.22.5-ambient-hero-hotfix-rc1`) **не меняют поведения**. Physical upload / LED visual PASS / two-ring acceptance / ARDU-DIRECT smoke не выполнены. D-104: F01 оставить, F02/F03 удалить лишь из будущего UI; рабочие P01…P12 не frozen IDs. Действует полный release policy FINALIZATION_PLAN; аккумуляторная ветка отменена.
+**ARDU v1 / полная Nano Ambient PREVIEW RC1 CI PASS (2026-10-08).** Самодостаточная Nano проверочная прошивка `04_Прошивка/nano_ambient_preview_rc1/nano_ambient_preview_rc1.ino` содержит полную текущую Nano v1 и три новые сцены: P01 Северное сияние, P04 Космос, P05 Камин. При выборе в прежнем Android страницы «Фон» → F01 «Цвет» показывается последовательность трёх сцен и обычного F01 по ~8,2 с. Стандартная `nano_ardu_v1.ino` по умолчанию сохраняет старые F01/F02/F03. ESP/Android/API/UART/EEPROM не изменены. CI [37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365) PASS: default 28690/1234 B Flash/SRAM globals, full PREVIEW RC 29376/1234 B, [готовый HEX](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835). Flash RC ниже hard 30720 на 1344 B, но выше soft 95% на 192 B; SRAM free 814 B, реальный stack/runtime и LED ток не измерены. **Физической прошивки и визуального PASS ещё нет.** Следующее действие владельца: `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md` с безопасным Upload Nano/COM, возвратом ESP TX→Nano D0 и визуальной проверкой трёх сцен. D-104 и отмена батареи сохранены, ARDU-DIRECT / dual-ring load tests pending.
 
 ## Что подтверждено и решено
 
@@ -2277,3 +2277,11 @@ The 12 IDs, API route, UART commands and EEPROM format are **NOT approved or fro
 - **ПРОВЕРЕНО:** host C++ 44-LED bounds, детерминированные разные сцены/анимация/диапазоны. **НЕ ПРОВЕРЕНО:** реальная лента/ток/скорости/стек в работе.
 - **ПОСТОЯННЫЙ ПОТОК:** Android/ESP/API/UART/EEPROM без изменений, F02/F03 не удалялись. Не прошивать lab build. Следующий gate — сокращение Flash/stack-review и согласованный полный Nano release candidate для визуальной проверки владельцем, а не изолированный test sketch.
 - **Отчёт:** `04_Прошивка/AMBIENT_PRESETS_LAB_R1.md`.
+
+### 2026-10-08 — full Nano Ambient PREVIEW RC1 ready, physical gate next
+
+- **CI** [37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365) PASS: default Nano 28690/1234 Flash/SRAM globals, full preview 29376/1234, IDE-openable sketch + header sync + host 44-LED tests + [HEX 11564965835](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835).
+- В preview F01 запускает цикл P01/P04/P05/legacy F01 по ~8,2 с, F02/F03 сохраняются. В обычной сборке все legacy режимы неизменны.
+- **Риск:** 95%-ориентир Flash = 29184 B; preview превышает на 192 B. Hard 30720 — PASS, свободно 1344 B; globals 1234, free for stack 814 B; runtime/actual LED test pending.
+- **Первый wrapper FAIL** [37809142084](https://github.com/dronrome1245/ARDU/actions/runs/37809142084): относительный include другого .ino после Arduino preprocessing. Исправлено двумя самодостаточными файлами и синхронизацией через CI.
+- **Физически в этом шаге ничего не прошивали.** Готовы [инструкция Nano Upload, просмотр, rollback](04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md). ESP/Android/API/UART/EEPROM не изменены; staged reset/speed Nano изменения входят в preview и нуждаются в smoke.

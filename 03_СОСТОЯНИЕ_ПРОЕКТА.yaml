@@ -2878,3 +2878,25 @@ ambient_presets_lab_r1_2026_10_08:
   stable_uart_api_eeprom_changes: false
   physical_upload_performed: false
   next: flash_reserve_and_stack_review_before_full_release_candidate
+
+# 2026-10-08 complete full Nano Ambient preview RC1, hardware pending
+ambient_preview_rc1_2026_10_08:
+  status: compiled_ci_pass_waiting_for_owner_hardware_smoke
+  source: "04_Прошивка/nano_ambient_preview_rc1/nano_ambient_preview_rc1.ino"
+  header: "04_Прошивка/nano_ambient_preview_rc1/ambient_preset_probe.h"
+  test_doc: "04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md"
+  ci_run: "https://github.com/dronrome1245/ARDU/actions/runs/37809369365"
+  hex_artifact: "https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835"
+  default_flash_bytes: 28690
+  preview_flash_bytes: 29376
+  preview_globals_sram_bytes: 1234
+  free_flash_bytes: 1344
+  free_sram_for_runtime_bytes: 814
+  excess_over_95_percent_flash_target_bytes: 192
+  full_sketch_compile_passed: true
+  device_flashed: false
+  visual_acceptance: pending
+  new_uart_http_ids: false
+  new_eeprom_layout: false
+  preview_cycle: [P01_aurora, P04_cosmos, P05_fireplace, F01_legacy]
+  next: owner_safe_nano_upload_and_ambient_f01_visual_smoke

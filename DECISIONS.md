@@ -1887,3 +1887,17 @@ R3 не прошивался и не тестировался на железе.
 4. Условие перехода: host/AVR build + Flash/SRAM PASS, затем запас памяти/stack review, **полный** firmware RC и визуальное подтверждение владельца на кольце.
 
 **ФАКТ 2026-10-08:** host tests и две Arduino CLI сборки в [run 37807204353](https://github.com/dronrome1245/ARDU/actions/runs/37807204353) прошли. Standard: 28690 Flash / 1234 globals, lab: 29312 Flash / 1234 globals. Target 95% flash превышен на 128 B; физическая загрузка отсутствует. Подробно: `04_Прошивка/AMBIENT_PRESETS_LAB_R1.md`.
+
+## D-107 — full Nano Ambient PREVIEW RC1 for owner visual test
+
+**Дата:** 2026-10-08. **Статус:** действующий план тестовой сборки, НЕ окончательный freeze IDs/API/релиза.  
+**Основание:** команда владельца «приступай» после CI-прототипа трёх Ambient-сцен.
+
+**РЕШЕНИЕ:**
+1. Для просмотра на железе подготовить самодостаточную полную Nano v1 RC (вся существующая система, не standalone demo) с флагом `ARDU_AMBIENT_PRESET_PROBE=1`; обычная `nano_ardu_v1.ino` имеет flag=0.
+2. Только в preview на F01 показывать P01→P04→P05→legacy F01 по ~8,2 с. Это не стабильные P IDs; F02/F03 не переиспользовать как новые numeric ID и оставить рабочими. Связь Android/ESP остаётся прежней.
+3. Перед Upload — безопасное разъединение ESP TX0→Nano D0 при снятом питании, проверка USB/5 V, rollback source и полный Serial/HTTP smoke: `AMBIENT_PRESETS_PREVIEW_RC1_TEST.md`.
+4. CI hard Flash PASS (29376/30720), soft 95% guidance **пока не выполнен** (на 192 B), поэтому это исследовательская RC, не потолочный продукт. Реальную яркость и остальные эффекты принимает владелец после физического просмотра.
+5. D-104 не меняется, окончательные 12 пресетов/P12, persistence, stable UART/HTTP IDs ещё не утверждены.
+
+**ФАКТ:** [CI 37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365) PASS, опубликован [HEX](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835). Физический Upload и тест на кольце не выполнялись в чате.

@@ -150,3 +150,10 @@
 - **G3–G5 (не начаты):** остальные сцены, persistence/API/UART, Android controls и физическая приёмка. Только полный согласованный RC upload по `FINALIZATION_PLAN.md`, не standalone-test sketch.
 
 Отчёт и точный исходный набор: [AMBIENT_PRESETS_LAB_R1.md](AMBIENT_PRESETS_LAB_R1.md).
+
+## 9. G2 готов к hardware gate, PREVIEW RC1 (2026-10-08)
+
+- **Реализовано и CI PASS:** самодостаточная полная Nano `nano_ambient_preview_rc1/nano_ambient_preview_rc1.ino` + `ambient_preset_probe.h`, F01 preview P01→P04→P05→обычный F01, каждые ~8,2 с.
+- [CI 37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365): 29376 Flash / 1234 globals, [готовый HEX](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835).
+- **Открытые gates:** 95% internal Flash target пока превышен на 192 B, реальный worst-case stack/LED/two-ring current не измерен, визуальное поведение владельцем не утверждено. Это проверочный RC, не новый production release.
+- **Следующее действие:** выполнить `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md` на стенде с полным Nano/ESP regression, затем скорректировать три сцены. Новые API/UART/EEPROM/stable P IDs и остальные 9 сцен пока не реализовывать.

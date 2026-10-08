@@ -2643,3 +2643,9 @@ No code/firmware/application assets changed and no hardware retest claimed.
 - +622 Flash / +0 globals по сравнению со standard; над проектным ориентиром 95% Flash на 128 B, реальный stack не измерен.
 
 Нет ни firmware upload, ни физического визуального теста/тока, ни app/API migration; локальная лампа остаётся на предыдущих версиях. См. `04_Прошивка/AMBIENT_PRESETS_LAB_R1.md`.
+
+## 2026-10-08 — compiled full Ambient PREVIEW RC1 and hardware handoff
+
+Первая попытка собрать отдельный IDE-wrapper для всей Nano v1 через относительный include `../nano_ardu_v1/nano_ardu_v1.ino` не прошла CI [37809142084](https://github.com/dronrome1245/ARDU/actions/runs/37809142084): после препроцессинга путь был недоступен. Исправлено на самодостаточную папку `04_Прошивка/nano_ambient_preview_rc1/` (полная версия .ino + копия header). В CI добавлен byte-for-byte sync с основной Nano v1 + flag.
+
+Итог: [CI 37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365) PASS — host frames, source sync, standard full Nano 28690 Flash/1234 globals, preview full Nano 29376 Flash/1234 globals, отдельный IDE-sketch PASS и [HEX artifact 11564965835](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835). Разработана инструкция `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md`: физический Nano Upload, UART, Android F01 demo, возврат. Физических загрузок/измерений в чате не было.

@@ -123,12 +123,12 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-1. **Принято владельцем:** все hero-изображения Android «Фон», «Ночь», «Будильник»; Android source `0.22.5-ambient-hero-hotfix-rc1` и v0.22 Home Hub остаются без изменения.
-2. **Начата реализация пресетов по D-106:** P01 Северное сияние, P04 Космос и P05 Камин в source-only `04_Прошивка/nano_ardu_v1/ambient_preset_probe.h`. Отчёт: `04_Прошивка/AMBIENT_PRESETS_LAB_R1.md`.
-3. **CI PASS:** [Arduino Verify run 37807204353](https://github.com/dronrome1245/ARDU/actions/runs/37807204353), обычная Nano 28690 Flash / 1234 SRAM; полная Nano с lab renderer 29312 Flash / 1234 SRAM. Это помещается в аппаратный предел, но **на 128 B превышает внутренний ориентир 95% Flash**.
-4. **Следующий кодовый шаг:** оптимизировать Flash/проверить stack, затем готовить один полный согласованный Nano RC и только после его загрузки делать реальный LED visual pass трёх разных сцен. Не заливать на устройство lab preview или standalone sketch вместо принятого release.
-5. Сохраняются D-104: ручной F01 оставить, пользовательские F02/F03 убрать позже; P01…P12 только временные имена, P12 не определён. Android/ESP/API/UART/EEPROM и физическое устройство не изменены этим source-prototype.
-6. В параллельной приёмке устройства ещё pending: staged reset-defaults/ambient speed source uploads, `ARDU-DIRECT` physical smoke и финальный двухкольцевой 44+44 power test. Battery/backup отменён.
+1. **Проверочная полная Nano PREVIEW RC1 подготовлена**: `04_Прошивка/nano_ambient_preview_rc1/nano_ambient_preview_rc1.ino` и локальная `ambient_preset_probe.h`. Старое приложение: «Фон» → F01 «Цвет» запускает P01 «Северное сияние» → P04 «Космос» → P05 «Камин» → обычный F01, по ~8,2 с.
+2. **CI [37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365) PASS**: полный обычный Nano 28690 Flash / 1234 globals SRAM; полный PREVIEW RC1 29376 Flash / 1234 globals; host/синхронизация исходников PASS, HEX [artifact 11564965835](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835).
+3. **Следующий практический hardware gate владельца**: [AMBIENT_PRESETS_PREVIEW_RC1_TEST.md](04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md): безопасная изоляция ESP TX→Nano D0, Upload Arduino Nano Old Bootloader, прямой Serial 1/2/4, восстановление UART, «Фон» → F01, видео всего цикла, L01/Music/RTC smoke и rollback при проблемах.
+4. Превышен мягкий ориентир 95% Flash на 192 B, но до hard 30720 свободно 1344 B; SRAM доступно 814 B для stack/locals. Это **тестовый RC**, а не production freeze. Реальное железо НЕ прошито и LED visual test НЕ закрыт.
+5. ESP/Android/API/UART/EEPROM прежние, F02/F03 wire IDs не переиспользованы; D-104 целевой UI = ручной F01 + будущие пресеты, P12 остаётся концептом. Staged reset/speed Nano входит в preview и требует отдельного smoke.
+6. Hero изображения Android владелец принял. ARDU-DIRECT physical, 44+44 two-ring power test остаются открытыми; аккумуляторная ветвь отменена.
 
 ## 12. База ColorMusic/FHT
 

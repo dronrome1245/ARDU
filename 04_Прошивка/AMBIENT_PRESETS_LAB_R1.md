@@ -64,3 +64,7 @@
 3. Перед **физическим** тестом этих сцен — выпустить и проверить один согласованный **полный** Nano release candidate по FINALIZATION_PLAN. Не прошивать standalone-прототип, не менять работающую конфигурацию без rollback.
 4. На реальном 44-LED кольце принять скорость, палитры, сглаживание трёх сцен. Только после владельческого visual PASS согласовать финальный каталог и версионированные UART/API/EEPROM значения.
 5. Два зеркальных 44+44 выхода, ARDU-DIRECT и нагрузочный тест остаются отдельными acceptance gates перед потолочной установкой.
+
+## Продолжение: готова полная аппаратная PREVIEW RC1
+
+В `04_Прошивка/nano_ambient_preview_rc1/` создан самодостаточный для Arduino IDE полный v1 скетч, в котором F01 переключает P01/P04/P05/старый F01 по ~8,2 с. CI [37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365) PASS, preview Flash 29376 / 30720, globals 1234 / 2048; [HEX artifact](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835). Следующий gate — **не новый код**, а проверка на физическом кольце по [AMBIENT_PRESETS_PREVIEW_RC1_TEST.md](AMBIENT_PRESETS_PREVIEW_RC1_TEST.md).

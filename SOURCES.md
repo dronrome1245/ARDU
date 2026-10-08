@@ -1084,3 +1084,9 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - Исходники: `04_Прошивка/nano_ardu_v1/ambient_preset_probe.h`, `.../tests/ambient_preset_probe_host.cpp`; хранятся в том же репозитории, аппаратной идентификации не требуют.
 - Проверка CI: [GitHub Actions Arduino Verify run 37807204353](https://github.com/dronrome1245/ARDU/actions/runs/37807204353), 2026-10-08, full original Nano and experimental full Nano + host tests PASS.
 - По тексту CI: baseline 28690/30720 Flash + 1234/2048 globals; probe 29312/30720 Flash + 1234/2048 globals. Это данные компилятора; они **не** подтверждают физические эффекты/температуру/напряжение и не разрешают upload.
+
+## 2026-10-08 — verified IDE-openable full Nano Ambient preview RC1
+
+- [Arduino Verify run 37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365): host tests / source sync / standalone full preview compile / full default Nano compile all PASS; 28690→29376 Flash bytes, globals SRAM 1234 B unchanged. 
+- [Compiled HEX artifact 11564965835](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835), ZIP SHA256 from CI: `07fbf048192593c9f093ac4028b0a3bda55e62bbf992b031d78d6e905bb494a2`.
+- Документация: `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md`. Данные CI не подтверждают прошивку устройства, визуальную приёмку, реальный ток или остаток стека в runtime.
