@@ -2987,3 +2987,25 @@ esp_v2_r2_ota_physical_2026_10_08:
   nano_v2_uploaded: false
   next: get_api_status_and_ambient_presets_before_nano_v2_upload
 
+# 2026-10-08: all 12 owner-approved photo thumbnails integrated into Android
+android_ambient12_images_2026_10_08:
+  decision: D-111
+  status: source_and_android_ci_pass_owner_visual_smoke_pending
+  version_code: 30
+  version_name: "0.22.7-ambient12-photo-tiles-rc1"
+  scene_ids: [P01,P02,P03,P04,P05,P06,P07,P08,P09,P10,P11,P12]
+  images: twelve_webp_at_192x192
+  drawable_directory: "05_WiFi_и_приложение/android_app_r1/app/src/main/res/drawable-nodpi"
+  asset_pattern: "ardu_preset_pXX.webp"
+  display_grid_columns: 4
+  display_grid_rows: 3
+  images_owner_approved: true
+  android_ci_run: "https://github.com/dronrome1245/ARDU/actions/runs/37838263956"
+  ci_assets_check: pass
+  ci_unit_tests: pass
+  ci_apk_build: pass
+  apk_artifact: "https://github.com/dronrome1245/ARDU/actions/runs/37838263956/artifacts/11576287564"
+  android_on_device_photo_grid_checked: false
+  nano_firmware_modified_for_images: false
+  esp_firmware_modified_for_images: false
+  next: git_pull_android_studio_run_owner_visual_smoke

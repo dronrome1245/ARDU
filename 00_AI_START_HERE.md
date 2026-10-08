@@ -123,11 +123,10 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-1. **ФИЗИЧЕСКИЙ PASS ESP v2:** владелец после OTA на `192.168.0.4` получил `GET /api/ping` → `fw=ARDU_ESP_V2_AMBIENT12`, `wifi_connected:true`, `network_mode:"station"`, `ota_ready:true`, `ota_port:8266`. Прошивка ESP v2 R2 реально установлена, работает домашняя Wi-Fi сеть и HTTP. `softap_active:false` в Station ожидаемо; ARDU-DIRECT **не** тестировали.
-2. **Следующий gate:** проверить связь новой ESP со старой Nano: `curl.exe http://192.168.0.4/api/status` и `curl.exe http://192.168.0.4/api/ambient/presets`. При старой Nano сцены должны возвращать `supported:false`, остальные параметры/статус — читаться. При потере UART **не** перепрошивать Nano до диагностики.
-3. Только после PASS UART — USB Upload полной Nano `04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino` (Arduino Nano ATmega328P Old Bootloader; при **полностью снятом питании** временно изолировать ESP TX→Nano D0; обеспечить безопасное питание USB). Проверить Nano UART 1/2/4/115, восстановить провод, прочитать `/api/status` / `/api/ambient/presets`.
-4. Затем Android `0.22.6`, физический просмотр P01..P12 и EEPROM/RTC/Music/L01 regression; только после обычного Station/LED PASS — физический ARDU-DIRECT на `192.168.4.1` при выключенном домашнем роутере. [План](ARDU_AMBIENT12_RELEASE_CANDIDATE.md).
-5. **Не объявлять финальный продукт:** Nano v2 не подтверждена на железе (Flash CI 29306/30720, globals 1282/2048), AVR stack и 44+44 ток/питание/температура, SoftAP failover и все сцены не приняты. Battery отказ сохраняется.
+1. **Текущий source/CI:** Android `0.22.7-ambient12-photo-tiles-rc1`, versionCode 30, 12 фотографических WebP-миниатюр P01..P12 (192×192) и полная сетка 4×3 в разделе «Фон». [CI 37838263956](https://github.com/dronrome1245/ARDU/actions/runs/37838263956) PASS: WebP binding check, Gradle unit contract tests, APK [11576287564](https://github.com/dronrome1245/ARDU/actions/runs/37838263956/artifacts/11576287564). Source-код/изображения физически в GitHub `main`.
+2. **Следующий gate владельца:** `cd C:\ARDU` → `git pull` → Android Studio Run. Открыть «Фон»: проверить P01..P12 в трёх рядах по четыре плитки, все изображения и подписи (Северное сияние, Закат на Бали, Океан, Космос, Камин, Свечи, Лунный свет, Лес, Неон, Лава, Дыхание, Радуга). Проверить выбранную рамку/подпись, переключение сцен и сохранение регуляторов. Если визуальная проблема — прислать скриншот нового экрана.
+3. **Факты до обновления Android:** владелец подтвердил `/api/ping` ESP v2, `GET /api/ambient/presets` с 12 сценами и `POST /api/ambient/preset P01` с `applied:true/persisted:true`, прежний тест приложения прошёл. **Новые фотоплитки на телефоне пока не показаны владельцем.**
+4. **ESP и Nano не перепрошивать из-за изображений:** изменения только в Android UI/ресурсах. Открыты физические acceptance gates: ARDU-DIRECT без роутера, 44+44 ток/питание/температура, стабильность RAM/stack, эстетика и автономность 12 эффектов; аккумулятор отменён.
 
 ## 12. База ColorMusic/FHT
 

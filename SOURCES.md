@@ -1117,3 +1117,8 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 
 Владелец прислал прямой результат запроса ESP `/api/ping`: `ok=true`; `fw=ARDU_ESP_V2_AMBIENT12`; `uart_protocol=1`; `wifi_connected=true`; `network_mode=station`; `softap_active=false`; `ip=192.168.0.4`; `rssi=-57`; `ota_ready=true`; `ota_hostname=ardu`; `ota_port=8266`. **ФАКТ:** физический ESP запустился на новой v2 R2, HTTP/Station работают. Этот запрос **не** подтверждает UART Nano или реальное переключение в ARDU-DIRECT; отдельные измерения ожидаются.
 
+## 2026-10-08 — approved Ambient12 thumbnail artwork source and APK evidence
+
+- Пользователь прислал три утверждённых листа с 12 тематическими картинками, без сцен интерьера: P01…P04, P05…P08, P09…P12. Происхождение и мэппинг описаны в `05_WiFi_и_приложение/AMBIENT12_ARTWORK.md`; сами финальные 12 миниатюр размещены как **реальные WebP Git blobs** в `android_app_r1/app/src/main/res/drawable-nodpi/ardu_preset_p01.webp`..`ardu_preset_p12.webp` (192×192).
+- [GitHub commit 4221b5b](https://github.com/dronrome1245/ARDU/commit/4221b5b6d497b2bf32172aec638c1efb92d5f8ae) — файлы и Kotlin/XML mapping. [CI 37838263956](https://github.com/dronrome1245/ARDU/actions/runs/37838263956) confirms presence/RIFF-WEBP headers/12 resource refs, Android unit tests, APK build, [APK artifact 11576287564](https://github.com/dronrome1245/ARDU/actions/runs/37838263956/artifacts/11576287564).
+- Это **программное** свидетельство успешной сборки; реальный внешний вид сетки на телефоне будет подтверждён пользователем после `git pull`→Run.
