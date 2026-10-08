@@ -1280,7 +1280,7 @@
                                 android:contentDescription="Северное сияние"
                                 android:padding="0dp"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/ardu_preset_aurora" />
+                                android:src="@drawable/ardu_preset_p01" />
                             <TextView android:id="@+id/ambientPresetAuroraLabel" style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:maxLines="2" android:text="Северное\nсияние" android:textAlignment="center" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
                         </LinearLayout>
 
@@ -1294,7 +1294,7 @@
                                 android:contentDescription="Закат на Бали"
                                 android:padding="0dp"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/ardu_preset_sunset" />
+                                android:src="@drawable/ardu_preset_p02" />
                             <TextView android:id="@+id/ambientPresetSunsetLabel" style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:maxLines="2" android:text="Закат" android:textAlignment="center" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
                         </LinearLayout>
 
@@ -1308,7 +1308,7 @@
                                 android:contentDescription="Океан"
                                 android:padding="0dp"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/ardu_preset_ocean" />
+                                android:src="@drawable/ardu_preset_p03" />
                             <TextView android:id="@+id/ambientPresetOceanLabel" style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:maxLines="2" android:text="Океан" android:textAlignment="center" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
                         </LinearLayout>
 
@@ -1322,7 +1322,7 @@
                                 android:contentDescription="Космос"
                                 android:padding="0dp"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/ardu_preset_cosmos" />
+                                android:src="@drawable/ardu_preset_p04" />
                             <TextView android:id="@+id/ambientPresetCosmosLabel" style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:maxLines="2" android:text="Космос" android:textAlignment="center" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
                         </LinearLayout>
                     </LinearLayout>

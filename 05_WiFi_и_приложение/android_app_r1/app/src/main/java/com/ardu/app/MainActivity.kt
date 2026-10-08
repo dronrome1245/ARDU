@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.graphics.Color
 import android.provider.Settings
+import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -160,7 +161,17 @@ class MainActivity : Activity() {
     private lateinit var ambientPresetDynamicsText: TextView
     private lateinit var ambientPresetDynamicsSeek: SmartSliderView
     private lateinit var ambientManualPanel: LinearLayout
-    private val ambientExtraPresetButtons = linkedMapOf<String, Button>()
+    private val ambientExtraPresetButtons = linkedMapOf<String, ImageButton>()
+    private val ambientExtraPresetLabels = linkedMapOf<String, TextView>()
+    // Curated 12-image pack P01..P12; all thumbnails ship locally in APK.
+    private val ambientSceneDrawables = mapOf(
+        "P01" to R.drawable.ardu_preset_p01, "P02" to R.drawable.ardu_preset_p02,
+        "P03" to R.drawable.ardu_preset_p03, "P04" to R.drawable.ardu_preset_p04,
+        "P05" to R.drawable.ardu_preset_p05, "P06" to R.drawable.ardu_preset_p06,
+        "P07" to R.drawable.ardu_preset_p07, "P08" to R.drawable.ardu_preset_p08,
+        "P09" to R.drawable.ardu_preset_p09, "P10" to R.drawable.ardu_preset_p10,
+        "P11" to R.drawable.ardu_preset_p11, "P12" to R.drawable.ardu_preset_p12
+    )
     private val ambientSceneNames = linkedMapOf(
         "P01" to "Северное сияние", "P02" to "Закат на Бали",
         "P03" to "Океан", "P04" to "Космос",
@@ -982,28 +993,53 @@ class MainActivity : Activity() {
             tile.configure(id, "Цвет")
             tile.setOnClickListener { setAmbientEffect(id) }
         }
-        ambientSceneNames.keys.drop(4).chunked(2).forEach { pair ->
+        // Reuse the four-thumbnail layout of the existing Home Hub. All
+        // additional rows have the same four columns, 76dp square-ish images
+        // and concise labels; no bitmap downloads, no interior-room imagery.
+        ambientSceneNames.keys.drop(4).chunked(4).forEach { four ->
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { topMargin = dp(6) }
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = dp(10) }
             }
-            pair.forEach { id ->
-                val button = Button(this).apply {
-                    text = "${id} • ${ambientSceneNames[id]}"
-                    isAllCaps = false
-                    textSize = 12f
-                    setTextColor(getColor(R.color.ardu_text))
+            four.forEach { id ->
+                val cell = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = Gravity.CENTER_HORIZONTAL
+                }
+                val button = ImageButton(this).apply {
+                    setImageResource(ambientSceneDrawables.getValue(id))
+                    scaleType = ImageView.ScaleType.CENTER_CROP
                     setBackgroundResource(R.drawable.ardu_preset_thumb)
-                    setPadding(dp(6), 0, dp(6), 0)
+                    clipToOutline = true
+                    contentDescription = ambientSceneNames[id]
+                    setPadding(0, 0, 0, 0)
                     setOnClickListener { applyAmbientPreset(id) }
                 }
-                row.addView(button, LinearLayout.LayoutParams(0, dp(52), 1f).apply {
+                cell.addView(button, LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, dp(76)
+                ))
+                val label = TextView(this).apply {
+                    text = ambientSceneNames.getValue(id)
+                    textSize = 10f
+                    maxLines = 2
+                    gravity = Gravity.CENTER
+                    setTextColor(getColor(R.color.ardu_nav_icon_tint))
+                }
+                cell.addView(label, LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = dp(5) })
+                row.addView(cell, LinearLayout.LayoutParams(0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                ).apply {
                     marginStart = dp(3)
                     marginEnd = dp(3)
                 })
                 ambientExtraPresetButtons[id] = button
+                ambientExtraPresetLabels[id] = label
             }
             ambientPresetExtraGrid.addView(row)
         }
@@ -1090,7 +1126,14 @@ class MainActivity : Activity() {
             ))
         }
         ambientExtraPresetButtons.forEach { (id, button) ->
-            setChoiceState(button, id == selectedId)
+            button.isSelected = id == selectedId
+            button.imageAlpha = if (id == selectedId) 255 else 230
+        }
+        ambientExtraPresetLabels.forEach { (id, label) ->
+            label.setTextColor(getColor(
+                if (id == selectedId) R.color.ardu_accent
+                else R.color.ardu_nav_icon_tint
+            ))
         }
     }
 
