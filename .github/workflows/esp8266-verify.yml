@@ -23,48 +23,54 @@ jobs:
           arduino-cli core update-index
           arduino-cli core install esp8266:esp8266
 
-      - name: Compile ARDU ESP8266 v2 Ambient12
+      - name: Verify no external credential header and prepare single-file test sketch
         run: |
-          arduino-cli compile \
-            --fqbn esp8266:esp8266:generic \
-            --warnings default \
-            --build-property "compiler.cpp.extra_flags=-DARDU_CI_BUILD=1" \
-            --build-path "$GITHUB_WORKSPACE/build-esp-v2" \
-            "05_WiFi_и_приложение/esp8266_ardu_v2"
+          python3 - <<'PY'
+          from pathlib import Path
+          import os, re
+          src = Path("05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino").read_text()
+          assert '#include "wifi_secrets.h"' not in src
+          assert "ARDU_CI_BUILD" not in src
+          assert "ARDU_CREDENTIALS_CONFIGURED" not in src
+          replacement = {
+              "ARDU_WIFI_SSID": "CI_STATION_WIFI",
+              "ARDU_WIFI_PASSWORD": "CI_TEST_HOME_PASSWORD",
+              "ARDU_OTA_PASSWORD": "CI_TEST_OTA_PASSWORD",
+              "ARDU_SOFTAP_PASSWORD": "CI_TEST_DIRECT_PASSWORD",
+          }
+          for key, value in replacement.items():
+              pattern = rf'(?m)^(#define\s+{key}\s+)"PUT_[A-Z_]+_HERE"$'
+              src, n = re.subn(pattern, lambda m: m[1] + '"' + value + '"', src)
+              assert n == 1, f"cannot locate exactly one editable {key} line"
+          output = Path(os.environ["RUNNER_TEMP"]) / "esp8266_ardu_v2"
+          output.mkdir(parents=True, exist_ok=True)
+          (output / "esp8266_ardu_v2.ino").write_text(src)
+          assert len(list(output.iterdir())) == 1
+          print("PASS: only one .ino with four editable credentials, no local .h")
+          PY
 
-      - name: Verify ESP v2 compiles from ONE INO in a clean directory
+      - name: Ensure default placeholders FAIL compilation (OTA safety)
         run: |
-          mkdir -p "$RUNNER_TEMP/esp8266_ardu_v2"
-          cp "05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino" \
-             "$RUNNER_TEMP/esp8266_ardu_v2/esp8266_ardu_v2.ino"
-          test "$(find "$RUNNER_TEMP/esp8266_ardu_v2" -type f | wc -l)" -eq 1
+          if arduino-cli compile \
+            --fqbn esp8266:esp8266:generic \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-esp-v2-unconfigured" \
+            "05_WiFi_и_приложение/esp8266_ardu_v2" \
+            > "$RUNNER_TEMP/esp-unconfigured.log" 2>&1; then
+            echo "ERROR: placeholder ESP firmware compiled unexpectedly"
+            exit 1
+          fi
+          grep -q 'Enter home Wi-Fi SSID' "$RUNNER_TEMP/esp-unconfigured.log"
+          echo "PASS: accidental OTA with default placeholder credentials is rejected"
+
+      - name: Compile ESP v2 manually configured ONE-file source
+        run: |
           arduino-cli compile \
             --fqbn esp8266:esp8266:generic \
             --warnings default \
-            --build-property "compiler.cpp.extra_flags=-DARDU_CI_BUILD=1" \
-            --build-path "$GITHUB_WORKSPACE/build-esp-v2-onefile" \
+            --build-path "$GITHUB_WORKSPACE/build-esp-v2-manual" \
             "$RUNNER_TEMP/esp8266_ardu_v2"
-          echo "PASS: ESP v2 does not need project-local type headers"
-
-      - name: Compile ESP v2 with local credential guard enabled
-        run: |
-          # Non-secret CI credentials exercise the exact user-side build path.
-          # The real wifi_secrets.h stays ignored and local to the owner.
-          cat > "05_WiFi_и_приложение/esp8266_ardu_v2/wifi_secrets.h" <<'EOF'
-          #pragma once
-          #define ARDU_WIFI_SSID "ARDU_CI_STA"
-          #define ARDU_WIFI_PASSWORD "ARDU_CI_TEST_PASSWORD"
-          #define ARDU_OTA_PASSWORD "ARDU_CI_OTA_PASSWORD"
-          #define ARDU_SOFTAP_PASSWORD "ARDU_CI_DIRECT_PASSWORD"
-          #define ARDU_CREDENTIALS_CONFIGURED 1
-          EOF
-          arduino-cli compile \
-            --fqbn esp8266:esp8266:generic \
-            --warnings default \
-            --build-path "$GITHUB_WORKSPACE/build-esp-v2-private-guard" \
-            "05_WiFi_и_приложение/esp8266_ardu_v2"
-          rm "05_WiFi_и_приложение/esp8266_ardu_v2/wifi_secrets.h"
-          echo "PASS: ESP v2 private-header OTA build works without ARDU_CI_BUILD"
+          echo "PASS: manually filled single-file ESP v2 compiles without wifi_secrets.h"
 
       - name: Compile ARDU ESP8266 v1
         run: |
