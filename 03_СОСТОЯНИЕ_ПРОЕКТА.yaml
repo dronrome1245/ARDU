@@ -2951,3 +2951,20 @@ ambient12_direct_rc_2026_10_08:
   ci_android: "https://github.com/dronrome1245/ARDU/actions/runs/37819918951"
   test_guide: "ARDU_AMBIENT12_RELEASE_CANDIDATE.md"
   next: esp_v2_station_ota_then_full_nano_v2_then_android_then_direct_wifi_smoke
+
+# D-110, 2026-10-08: self-contained ESP v2 R2 with manual credentials
+esp_v2_r2_manual_config_2026_10_08:
+  state: source_and_ci_pass_physical_upload_pending
+  sketch: "05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino"
+  external_wifi_secrets_h_required: false
+  local_extra_project_headers_required: false
+  fields: [ARDU_WIFI_SSID, ARDU_WIFI_PASSWORD, ARDU_OTA_PASSWORD, ARDU_SOFTAP_PASSWORD]
+  config_flag_required: false
+  placeholder_ota_build_rejected: true
+  ci: "https://github.com/dronrome1245/ARDU/actions/runs/37823238584"
+  ci_one_ino_build: pass
+  ci_negative_default_credentials: pass
+  secrets_in_git: false
+  hardware_uploaded: false
+  next: edit_four_local_strings_verify_then_station_ota
+  handoff: "ARDU_AMBIENT12_RELEASE_CANDIDATE.md"

@@ -498,3 +498,7 @@ The twelve atmospheric preset candidates are documented in `04_Прошивка/
 - `POST /api/ambient/effect` accepts only `{"id":"F01"}` (manual HSV). Historical F02/F03 HTTP and four Android macros described above are **v1-only**, retired in the new user experience; numeric IDs reserved, not reassigned.
 
 Private `wifi_secrets.h` (home SSID/password, OTA password, new WPA2 `ARDU-DIRECT` pass ≥8 chars) is **mandatory** for real IDE compilation; `ARDU_CREDENTIALS_CONFIGURED=1` only after replacement, and compile-time guards reject template passwords. [ESP CI](https://github.com/dronrome1245/ARDU/actions/runs/37820404281) PASS. Full physical Wi-Fi/OTA/protocol smoke still pending; see `ARDU_AMBIENT12_RELEASE_CANDIDATE.md`.
+
+### D-110 credential packaging note — ESP v2 R2 (2026-10-08)
+
+The earlier instruction requiring `wifi_secrets.h` is superseded **for current ESP v2**. The source `esp8266_ardu_v2.ino` is one file with 4 editable macros at its top: `ARDU_WIFI_SSID`, `ARDU_WIFI_PASSWORD`, `ARDU_OTA_PASSWORD` and `ARDU_SOFTAP_PASSWORD`. No local .h or configuration flag. Default placeholder values deliberately fail compile; real values must remain on an owner's local copy outside Git. [Single-file ESP CI 37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) PASS, physical OTA not yet done.
