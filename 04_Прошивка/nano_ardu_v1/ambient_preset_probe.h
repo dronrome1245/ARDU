@@ -31,13 +31,14 @@ inline bool render(uint8_t scene, CRGB* out, uint8_t count,
                    uint32_t nowMs, uint8_t dynamics) {
   // Production geometry is exactly 44 LEDs per ring, nothing else.
   if (!out || count != 44U || scene > FIREPLACE) return false;
-  // A single constant 32-bit shift and 16-bit multiplication replaces
-  // scene-specific variable 32-bit shifts on ATmega328P.
-  const uint8_t velocity = dynamics >= 170U ? 3U : (dynamics >= 85U ? 2U : 1U);
-  const uint16_t tick = static_cast<uint16_t>(nowMs >> 6) * velocity;
+  // One fixed 32-bit time shift, then cheap 16-bit shifts for speed.
+  // Tick increments every 32ms at default dynamics.
+  uint16_t tick = static_cast<uint16_t>(nowMs >> 5);
+  if (dynamics >= 170U) tick <<= 1;
+  else if (dynamics < 85U) tick >>= 1;
 
   if (scene == AURORA) {
-    const uint8_t phase = static_cast<uint8_t>(tick >> 2);
+    const uint8_t phase = static_cast<uint8_t>(tick >> 3);
     for (uint8_t i = 0; i < count; ++i) {
       const uint8_t flow = triangle8(static_cast<uint8_t>(i * 7U + phase));
       const uint8_t depth = triangle8(static_cast<uint8_t>(i * 11U - (phase >> 1)));
@@ -52,7 +53,7 @@ inline bool render(uint8_t scene, CRGB* out, uint8_t count,
     // Three fades are 1/3 period apart; no per-star random frame state.
     for (uint8_t i = 0; i < count; ++i) out[i] = CHSV(165U, 230U, 10U);
     for (uint8_t star = 0; star < 3U; ++star) {
-      const uint16_t starTick = static_cast<uint16_t>(tick + star * 85U);
+      const uint16_t starTick = static_cast<uint16_t>((tick >> 1) + star * 85U);
       const uint8_t fade = triangle8(static_cast<uint8_t>(starTick));
       const uint8_t seed = hash8(static_cast<uint8_t>(
           (starTick >> 8) * 19U + star * 61U));
