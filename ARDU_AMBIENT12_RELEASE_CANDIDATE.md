@@ -19,7 +19,10 @@
 
 ## 2. Проверка CI и открытые риски
 
-- [Nano Arduino Verify](https://github.com/dronrome1245/ARDU/actions/runs/37818601346): **PASS** — полная Nano с 12 сценами **29560 / 30720 байт Flash**, **1282 / 2048 байт globals SRAM** (запас ≈1160 B Flash и 766 B SRAM для стека/локальных данных). Целевой резерв Flash ≤95% (29184 B) **не выполнен на 376 байт**; worst-case стек и работа светодиодов при включённых подсистемах ещё не измерены.
+**Последний Nano CI**: [37820974644](https://github.com/dronrome1245/ARDU/actions/runs/37820974644), после удаления устаревших обработчиков F02/F03, [готовый HEX](https://github.com/dronrome1245/ARDU/actions/runs/37820974644/artifacts/11568284647). Размеры ниже относятся именно к нему, а не к более ранней v2. Перед USB upload предпочтительнее `.ino` и Verify в собственной Arduino IDE.
+
+
+- [Nano Arduino Verify](https://github.com/dronrome1245/ARDU/actions/runs/37820974644): **PASS** — полная Nano с 12 сценами **29306 / 30720 байт Flash**, **1282 / 2048 байт globals SRAM** (запас ≈1414 B Flash и 766 B SRAM для стека/локальных данных). Целевой резерв Flash ≤95% (29184 B) **не выполнен на 122 байта**; worst-case стек и работа светодиодов при включённых подсистемах ещё не измерены.
 - [ESP8266 Verify](https://github.com/dronrome1245/ARDU/actions/runs/37819874326): **PASS** — ESP v2 с типовым CI-определением флага; 32176/80192 B статическая RAM (40%), IRAM 60823/65536 B (92%). Перед прошивкой реально собирать только с заполненным `wifi_secrets.h`.
 - [Android Verify](https://github.com/dronrome1245/ARDU/actions/runs/37819918951): **PASS** — JVM contract tests + APK сборка. [Android debug APK artifact](https://github.com/dronrome1245/ARDU/actions/runs/37819918951/artifacts/11568856875).
 - CI не доказывает, что 12 сценариев на настоящем кольце выглядят как задумано, что ARDU-DIRECT работает при отключённом роутере, что нет сбоев питания или что работает OTA rollback.
@@ -61,7 +64,7 @@
 1. Открыть `04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino` (вся прошивка, не самостоятельный demo sketch). Достаточно одного `.ino`, нужны установленные **FastLED** и та же оригинальная **FHT** из `04_Прошивка/libraries/FHT`.
 2. Arduino IDE: Board **Arduino Nano**, Processor **ATmega328P (Old Bootloader)**, правильный физический COM-порт (USB-C Nano в текущем стенде).
 3. **До перемещения проводов полностью выключить внешние 5 В и отсоединить USB.** Для программирования временно разъединить **ESP TX0/GPIO1 → Nano D0/RX**; делитель **Nano D1/TX → ESP RX** оставить. Не подавать на Nano USB 5 В и внешний +5 В одновременно без подтверждённой схемы развязки, не питать выключенную ленту через DATA. При неопределённости схемы остановиться до безопасного подключения.
-4. Сначала **Verify**: при CI-зависимостях около `29560` Flash / `1282` SRAM globals. При flash overflow или иных error Upload запрещён.
+4. Сначала **Verify**: при CI-зависимостях около `29306` Flash / `1282` SRAM globals. При flash overflow или иных error Upload запрещён.
 5. Затем **Upload** полной Nano. Пока ESP TX ещё отсоединён, Serial Monitor **115200, Newline**:
    - `1` → `O 1`;
    - `2` → `D 2 ...`;
@@ -107,6 +110,6 @@ HTTP-запрос примера (после установки обеих пр�
 
 Обязательно на **реальном** устройстве: один 44-LED канал → оба D6/D7, фактическое напряжение 5 В под нагрузкой, ток/температура/сечение и надёжность проводки, отсутствие LED glitches и UART corruption; L01 Kelvin/RGB/clap и калибровка MAX9814, Music M01/M02/M03/M04/M05/M08/M09, Night schedule, RTC/Alarm/Dawn/STOP/recovery, сохранение EEPROM через физический power-cycle, 12 реально различимых сцен, отдельные brightness/dynamics, Station→ARDU-DIRECT→Station, OTA доступ в Station.
 
-**Пока не проверено:** SRAM stack worst-case, светодиодные сцены на железе, два кольца 44+44, защита/нагрев блока питания и прямой Wi-Fi. Nano занимает 29560 байт Flash (~96% > 95% project target), ESP IRAM 92%; оба компилируются, но это ещё не доказанный final hardware PASS. S-30-5 (металлический корпус без PE) пригоден только для стенда, для потолка нужен финальный Class II БП по BOM.
+**Пока не проверено:** SRAM stack worst-case, светодиодные сцены на железе, два кольца 44+44, защита/нагрев блока питания и прямой Wi-Fi. Nano занимает 29306 байт Flash (~96% > 95% project target), ESP IRAM 92%; оба компилируются, но это ещё не доказанный final hardware PASS. S-30-5 (металлический корпус без PE) пригоден только для стенда, для потолка нужен финальный Class II БП по BOM.
 
 Если что-то не работает — зафиксировать результат конкретного gate и откатить **только** нарушенную подсистему; без серийных новых перепрошивок «на удачу».
