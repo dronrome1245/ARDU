@@ -2820,3 +2820,21 @@ android_generated_heroes_v0_22_4_2026_10_07:
     behavior_design: pending_owner_discussion
     stable_ids_not_frozen: true
   next: emulator_hero_check_then_ambient_preset_behavior_design
+
+ambient_preset_idea_d104_2026_10_08:
+  status: idea_only_not_approved_for_implementation
+  owner_decision: D-104
+  target_manual_ambient_effect: F01
+  future_ui_excludes: [F02, F03]
+  current_firmware_retains_legacy_f02_f03: true
+  source_changes_in_this_iteration: false
+  proposed_scene_count: 12
+  proposed_algorithm_families: [gradient_waves, flicker_fire, sparse_stars, breathing]
+  proposed_controls: [brightness, dynamics]
+  proposed_ids_frozen: false
+  proposed_http_api_frozen: false
+  proposed_uart_frozen: false
+  proposed_eeprom_schema_frozen: false
+  concept_doc: "04_Прошивка/AMBIENT_PRESETS_CONCEPT.md"
+  android_version_unchanged: "0.22.5-ambient-hero-hotfix-rc1"
+  next: "verify_ambient_hero_in_emulator; implementation_only_after_explicit_approval"
