@@ -50,3 +50,12 @@
 - F02/F03 — **не нужны для будущего user-facing набора по решению владельца**. Их ID уже заняты в текущем firmware/API и не переименовываются/не переиспользуются без миграции.
 - В действующем исходном коде F02/F03 по-прежнему присутствуют; на этом шаге ничего не удалялось.
 - Рабочие обозначения будущих пресетов `P01…P12` описаны как **идея**, НЕ stable IDs в [AMBIENT_PRESETS_CONCEPT.md](AMBIENT_PRESETS_CONCEPT.md).
+
+## D-109 — stable API scene IDs approved for v2 (2026-10-08)
+
+Owner-approved twelve-scene catalog:
+- `P01` Северное сияние; `P02` Закат на Бали; `P03` Океан; `P04` Космос;
+- `P05` Камин; `P06` Свечи; `P07` Лунный свет; `P08` Лес;
+- `P09` Неон; `P10` Лава; `P11` Дыхание; `P12` Радуга.
+
+`F01` remains manual HSV. `F02/F03` retired from NEW UI, their old numeric UART IDs reserved, not reused. Nano v2 opcode100 value0 selects F01 and opcode111 values1..12 selects P01..P12. Twelve separate brightness/dynamics profiles in Nano EEPROM at 512..540. Scene visuals still need physical owner review; only software CI has passed. See `ARDU_AMBIENT12_RELEASE_CANDIDATE.md`.

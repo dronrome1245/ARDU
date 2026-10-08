@@ -204,3 +204,19 @@ Opcode 130 добавлен по прямому запросу владельц�
 ### D-104: No UART change for proposed Ambient presets (2026-10-08)
 
 Future Ambient UI will keep F01 and omit F02/F03 (owner decision). The current v1 numeric UART still supports their existing mappings, and no firmware/source changes were made in this documentation-only step. Proposed `P01…P12`, UART opcodes, persisted schema and any new statuses are **IDEAS / NOT FROZEN**. See `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md`.
+
+## D-109 — P01..P12 additive internal UART contract for full Nano v2 (2026-10-08)
+
+Other UART v1 numeric commands for L01/Music/Night/RTC/Clap remain unchanged. Opcode `100 0` selects F01 manual and clears P. Old `100 1` and `100 2` (retired F02/F03) return `E 2` and are NOT reused.
+
+| Numeric opcode | Args | Normal response | Meaning |
+| ---: | --- | --- | --- |
+| `111` | `1..12` | `O 111` | Select P01..P12 (activate Ambient) |
+| `112` | `0..255` | `O 112` | Update selected P brightness in Nano RAM |
+| `113` | `0..255` | `O 113` | Update selected P dynamics in Nano RAM |
+| `114` | no args | `O 114` | Persist selected scene and all 12 profiles |
+| `115` | no args | `D 115 1 selected active br1 dyn1 ... br12 dyn12` | Authoritative Nano readback |
+
+After `D 115 1` exactly **26** numbers: selected=0 for F01 or 1..12, active=1 iff Nano mode=AMBIENT and selected P, then 12 brightness/dynamics pairs. Independent versioned+checksummed EEPROM block 29 bytes at 512..540, magic 0xA1D2 version1; old settings untouched.
+
+ESP v2 bridges numeric UART to semantic HTTP, Android never sends raw opcode. Old Nano returning E1 for 115 causes ESP to report presets supported:false. [Nano CI 37818601346](https://github.com/dronrome1245/ARDU/actions/runs/37818601346) compile PASS; physical UART/EEPROM smoke pending.

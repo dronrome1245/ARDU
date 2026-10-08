@@ -847,3 +847,9 @@ This is **backlog idea only**, not a scope addition to the active release accept
 ## 35. Arduino IDE preview RC2 packaging fix — 2026-10-08
 
 Пользовательская компиляция RC1 не находила локальный `ambient_preset_probe.h` несмотря на подтверждённое нахождение в том же каталоге; причина на Windows не выяснена. Заменить практический preview-gate на **один файл** `04_Прошивка/nano_ambient_preview_rc2/nano_ambient_preview_rc2.ino`. [CI 37814719230](https://github.com/dronrome1245/ARDU/actions/runs/37814719230) PASS после копирования только .ino в изолированный sketch folder. Порядок физической проверки: `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC2_TEST.md`. Nano v1, ESP/Android/API/EEPROM без изменений; аппаратный просмотр и runtime/stack acceptance по-прежнему не закрыты.
+
+## 36. D-109 — Ambient12 + WPA2 ARDU-DIRECT integrated v2 candidate
+
+Owner explicitly approves P01..P12 including P12 Rainbow and retires F02/F03 from user-facing controls; F01 stays manual. Full Nano v2, ESP v2 (Station→ARDU-DIRECT fallback) and Android v0.22.6 source/CI are prepared, keeping historic v1 baselines as rollback. Previous idea-only catalog status is superseded by D-109 in feature scope, NOT in hardware acceptance.
+
+**Release order:** [ARDU_AMBIENT12_RELEASE_CANDIDATE.md](ARDU_AMBIENT12_RELEASE_CANDIDATE.md): load ESP v2 **first via OTA on working Station**, verify old Nano/basic API, then full Nano v2 via USB with ESP TX→Nano D0 temporarily isolated, reconnect UART, Android/scene readback, then disable router to test ARDU-DIRECT. CI [Nano](https://github.com/dronrome1245/ARDU/actions/runs/37818601346) [ESP](https://github.com/dronrome1245/ARDU/actions/runs/37820404281) [Android](https://github.com/dronrome1245/ARDU/actions/runs/37819918951) PASS. **No physical OTA/USB/current/stack/two-ring/direct-mode PASS yet; production firmware not frozen.**
