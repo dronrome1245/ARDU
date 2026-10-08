@@ -392,3 +392,11 @@ Check:
 4. verify the room compositions feel natural behind the existing text/status overlay.
 
 Ambient preset behavior is a separate design task; the current four choices are not final.
+
+## Ambient hero asset hotfix — v0.22.5
+
+After owner emulator screenshot showed visual corruption, only the Ambient hero WebP was re-encoded from approved room art.
+
+`git pull` → Android Studio → **Run** in the Pixel emulator → open **Фон** and confirm the TV with cyan/magenta ambient backlight is visible. The Night/Alarm backgrounds and preset behavior are unchanged.
+
+Current version: `0.22.5-ambient-hero-hotfix-rc1`, versionCode 28.
