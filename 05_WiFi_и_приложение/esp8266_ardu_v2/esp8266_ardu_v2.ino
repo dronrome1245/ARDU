@@ -13,8 +13,8 @@
 
   This sketch preserves the proven ARDU Station Wi-Fi + ArduinoOTA transport and
   adds a protected SoftAP fallback for router-less local control.
-  Real WIFI_SSID / WIFI_PASSWORD / OTA_PASSWORD / SOFTAP_PASSWORD must remain
-  local and uncommitted.
+  Credentials are typed directly into the LOCAL .ino copy (four fields),
+  and must never be committed to the repository.
 */
 
 #include <Arduino.h>
@@ -34,63 +34,37 @@ struct NanoResult {
 };
 
 // ---------------------------------------------------------------------------
-// Local credentials.
+// MANUAL WIFI CONFIGURATION (ESP V2 CONFIG REVISION R2).
 //
-// For a real device, create wifi_secrets.h next to this sketch from
-// wifi_secrets.example.h. The local header is ignored by Git, so normal
-// pulls/branch switches never touch the tracked .ino.
-//
-// CI explicitly sets ARDU_CI_BUILD. Normal IDE builds REQUIRE a private local
-// wifi_secrets.h with ARDU_CREDENTIALS_CONFIGURED 1 and real passwords;
-// accidental OTA updates with Git-tracked placeholders must fail at compile.
+// Change ONLY the four quoted strings below in YOUR LOCAL COPY of this .ino.
+// The sketch has NO wifi_secrets.h dependency. NEVER commit real passwords.
+// To update an already installed ESP by OTA, Arduino IDE will ask for the
+// password of the CURRENT installed firmware, not the new value below.
 // ---------------------------------------------------------------------------
-#if defined(__has_include)
-#  if __has_include("wifi_secrets.h")
-#    include "wifi_secrets.h"
-#  elif !defined(ARDU_CI_BUILD)
-#    error "ARDU ESP v2 requires a local wifi_secrets.h before OTA upload"
-#  endif
-#elif !defined(ARDU_CI_BUILD)
-#  include "wifi_secrets.h"
-#endif
+#define ARDU_WIFI_SSID        "PUT_YOUR_WIFI_SSID_HERE"
+#define ARDU_WIFI_PASSWORD    "PUT_YOUR_WIFI_PASSWORD_HERE"
+#define ARDU_OTA_PASSWORD     "PUT_A_STRONG_OTA_PASSWORD_HERE"
+#define ARDU_SOFTAP_PASSWORD  "PUT_A_STRONG_AP_PASSWORD_HERE"
 
-#ifndef ARDU_CI_BUILD
-#  if !defined(ARDU_CREDENTIALS_CONFIGURED) || !ARDU_CREDENTIALS_CONFIGURED
-#    error "Set ARDU_CREDENTIALS_CONFIGURED 1 in your private wifi_secrets.h after filling all four passwords"
-#  endif
-static_assert(sizeof(ARDU_SOFTAP_PASSWORD)>=9,"ARDU-DIRECT password must be at least 8 characters");
-static_assert(sizeof(ARDU_OTA_PASSWORD)>=9,"OTA password must be at least 8 characters");
-// OTA is the only normal maintenance path once ESP is mounted. Reject the
-// tracked example placeholders even if a private header incorrectly sets
-// ARDU_CREDENTIALS_CONFIGURED to 1.
-constexpr bool arduSameLiteral(const char* a,const char* b) {
-  return (*a==*b) && ((*a=='\0') || arduSameLiteral(a+1,b+1));
+// Safety gate: stop a real OTA build if any quoted string remains a placeholder.
+// No extra flags or configuration headers are needed once the four fields are
+// filled in. ARDU-DIRECT WPA2 needs 8..63 characters.
+constexpr bool arduSameLiteral(const char* a, const char* b) {
+  return (*a == *b) && ((*a == '\0') || arduSameLiteral(a + 1, b + 1));
 }
-static_assert(!arduSameLiteral(ARDU_WIFI_SSID,"PUT_YOUR_WIFI_SSID_HERE"),
-              "Replace home Wi-Fi SSID before a real OTA build");
-static_assert(!arduSameLiteral(ARDU_WIFI_PASSWORD,"PUT_YOUR_WIFI_PASSWORD_HERE"),
-              "Replace home Wi-Fi password before a real OTA build");
-static_assert(!arduSameLiteral(ARDU_OTA_PASSWORD,"PUT_A_STRONG_OTA_PASSWORD_HERE"),
-              "Replace OTA password before a real OTA build");
-static_assert(!arduSameLiteral(ARDU_SOFTAP_PASSWORD,"PUT_A_STRONG_AP_PASSWORD_HERE"),
-              "Replace ARDU-DIRECT password before a real OTA build");
-#endif
-
-#ifndef ARDU_WIFI_SSID
-#define ARDU_WIFI_SSID "PUT_YOUR_WIFI_SSID_HERE"
-#endif
-
-#ifndef ARDU_WIFI_PASSWORD
-#define ARDU_WIFI_PASSWORD "PUT_YOUR_WIFI_PASSWORD_HERE"
-#endif
-
-#ifndef ARDU_OTA_PASSWORD
-#define ARDU_OTA_PASSWORD "PUT_A_STRONG_OTA_PASSWORD_HERE"
-#endif
-
-#ifndef ARDU_SOFTAP_PASSWORD
-#define ARDU_SOFTAP_PASSWORD "PUT_A_STRONG_AP_PASSWORD_HERE"
-#endif
+static_assert(sizeof(ARDU_WIFI_SSID) > 1 &&
+              !arduSameLiteral(ARDU_WIFI_SSID, "PUT_YOUR_WIFI_SSID_HERE"),
+              "Enter home Wi-Fi SSID in esp8266_ardu_v2.ino");
+static_assert(sizeof(ARDU_WIFI_PASSWORD) > 1 &&
+              !arduSameLiteral(ARDU_WIFI_PASSWORD, "PUT_YOUR_WIFI_PASSWORD_HERE"),
+              "Enter home Wi-Fi password in esp8266_ardu_v2.ino");
+static_assert(sizeof(ARDU_OTA_PASSWORD) >= 9 &&
+              !arduSameLiteral(ARDU_OTA_PASSWORD, "PUT_A_STRONG_OTA_PASSWORD_HERE"),
+              "Enter a real OTA password (at least 8 characters) in esp8266_ardu_v2.ino");
+static_assert(sizeof(ARDU_SOFTAP_PASSWORD) >= 9 &&
+              sizeof(ARDU_SOFTAP_PASSWORD) <= 64 &&
+              !arduSameLiteral(ARDU_SOFTAP_PASSWORD, "PUT_A_STRONG_AP_PASSWORD_HERE"),
+              "Enter an ARDU-DIRECT WPA2 password (8..63 characters) in esp8266_ardu_v2.ino");
 
 const char* WIFI_SSID = ARDU_WIFI_SSID;
 const char* WIFI_PASSWORD = ARDU_WIFI_PASSWORD;
