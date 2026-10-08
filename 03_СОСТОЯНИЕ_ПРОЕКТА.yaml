@@ -2900,3 +2900,24 @@ ambient_preview_rc1_2026_10_08:
   new_eeprom_layout: false
   preview_cycle: [P01_aurora, P04_cosmos, P05_fireplace, F01_legacy]
   next: owner_safe_nano_upload_and_ambient_f01_visual_smoke
+
+# 2026-10-08: single-file Nano RC2 fixes Windows missing-header compile
+ambient_preview_rc2_2026_10_08:
+  status: one_file_source_ci_pass_pending_windows_verify_and_physical_test
+  supersedes_preview: nano_ambient_preview_rc1
+  observed_blocker: ambient_preset_probe_h_not_found_on_owner_windows
+  root_cause_confirmed: false
+  source: "04_Прошивка/nano_ambient_preview_rc2/nano_ambient_preview_rc2.ino"
+  additional_local_header_required: false
+  test_doc: "04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC2_TEST.md"
+  ci: "https://github.com/dronrome1245/ARDU/actions/runs/37814719230"
+  ci_isolated_one_ino_compile: pass
+  ci_host_tests: pass
+  ci_integrity_check: pass
+  flash_bytes: 29376
+  sram_globals_bytes: 1234
+  hex_artifact: "https://github.com/dronrome1245/ARDU/actions/runs/37814719230/artifacts/11567275089"
+  physical_upload_done: false
+  device_led_test_done: false
+  api_uart_eeprom_unchanged: true
+  next: open_rc2_single_ino_windows_arduino_verify_then_safe_upload

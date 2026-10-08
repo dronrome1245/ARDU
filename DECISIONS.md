@@ -1901,3 +1901,14 @@ R3 не прошивался и не тестировался на железе.
 5. D-104 не меняется, окончательные 12 пресетов/P12, persistence, stable UART/HTTP IDs ещё не утверждены.
 
 **ФАКТ:** [CI 37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365) PASS, опубликован [HEX](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835). Физический Upload и тест на кольце не выполнялись в чате.
+
+## D-108 — Arduino IDE RC1 local header error; replace physical handoff with single-file RC2
+
+**Дата:** 2026-10-08  
+**Статус:** ДЕЙСТВУЕТ; ЗАМЕНЯЕТ D-107 только в части используемого preview-артефакта и пути его загрузки, сохраняет D-104.
+
+**ФАКТ от владельца:** `nano_ambient_preview_rc1.ino` при компиляции на Windows `C:\Users\Пользователь\Downloads\...` не находил `ambient_preset_probe.h` (строка 38), несмотря на то, что пользователь положил `.h` в тот же каталог. Причина локальной проблемы IDE не установлена; не приписывать её владельцу.
+
+**РЕШЕНИЕ:** выпустить отдельную `nano_ambient_preview_rc2.ino` как полностью самодостаточную Nano v1 с inline P01/P04/P05, без нестандартного `#include "ambient_preset_probe.h"`. Автоматически проверить **только один .ino** в пустой папке на Arduino AVR в CI. Старую RC1 пометить устаревшей, не переписывать её как проверенную на Windows. Протокол, EEPROM, ESP/Android и стандартную Nano v1 оставить без изменений. Реальная загрузка по отдельной инструкции после Verify.
+
+**CI:** [37814719230](https://github.com/dronrome1245/ARDU/actions/runs/37814719230) PASS; RC2 single-file 29376 Flash / 1234 globals SRAM, HEX [11567275089](https://github.com/dronrome1245/ARDU/actions/runs/37814719230/artifacts/11567275089). **Физический hardware PASS не подтверждён.**

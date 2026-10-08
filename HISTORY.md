@@ -2649,3 +2649,11 @@ No code/firmware/application assets changed and no hardware retest claimed.
 Первая попытка собрать отдельный IDE-wrapper для всей Nano v1 через относительный include `../nano_ardu_v1/nano_ardu_v1.ino` не прошла CI [37809142084](https://github.com/dronrome1245/ARDU/actions/runs/37809142084): после препроцессинга путь был недоступен. Исправлено на самодостаточную папку `04_Прошивка/nano_ambient_preview_rc1/` (полная версия .ino + копия header). В CI добавлен byte-for-byte sync с основной Nano v1 + flag.
 
 Итог: [CI 37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365) PASS — host frames, source sync, standard full Nano 28690 Flash/1234 globals, preview full Nano 29376 Flash/1234 globals, отдельный IDE-sketch PASS и [HEX artifact 11564965835](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835). Разработана инструкция `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md`: физический Nano Upload, UART, Android F01 demo, возврат. Физических загрузок/измерений в чате не было.
+
+## 2026-10-08 — RC1 include issue on owner Windows; self-contained RC2 verified
+
+Получено от владельца: `nano_ambient_preview_rc1.ino:38:10 fatal error: ambient_preset_probe.h: No such file or directory`, при этом заголовок, по сообщению, расположен рядом. Реальная причина поиска Arduino IDE не установлена; RC1 не пройдена локально.
+
+Реализована отдельная RC2: `04_Прошивка/nano_ambient_preview_rc2/nano_ambient_preview_rc2.ino`. Она сформирована из **всего** `nano_ardu_v1.ino` с включённым preview и с **inline** содержимым `nano_ardu_v1/ambient_preset_probe.h`; прежняя canonical Nano не менялась. GitHub workflow добавил проверку соответствия inline исходнику и isolated compile, где в папке буквально только один RC2 .ino.
+
+[CI 37814719230](https://github.com/dronrome1245/ARDU/actions/runs/37814719230) **PASS**, 29376 B Flash/1234 B globals, [HEX artifact 11567275089](https://github.com/dronrome1245/ARDU/actions/runs/37814719230/artifacts/11567275089). Дальнейшие действия на реальном Nano ещё не подтверждены. Инструкция: `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC2_TEST.md`.

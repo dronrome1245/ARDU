@@ -123,12 +123,11 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-1. **Проверочная полная Nano PREVIEW RC1 подготовлена**: `04_Прошивка/nano_ambient_preview_rc1/nano_ambient_preview_rc1.ino` и локальная `ambient_preset_probe.h`. Старое приложение: «Фон» → F01 «Цвет» запускает P01 «Северное сияние» → P04 «Космос» → P05 «Камин» → обычный F01, по ~8,2 с.
-2. **CI [37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365) PASS**: полный обычный Nano 28690 Flash / 1234 globals SRAM; полный PREVIEW RC1 29376 Flash / 1234 globals; host/синхронизация исходников PASS, HEX [artifact 11564965835](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835).
-3. **Следующий практический hardware gate владельца**: [AMBIENT_PRESETS_PREVIEW_RC1_TEST.md](04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md): безопасная изоляция ESP TX→Nano D0, Upload Arduino Nano Old Bootloader, прямой Serial 1/2/4, восстановление UART, «Фон» → F01, видео всего цикла, L01/Music/RTC smoke и rollback при проблемах.
-4. Превышен мягкий ориентир 95% Flash на 192 B, но до hard 30720 свободно 1344 B; SRAM доступно 814 B для stack/locals. Это **тестовый RC**, а не production freeze. Реальное железо НЕ прошито и LED visual test НЕ закрыт.
-5. ESP/Android/API/UART/EEPROM прежние, F02/F03 wire IDs не переиспользованы; D-104 целевой UI = ручной F01 + будущие пресеты, P12 остаётся концептом. Staged reset/speed Nano входит в preview и требует отдельного smoke.
-6. Hero изображения Android владелец принял. ARDU-DIRECT physical, 44+44 two-ring power test остаются открытыми; аккумуляторная ветвь отменена.
+1. **Исправление Windows Compile:** RC1 выдала `ambient_preset_probe.h: No such file or directory`, хотя владелец сообщил, что файл лежит рядом. Вместо неё использовать исключительно **`04_Прошивка/nano_ambient_preview_rc2/nano_ambient_preview_rc2.ino`**: один .ino, никакого локального .h.
+2. **Подтверждено CI:** [37814719230](https://github.com/dronrome1245/ARDU/actions/runs/37814719230) PASS, включая копирование **единственного .ino в пустой sketch-каталог** и последующую AVR-сборку; [HEX RC2](https://github.com/dronrome1245/ARDU/actions/runs/37814719230/artifacts/11567275089). Полный Nano preview: 29376 Flash/1234 globals SRAM.
+3. **Практический gate:** [AMBIENT_PRESETS_PREVIEW_RC2_TEST.md](04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC2_TEST.md): `git pull` или GitHub Raw download одного `.ino` → Arduino Nano / Old Bootloader / Verify. После Verify безопасный Upload с временным отключением ESP TX→Nano D0 при полностью снятом питании и тест Android «Фон» → F01 на 35–40 секунд.
+4. **Поведение:** P01 «Северное сияние» → P04 «Космос» → P05 «Камин» → обычный F01. ESP и Android не менялись; старые F02/F03/numeric IDs/EEPROM сохранены. Никакая Nano пока физически не обновлена по результатам этого чата.
+5. Фактический stack/two-ring current/температура не проверены; превью Flash выше мягкого ориентира на 192 B, но в пределах hard 30720. ARDU-DIRECT и 44+44 нагрузка также pending. Battery/backup отменён.
 
 ## 12. База ColorMusic/FHT
 

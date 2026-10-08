@@ -68,3 +68,7 @@
 ## Продолжение: готова полная аппаратная PREVIEW RC1
 
 В `04_Прошивка/nano_ambient_preview_rc1/` создан самодостаточный для Arduino IDE полный v1 скетч, в котором F01 переключает P01/P04/P05/старый F01 по ~8,2 с. CI [37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365) PASS, preview Flash 29376 / 30720, globals 1234 / 2048; [HEX artifact](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835). Следующий gate — **не новый код**, а проверка на физическом кольце по [AMBIENT_PRESETS_PREVIEW_RC1_TEST.md](AMBIENT_PRESETS_PREVIEW_RC1_TEST.md).
+
+## Продолжение — RC2 без внешнего заголовка
+
+Владелец не смог скомпилировать RC1 на Windows: локальный `ambient_preset_probe.h` не был обнаружен IDE, несмотря на его расположение рядом. Фактический физический тест **не проводился**. Подготовлен единственный `nano_ambient_preview_rc2.ino` с inline renderer; [CI 37814719230](https://github.com/dronrome1245/ARDU/actions/runs/37814719230) PASS single-file isolated compile / same 29376 B Flash / 1234 B globals. RC1 — историческая ревизия; новый hardware gate: `AMBIENT_PRESETS_PREVIEW_RC2_TEST.md`.

@@ -1090,3 +1090,9 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - [Arduino Verify run 37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365): host tests / source sync / standalone full preview compile / full default Nano compile all PASS; 28690→29376 Flash bytes, globals SRAM 1234 B unchanged. 
 - [Compiled HEX artifact 11564965835](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835), ZIP SHA256 from CI: `07fbf048192593c9f093ac4028b0a3bda55e62bbf992b031d78d6e905bb494a2`.
 - Документация: `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md`. Данные CI не подтверждают прошивку устройства, визуальную приёмку, реальный ток или остаток стека в runtime.
+
+## 2026-10-08 — owner Arduino IDE error and verified single-file Nano RC2
+
+- **Наблюдение владельца:** Windows path `C:\Users\Пользователь\Downloads\nano_ambient_preview_rc1\nano_ambient_preview_rc1.ino:38` → missing `ambient_preset_probe.h`, несмотря на нахождение заголовка в той же папке по сообщению. Скрин/полный компиляторский verbose log не предоставлен — точная причина неизвестна.
+- **Source fix:** `04_Прошивка/nano_ambient_preview_rc2/nano_ambient_preview_rc2.ino` без локального заголовка; стандартная Nano v1 сохранена.
+- **CI evidence:** [Arduino Verify 37814719230](https://github.com/dronrome1245/ARDU/actions/runs/37814719230) — скетч с **одним** `.ino` в пустом каталоге скомпилирован, host tests и byte-for-byte renderer-source check прошли, 29376 Flash / 1234 globals SRAM. [RC2 HEX artifact 11567275089](https://github.com/dronrome1245/ARDU/actions/runs/37814719230/artifacts/11567275089).

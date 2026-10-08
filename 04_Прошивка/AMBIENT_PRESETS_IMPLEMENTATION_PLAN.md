@@ -157,3 +157,9 @@
 - [CI 37809369365](https://github.com/dronrome1245/ARDU/actions/runs/37809369365): 29376 Flash / 1234 globals, [готовый HEX](https://github.com/dronrome1245/ARDU/actions/runs/37809369365/artifacts/11564965835).
 - **Открытые gates:** 95% internal Flash target пока превышен на 192 B, реальный worst-case stack/LED/two-ring current не измерен, визуальное поведение владельцем не утверждено. Это проверочный RC, не новый production release.
 - **Следующее действие:** выполнить `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC1_TEST.md` на стенде с полным Nano/ESP regression, затем скорректировать три сцены. Новые API/UART/EEPROM/stable P IDs и остальные 9 сцен пока не реализовывать.
+
+## 10. Исправление RC1 local header failure — переход на RC2 (2026-10-08)
+
+- Реальная Arduino IDE Windows не находила `ambient_preset_probe.h` в RC1, хотя владелец подтвердил, что файл лежит рядом. Истинная причина не установлена.
+- **RC2** = один полный Nano v1 `04_Прошивка/nano_ambient_preview_rc2/nano_ambient_preview_rc2.ino`, в него встроен renderer P01/P04/P05.
+- **CI PASS** [37814719230](https://github.com/dronrome1245/ARDU/actions/runs/37814719230), включая сборку одной .ino из пустой папки и [HEX](https://github.com/dronrome1245/ARDU/actions/runs/37814719230/artifacts/11567275089). Дальнейшая физическая проверка G2 — строго по `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC2_TEST.md`, без изменения действующих EEPROM/UART/HTTP ID.
