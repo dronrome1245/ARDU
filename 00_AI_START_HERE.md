@@ -123,19 +123,14 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Current Android visual source = `0.22.5-ambient-hero-hotfix-rc1` (fixed corrupted Ambient asset).
+Current Android visual source: `0.22.5-ambient-hero-hotfix-rc1`. v0.22 Home Hub remains the canonical UI; v0.23 is rejected.
 
-1. v0.22 Home Hub remains the canonical visual baseline; v0.23 remains rejected.
-2. Owner approved and repo now uses new dedicated wide hero scenes for Ambient / Night / Alarm-Dawn.
-3. Immediate visual gate: `git pull` → Pixel emulator → Run → check the repaired Ambient hero («Фон»). Night/Alarm images already look correct per owner.
-4. Ambient preset design is intentionally open:
-   - current 4 presets are provisional;
-   - owner wants more than four;
-   - agree physical light behavior first, then implement stable preset layer.
-5. Do not add more preset code/IDs before that agreement.
-6. Nano/ESP reset-defaults + Ambient speed source changes remain not physically uploaded.
-7. After visual/preset design acceptance: compile/size gate → firmware upload → physical ARDU-DIRECT/reset/speed/preset acceptance.
-8. Battery/backup remains cancelled.
+1. Immediate software gate remains **`git pull` → Pixel emulator → Run → check the repaired Ambient hero**. Night/Alarm heroes were accepted earlier; no Android version change in this documentation step.
+2. **Decision D-104:** future Ambient user UI keeps F01 and excludes F02/F03. Existing Nano/ESP/Android source still contains F02/F03; do not pretend they were removed.
+3. **Idea only:** 12 candidate atmospheric scenes with 4 compact renderer families and separate brightness/dynamics, recorded in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md`. No IDs, API, UART, EEPROM schema or implementation are approved.
+4. Do not code presets or remove existing effect IDs without another explicit owner decision and a Nano flash/SRAM compile gate.
+5. Staged Nano/ESP reset-defaults / Ambient speed changes have not been physically uploaded. Router-less `ARDU-DIRECT` physical smoke remains pending.
+6. Battery/backup remains cancelled.
 
 ## 12. База ColorMusic/FHT
 
