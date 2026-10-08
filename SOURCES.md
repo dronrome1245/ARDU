@@ -1103,3 +1103,8 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - ESP v2 `05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino`, [ESP CI 37820404281](https://github.com/dronrome1245/ARDU/actions/runs/37820404281) PASS including private-header OTA build and reject-default-password guard; statics 32176/80192 RAM, 60823/65536 IRAM, IROM ≈329096. Protected ARDU-DIRECT and STA-only OTA not physically tested.
 - Android `0.22.6-ambient12-functional-rc1`: [CI 37819918951](https://github.com/dronrome1245/ARDU/actions/runs/37819918951) unit contract tests + debug APK PASS, [APK artifact](https://github.com/dronrome1245/ARDU/actions/runs/37819918951/artifacts/11568856875).
 - [ARDU_AMBIENT12_RELEASE_CANDIDATE.md](ARDU_AMBIENT12_RELEASE_CANDIDATE.md) contains owner-side physical checks. Compilation does not establish physical upload/LED-current/direct-mode PASS.
+
+## 2026-10-08 — latest Nano Ambient12 optimization CI evidence
+
+- After removing the unneeded legacy F02/F03/auto controls from the **new Nano v2 only**, [Arduino Verify 37820974644](https://github.com/dronrome1245/ARDU/actions/runs/37820974644) **PASS**. Latest full Nano12: **29306/30720 bytes Flash**; globals **1282/2048 SRAM**. Free: 1414 Flash bytes, 766 SRAM bytes for stack/locals; the latter is not an observed worst-case stack measurement. Soft 95% Flash guideline (29184) still exceeded by **122 bytes**.
+- [Updated compiled Nano12 HEX 11568284647](https://github.com/dronrome1245/ARDU/actions/runs/37820974644/artifacts/11568284647) replaces the earlier unoptimized artifact for future bench acceptance; both remain Git history, no actual hardware upload in this conversation.
