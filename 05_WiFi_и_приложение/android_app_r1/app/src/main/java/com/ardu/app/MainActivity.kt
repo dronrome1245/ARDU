@@ -151,6 +151,24 @@ class MainActivity : Activity() {
     private lateinit var ambientOffButton: Button
     private lateinit var ambientPresetButtons: Map<String, ImageButton>
     private lateinit var ambientPresetLabels: Map<String, TextView>
+    private lateinit var ambientPresetExtraGrid: LinearLayout
+    private lateinit var ambientPresetCapabilityText: TextView
+    private lateinit var ambientPresetControls: LinearLayout
+    private lateinit var ambientPresetStatusText: TextView
+    private lateinit var ambientPresetBrightnessText: TextView
+    private lateinit var ambientPresetBrightnessSeek: SmartSliderView
+    private lateinit var ambientPresetDynamicsText: TextView
+    private lateinit var ambientPresetDynamicsSeek: SmartSliderView
+    private lateinit var ambientManualPanel: LinearLayout
+    private val ambientExtraPresetButtons = linkedMapOf<String, Button>()
+    private val ambientSceneNames = linkedMapOf(
+        "P01" to "Северное сияние", "P02" to "Закат на Бали",
+        "P03" to "Океан", "P04" to "Космос",
+        "P05" to "Камин", "P06" to "Свечи",
+        "P07" to "Лунный свет", "P08" to "Лес",
+        "P09" to "Неон", "P10" to "Лава",
+        "P11" to "Дыхание", "P12" to "Радуга"
+    )
 
     private lateinit var nightConnectionText: TextView
     private lateinit var nightOperationText: TextView
@@ -931,35 +949,78 @@ class MainActivity : Activity() {
         }
 
         ambientPresetButtons = mapOf(
-            "aurora" to findViewById(R.id.ambientPresetAurora),
-            "sunset" to findViewById(R.id.ambientPresetSunset),
-            "ocean" to findViewById(R.id.ambientPresetOcean),
-            "cosmos" to findViewById(R.id.ambientPresetCosmos)
+            "P01" to findViewById(R.id.ambientPresetAurora),
+            "P02" to findViewById(R.id.ambientPresetSunset),
+            "P03" to findViewById(R.id.ambientPresetOcean),
+            "P04" to findViewById(R.id.ambientPresetCosmos)
         )
         ambientPresetLabels = mapOf(
-            "aurora" to findViewById(R.id.ambientPresetAuroraLabel),
-            "sunset" to findViewById(R.id.ambientPresetSunsetLabel),
-            "ocean" to findViewById(R.id.ambientPresetOceanLabel),
-            "cosmos" to findViewById(R.id.ambientPresetCosmosLabel)
+            "P01" to findViewById(R.id.ambientPresetAuroraLabel),
+            "P02" to findViewById(R.id.ambientPresetSunsetLabel),
+            "P03" to findViewById(R.id.ambientPresetOceanLabel),
+            "P04" to findViewById(R.id.ambientPresetCosmosLabel)
         )
         ambientPresetButtons.forEach { (id, button) ->
             button.setOnClickListener { applyAmbientPreset(id) }
         }
-
+        ambientPresetExtraGrid = findViewById(R.id.ambientPresetExtraGrid)
+        ambientPresetCapabilityText = findViewById(R.id.ambientPresetCapabilityText)
+        ambientPresetControls = findViewById(R.id.ambientPresetControls)
+        ambientPresetStatusText = findViewById(R.id.ambientPresetStatusText)
+        ambientPresetBrightnessText = findViewById(R.id.ambientPresetBrightnessText)
+        ambientPresetBrightnessSeek = findViewById(R.id.ambientPresetBrightnessSeek)
+        ambientPresetDynamicsText = findViewById(R.id.ambientPresetDynamicsText)
+        ambientPresetDynamicsSeek = findViewById(R.id.ambientPresetDynamicsSeek)
+        ambientManualPanel = ambientHueSeek.parent as LinearLayout
+        findViewById<View>(R.id.ambientF02Button).visibility = View.GONE
+        findViewById<View>(R.id.ambientF03Button).visibility = View.GONE
+        (ambientAutoSwitch.parent as LinearLayout).visibility = View.GONE
         ambientEffectButtonMap = mapOf(
-            "F01" to findViewById<AmbientEffectTileView>(R.id.ambientF01Button),
-            "F02" to findViewById<AmbientEffectTileView>(R.id.ambientF02Button),
-            "F03" to findViewById<AmbientEffectTileView>(R.id.ambientF03Button)
-        )
-        val ambientNames = mapOf(
-            "F01" to "Цвет",
-            "F02" to "Смена",
-            "F03" to "Радуга"
+            "F01" to findViewById<AmbientEffectTileView>(R.id.ambientF01Button)
         )
         ambientEffectButtonMap.forEach { (id, tile) ->
-            tile.configure(id, ambientNames[id] ?: id)
+            tile.configure(id, "Цвет")
             tile.setOnClickListener { setAmbientEffect(id) }
         }
+        ambientSceneNames.keys.drop(4).chunked(2).forEach { pair ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = dp(6) }
+            }
+            pair.forEach { id ->
+                val button = Button(this).apply {
+                    text = "${id} • ${ambientSceneNames[id]}"
+                    isAllCaps = false
+                    textSize = 12f
+                    setTextColor(getColor(R.color.ardu_text))
+                    setBackgroundResource(R.drawable.ardu_preset_thumb)
+                    setPadding(dp(6), 0, dp(6), 0)
+                    setOnClickListener { applyAmbientPreset(id) }
+                }
+                row.addView(button, LinearLayout.LayoutParams(0, dp(52), 1f).apply {
+                    marginStart = dp(3)
+                    marginEnd = dp(3)
+                })
+                ambientExtraPresetButtons[id] = button
+            }
+            ambientPresetExtraGrid.addView(row)
+        }
+        bindSmartSlider(
+            ambientPresetBrightnessSeek, 0, 255, SmartSliderView.VisualMode.BRIGHTNESS,
+            { ambientPresetBrightnessText.text = "Яркость • ${brightnessPercent(it)}%" },
+            { value -> runDeviceAction("Яркость сцены") {
+                api.updateAmbientPresetSettings(brightness = value)
+            } }
+        )
+        bindSmartSlider(
+            ambientPresetDynamicsSeek, 0, 255, SmartSliderView.VisualMode.ACCENT,
+            { ambientPresetDynamicsText.text = "Динамика • $it" },
+            { value -> runDeviceAction("Динамика сцены") {
+                api.updateAmbientPresetSettings(dynamics = value)
+            } }
+        )
 
         bindSmartSlider(
             ambientHueSeek, 0, 255, SmartSliderView.VisualMode.HUE,
@@ -1014,53 +1075,8 @@ class MainActivity : Activity() {
     }
 
     private fun applyAmbientPreset(id: String) {
-        val label = when (id) {
-            "aurora" -> "Северное сияние"
-            "sunset" -> "Закат"
-            "ocean" -> "Океан"
-            "cosmos" -> "Космос"
-            else -> return
-        }
-        setAmbientPresetSelection(id)
-        runDeviceAction(label) {
-            when (id) {
-                "aurora" -> {
-                    api.selectAmbientEffect("F02")
-                    api.updateAmbientSettings(
-                        hue = 105,
-                        saturation = 235,
-                        brightness = 128,
-                        speed = 190
-                    )
-                }
-                "sunset" -> {
-                    api.selectAmbientEffect("F01")
-                    api.updateAmbientSettings(
-                        hue = 10,
-                        saturation = 245,
-                        brightness = 145
-                    )
-                }
-                "ocean" -> {
-                    api.selectAmbientEffect("F02")
-                    api.updateAmbientSettings(
-                        hue = 142,
-                        saturation = 255,
-                        brightness = 135,
-                        speed = 125
-                    )
-                }
-                "cosmos" -> {
-                    api.selectAmbientEffect("F03")
-                    api.updateAmbientSettings(
-                        hue = 185,
-                        brightness = 100,
-                        speed = 72,
-                        rainbowStep = 1.2
-                    )
-                }
-            }
-        }
+        val label = ambientSceneNames[id] ?: return
+        runDeviceAction(label) { api.selectAmbientPreset(id) }
     }
 
     private fun setAmbientPresetSelection(selectedId: String?) {
@@ -1069,6 +1085,12 @@ class MainActivity : Activity() {
         }
         ambientPresetLabels.forEach { (id, label) ->
             label.isSelected = id == selectedId
+            label.setTextColor(getColor(
+                if (id == selectedId) R.color.ardu_accent else R.color.ardu_nav_icon_tint
+            ))
+        }
+        ambientExtraPresetButtons.forEach { (id, button) ->
+            setChoiceState(button, id == selectedId)
         }
     }
 
@@ -1487,44 +1509,55 @@ class MainActivity : Activity() {
 
     private fun renderAmbient(settings: ArduSettings) {
         val a = settings.ambient
-        val cfg = a.effects[a.effect] ?: return
-
-        ambientEffectText.text =
-            "${ambientEffectTitle(a.effect)} • " +
-            if (latestMode == "ambient") "активно" else "выключено"
+        val p = settings.ambientPresets
+        val selected = if (p.supported) p.selected else null
+        val cfg = a.effects["F01"] ?: return
         val ambientActive = latestMode == "ambient"
+
+        ambientEffectText.text = (
+            if (selected != null) ambientSceneNames[selected] ?: selected
+            else "Постоянный цвет"
+        ) + if (ambientActive) " • активно" else " • выключено"
         setChoiceState(ambientOnButton, ambientActive)
         setChoiceState(ambientOffButton, !ambientActive)
-        ambientEffectButtonMap.forEach { (id, tile) ->
-            tile.isSelected = ambientActive && id == a.effect
+        ambientEffectButtonMap.forEach { (_, tile) ->
+            tile.isSelected = ambientActive && selected == null
             tile.invalidate()
         }
+        setAmbientPresetSelection(if (ambientActive) selected else null)
+        ambientPresetCapabilityText.text = if (p.supported) {
+            "12 сцен доступны • параметры сохраняются в ARDU"
+        } else {
+            "Для атмосферных сцен нужны новые прошивки ESP и Nano"
+        }
+        ambientPresetButtons.values.forEach { it.isEnabled = p.supported }
+        ambientExtraPresetButtons.values.forEach { it.isEnabled = p.supported }
 
+        ambientManualPanel.visibility = if (selected == null) View.VISIBLE else View.GONE
+        ambientPresetControls.visibility = if (selected != null) View.VISIBLE else View.GONE
+        if (selected != null) {
+            val scene = p.scenes[selected]
+            ambientPresetStatusText.text = ambientSceneNames[selected] ?: selected
+            if (scene != null) {
+                ambientPresetBrightnessSeek.setValue(scene.brightness)
+                ambientPresetDynamicsSeek.setValue(scene.dynamics)
+                ambientPresetBrightnessText.text =
+                    "Яркость • ${brightnessPercent(scene.brightness)}%"
+                ambientPresetDynamicsText.text = "Динамика • ${scene.dynamics}"
+            }
+        }
+        // F01 still has its own hue/saturation/brightness.
         ambientHueSeek.setValue(cfg.hue)
         ambientBrightnessSeek.setValue(cfg.brightness)
         ambientHueText.text = "Цвет • ${cfg.hue}"
         ambientBrightnessText.text = "Яркость • ${brightnessPercent(cfg.brightness)}%"
-
         cfg.saturation?.let {
             ambientSaturationSeek.setValue(it)
             ambientSaturationText.text = "Насыщенность • ${brightnessPercent(it)}%"
         }
-        cfg.speed?.let {
-            ambientSpeedSeek.setValue(it.coerceIn(1, 255))
-            ambientSpeedText.text = "Скорость • $it"
-        }
-        cfg.rainbowStep?.let {
-            ambientRainbowSeek.setValue((it * 10.0).toInt().coerceIn(5, 100))
-            ambientRainbowText.text = String.format(Locale.US, "Шаг • %.1f", it)
-        }
-
-        ambientAutoSwitch.isChecked = a.autoCycle
-        ambientPeriodSeek.setValue(a.autoPeriodSec)
-        ambientPeriodText.text = "Период • ${a.autoPeriodSec} с"
-
-        ambientSaturationGroup.visibility = if (a.effect == "F03") View.GONE else View.VISIBLE
-        ambientSpeedGroup.visibility = if (a.effect == "F01") View.GONE else View.VISIBLE
-        ambientRainbowGroup.visibility = if (a.effect == "F03") View.VISIBLE else View.GONE
+        ambientSaturationGroup.visibility = View.VISIBLE
+        ambientSpeedGroup.visibility = View.GONE
+        ambientRainbowGroup.visibility = View.GONE
         updateAmbientPreview()
     }
 

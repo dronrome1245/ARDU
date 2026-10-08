@@ -1255,14 +1255,14 @@
                         style="@style/ARDU.CardTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Популярные сцены" />
+                        android:text="Атмосферные сцены" />
 
                     <TextView
                         style="@style/ARDU.Muted"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Готовые сочетания существующих эффектов" />
+                        android:text="12 независимых световых анимаций с собственными настройками" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1326,6 +1326,57 @@
                             <TextView android:id="@+id/ambientPresetCosmosLabel" style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:maxLines="2" android:text="Космос" android:textAlignment="center" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
                         </LinearLayout>
                     </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/ambientPresetExtraGrid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical" />
+                    <TextView
+                        android:id="@+id/ambientPresetCapabilityText"
+                        style="@style/ARDU.Muted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Проверка поддержки сцен…" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/ambientPresetControls"
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+                    <TextView
+                        android:id="@+id/ambientPresetStatusText"
+                        style="@style/ARDU.CardTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Настройки сцены" />
+                    <TextView
+                        android:id="@+id/ambientPresetBrightnessText"
+                        style="@style/ARDU.Value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Яркость" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/ambientPresetBrightnessSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
+                    <TextView
+                        android:id="@+id/ambientPresetDynamicsText"
+                        style="@style/ARDU.Value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Динамика" />
+                    <com.ardu.app.ui.SmartSliderView
+                        android:id="@+id/ambientPresetDynamicsSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
 
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
