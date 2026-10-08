@@ -49,8 +49,10 @@ inline bool render(uint8_t scene, CRGB* out, uint8_t count,
     // One shared epoch, three independent soft fades. Avoid expensive
     // per-star 32-bit divisions/modulo, important on ATmega328P Flash.
     const uint8_t shift = static_cast<uint8_t>(flowShift + 4U);
-    const uint16_t epoch = static_cast<uint16_t>(nowMs >> shift);
-    const uint8_t age = static_cast<uint8_t>(nowMs >> (shift - 8U));
+    // One 32-bit shift yields both the slot and its 8-bit fade phase.
+    const uint16_t timeline = static_cast<uint16_t>(nowMs >> (shift - 8U));
+    const uint16_t epoch = static_cast<uint16_t>(timeline >> 8);
+    const uint8_t age = static_cast<uint8_t>(timeline);
     for (uint8_t i = 0; i < count; ++i) out[i] = CHSV(165U, 230U, 10U);
     for (uint8_t star = 0; star < 3U; ++star) {
       const uint8_t phase = static_cast<uint8_t>(age + star * 85U);
@@ -69,8 +71,9 @@ inline bool render(uint8_t scene, CRGB* out, uint8_t count,
   // P05: warm independent segments, smoothly interpolated between noise
   // targets. No per-frame random flashing and no per-LED runtime buffer.
   const uint8_t shift = flowShift;
-  const uint16_t slot = static_cast<uint16_t>(nowMs >> shift);
-  const uint8_t fraction = static_cast<uint8_t>((nowMs >> (shift - 4U)) & 15U);
+  const uint16_t timeline = static_cast<uint16_t>(nowMs >> (shift - 4U));
+  const uint16_t slot = static_cast<uint16_t>(timeline >> 4);
+  const uint8_t fraction = static_cast<uint8_t>(timeline & 15U);
   for (uint8_t i = 0; i < count; ++i) {
     const uint8_t seed = static_cast<uint8_t>(i * 37U + slot * 19U);
     const uint8_t a = hash8(seed);
