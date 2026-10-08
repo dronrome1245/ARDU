@@ -1,14 +1,10 @@
 #pragma once
 
-// Copy this file to wifi_secrets.h in the same sketch folder.
-// Do NOT commit wifi_secrets.h.
-//
-// The real values stay local so the tracked esp8266_ardu_v1.ino remains clean
-// across git pull / branch switching.
-
-#define ARDU_WIFI_SSID "YOUR_WIFI_SSID"
-#define ARDU_WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
-#define ARDU_OTA_PASSWORD "YOUR_OTA_PASSWORD"
-
-// Minimum 8 characters for ESP8266 SoftAP WPA2.
-#define ARDU_SOFTAP_PASSWORD "YOUR_ARDU_DIRECT_PASSWORD"
+// Create wifi_secrets.h alongside esp8266_ardu_v2.ino, edit FOUR values,
+// then set ARDU_CREDENTIALS_CONFIGURED=1 before an OTA upload.
+// wifi_secrets.h is globally ignored by Git; never share it or its passwords.
+#define ARDU_WIFI_SSID "PUT_YOUR_WIFI_SSID_HERE"
+#define ARDU_WIFI_PASSWORD "PUT_YOUR_WIFI_PASSWORD_HERE"
+#define ARDU_OTA_PASSWORD "PUT_A_STRONG_OTA_PASSWORD_HERE"
+#define ARDU_SOFTAP_PASSWORD "PUT_A_STRONG_AP_PASSWORD_HERE"
+#define ARDU_CREDENTIALS_CONFIGURED 0

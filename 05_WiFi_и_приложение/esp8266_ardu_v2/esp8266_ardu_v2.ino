@@ -23,7 +23,15 @@
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
-#include "ardu_esp_v1_types.h"
+// Kept inside the sketch so Windows Arduino IDE can compile this one .ino
+// without a second project-local types header.
+enum JsonRead : uint8_t { JSON_MISSING=0, JSON_OK=1, JSON_BAD=2 };
+struct NanoResult {
+  bool ok=false;
+  bool timedOut=false;
+  uint8_t errorCode=0;
+  String response;
+}
 
 // ---------------------------------------------------------------------------
 // Local credentials.
@@ -32,13 +40,26 @@
 // wifi_secrets.example.h. The local header is ignored by Git, so normal
 // pulls/branch switches never touch the tracked .ino.
 //
-// CI / source-only builds still compile without the local header and use
-// non-secret placeholders. Do not flash those placeholder values to hardware.
+// CI explicitly sets ARDU_CI_BUILD. Normal IDE builds REQUIRE a private local
+// wifi_secrets.h with ARDU_CREDENTIALS_CONFIGURED 1 and real passwords;
+// accidental OTA updates with Git-tracked placeholders must fail at compile.
 // ---------------------------------------------------------------------------
 #if defined(__has_include)
 #  if __has_include("wifi_secrets.h")
 #    include "wifi_secrets.h"
+#  elif !defined(ARDU_CI_BUILD)
+#    error "ARDU ESP v2 requires a local wifi_secrets.h before OTA upload"
 #  endif
+#elif !defined(ARDU_CI_BUILD)
+#  include "wifi_secrets.h"
+#endif
+
+#ifndef ARDU_CI_BUILD
+#  if !defined(ARDU_CREDENTIALS_CONFIGURED) || !ARDU_CREDENTIALS_CONFIGURED
+#    error "Set ARDU_CREDENTIALS_CONFIGURED 1 in your private wifi_secrets.h after filling all four passwords"
+#  endif
+static_assert(sizeof(ARDU_SOFTAP_PASSWORD)>=9,"ARDU-DIRECT password must be at least 8 characters");
+static_assert(sizeof(ARDU_OTA_PASSWORD)>=9,"OTA password must be at least 8 characters");
 #endif
 
 #ifndef ARDU_WIFI_SSID

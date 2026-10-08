@@ -28,8 +28,23 @@ jobs:
           arduino-cli compile \
             --fqbn esp8266:esp8266:generic \
             --warnings default \
+            --build-property "compiler.cpp.extra_flags=-DARDU_CI_BUILD=1" \
             --build-path "$GITHUB_WORKSPACE/build-esp-v2" \
             "05_WiFi_и_приложение/esp8266_ardu_v2"
+
+      - name: Verify ESP v2 compiles from ONE INO in a clean directory
+        run: |
+          mkdir -p "$RUNNER_TEMP/esp8266_ardu_v2"
+          cp "05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino" \
+             "$RUNNER_TEMP/esp8266_ardu_v2/esp8266_ardu_v2.ino"
+          test "$(find "$RUNNER_TEMP/esp8266_ardu_v2" -type f | wc -l)" -eq 1
+          arduino-cli compile \
+            --fqbn esp8266:esp8266:generic \
+            --warnings default \
+            --build-property "compiler.cpp.extra_flags=-DARDU_CI_BUILD=1" \
+            --build-path "$GITHUB_WORKSPACE/build-esp-v2-onefile" \
+            "$RUNNER_TEMP/esp8266_ardu_v2"
+          echo "PASS: ESP v2 does not need project-local type headers"
 
       - name: Compile ARDU ESP8266 v1
         run: |

@@ -45,3 +45,6 @@ local.properties
 
 # Android Studio / Gradle generated JVM criteria
 **/gradle-daemon-jvm.properties
+
+# All future ARDU ESP sketches: never track local Wi-Fi / OTA / SoftAP passwords
+**/wifi_secrets.h
