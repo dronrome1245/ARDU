@@ -24,6 +24,20 @@ jobs:
       - name: Install FastLED
         run: arduino-cli lib install FastLED
 
+      - name: Verify IDE preview mirrors the full Nano source and renderer
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path("04_Прошивка")
+          main = (root / "nano_ardu_v1" / "nano_ardu_v1.ino").read_bytes()
+          preview = (root / "nano_ambient_preview_rc1" / "nano_ambient_preview_rc1.ino").read_bytes()
+          assert preview == b"#define ARDU_AMBIENT_PRESET_PROBE 1\n" + main, "preview source drift"
+          head = (root / "nano_ardu_v1" / "ambient_preset_probe.h").read_bytes()
+          copy = (root / "nano_ambient_preview_rc1" / "ambient_preset_probe.h").read_bytes()
+          assert copy == head, "preview renderer drift"
+          print("PASS: preview RC1 is the complete Nano v1 + build flag")
+          PY
+
       - name: Host test experimental 44-LED preset renderers
         run: |
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
