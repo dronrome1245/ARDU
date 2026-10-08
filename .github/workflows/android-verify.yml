@@ -26,3 +26,11 @@ jobs:
 
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
+
+      - name: Publish Android debug APK for Ambient12 smoke test
+        uses: actions/upload-artifact@v4
+        with:
+          name: ardu-android-ambient12-debug-apk
+          path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
