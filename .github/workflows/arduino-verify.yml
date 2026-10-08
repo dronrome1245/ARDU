@@ -23,12 +23,29 @@ jobs:
       - name: Install FastLED
         run: arduino-cli lib install FastLED
 
+      - name: Host test experimental 44-LED preset renderers
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+            "04_Прошивка/nano_ardu_v1/tests/ambient_preset_probe_host.cpp" \
+            -o "$RUNNER_TEMP/ardu-ambient-probe-test"
+          "$RUNNER_TEMP/ardu-ambient-probe-test"
+
       - name: Compile ARDU Nano v1
         run: |
           arduino-cli compile \
             --fqbn arduino:avr:nano:cpu=atmega328old \
             --warnings default \
             --build-path "$GITHUB_WORKSPACE/build-nano-v1" \
+            --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
+            "04_Прошивка/nano_ardu_v1"
+
+      - name: Compile full Nano with PREVIEW-ONLY Ambient probe
+        run: |
+          arduino-cli compile \
+            --fqbn arduino:avr:nano:cpu=atmega328old \
+            --warnings default \
+            --build-property "compiler.cpp.extra_flags=-DARDU_AMBIENT_PRESET_PROBE=1" \
+            --build-path "$GITHUB_WORKSPACE/build-nano-ambient-probe" \
             --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
             "04_Прошивка/nano_ardu_v1"
 
@@ -43,3 +60,6 @@ jobs:
           "$AVR_BIN/avr-nm" -S --size-sort "$ELF" | tail -n 100 || true
           echo "--- SRAM symbols ---"
           "$AVR_BIN/avr-nm" -S --size-sort "$ELF" | grep -E ' [BbDd] ' | tail -n 100 || true
+          echo "--- Full Nano Ambient lab probe size ---"
+          PROBE_ELF="$(find "$GITHUB_WORKSPACE/build-nano-ambient-probe" -name '*.elf' | head -n 1)"
+          if [ -n "$PROBE_ELF" ]; then "$AVR_BIN/avr-size" -C --mcu=atmega328p "$PROBE_ELF" || true; fi

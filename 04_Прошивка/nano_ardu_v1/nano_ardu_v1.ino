@@ -29,6 +29,14 @@
 #define FASTLED_ALLOW_INTERRUPTS 1
 #include <FastLED.h>
 
+// Dev-only lab probe: default release preserves all F01/F02/F03 behavior.
+#ifndef ARDU_AMBIENT_PRESET_PROBE
+#define ARDU_AMBIENT_PRESET_PROBE 0
+#endif
+#if ARDU_AMBIENT_PRESET_PROBE
+#include "ambient_preset_probe.h"
+#endif
+
 namespace Pins {
 constexpr uint8_t RING_A = 6;
 constexpr uint8_t RING_B = 7;
@@ -1488,6 +1496,26 @@ void updateAmbient(){
   if(a.autoCycle && now-lastAmbientAutoMs>=static_cast<unsigned long>(a.autoPeriodSec)*1000UL){
     lastAmbientAutoMs=now;nextAmbient(1);
   }
+
+#if ARDU_AMBIENT_PRESET_PROBE
+  // The lab build includes BOTH legacy Ambient and P01/P04/P05 code.
+  // It has NO extra UART IDs, HTTP endpoints or EEPROM changes.
+  // Do not upload this special build over the accepted v1 release.
+  static uint8_t labScene = 0;
+  static unsigned long lastLabSwitch = 0;
+  if (now - lastLabSwitch >= 12000UL) {
+    lastLabSwitch = now;
+    labScene = static_cast<uint8_t>((labScene + 1U) & 3U);
+  }
+  if (labScene < 3U) {
+    if (now - lastAmbientFrameMs < 40UL) return;
+    lastAmbientFrameMs = now;
+    ArduAmbientProbe::render(labScene, leds, Cfg::LED_COUNT, now, 128U);
+    requestedBrightness = labScene == ArduAmbientProbe::COSMOS ? 64U : 115U;
+    frameDirty = true;
+    return;
+  }
+#endif
   const AmbientEffect e=static_cast<AmbientEffect>(a.effect);
   if(e==AmbientEffect::F01){
     fill_solid(leds,Cfg::LED_COUNT,CHSV(a.f01Hue,a.f01Sat,255));
