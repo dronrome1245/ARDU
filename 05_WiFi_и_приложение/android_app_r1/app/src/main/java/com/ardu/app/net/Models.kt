@@ -108,6 +108,15 @@ data class AmbientEffectSettings(
     val rainbowStep: Double? = null
 )
 
+data class AmbientPresetSettings(val brightness: Int, val dynamics: Int)
+
+data class AmbientPresets(
+    val supported: Boolean = false,
+    val selected: String? = null,
+    val active: Boolean = false,
+    val scenes: Map<String, AmbientPresetSettings> = emptyMap()
+)
+
 data class AmbientSettings(
     val effect: String,
     val autoCycle: Boolean,
@@ -147,7 +156,8 @@ data class ArduSettings(
     val alarm: AlarmSettings,
     val ambient: AmbientSettings,
     val music: MusicSettings,
-    val system: SystemSettings
+    val system: SystemSettings,
+    val ambientPresets: AmbientPresets = AmbientPresets()
 )
 
 data class ClapCalibrationSample(

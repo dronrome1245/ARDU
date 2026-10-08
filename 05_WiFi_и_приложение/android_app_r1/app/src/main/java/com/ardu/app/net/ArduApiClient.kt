@@ -258,6 +258,30 @@ class ArduApiClient {
         postApplied("/api/ambient/effect", JSONObject().put("id", id))
     }
 
+    fun selectAmbientPreset(id: String) {
+        require(id in PRESET_IDS) { "Неизвестная фоновая сцена" }
+        postApplied("/api/ambient/preset", JSONObject().put("id", id))
+    }
+
+    fun updateAmbientPresetSettings(
+        brightness: Int? = null,
+        dynamics: Int? = null,
+        persist: Boolean = true
+    ) {
+        require(brightness != null || dynamics != null)
+        val json = JSONObject().put("persist", persist)
+        brightness?.let {
+            require(it in 0..255)
+            json.put("brightness", it)
+        }
+        dynamics?.let {
+            require(it in 0..255)
+            json.put("dynamics", it)
+        }
+        postApplied("/api/ambient/preset/settings", json)
+    }
+
+
     fun updateAmbientSettings(
         autoCycle: Boolean? = null,
         autoPeriodSec: Int? = null,
@@ -468,6 +492,26 @@ class ArduApiClient {
             "F03" to parseAmbientEffect(ambient.requiredObject("F03"), true, true)
         )
 
+        val presetRoot = json.optJSONObject("ambient_presets")
+        val presetSupported = presetRoot?.optBoolean("supported", false) == true
+        val presetScenes = if (presetSupported) {
+            val all = presetRoot!!.requiredObject("scenes")
+            PRESET_IDS.associateWith { id ->
+                val item = all.requiredObject(id)
+                AmbientPresetSettings(
+                    brightness = item.requiredInt("brightness", 0..255),
+                    dynamics = item.requiredInt("dynamics", 0..255)
+                )
+            }
+        } else emptyMap()
+        val ambientPresets = AmbientPresets(
+            supported = presetSupported,
+            selected = if (presetSupported) presetRoot?.optString("selected")
+                ?.takeIf { it in PRESET_IDS } else null,
+            active = presetRoot?.optBoolean("active", false) == true,
+            scenes = presetScenes
+        )
+
         val modes = MUSIC_IDS.associateWith { id ->
             val item = musicModes.requiredObject(id)
             MusicModeSettings(
@@ -544,7 +588,8 @@ class ArduApiClient {
                 micDc = system.requiredInt("mic_dc", 0..1023),
                 vuLowPass = system.requiredInt("vu_low_pass", 0..1023),
                 spectrumLowPass = system.requiredInt("spectrum_low_pass", 0..255)
-            )
+            ),
+            ambientPresets = ambientPresets
         )
     }
 
@@ -662,6 +707,7 @@ class ArduApiClient {
 
     companion object {
         val MUSIC_IDS = listOf("M01", "M02", "M03", "M04", "M05", "M08", "M09")
-        val AMBIENT_IDS = listOf("F01", "F02", "F03")
+        val AMBIENT_IDS = listOf("F01")
+        val PRESET_IDS = (1..12).map { "P" + it.toString().padStart(2, '0') }
     }
 }
