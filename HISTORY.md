@@ -2609,3 +2609,7 @@ Repo replacement:
 RoomHeroView now preserves the full wide scene instead of using the v0.22.3 inset scale trick.
 
 Preset follow-up intentionally deferred: owner wants an expanded catalog (>4) and explicit behavior design before more firmware/app preset work.
+
+## 2026-10-08 — Ambient hero corruption fixed at asset layer
+
+Owner showed screenshot where Ambient hero was gray corrupted texture while Night and Alarm heroes were correct. Restored just `ardu_ambient_hero.webp` from the approved RGB-TV living-room original. A newly encoded WebP decoded successfully locally and was inserted as an exact Git blob (SHA `667b6bac57b4c32ff29cea9e6f18513bcae4db6a`). Bumped Android to `0.22.5-ambient-hero-hotfix-rc1` (28). No changes to rendering, navigation, presets or hardware. Awaiting emulator visual result.
