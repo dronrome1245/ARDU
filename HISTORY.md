@@ -2613,3 +2613,14 @@ Preset follow-up intentionally deferred: owner wants an expanded catalog (>4) an
 ## 2026-10-08 — Ambient hero corruption fixed at asset layer
 
 Owner showed screenshot where Ambient hero was gray corrupted texture while Night and Alarm heroes were correct. Restored just `ardu_ambient_hero.webp` from the approved RGB-TV living-room original. A newly encoded WebP decoded successfully locally and was inserted as an exact Git blob (SHA `667b6bac57b4c32ff29cea9e6f18513bcae4db6a`). Bumped Android to `0.22.5-ambient-hero-hotfix-rc1` (28). No changes to rendering, navigation, presets or hardware. Awaiting emulator visual result.
+
+## 2026-10-08 — owner rejects F02/F03 for future Ambient; presets saved as idea
+
+Owner direction: «F02 и F03 не нужен. остальное зафиксируй в репозитории как идею».
+
+Documentation-only decision D-104:
+- target Ambient retains F01;
+- F02/F03 retired from **planned user-facing** functionality, without immediate source deletion;
+- twelve candidate scenes with example patterns/brightness, 4 compact algorithm families, UX, persistence, and staged hardware plan saved in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md` as **IDEA / NOT APPROVED FOR IMPLEMENTATION**.
+
+No code/firmware/application assets changed and no hardware retest claimed.
