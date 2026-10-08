@@ -28,6 +28,8 @@ class ArduApiClientContractTest {
 
         applied("/api/mode")
         applied("/api/ambient/effect")
+        applied("/api/ambient/preset")
+        applied("/api/ambient/preset/settings")
         applied("/api/night/settings")
         applied("/api/alarm/settings")
         applied("/api/light/settings")
@@ -76,6 +78,9 @@ class ArduApiClientContractTest {
         assertEquals("F03", settings.ambient.effect)
         assertEquals(0.5, settings.ambient.effects.getValue("F03").rainbowStep!!, 0.001)
         assertEquals(128, settings.music.modes.getValue("M01").brightness)
+        assertTrue(settings.ambientPresets.supported)
+        assertEquals("P03", settings.ambientPresets.selected)
+        assertEquals(102, settings.ambientPresets.scenes.getValue("P03").brightness)
         assertEquals(3000, settings.system.currentLimitMa)
 
         assertTrue(time.valid)
@@ -95,7 +100,9 @@ class ArduApiClientContractTest {
     @Test
     fun sendsSemanticWritesAndNumericDeveloperCommand() {
         api.setMode("music")
-        api.selectAmbientEffect("F02")
+        api.selectAmbientEffect("F01")
+        api.selectAmbientPreset("P05")
+        api.updateAmbientPresetSettings(brightness = 115, dynamics = 90)
         api.updateNightSettings(
             hue = 24,
             saturation = 180,
@@ -110,7 +117,10 @@ class ArduApiClientContractTest {
         val raw = api.sendNanoCommand("1")
 
         assertEquals("music", JSONObject(received.getValue("/api/mode")).getString("mode"))
-        assertEquals("F02", JSONObject(received.getValue("/api/ambient/effect")).getString("id"))
+        assertEquals("F01", JSONObject(received.getValue("/api/ambient/effect")).getString("id"))
+        assertEquals("P05", JSONObject(received.getValue("/api/ambient/preset")).getString("id"))
+        assertEquals(115, JSONObject(received.getValue("/api/ambient/preset/settings")).getInt("brightness"))
+        assertEquals(90, JSONObject(received.getValue("/api/ambient/preset/settings")).getInt("dynamics"))
         assertEquals(24, JSONObject(received.getValue("/api/night/settings")).getInt("hue"))
         assertEquals(7, JSONObject(received.getValue("/api/alarm/settings")).getInt("hour"))
         assertEquals(64, JSONObject(received.getValue("/api/light/settings")).getInt("brightness"))
@@ -207,6 +217,22 @@ class ArduApiClientContractTest {
             "F01":{"hue":32,"saturation":255,"brightness":80},
             "F02":{"hue":40,"saturation":220,"brightness":75,"speed":30},
             "F03":{"hue":0,"brightness":90,"speed":25,"rainbow_step":0.5}
+          },
+          "ambient_presets":{"supported":true,"selected":"P03","active":false,
+            "scenes":{
+             "P01":{"brightness":64,"dynamics":90},
+             "P02":{"brightness":64,"dynamics":90},
+             "P03":{"brightness":102,"dynamics":90},
+             "P04":{"brightness":64,"dynamics":90},
+             "P05":{"brightness":64,"dynamics":90},
+             "P06":{"brightness":64,"dynamics":90},
+             "P07":{"brightness":64,"dynamics":90},
+             "P08":{"brightness":64,"dynamics":90},
+             "P09":{"brightness":64,"dynamics":90},
+             "P10":{"brightness":64,"dynamics":90},
+             "P11":{"brightness":64,"dynamics":90},
+             "P12":{"brightness":64,"dynamics":90}
+            }
           },
           "music":{
             "selected":"M08",
