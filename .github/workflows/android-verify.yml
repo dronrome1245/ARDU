@@ -25,7 +25,7 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          root=Path("05_WiFi_и_приложение/android_app_r1/app")
+          root=Path("app")
           assets=root/"src/main/res/drawable-nodpi"
           kotlin=(root/"src/main/java/com/ardu/app/MainActivity.kt").read_text()
           layout=(root/"src/main/res/layout/activity_main.xml").read_text()
