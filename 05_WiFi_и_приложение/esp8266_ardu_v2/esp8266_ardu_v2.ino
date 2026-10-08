@@ -767,9 +767,20 @@ void handleStatus() {
   uint8_t tn = 0;
   const bool timeParsed = parseTimeValues(tr, t, tn);
 
+  const NanoResult presetRead=nanoData(115,F("115"));
+  uint32_t pv[26];const bool ready=parsePresetReply(presetRead,pv);
   String body;
-  body.reserve(520);
-  body = F("{\"ok\":true,\"nano_fw\":\"ARDU_V1\",\"uart_protocol\":1");
+  body.reserve(640);
+  body = F("{\"ok\":true,\"nano_fw\":\"");
+  body+=ready?F("ARDU_V2"):F("ARDU_V1");
+  body+=F("\",\"uart_protocol\":1");
+  body+=F(",\"ambient_presets_supported\":");
+  body+=ready?F("true"):F("false");
+  if(ready){
+    body+=F(",\"ambient_preset_selected\":");
+    if(pv[0]){body+='\"';body+=presetId(pv[0]);body+='\"';}
+    else body+=F("null");
+  }
   body += F(",\"mode\":\""); body += modeName(s[0]); body += '"';
   body += F(",\"mode_id\":"); body += s[0];
   body += F(",\"rtc_valid\":"); body += s[1] ? F("true") : F("false");
