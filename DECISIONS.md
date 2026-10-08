@@ -1912,3 +1912,20 @@ R3 не прошивался и не тестировался на железе.
 **РЕШЕНИЕ:** выпустить отдельную `nano_ambient_preview_rc2.ino` как полностью самодостаточную Nano v1 с inline P01/P04/P05, без нестандартного `#include "ambient_preset_probe.h"`. Автоматически проверить **только один .ino** в пустой папке на Arduino AVR в CI. Старую RC1 пометить устаревшей, не переписывать её как проверенную на Windows. Протокол, EEPROM, ESP/Android и стандартную Nano v1 оставить без изменений. Реальная загрузка по отдельной инструкции после Verify.
 
 **CI:** [37814719230](https://github.com/dronrome1245/ARDU/actions/runs/37814719230) PASS; RC2 single-file 29376 Flash / 1234 globals SRAM, HEX [11567275089](https://github.com/dronrome1245/ARDU/actions/runs/37814719230/artifacts/11567275089). **Физический hardware PASS не подтверждён.**
+
+## D-109 — owner approves 12 atmospheric scenes and protected ARDU-DIRECT in integrated firmware v2
+
+**Дата:** 2026-10-08  
+**Статус:** ДЕЙСТВУЕТ в части feature-scope. Source/CI готов, реальная физическая приёмка НЕ подтверждена.  
+**Уточняет/заменяет:** D-104 (сцены ранее только идея), D-107/D-108 относятся лишь к историческим preview, D-100 отсутствие резервного аккумулятора сохраняется.
+
+**Последнее явное решение владельца:** «ARDU-DIRECT я не загружал. давай его сразу реализовывать. можешь F02 и F03 нам теперь не нужен, но нужны новые 12. предлагаю сразу предусмотреть все для прошивки esp и загрузить уже окончательную версию».
+
+**РЕШЕНИЯ:**
+1. Целевой user-facing «Фон»: F01 ручной цвет + P01…P12, включая P12 Радуга, все с индивидуальным настраиваемым поведением и параметрами в Nano EEPROM. Их имена стабилизированы для нового feature/API contract, визуальная аппаратная приёмка каждой сцены остаётся открытой.
+2. F02/F03 не нужны пользователю, старые числовые UART IDs не переиспользовать; Nano v2 отклоняет opcode100 1/2. Полная архитектура прежних L01/Music/Night/Alarm/Clap/RTC не удаляется.
+3. ESP v2 получает Station OTA и защищённый WPA2 `ARDU-DIRECT` (192.168.4.1), семантический API новых P-сцен. OTA выполняется **в рабочем домашнем Station в первую очередь**, до замены Nano, чтобы не смешивать сетевой и аппаратный риск.
+4. После Station ESP smoke загрузить полную Nano v2 через USB (со снятым питанием и временным отсоединением ESP TX→Nano D0), затем проверить Android v0.22.6 и физический SoftAP direct failover.
+5. Использовать `ARDU_AMBIENT12_RELEASE_CANDIDATE.md` как обязательный сценарий + rollback; ни один исходник не считается окончательной проверенной прошивкой по одному CI. Внутренний ориентир Nano Flash ≤95% не достигнут, stack/two-ring current/scene visual PASS pending.
+
+**ФАКТ:** [Nano CI](https://github.com/dronrome1245/ARDU/actions/runs/37818601346), [ESP CI](https://github.com/dronrome1245/ARDU/actions/runs/37820404281), [Android CI](https://github.com/dronrome1245/ARDU/actions/runs/37819918951) — PASS. Физических обновлений этим GitHub-коммитом не делалось.

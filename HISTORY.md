@@ -2657,3 +2657,11 @@ No code/firmware/application assets changed and no hardware retest claimed.
 Реализована отдельная RC2: `04_Прошивка/nano_ambient_preview_rc2/nano_ambient_preview_rc2.ino`. Она сформирована из **всего** `nano_ardu_v1.ino` с включённым preview и с **inline** содержимым `nano_ardu_v1/ambient_preset_probe.h`; прежняя canonical Nano не менялась. GitHub workflow добавил проверку соответствия inline исходнику и isolated compile, где в папке буквально только один RC2 .ino.
 
 [CI 37814719230](https://github.com/dronrome1245/ARDU/actions/runs/37814719230) **PASS**, 29376 B Flash/1234 B globals, [HEX artifact 11567275089](https://github.com/dronrome1245/ARDU/actions/runs/37814719230/artifacts/11567275089). Дальнейшие действия на реальном Nano ещё не подтверждены. Инструкция: `04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC2_TEST.md`.
+
+## 2026-10-08 — completed Ambient12 v2 integration in GitHub, physical ESP OTA outstanding
+
+Выполнено по явному разрешению владельца: созданы отдельные **полные** версии `04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino` и `05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino` и обновлено Android-приложение `0.22.6-ambient12-functional-rc1`. Полный набор P01…P12 с хранением в отдельной EEPROM и UART 111..115; REST endpoints чтения, выбора и индивидуальных brightness/dynamics; WPA2 `ARDU-DIRECT` при отсутствии домашнего Wi-Fi; OTA в Station.
+
+Коды firmware source прошли GitHub CI: [Nano 37818601346](https://github.com/dronrome1245/ARDU/actions/runs/37818601346) 29560 Flash/1282 globals, [ESP 37820404281](https://github.com/dronrome1245/ARDU/actions/runs/37820404281) включая real-credentials compile guard. [Android 37819918951](https://github.com/dronrome1245/ARDU/actions/runs/37819918951) JVM tests + APK PASS (artifact 11568856875). Важный этап безопасности: приватный `wifi_secrets.h` обязателен в ESP v2, `.gitignore` исключает его из Git; placeholder-пароли не допускаются при обычной сборке.
+
+Создан `ARDU_AMBIENT12_RELEASE_CANDIDATE.md` с безопасным планом одного OTA ESP v2 → USB полной Nano v2 → Android → теста `ARDU-DIRECT`. **Владелец сообщил, что ARDU-DIRECT до сих пор не загружал; реальные OTA/USB/питание/две ленты/12 сцен этим чатом не подтверждены.**

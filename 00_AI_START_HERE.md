@@ -123,11 +123,11 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-1. **Исправление Windows Compile:** RC1 выдала `ambient_preset_probe.h: No such file or directory`, хотя владелец сообщил, что файл лежит рядом. Вместо неё использовать исключительно **`04_Прошивка/nano_ambient_preview_rc2/nano_ambient_preview_rc2.ino`**: один .ino, никакого локального .h.
-2. **Подтверждено CI:** [37814719230](https://github.com/dronrome1245/ARDU/actions/runs/37814719230) PASS, включая копирование **единственного .ino в пустой sketch-каталог** и последующую AVR-сборку; [HEX RC2](https://github.com/dronrome1245/ARDU/actions/runs/37814719230/artifacts/11567275089). Полный Nano preview: 29376 Flash/1234 globals SRAM.
-3. **Практический gate:** [AMBIENT_PRESETS_PREVIEW_RC2_TEST.md](04_Прошивка/AMBIENT_PRESETS_PREVIEW_RC2_TEST.md): `git pull` или GitHub Raw download одного `.ino` → Arduino Nano / Old Bootloader / Verify. После Verify безопасный Upload с временным отключением ESP TX→Nano D0 при полностью снятом питании и тест Android «Фон» → F01 на 35–40 секунд.
-4. **Поведение:** P01 «Северное сияние» → P04 «Космос» → P05 «Камин» → обычный F01. ESP и Android не менялись; старые F02/F03/numeric IDs/EEPROM сохранены. Никакая Nano пока физически не обновлена по результатам этого чата.
-5. Фактический stack/two-ring current/температура не проверены; превью Flash выше мягкого ориентира на 192 B, но в пределах hard 30720. ARDU-DIRECT и 44+44 нагрузка также pending. Battery/backup отменён.
+1. Владелец **утвердил функциональный scope**: F01 ручной + двенадцать P01..P12. Новые scene names/внешние API реализованы в source, физическое визуальное качество ещё требуется проверить. F02/F03 не нужны для будущего user-facing набора, их numeric IDs остаются зарезервированными.
+2. Готовы три слоя: Nano `04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino`, ESP `05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino`, Android `android_app_r1` v0.22.6. GitHub Actions: [Nano](https://github.com/dronrome1245/ARDU/actions/runs/37818601346), [ESP](https://github.com/dronrome1245/ARDU/actions/runs/37820404281), [Android APK](https://github.com/dronrome1245/ARDU/actions/runs/37819918951) — PASS; **hardware нет**.
+3. Ближайший hardware gate строго по `ARDU_AMBIENT12_RELEASE_CANDIDATE.md`: `git pull` → создать игнорируемый `esp8266_ardu_v2/wifi_secrets.h` из шаблона и вписать 4 секрета, установить `ARDU_CREDENTIALS_CONFIGURED 1` → ESP v2 Arduino IDE Verify и **одно OTA обновление при работающем домашнем роутере**. Проверить новый `/api/ping`/`/api/status` с пока старой Nano. Только при PASS — полная Nano v2 Old Bootloader/USB-C с ESP TX→Nano D0 изолированным при выключенном питании; затем восстановить UART.
+4. Android Studio `git pull`→Run или [готовый APK](https://github.com/dronrome1245/ARDU/actions/runs/37819918951/artifacts/11568856875), проверить реальные 12 сцен и per-scene параметры; затем отдельно отключить роутер и проверить WPA2 ARDU-DIRECT/192.168.4.1 и возврат в Station.
+5. Не объявлять «окончательно прошито» до физического OTA+Nano+2×44 LED+current+RTC/FHT/clap+EEPROM+direct-mode PASS. Nano Flash 29560/30720 > soft 29184, SRAM globals 1282/2048. ESP IRAM 60823/65536. Аккумулятор/backup отменены.
 
 ## 12. База ColorMusic/FHT
 
