@@ -2328,18 +2328,17 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
     case 115: // read all 12 values and active scene from Nano
       if(n)return uartErr(UE_PARSE);
       printPresets();return;
-    case 103:
-      if(n!=1||a[0]>1)return uartErr(UE_RANGE);extCfg.ambient.autoCycle=a[0];extCfg.dirty=true;lastAmbientAutoMs=millis();uartAck(op);return;
-    case 104:
-      if(n!=1||!argRange(a[0],1,255))return uartErr(UE_RANGE);extCfg.ambient.autoPeriodSec=a[0];extCfg.dirty=true;uartAck(op);return;
-    case 105:case 106:case 107:case 108:case 109: {
-      if(n!=1)return uartErr(UE_PARSE);AmbientSettingsV1& x=extCfg.ambient;
-      if(op==105){if(a[0]>255)return uartErr(UE_RANGE);if(x.effect==0)x.f01Hue=a[0];else if(x.effect==1)x.f02Hue=a[0];else x.f03Hue=a[0];prepareAmbient();}
-      else if(op==106){if(a[0]>255||x.effect==2)return uartErr(UE_APPLICABILITY);if(x.effect==0)x.f01Sat=a[0];else x.f02Sat=a[0];}
-      else if(op==107){if(a[0]>255)return uartErr(UE_RANGE);if(x.effect==0)x.f01Brightness=a[0];else if(x.effect==1)x.f02Brightness=a[0];else x.f03Brightness=a[0];}
-      else if(op==108){if(!argRange(a[0],1,255)||x.effect==0)return uartErr(UE_APPLICABILITY);if(x.effect==1)x.f02Speed=a[0];else x.f03Speed=a[0];}
-      else{if(x.effect!=2||!argRange(a[0],5,100))return uartErr(UE_APPLICABILITY);x.f03Step10=a[0];}
-      extCfg.dirty=true;uartAck(op);return;
+    case 103:case 104:case 108:case 109:
+      // Removed Auto/F02/F03 controls. Wire opcodes stay reserved.
+      uartErr(UE_APPLICABILITY);return;
+    case 105:case 106:case 107: {
+      if(n!=1||a[0]>255)return uartErr(UE_RANGE);
+      AmbientSettingsV1& x=extCfg.ambient;
+      if(presetCfg.selected)return uartErr(UE_APPLICABILITY);
+      if(op==105)x.f01Hue=static_cast<uint8_t>(a[0]);
+      else if(op==106)x.f01Sat=static_cast<uint8_t>(a[0]);
+      else x.f01Brightness=static_cast<uint8_t>(a[0]);
+      extCfg.dirty=true;frameDirty=true;uartAck(op);return;
     }
     case 110:saveExtended();uartAck(op);return;
     case 120:
