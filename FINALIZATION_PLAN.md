@@ -819,3 +819,9 @@ Targeted UI corrections requested by owner are source-complete. This is not a ne
 Immediate gate is emulator visual review before any new firmware upload.
 
 Firmware-affecting items (Ambient speed + reset defaults) are staged in source and require a separate compile/size/upload acceptance after UI approval.
+
+## 30. Ambient preset idea / D-104 — 2026-10-08
+
+Owner decided future Ambient UI retains F01 but does not need F02/F03. A 12-scene atmospheric preset model is stored for later consideration in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md`.
+
+This is **backlog idea only**, not a scope addition to the active release acceptance. Do not implement new IDs/API/UART/EEPROM, delete legacy effects, or request firmware upload until owner separately approves and flash/SRAM compile checks pass. Current Android/Nano/ESP source still implements F02/F03; this is a documentation-only update. Existing v0.22.5 emulator image gate stays next.
