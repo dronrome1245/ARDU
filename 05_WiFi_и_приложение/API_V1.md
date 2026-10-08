@@ -485,3 +485,16 @@ Ambient effect selection `POST /api/ambient/effect` сохраняется ср�
 Owner decision: F02 and F03 are unnecessary in the **future user-facing** Ambient experience; F01 remains. All F02/F03 mappings above describe the **existing** v1 API and still apply to current Android/Nano/ESP source. D-104 does **not** remove these endpoints, retire any wire identifiers, or authorize a new protocol.
 
 The twelve atmospheric preset candidates are documented in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md` as an **idea only**. A possible `POST /api/ambient/preset` is not implemented, approved or frozen.
+
+## D-109 — ESP v2 Ambient12 semantic HTTP extension (2026-10-08)
+
+**Live-source target:** `ARDU_ESP_V2_AMBIENT12`, existing numeric UART protocol v1 with additive scene opcodes 111..115. `ARDU-DIRECT` WPA2 hotspot `192.168.4.1` is used only when the home Station router is unavailable, with same endpoints. OTA is deliberately Station-only.
+
+- `GET /api/ambient/presets` → `{"ok":true,"presets":{"supported":true,"selected":"P03","active":true,"scenes":{"P01":{"brightness":115,"dynamics":90},...}}}` with all 12 values and real Nano readback. When Nano old: `{"ok":true,"supported":false,"reason":"NANO_UPDATE_REQUIRED"}`.
+- `POST /api/ambient/preset` body `{"id":"P03"}` → Nano `111 3` followed by EEPROM commit `114`; returns `{"ok":true,"selected":"P03","applied":true,"persisted":true}`. P01..P12 only; F02/F03 not aliases.
+- `POST /api/ambient/preset/settings` body `{"brightness":102,"dynamics":120,"persist":true}` → 112/113 + optional 114; brightness/dynamics 0..255, either optional but ≥1 required, persist defaults true, false means live RAM preview.
+- `GET /api/settings` retains v1 schema response and adds top-level `ambient_presets`: `{"supported":true,"selected":"P03","active":true,"scenes":{"P01":{"brightness":...,"dynamics":...},...}}` or `{"supported":false}` on older Nano. Android must read from device, not assume app cache.
+- `GET /api/status` adds `ambient_presets_supported`, `ambient_preset_selected` and identifies `nano_fw:"ARDU_V2"` when readback115 succeeds.
+- `POST /api/ambient/effect` accepts only `{"id":"F01"}` (manual HSV). Historical F02/F03 HTTP and four Android macros described above are **v1-only**, retired in the new user experience; numeric IDs reserved, not reassigned.
+
+Private `wifi_secrets.h` (home SSID/password, OTA password, new WPA2 `ARDU-DIRECT` pass ≥8 chars) is **mandatory** for real IDE compilation; `ARDU_CREDENTIALS_CONFIGURED=1` only after replacement, and compile-time guards reject template passwords. [ESP CI](https://github.com/dronrome1245/ARDU/actions/runs/37820404281) PASS. Full physical Wi-Fi/OTA/protocol smoke still pending; see `ARDU_AMBIENT12_RELEASE_CANDIDATE.md`.

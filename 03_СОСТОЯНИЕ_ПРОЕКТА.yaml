@@ -2921,3 +2921,33 @@ ambient_preview_rc2_2026_10_08:
   device_led_test_done: false
   api_uart_eeprom_unchanged: true
   next: open_rc2_single_ino_windows_arduino_verify_then_safe_upload
+
+# Owner-approved full Ambient12 and ARDU-DIRECT v2 release-candidate handoff 2026-10-08
+ambient12_direct_rc_2026_10_08:
+  status: source_and_ci_pass_hardware_upload_pending
+  decision: D-109
+  owner_approved_catalogue: [P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12]
+  manual_effect: F01
+  retired_user_effects: [F02, F03]
+  numeric_wire_ids_reused: false
+  nano_sketch: "04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino"
+  nano_new_eeprom_base: 512
+  nano_preset_storage_bytes: 29
+  nano_flash_ci_bytes_latest: 29306
+  nano_sram_globals_ci_bytes_latest: 1282
+  esp_sketch: "05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino"
+  esp_requires_private_credentials: true
+  esp_direct_ssid: ARDU-DIRECT
+  esp_direct_ip: "192.168.4.1"
+  esp_ota_station_only: true
+  android_version: "0.22.6-ambient12-functional-rc1"
+  android_version_code: 29
+  hardware_esp_v2_ota_uploaded: false
+  hardware_nano_v2_usb_uploaded: false
+  physical_direct_mode_verified: false
+  physical_scene_visual_pass: false
+  ci_nano: "https://github.com/dronrome1245/ARDU/actions/runs/37820974644"
+  ci_esp: "https://github.com/dronrome1245/ARDU/actions/runs/37820404281"
+  ci_android: "https://github.com/dronrome1245/ARDU/actions/runs/37819918951"
+  test_guide: "ARDU_AMBIENT12_RELEASE_CANDIDATE.md"
+  next: esp_v2_station_ota_then_full_nano_v2_then_android_then_direct_wifi_smoke
