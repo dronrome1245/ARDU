@@ -1493,24 +1493,28 @@ void updateAmbient(){
   if(currentMode!=SystemMode::AMBIENT)return;
   AmbientSettingsV1& a=extCfg.ambient;
   const unsigned long now=millis();
+#if ARDU_AMBIENT_PRESET_PROBE
+  // In the full preview RC, legacy F01 is a temporary visual-test launcher.
+  // The 4th slot renders ORIGINAL F01 for reference; F02/F03 stay unchanged.
+  // On selecting Ambient/F01 the scene sequence restarts from Aurora.
+  const bool previewF01 = a.effect == static_cast<uint8_t>(AmbientEffect::F01);
+  if (previewF01) {
+    const uint8_t labScene = static_cast<uint8_t>(
+        ((now - lastAmbientAutoMs) >> 13) & 3U); // ~8.2 seconds each
+    if (labScene < 3U) {
+      if (now - lastAmbientFrameMs < 40UL) return;
+      lastAmbientFrameMs = now;
+      ArduAmbientProbe::render(labScene, leds, Cfg::LED_COUNT, now, 128U);
+      requestedBrightness = labScene == ArduAmbientProbe::COSMOS ? 64U : 115U;
+      frameDirty = true;
+      return;
+    }
+    // Do not start the legacy automatic F01/F02/F03 cycling in preview.
+  } else
+#endif
   if(a.autoCycle && now-lastAmbientAutoMs>=static_cast<unsigned long>(a.autoPeriodSec)*1000UL){
     lastAmbientAutoMs=now;nextAmbient(1);
   }
-
-#if ARDU_AMBIENT_PRESET_PROBE
-  // Source-only rotating preview, with a legacy Ambient window each 32s.
-  // Uses uptime bits (8s each) and NO extra SRAM timer.
-  // This lab build MUST NOT be uploaded as the v1 release.
-  const uint8_t labScene = static_cast<uint8_t>((now >> 13) & 3U);
-  if (labScene < 3U) {
-    if (now - lastAmbientFrameMs < 40UL) return;
-    lastAmbientFrameMs = now;
-    ArduAmbientProbe::render(labScene, leds, Cfg::LED_COUNT, now, 128U);
-    requestedBrightness = labScene == ArduAmbientProbe::COSMOS ? 64U : 115U;
-    frameDirty = true;
-    return;
-  }
-#endif
   const AmbientEffect e=static_cast<AmbientEffect>(a.effect);
   if(e==AmbientEffect::F01){
     fill_solid(leds,Cfg::LED_COUNT,CHSV(a.f01Hue,a.f01Sat,255));

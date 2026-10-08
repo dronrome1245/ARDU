@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "04_Прошивка/nano_ardu_v1/**"
+      - "04_Прошивка/nano_ambient_preview_rc1/**"
       - ".github/workflows/arduino-verify.yml"
   workflow_dispatch:
 
@@ -49,6 +50,15 @@ jobs:
             --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
             "04_Прошивка/nano_ardu_v1"
 
+      - name: Compile IDE-openable full Nano Ambient preview RC1
+        run: |
+          arduino-cli compile \
+            --fqbn arduino:avr:nano:cpu=atmega328old \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-nano-ambient-preview-rc1" \
+            --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
+            "04_Прошивка/nano_ambient_preview_rc1"
+
       - name: Size profile
         if: always()
         run: |
@@ -63,3 +73,14 @@ jobs:
           echo "--- Full Nano Ambient lab probe size ---"
           PROBE_ELF="$(find "$GITHUB_WORKSPACE/build-nano-ambient-probe" -name '*.elf' | head -n 1)"
           if [ -n "$PROBE_ELF" ]; then "$AVR_BIN/avr-size" -C --mcu=atmega328p "$PROBE_ELF" || true; fi
+          echo "--- IDE preview RC1 firmware size ---"
+          RC_ELF="$(find "$GITHUB_WORKSPACE/build-nano-ambient-preview-rc1" -name '*.elf' | head -n 1)"
+          if [ -n "$RC_ELF" ]; then "$AVR_BIN/avr-size" -C --mcu=atmega328p "$RC_ELF"; fi
+
+      - name: Publish compiled Ambient preview RC1 HEX for recovery/test
+        uses: actions/upload-artifact@v4
+        with:
+          name: ardu-nano-ambient-preview-rc1
+          path: build-nano-ambient-preview-rc1/*.hex
+          if-no-files-found: error
+          retention-days: 30
