@@ -1873,3 +1873,17 @@ R3 не прошивался и не тестировался на железе.
 2. P01…P12 и P12 «Радуга» остаются кандидатами, не стабильными режимами. Новые opcode, API, EEPROM version и включение в scope очередного release требуют отдельного gate.
 3. Соблюдать `FINALIZATION_PLAN.md`: рабочую Nano v1 не заменять standalone-скетчами; при физическом обновлении использовать только целостный согласованный release candidate.
 4. Ни новых прошивок, ни app code, ни hardware acceptance в данном шаге нет.
+
+## D-106 — start Ambient preset engineering with a source-only three-scene probe
+
+**Дата:** 2026-10-08  
+**Статус:** ДЕЙСТВУЕТ для первого этапа разработки, НЕ утверждает новый wire/release scope.  
+**Основание:** владелец: «давай начнем тогда реализовывыть пресеты».
+
+**РЕШЕНИЕ:**
+1. Начать подготовку нового Ambient engine с трёх прототипов: P01 Northern Lights / P04 Space / P05 Fireplace. Временные внутренние индексы не являются stable preset IDs.
+2. Сохранить полную стандартную Nano v1 и действующие F01/F02/F03 без изменений поведения. Допускать только отдельно собранный source-only lab flag, без upload, ESP/API/Android/EEPROM изменений.
+3. Реальный визуальный характер и полный набор P01…P12, включая P12 Rainbow, пока не утверждены. Для включения в выпуск потребуется отдельный G0 catalog/release scope + memory/physical acceptance согласно `FINALIZATION_PLAN.md`.
+4. Условие перехода: host/AVR build + Flash/SRAM PASS, затем запас памяти/stack review, **полный** firmware RC и визуальное подтверждение владельца на кольце.
+
+**ФАКТ 2026-10-08:** host tests и две Arduino CLI сборки в [run 37807204353](https://github.com/dronrome1245/ARDU/actions/runs/37807204353) прошли. Standard: 28690 Flash / 1234 globals, lab: 29312 Flash / 1234 globals. Target 95% flash превышен на 128 B; физическая загрузка отсутствует. Подробно: `04_Прошивка/AMBIENT_PRESETS_LAB_R1.md`.

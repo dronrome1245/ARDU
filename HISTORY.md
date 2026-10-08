@@ -2631,3 +2631,15 @@ No code/firmware/application assets changed and no hardware retest claimed.
 - Создан `04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md`: согласование будущего каталога, свежая compilation/EEPROM baseline, три P01/P04/P05 алгоритма, memory gates, дальнейший каталог, versioned persistence/API, ESP/Android, physical acceptance и rollback.
 - D-105 фиксирует принятие визуалов и последовательность работ; D-104 (F01 да, F02/F03 нет в будущем UI) сохраняется. P01…P12 не frozen IDs.
 - Документационное изменение: source прошивок, Android, UART/HTTP, EEPROM и физическое устройство **не изменены / не тестировались**.
+
+## 2026-10-08 — Ambient three-scene software lab R1: code + CI passed
+
+Владелец дал прямую команду начать реализацию пресетов. В `nano_ardu_v1/ambient_preset_probe.h` реализованы AURORA (P01), COSMOS (P04), FIREPLACE (P05) с одним 44-LED framebuffer, без новых EEPROM/UART IDs. Рабочая прошивка Nano v1 подключает эти алгоритмы **только** при специальном compile флаге (по умолчанию OFF), так что доступные Android/ESP F01/F02/F03 не меняют смысла.
+
+Разработаны C++ host tests, расширен Arduino Verify workflow до отдельной полной Nano probe compile, оптимизированы 32-bit math и preview scheduler:
+- коммиты исходного алгоритма/интеграции: `46ef1c2`, `44eb68e`;
+- оптимизации: `fc44636`, `7f676fc`, `82747f0`;
+- итоговая проверка [CI run 37807204353](https://github.com/dronrome1245/ARDU/actions/runs/37807204353) **PASS**: host tests, стандартный full Nano 28690/30720 flash + 1234/2048 SRAM, experimental full Nano 29312/30720 flash + 1234/2048 SRAM.
+- +622 Flash / +0 globals по сравнению со standard; над проектным ориентиром 95% Flash на 128 B, реальный stack не измерен.
+
+Нет ни firmware upload, ни физического визуального теста/тока, ни app/API migration; локальная лампа остаётся на предыдущих версиях. См. `04_Прошивка/AMBIENT_PRESETS_LAB_R1.md`.

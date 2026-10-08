@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — 2026-10-08 владелец принял все текущие hero-фоновые изображения Android для «Фон», «Ночь», «Будильник».** Android source остаётся `0.22.5-ambient-hero-hotfix-rc1` (versionCode 28), утверждённый v0.22 Home Hub без нового redesign. В `04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md` оформлен план расширения фоновых сцен (не реализация). D-104: будущая страница «Фон» сохраняет F01 и исключает F02/F03; текущие Nano/ESP/Android всё ещё поддерживают F02/F03; 12 сцен и P01…P12 остаются идеей без frozen IDs/API/EEPROM. Следующий технический gate при отдельной команде на реализацию: утвердить список/release scope, обновить Nano/ESP compile и EEPROM map, затем минимальные P01/P04/P05 с Flash/SRAM gate. Правила FINALIZATION_PLAN сохраняются; staged reset/speed Nano/ESP ещё не загружены, ARDU-DIRECT physical smoke и 44+44 load test ещё pending.
+**ФИНАЛИЗАЦИЯ ARDU v1 + первый SOURCE-PROTOTYPE фоновых сцен (2026-10-08).** После принятия владельцем всех Android hero-изображений выполнена отдельная кодовая итерация G1/часть G2 из `04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md`. Реализованы компактные P01 «Северное сияние», P04 «Космос», P05 «Камин» в `nano_ardu_v1/ambient_preset_probe.h` и экспериментальное включение только по `ARDU_AMBIENT_PRESET_PROBE=1`. CI Arduino Verify run 37807204353: host test PASS; стандартная полная Nano 28690 Flash / 1234 SRAM; полная Nano с тремя сценами 29312 Flash / 1234 SRAM, **компиляция PASS**. Прототип ниже hard flash limit 30720, но на 128 B выше проектного ориентира 29184 (95%), требуется оптимизация перед release. В обычной сборке F01/F02/F03, numeric UART/API, EEPROM, ESP и Android (source `0.22.5-ambient-hero-hotfix-rc1`) **не меняют поведения**. Physical upload / LED visual PASS / two-ring acceptance / ARDU-DIRECT smoke не выполнены. D-104: F01 оставить, F02/F03 удалить лишь из будущего UI; рабочие P01…P12 не frozen IDs. Действует полный release policy FINALIZATION_PLAN; аккумуляторная ветка отменена.
 
 ## Что подтверждено и решено
 
@@ -2268,3 +2268,12 @@ The 12 IDs, API route, UART commands and EEPROM format are **NOT approved or fro
 - **РЕШЕНИЕ:** F01 остаётся, F02/F03 не нужны в будущем UI (D-104). Старые wire IDs не переписываются. P01…P12, включая P12 «Радуга», пока только условные кандидаты.
 - **ФАКТ:** в этом коммите меняется только документация; Android version, прошивки, HTTP/UART контракт, EEPROM и железо остаются без изменений.
 - **Следующее действие:** по отдельной команде на реализацию выполнить G0/G1; без новых одиночных test-sketch uploads. Сохранить отдельный gate v1/ARDU-DIRECT/two-ring acceptance.
+
+### 2026-10-08 — первый источник P01/P04/P05, host + AVR compile PASS
+
+- **РЕШЕНИЕ владельца:** начать реализацию фоновых пресетов; первый малый срез — три существенно разных анимации вместо прежних макросов. Пакет не замораживает каталог, EEPROM/API или внешние P ID.
+- **РЕАЛИЗОВАНО В SOURCE:** `04_Прошивка/nano_ardu_v1/ambient_preset_probe.h`, compile-only флаг `ARDU_AMBIENT_PRESET_PROBE=1`, host tests и отдельная экспериментальная сборка в `.github/workflows/arduino-verify.yml`. Без этого флага release behavior F01/F02/F03 не меняется.
+- **CI PASS:** [run 37807204353](https://github.com/dronrome1245/ARDU/actions/runs/37807204353); штатная Nano 28690 / 1234 B (Flash/globals), lab 29312 / 1234 B. Добавка +622 Flash / +0 SRAM. Target 95% = 29184 B пока превышен на 128 B; максимальный Flash 30720 B не превышен.
+- **ПРОВЕРЕНО:** host C++ 44-LED bounds, детерминированные разные сцены/анимация/диапазоны. **НЕ ПРОВЕРЕНО:** реальная лента/ток/скорости/стек в работе.
+- **ПОСТОЯННЫЙ ПОТОК:** Android/ESP/API/UART/EEPROM без изменений, F02/F03 не удалялись. Не прошивать lab build. Следующий gate — сокращение Flash/stack-review и согласованный полный Nano release candidate для визуальной проверки владельцем, а не изолированный test sketch.
+- **Отчёт:** `04_Прошивка/AMBIENT_PRESETS_LAB_R1.md`.

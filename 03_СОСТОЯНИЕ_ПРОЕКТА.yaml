@@ -2854,3 +2854,27 @@ ambient_presets_plan_2026_10_08:
   physical_upload_authorized: false
   preserve_finalization_plan_release_policy: true
   deployed_nano_esp_unchanged: true
+
+# 2026-10-08: first Ambient presets source prototype with CI evidence
+ambient_presets_lab_r1_2026_10_08:
+  status: source_prototype_ci_pass_hardware_pending
+  report: "04_Прошивка/AMBIENT_PRESETS_LAB_R1.md"
+  renderer: "04_Прошивка/nano_ardu_v1/ambient_preset_probe.h"
+  concepts: [P01_aurora, P04_cosmos, P05_fireplace]
+  ids_frozen: false
+  full_catalog_approved: false
+  ci_run: "https://github.com/dronrome1245/ARDU/actions/runs/37807204353"
+  nano_default_flash_bytes: 28690
+  nano_lab_flash_bytes: 29312
+  nano_flash_limit_bytes: 30720
+  nano_target_95pct_flash_bytes: 29184
+  nano_lab_over_target_bytes: 128
+  nano_default_sram_globals_bytes: 1234
+  nano_lab_sram_globals_bytes: 1234
+  host_tests: pass
+  nano_default_build: pass
+  nano_lab_build: pass
+  hardware_led_test: not_done
+  stable_uart_api_eeprom_changes: false
+  physical_upload_performed: false
+  next: flash_reserve_and_stack_review_before_full_release_candidate

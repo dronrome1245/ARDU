@@ -831,3 +831,11 @@ This is **backlog idea only**, not a scope addition to the active release accept
 Владелец подтвердил, что все новые фоновые изображения Android его устраивают. Повторный visual gate для исправленного hero «Фон» закрыт на основании ответа владельца.
 
 По запросу владельца создан `04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md`. План описывает **возможную следующую feature-итерацию**, но сам по себе **не** расширяет `v1` release scope и не отменяет правило полной прошивки/заморозки после acceptance. До реализации нужны утверждение списка, определение release scope и fresh Nano flash/SRAM/EEPROM gates. В текущем source F02/F03 и 4 app-макроса сохраняются; новые P IDs/API/UART/EEPROM не вводились.
+
+## 32. G1/G2 source-only prototype of three Ambient presets — 2026-10-08
+
+Владелец явно инициировал реализацию. Первая малая source-итерация внедрила изолированные AURORA/COSMOS/FIREPLACE renderers и CI host tests, не меняя стандартную Nano release v1, ESP/API/UART/EEPROM/Android и не загружая новую прошивку физически.
+
+[Arduino Verify run 37807204353](https://github.com/dronrome1245/ARDU/actions/runs/37807204353): standard Nano 28690 Flash, 1234 SRAM; full Nano + prototype flag 29312 Flash, 1234 SRAM, оба compile PASS; host tests PASS. Internal 95% flash target не достигнут на 128 bytes, физический ring visual PASS отсутствует. Legacy F02/F03 остаются доступными в стандартной сборке в соответствии с D-104/D-106.
+
+**Не расширять утверждённый v1 release scope автоматически.** Дальнейший gate — memory/stack оптимизация и полный согласованный RC для физического просмотра P01/P04/P05; см. `04_Прошивка/AMBIENT_PRESETS_LAB_R1.md`.

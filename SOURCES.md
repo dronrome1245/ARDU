@@ -1078,3 +1078,9 @@ These sources define candidate hardware only. Final acceptance remains a physica
 - UGREEN Nexode 20000 mAh 100 W SKU 25188: 72 Wh, USB-C1 supports 15 V / 3 A.
 
 All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-drop, current and temperature acceptance before ceiling installation.
+
+## 2026-10-08 — Nano Ambient presets lab R1 / first CI evidence
+
+- Исходники: `04_Прошивка/nano_ardu_v1/ambient_preset_probe.h`, `.../tests/ambient_preset_probe_host.cpp`; хранятся в том же репозитории, аппаратной идентификации не требуют.
+- Проверка CI: [GitHub Actions Arduino Verify run 37807204353](https://github.com/dronrome1245/ARDU/actions/runs/37807204353), 2026-10-08, full original Nano and experimental full Nano + host tests PASS.
+- По тексту CI: baseline 28690/30720 Flash + 1234/2048 globals; probe 29312/30720 Flash + 1234/2048 globals. Это данные компилятора; они **не** подтверждают физические эффекты/температуру/напряжение и не разрешают upload.
