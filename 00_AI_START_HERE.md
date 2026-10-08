@@ -123,11 +123,11 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Current Android visual source = `0.22.4-generated-heroes-rc1`.
+Current Android visual source = `0.22.5-ambient-hero-hotfix-rc1` (fixed corrupted Ambient asset).
 
 1. v0.22 Home Hub remains the canonical visual baseline; v0.23 remains rejected.
 2. Owner approved and repo now uses new dedicated wide hero scenes for Ambient / Night / Alarm-Dawn.
-3. Immediate visual gate: `git pull` → Pixel emulator → Run → check those three hero scenes in the actual overlay/layout.
+3. Immediate visual gate: `git pull` → Pixel emulator → Run → check the repaired Ambient hero («Фон»). Night/Alarm images already look correct per owner.
 4. Ambient preset design is intentionally open:
    - current 4 presets are provisional;
    - owner wants more than four;
