@@ -1498,15 +1498,10 @@ void updateAmbient(){
   }
 
 #if ARDU_AMBIENT_PRESET_PROBE
-  // The lab build includes BOTH legacy Ambient and P01/P04/P05 code.
-  // It has NO extra UART IDs, HTTP endpoints or EEPROM changes.
-  // Do not upload this special build over the accepted v1 release.
-  static uint8_t labScene = 0;
-  static unsigned long lastLabSwitch = 0;
-  if (now - lastLabSwitch >= 12000UL) {
-    lastLabSwitch = now;
-    labScene = static_cast<uint8_t>((labScene + 1U) & 3U);
-  }
+  // Source-only rotating preview, with a legacy Ambient window each 32s.
+  // Uses uptime bits (8s each) and NO extra SRAM timer.
+  // This lab build MUST NOT be uploaded as the v1 release.
+  const uint8_t labScene = static_cast<uint8_t>((now >> 13) & 3U);
   if (labScene < 3U) {
     if (now - lastAmbientFrameMs < 40UL) return;
     lastAmbientFrameMs = now;

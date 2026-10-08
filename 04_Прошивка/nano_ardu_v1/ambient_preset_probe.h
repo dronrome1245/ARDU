@@ -29,11 +29,12 @@ inline uint8_t hash8(uint8_t x) {
 // One 44-pixel logical frame is mirrored by Nano on D6 and D7.
 inline bool render(uint8_t scene, CRGB* out, uint8_t count,
                    uint32_t nowMs, uint8_t dynamics) {
-  if (!out || count == 0U || scene > FIREPLACE) return false;
+  // Production geometry is exactly 44 LEDs per ring, nothing else.
+  if (!out || count != 44U || scene > FIREPLACE) return false;
+  const uint8_t flowShift = dynamics >= 170U ? 7U : (dynamics >= 85U ? 8U : 9U);
 
   if (scene == AURORA) {
-    const uint8_t shift = dynamics >= 170U ? 7U : (dynamics >= 85U ? 8U : 9U);
-    const uint8_t phase = static_cast<uint8_t>(nowMs >> shift);
+    const uint8_t phase = static_cast<uint8_t>(nowMs >> flowShift);
     for (uint8_t i = 0; i < count; ++i) {
       const uint8_t flow = triangle8(static_cast<uint8_t>(i * 7U + phase));
       const uint8_t depth = triangle8(static_cast<uint8_t>(i * 11U - (phase >> 1)));
@@ -46,7 +47,7 @@ inline bool render(uint8_t scene, CRGB* out, uint8_t count,
 
   if (scene == COSMOS) {
     // Dark backdrop with independently phased, slowly fading stars.
-    const uint8_t shift = dynamics >= 170U ? 11U : (dynamics >= 85U ? 12U : 13U);
+    const uint8_t shift = static_cast<uint8_t>(flowShift + 4U);
     for (uint8_t i = 0; i < count; ++i) out[i] = CHSV(165U, 230U, 10U);
     for (uint8_t star = 0; star < 3U; ++star) {
       const uint32_t time = nowMs +
@@ -54,7 +55,7 @@ inline bool render(uint8_t scene, CRGB* out, uint8_t count,
       const uint16_t slot = static_cast<uint16_t>(time >> shift);
       const uint8_t fade = triangle8(static_cast<uint8_t>(time >> (shift - 8U)));
       const uint8_t index = static_cast<uint8_t>(
-          static_cast<uint16_t>(slot * 17U + star * 13U + 7U) % count);
+          static_cast<uint16_t>(slot * 17U + star * 13U + 7U) % 44U);
       out[index] = CHSV(static_cast<uint8_t>(155U + star * 13U), 80U,
                         static_cast<uint8_t>(10U + (fade >> 1)));
     }
@@ -63,7 +64,7 @@ inline bool render(uint8_t scene, CRGB* out, uint8_t count,
 
   // P05: warm independent segments, smoothly interpolated between noise
   // targets. No per-frame random flashing and no per-LED runtime buffer.
-  const uint8_t shift = dynamics >= 170U ? 7U : (dynamics >= 85U ? 8U : 9U);
+  const uint8_t shift = flowShift;
   const uint16_t slot = static_cast<uint16_t>(nowMs >> shift);
   const uint8_t fraction = static_cast<uint8_t>((nowMs >> (shift - 4U)) & 15U);
   for (uint8_t i = 0; i < count; ++i) {
