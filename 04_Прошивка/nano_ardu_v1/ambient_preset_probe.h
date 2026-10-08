@@ -46,16 +46,20 @@ inline bool render(uint8_t scene, CRGB* out, uint8_t count,
   }
 
   if (scene == COSMOS) {
-    // Dark backdrop with independently phased, slowly fading stars.
+    // One shared epoch, three independent soft fades. Avoid expensive
+    // per-star 32-bit divisions/modulo, important on ATmega328P Flash.
     const uint8_t shift = static_cast<uint8_t>(flowShift + 4U);
+    const uint16_t epoch = static_cast<uint16_t>(nowMs >> shift);
+    const uint8_t age = static_cast<uint8_t>(nowMs >> (shift - 8U));
     for (uint8_t i = 0; i < count; ++i) out[i] = CHSV(165U, 230U, 10U);
     for (uint8_t star = 0; star < 3U; ++star) {
-      const uint32_t time = nowMs +
-          (static_cast<uint32_t>(star) << (shift - 2U));
-      const uint16_t slot = static_cast<uint16_t>(time >> shift);
-      const uint8_t fade = triangle8(static_cast<uint8_t>(time >> (shift - 8U)));
+      const uint8_t phase = static_cast<uint8_t>(age + star * 85U);
+      const uint8_t fade = triangle8(phase);
+      const uint8_t slot = static_cast<uint8_t>(
+          epoch + static_cast<uint8_t>(phase < age));
+      const uint8_t seed = hash8(static_cast<uint8_t>(slot * 19U + star * 61U));
       const uint8_t index = static_cast<uint8_t>(
-          static_cast<uint16_t>(slot * 17U + star * 13U + 7U) % 44U);
+          (static_cast<uint16_t>(seed) * 44U) >> 8);
       out[index] = CHSV(static_cast<uint8_t>(155U + star * 13U), 80U,
                         static_cast<uint8_t>(10U + (fade >> 1)));
     }
