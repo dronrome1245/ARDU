@@ -160,7 +160,22 @@ class MainActivity : Activity() {
     private lateinit var ambientPresetDynamicsText: TextView
     private lateinit var ambientPresetDynamicsSeek: SmartSliderView
     private lateinit var ambientManualPanel: LinearLayout
-    private val ambientExtraPresetButtons = linkedMapOf<String, Button>()
+    private val ambientExtraPresetButtons = linkedMapOf<String, ImageButton>()
+    private val ambientExtraPresetLabels = linkedMapOf<String, TextView>()
+    private val ambientSceneImageResources = mapOf(
+        "P01" to R.drawable.ardu_preset_p01,
+        "P02" to R.drawable.ardu_preset_p02,
+        "P03" to R.drawable.ardu_preset_p03,
+        "P04" to R.drawable.ardu_preset_p04,
+        "P05" to R.drawable.ardu_preset_p05,
+        "P06" to R.drawable.ardu_preset_p06,
+        "P07" to R.drawable.ardu_preset_p07,
+        "P08" to R.drawable.ardu_preset_p08,
+        "P09" to R.drawable.ardu_preset_p09,
+        "P10" to R.drawable.ardu_preset_p10,
+        "P11" to R.drawable.ardu_preset_p11,
+        "P12" to R.drawable.ardu_preset_p12
+    )
     private val ambientSceneNames = linkedMapOf(
         "P01" to "Северное сияние", "P02" to "Закат на Бали",
         "P03" to "Океан", "P04" to "Космос",
@@ -982,28 +997,53 @@ class MainActivity : Activity() {
             tile.configure(id, "Цвет")
             tile.setOnClickListener { setAmbientEffect(id) }
         }
-        ambientSceneNames.keys.drop(4).chunked(2).forEach { pair ->
+        // All 12 tiles now use the same four-column photo grid. The top row
+        // is declared in XML; P05..P12 are added using identical ImageButtons.
+        ambientSceneNames.keys.drop(4).chunked(4).forEach { group ->
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { topMargin = dp(6) }
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = dp(9) }
             }
-            pair.forEach { id ->
-                val button = Button(this).apply {
-                    text = "${id} • ${ambientSceneNames[id]}"
-                    isAllCaps = false
-                    textSize = 12f
-                    setTextColor(getColor(R.color.ardu_text))
+            group.forEach { id ->
+                val tile = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = android.view.Gravity.CENTER_HORIZONTAL
+                }
+                val image = ImageButton(this).apply {
                     setBackgroundResource(R.drawable.ardu_preset_thumb)
-                    setPadding(dp(6), 0, dp(6), 0)
+                    clipToOutline = true
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setPadding(0, 0, 0, 0)
+                    setImageResource(ambientSceneImageResources.getValue(id))
+                    contentDescription = ambientSceneNames.getValue(id)
                     setOnClickListener { applyAmbientPreset(id) }
                 }
-                row.addView(button, LinearLayout.LayoutParams(0, dp(52), 1f).apply {
+                tile.addView(image, LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, dp(76)
+                ))
+                val label = TextView(this).apply {
+                    text = ambientSceneNames.getValue(id)
+                    textSize = 10f
+                    setTextColor(getColor(R.color.ardu_nav_icon_tint))
+                    gravity = android.view.Gravity.CENTER
+                    maxLines = 2
+                    minHeight = dp(26)
+                }
+                tile.addView(label, LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = dp(5) })
+                row.addView(tile, LinearLayout.LayoutParams(
+                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                ).apply {
                     marginStart = dp(3)
                     marginEnd = dp(3)
                 })
-                ambientExtraPresetButtons[id] = button
+                ambientExtraPresetButtons[id] = image
+                ambientExtraPresetLabels[id] = label
             }
             ambientPresetExtraGrid.addView(row)
         }
@@ -1090,7 +1130,14 @@ class MainActivity : Activity() {
             ))
         }
         ambientExtraPresetButtons.forEach { (id, button) ->
-            setChoiceState(button, id == selectedId)
+            button.isSelected = id == selectedId
+            button.invalidate()
+        }
+        ambientExtraPresetLabels.forEach { (id, label) ->
+            label.isSelected = id == selectedId
+            label.setTextColor(getColor(
+                if (id == selectedId) R.color.ardu_accent else R.color.ardu_nav_icon_tint
+            ))
         }
     }
 

@@ -21,6 +21,28 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Verify P01-P12 Android photo assets and bindings
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path("05_WiFi_и_приложение/android_app_r1/app")
+          assets=root/"src/main/res/drawable-nodpi"
+          kotlin=(root/"src/main/java/com/ardu/app/MainActivity.kt").read_text()
+          layout=(root/"src/main/res/layout/activity_main.xml").read_text()
+          for i in range(1,13):
+              name=f"ardu_preset_p{i:02}"
+              data=(assets/(name+".webp")).read_bytes()
+              assert data.startswith(b"RIFF") and data[8:12]==b"WEBP",name
+              assert 2000 < len(data) < 25000,(name,len(data))
+              assert f"R.drawable.{name}" in kotlin,name
+              if i<=4:
+                  assert f'@drawable/{name}' in layout,name
+          assert 'chunked(4)' in kotlin
+          assert 'ambientExtraPresetButtons[id] = image' in kotlin
+          assert 'ambientExtraPresetLabels[id] = label' in kotlin
+          print("PASS: 12 embedded WebP thumbnails and 4-column grid")
+          PY
+
       - name: Unit contract tests
         run: bash ./gradlew --no-daemon testDebugUnitTest
 

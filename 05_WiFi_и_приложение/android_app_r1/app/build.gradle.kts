@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 29
-        versionName = "0.22.6-ambient12-functional-rc1"
+        versionCode = 30
+        versionName = "0.22.7-ambient12-photo-tiles-rc1"
     }
 
     compileOptions {
