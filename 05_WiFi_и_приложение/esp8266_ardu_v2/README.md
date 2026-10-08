@@ -1,23 +1,38 @@
-# ARDU ESP8266 v2 — ARDU-DIRECT + Ambient P01..P12
+# ARDU ESP8266 v2 (ручная настройка, ревизия R2) — ОДИН .ino
 
-**Статус:** исходный файл скомпилирован в GitHub CI, на железо ещё не загружен. Физическую OTA выполняет владелец через Arduino IDE по [единой инструкции](../../ARDU_AMBIENT12_RELEASE_CANDIDATE.md).
+**Статус:** source/CI; физическая OTA-загрузка и режим ARDU-DIRECT ещё не подтверждены. Все существующие HTTP-маршруты и новые P01..P12 сохранены.
 
-## Исходники и пароли
+## 1. Один файл для Arduino IDE
 
-Arduino IDE открывает `esp8266_ardu_v2.ino`. Для реальной прошивки создать в **этой же папке** свой `wifi_secrets.h`: скопировать `wifi_secrets.example.h`, заполнить:
-- `ARDU_WIFI_SSID` — действующее домашнее имя сети;
-- `ARDU_WIFI_PASSWORD` — домашний пароль;
-- `ARDU_OTA_PASSWORD` — OTA пароль, который будет использовать новая ESP; для обслуживания лучше оставить прежний;
-- `ARDU_SOFTAP_PASSWORD` — новый сильный пароль для защищённой `ARDU-DIRECT`, **не менее 8 символов**.
+Открывай **`esp8266_ardu_v2.ino`**. Никаких `wifi_secrets.h`, `wifi_secrets.example.h` или иных локальных заголовков для ESP v2 больше не требуется.
 
-После заполнения заменить `ARDU_CREDENTIALS_CONFIGURED 0` на `ARDU_CREDENTIALS_CONFIGURED 1`. Без файла или с example passwords реальная сборка **намеренно выдаёт compile error**, чтобы случайно не потерять OTA-доступ. `wifi_secrets.h` игнорируется глобальным Git rule `**/wifi_secrets.h`, секреты не публиковать.
+Непосредственно в начале скетча найди четыре строки:
 
-`ARDU_CI_BUILD` — только для автоматического теста пустых credentials, вручную никогда не устанавливать его перед OTA. Встроенные локальные типы позволяют проверять один `.ino` без второго project-header; локальный secret header **обязателен** на устройстве.
+`#define ARDU_WIFI_SSID        "PUT_YOUR_WIFI_SSID_HERE"`
+`#define ARDU_WIFI_PASSWORD    "PUT_YOUR_WIFI_PASSWORD_HERE"`
+`#define ARDU_OTA_PASSWORD     "PUT_A_STRONG_OTA_PASSWORD_HERE"`
+`#define ARDU_SOFTAP_PASSWORD  "PUT_A_STRONG_AP_PASSWORD_HERE"`
 
-## OTA
+Замени **только текст внутри кавычек** своими значениями:
+1. домашнее имя Wi-Fi (SSID);
+2. пароль домашней сети;
+3. OTA-пароль для **новой** ESP-прошивки (лучше сохранить прежний, если он известен);
+4. новый пароль точки доступа `ARDU-DIRECT` — от 8 до 63 символов.
 
-ESP v2 следует обновить **первым** через уже работающий домашний Station/Arduino OTA port `ardu` (порт 8266), сохранив роутер включённым. При запросе OTA-пароля во время текущей загрузки нужен пароль из **старой, установленной ESP прошивки**. Затем проверить `/api/ping`: `fw:"ARDU_ESP_V2_AMBIENT12"`, `network_mode:"station"`, `uart_protocol:1`, `ota_ready:true`.
+Больше ничего включать или переключать не нужно: `ARDU_CREDENTIALS_CONFIGURED`/`ARDU_CI_BUILD` в R2 **отсутствуют**. Если хотя бы одно поле осталось шаблонным, **Verify специально завершится ошибкой**: это защита от потери Wi-Fi/OTA после прошивки.
 
-До Nano v2 чтение 12 сцен возвращает `supported:false`, это ожидаемо. После полной Nano v2 становится доступна цепочка `GET /api/ambient/presets`, `POST /api/ambient/preset`, `POST /api/ambient/preset/settings`, расширение `GET /api/settings`. `F02/F03` не пользовательские эффекты, зарезервированы. Только после этого проверить отключение роутера и подключение телефона к WPA2 `ARDU-DIRECT` на `192.168.4.1`. OTA в SoftAP-режиме не предполагается.
+**Секреты нельзя публиковать в GitHub или присылать в чат.** Чтобы не получить незакоммиченные пароли в Git, скачай Raw `.ino` в отдельный каталог, например `C:\Users\Пользователь\Downloads\esp8266_ardu_v2\esp8266_ardu_v2.ino`, и впиши их только в эту личную локальную копию. Не делай `git add`/`git commit`/`git push` файла с реальными паролями.
 
-**[GitHub CI 37820404281](https://github.com/dronrome1245/ARDU/actions/runs/37820404281) PASS:** полный ESP v2, one-file CI source, обычная сборка с непубличным тестовым `wifi_secrets.h`, проверка compile guard, исходный ESP v1. После физического стендового теста отдельно подтверждаются автономность Wi-Fi, возврат Station и действующее OTA.
+## 2. Порядок загрузки
+
+Сначала убедись, что действующая ESP ещё доступна из домашней Wi-Fi сети:
+
+`curl.exe http://192.168.0.4/api/ping`
+
+В Arduino IDE открой единственный `.ino`, выбери ту же проверенную конфигурацию **Generic ESP8266 Module** и **Verify**. После успеха выбери действующий **сетевой OTA порт** `ardu`/`192.168.0.4` (не COM-порт Nano) и **Upload**. Если IDE спрашивает пароль *для загрузки текущего обновления*, это пароль **старой, уже работающей на ESP прошивки**. Установленный внутри нового `.ino` `ARDU_OTA_PASSWORD` начнёт действовать после успешного перезапуска.
+
+После OTA проверить ответ `/api/ping`: `fw:"ARDU_ESP_V2_AMBIENT12"`, `network_mode:"station"`, `ota_ready:true`. До загрузки Nano v2 отсутствие P01..P12 (`ambient_presets_supported:false`) ожидаемо.
+
+**Не выключай домашний роутер до успешной Station OTA и проверки связи с Nano.** После этого по центральному [плану обновления](../../ARDU_AMBIENT12_RELEASE_CANDIDATE.md) перейти к полной Nano v2, Android и физическому тесту WPA2 `ARDU-DIRECT` на `192.168.4.1`.
+
+CI [ESP8266 Verify](https://github.com/dronrome1245/ARDU/actions/workflows/esp8266-verify.yml) компилирует отдельную временную копию **единственного** `.ino` с непубличными тестовыми значениями, а также проверяет, что незаполненный исходный вариант сборку не проходит. Это только software gate, не физическая приёмка.
