@@ -6,6 +6,7 @@ on:
       - "04_Прошивка/nano_ardu_v1/**"
       - "04_Прошивка/nano_ambient_preview_rc1/**"
       - "04_Прошивка/nano_ambient_preview_rc2/**"
+      - "04_Прошивка/nano_ambient12_v1/**"
       - ".github/workflows/arduino-verify.yml"
   workflow_dispatch:
 
@@ -109,6 +110,15 @@ jobs:
             "$RUNNER_TEMP/nano_ambient_preview_rc2"
           echo "PASS: Nano Ambient Preview RC2 compiled with ONLY one .ino file"
 
+      - name: Compile full Nano v2 with twelve scenes
+        run: |
+          arduino-cli compile \
+            --fqbn arduino:avr:nano:cpu=atmega328old \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-nano-ambient12-v1" \
+            --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
+            "04_Прошивка/nano_ambient12_v1"
+
       - name: Size profile
         if: always()
         run: |
@@ -129,6 +139,14 @@ jobs:
           echo "--- IDE preview RC1 firmware size ---"
           RC_ELF="$(find "$GITHUB_WORKSPACE/build-nano-ambient-preview-rc1" -name '*.elf' | head -n 1)"
           if [ -n "$RC_ELF" ]; then "$AVR_BIN/avr-size" -C --mcu=atmega328p "$RC_ELF"; fi
+
+      - name: Publish full Nano v2 twelve-scene HEX
+        uses: actions/upload-artifact@v4
+        with:
+          name: ardu-nano-ambient12-v1
+          path: build-nano-ambient12-v1/*.hex
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Publish single-file Ambient preview RC2 HEX
         uses: actions/upload-artifact@v4
