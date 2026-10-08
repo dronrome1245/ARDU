@@ -2677,3 +2677,10 @@ No code/firmware/application assets changed and no hardware retest claimed.
 ## 2026-10-08 — Owner started ESP v2 R2 OTA; Auth OK, upload result not shown
 
 Владелец сообщил об OTA-попытке на IP 192.168.0.4. IDE компилирует ESP v2: 32208/80192 bytes static RAM, 60823/65536 IRAM, 329120/1048576 IROM. Вывод `Authenticating...OK`, затем `Uploading...` и точки. Одновременно окно `No monitor available for the port protocol network` — это IDE Serial Monitor для network-порта, не самостоятельный OTA-failure verdict. **Полного лога с завершающим результатом пока нет, модель ESP на железе не подтверждена.** Следующий минимальный gate после окончания текущей загрузки: закрыть Serial Monitor, `curl.exe --max-time 8 http://192.168.0.4/api/ping` и прочитать поле `fw`; до результата не менять Nano и не делать вторую загрузку ESP.
+
+## 2026-10-08 — first physical ESP v2 OTA is SUCCESSFUL by firmware ping
+
+После сообщения Arduino IDE `Authenticating...OK` / `Uploading...` (и отдельной ошибки сетевого Serial Monitor) владелец прислал **реальный** ответ ESP: `{"ok":true,"device":"ARDU-ESP8266","fw":"ARDU_ESP_V2_AMBIENT12","uart_protocol":1,"wifi_connected":true,"network_mode":"station","softap_active":false,"ip":"192.168.0.4","rssi":-57,"ota_ready":true,"ota_hostname":"ardu","ota_port":8266}`. Это доказывает успешное обновление до новой ESP v2 R2, работу домашнего Station Wi-Fi и доступность HTTP и запущенной OTA-службы; жалоба IDE касалась попытки открытия serial monitor через network port, не фактической неудачи новой прошивки.
+
+**Gate closed:** ESP v2 firmware/ping/Station startup physically PASS. **Pending:** ESP↔Nano UART, device settings, ARDU-DIRECT SoftAP under router outage, further OTA, Nano v2 flash, Android real phone and LED/power regression. Далее выполнить `/api/status` и `/api/ambient/presets` до Nano USB Upload.
+

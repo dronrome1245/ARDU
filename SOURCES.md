@@ -1112,3 +1112,8 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 ## 2026-10-08 — ESP v2 R2 single INO evidence
 
 [ESP8266 Verify run 37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) completed successfully. One `esp8266_ardu_v2.ino` copied into isolated directory with **four fake CI values** and compiled without `wifi_secrets.h` or other local headers. Explicit negative test: unchanged placeholders rejected at compile. ESP RAM statics 32256/80192 B (40%), IRAM 60823/65536 (92%), IROM 329096 B. The test does not imply OTA or SoftAP physically works. Local real credentials must never be committed or sent in chat.
+
+## 2026-10-08 — owner physical HTTP confirmation after ESP v2 OTA
+
+Владелец прислал прямой результат запроса ESP `/api/ping`: `ok=true`; `fw=ARDU_ESP_V2_AMBIENT12`; `uart_protocol=1`; `wifi_connected=true`; `network_mode=station`; `softap_active=false`; `ip=192.168.0.4`; `rssi=-57`; `ota_ready=true`; `ota_hostname=ardu`; `ota_port=8266`. **ФАКТ:** физический ESP запустился на новой v2 R2, HTTP/Station работают. Этот запрос **не** подтверждает UART Nano или реальное переключение в ARDU-DIRECT; отдельные измерения ожидаются.
+

@@ -123,10 +123,11 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-1. **ESP v2 R2 теперь один `.ino`.** В `05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino` вручную заполнить четыре строки `ARDU_WIFI_SSID`, `ARDU_WIFI_PASSWORD`, `ARDU_OTA_PASSWORD`, `ARDU_SOFTAP_PASSWORD`. `wifi_secrets.h` и другие локальные заголовки не нужны. Настоящие пароли не публиковать и не коммитить; лучше скачивать Raw .ino в Downloads вне Git.
-2. **CI [37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) PASS:** только один .ino с тестовыми непубличными значениями компилируется, незаменённые placeholders отвергаются компилятором. Следующий шаг — собственный Verify/OTA Upload по домашней сети с паролем **старой установленной ESP** (новый OTA пароль в .ino будет действовать после reboot).
-3. Проверить `/api/ping` с `fw=ARDU_ESP_V2_AMBIENT12` и обычные функции со старой Nano. После PASS — полная Nano `nano_ambient12_v1.ino` по безопасному USB/Old Bootloader, Android 0.22.6, реальный ARDU-DIRECT/192.168.4.1 и два кольца. [Полная инструкция](ARDU_AMBIENT12_RELEASE_CANDIDATE.md).
-4. Прошивки на реальном оборудовании пока НЕ обновлены; аппаратные тесты сценариев, тока, EEPROM, Wi-Fi failover/stack остаются открытыми. Nano Flash 29306/30720, globals SRAM 1282/2048. Батарея отменена.
+1. **ФИЗИЧЕСКИЙ PASS ESP v2:** владелец после OTA на `192.168.0.4` получил `GET /api/ping` → `fw=ARDU_ESP_V2_AMBIENT12`, `wifi_connected:true`, `network_mode:"station"`, `ota_ready:true`, `ota_port:8266`. Прошивка ESP v2 R2 реально установлена, работает домашняя Wi-Fi сеть и HTTP. `softap_active:false` в Station ожидаемо; ARDU-DIRECT **не** тестировали.
+2. **Следующий gate:** проверить связь новой ESP со старой Nano: `curl.exe http://192.168.0.4/api/status` и `curl.exe http://192.168.0.4/api/ambient/presets`. При старой Nano сцены должны возвращать `supported:false`, остальные параметры/статус — читаться. При потере UART **не** перепрошивать Nano до диагностики.
+3. Только после PASS UART — USB Upload полной Nano `04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino` (Arduino Nano ATmega328P Old Bootloader; при **полностью снятом питании** временно изолировать ESP TX→Nano D0; обеспечить безопасное питание USB). Проверить Nano UART 1/2/4/115, восстановить провод, прочитать `/api/status` / `/api/ambient/presets`.
+4. Затем Android `0.22.6`, физический просмотр P01..P12 и EEPROM/RTC/Music/L01 regression; только после обычного Station/LED PASS — физический ARDU-DIRECT на `192.168.4.1` при выключенном домашнем роутере. [План](ARDU_AMBIENT12_RELEASE_CANDIDATE.md).
+5. **Не объявлять финальный продукт:** Nano v2 не подтверждена на железе (Flash CI 29306/30720, globals 1282/2048), AVR stack и 44+44 ток/питание/температура, SoftAP failover и все сцены не приняты. Battery отказ сохраняется.
 
 ## 12. База ColorMusic/FHT
 

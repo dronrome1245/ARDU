@@ -2968,3 +2968,22 @@ esp_v2_r2_manual_config_2026_10_08:
   hardware_uploaded: false
   next: edit_four_local_strings_verify_then_station_ota
   handoff: "ARDU_AMBIENT12_RELEASE_CANDIDATE.md"
+
+# 2026-10-08: hardware owner confirmation of ESP v2 OTA
+esp_v2_r2_ota_physical_2026_10_08:
+  verified: true
+  installed_fw: ARDU_ESP_V2_AMBIENT12
+  proof: owner_http_api_ping_response
+  ip: "192.168.0.4"
+  station_wifi_connected: true
+  network_mode: station
+  rssi_dbm: -57
+  ota_service_ready: true
+  ota_port: 8266
+  ota_hostname: ardu
+  softap_active_during_station: false
+  ardu_direct_without_router_tested: false
+  nano_uart_bridge_confirmed_after_esp_ota: false
+  nano_v2_uploaded: false
+  next: get_api_status_and_ambient_presets_before_nano_v2_upload
+

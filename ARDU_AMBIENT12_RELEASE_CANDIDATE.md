@@ -55,6 +55,12 @@
 6. После загрузки проверить `curl.exe http://192.168.0.4/api/ping` (IP заменить, если изменился). Ожидается `fw:"ARDU_ESP_V2_AMBIENT12"`, `network_mode:"station"`, `uart_protocol:1` и `ota_ready:true`. Старая Nano должна отвечать через `/api/status` и `/api/light/status`. На переходном этапе `ambient_presets_supported:false` — **нормально**.
 7. Если ESP не отвечает, **не переходить к Nano и не отключать роутер**. Восстановить Station HTTP/OTA связь, проверить Wi-Fi/питание/адрес. Только после PASS выполнять `## 5`.
 
+### Результат фактической ESP OTA: 2026-10-08
+
+**PASS:** владелец предъявил ответ устройства `/api/ping`: `fw:"ARDU_ESP_V2_AMBIENT12"`, `wifi_connected:true`, `network_mode:"station"`, `ip:"192.168.0.4"`, `rssi:-57`, `ota_ready:true`, `ota_port:8266`. Шаг установки ESP v2 выполнен. `softap_active:false` нормально при работающем роутере. **ARDU-DIRECT пока физически НЕ проверен.**
+
+**Непосредственно перед Nano Upload:** запросить `GET http://192.168.0.4/api/status` и `GET http://192.168.0.4/api/ambient/presets`. На ещё старой Nano bridge должен читать системный статус, а новые P-сцены должны показать `supported:false` / `NANO_UPDATE_REQUIRED`. Если мост ESP↔Nano не отвечает, остановить обновление Nano и диагностировать UART/power.
+
 ## 5. Полная Nano v2 — только после ESP Station PASS
 
 1. Открыть `04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino` (вся прошивка, не самостоятельный demo sketch). Достаточно одного `.ino`, нужны установленные **FastLED** и та же оригинальная **FHT** из `04_Прошивка/libraries/FHT`.
