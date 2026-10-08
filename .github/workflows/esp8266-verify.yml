@@ -46,6 +46,26 @@ jobs:
             "$RUNNER_TEMP/esp8266_ardu_v2"
           echo "PASS: ESP v2 does not need project-local type headers"
 
+      - name: Compile ESP v2 with local credential guard enabled
+        run: |
+          # Non-secret CI credentials exercise the exact user-side build path.
+          # The real wifi_secrets.h stays ignored and local to the owner.
+          cat > "05_WiFi_и_приложение/esp8266_ardu_v2/wifi_secrets.h" <<'EOF'
+          #pragma once
+          #define ARDU_WIFI_SSID "ARDU_CI_STA"
+          #define ARDU_WIFI_PASSWORD "ARDU_CI_TEST_PASSWORD"
+          #define ARDU_OTA_PASSWORD "ARDU_CI_OTA_PASSWORD"
+          #define ARDU_SOFTAP_PASSWORD "ARDU_CI_DIRECT_PASSWORD"
+          #define ARDU_CREDENTIALS_CONFIGURED 1
+          EOF
+          arduino-cli compile \
+            --fqbn esp8266:esp8266:generic \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-esp-v2-private-guard" \
+            "05_WiFi_и_приложение/esp8266_ardu_v2"
+          rm "05_WiFi_и_приложение/esp8266_ardu_v2/wifi_secrets.h"
+          echo "PASS: ESP v2 private-header OTA build works without ARDU_CI_BUILD"
+
       - name: Compile ARDU ESP8266 v1
         run: |
           arduino-cli compile \
