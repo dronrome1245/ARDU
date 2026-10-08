@@ -2838,3 +2838,19 @@ ambient_preset_idea_d104_2026_10_08:
   concept_doc: "04_Прошивка/AMBIENT_PRESETS_CONCEPT.md"
   android_version_unchanged: "0.22.5-ambient-hero-hotfix-rc1"
   next: "verify_ambient_hero_in_emulator; implementation_only_after_explicit_approval"
+
+# 2026-10-08 handoff: planned Ambient presets (documentation only)
+ambient_presets_plan_2026_10_08:
+  doc: "04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md"
+  status: "documented_not_implemented"
+  owner_approved_current_hero_images: true
+  android_source: "0.22.5-ambient-hero-hotfix-rc1"
+  future_manual_effect: "F01"
+  future_ui_excludes_effects: ["F02", "F03"]
+  old_wire_identifiers_retained: true
+  scene_ids: "P01..P12_provisional_not_frozen"
+  p12_rainbow: "undecided"
+  next_gate: "G0_G1_catalog_scope_and_fresh_full_nano_esp_compile_flash_sram_eeprom"
+  physical_upload_authorized: false
+  preserve_finalization_plan_release_policy: true
+  deployed_nano_esp_unchanged: true

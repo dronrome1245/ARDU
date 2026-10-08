@@ -123,14 +123,12 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-Current Android visual source: `0.22.5-ambient-hero-hotfix-rc1`. v0.22 Home Hub remains the canonical UI; v0.23 is rejected.
-
-1. Immediate software gate remains **`git pull` → Pixel emulator → Run → check the repaired Ambient hero**. Night/Alarm heroes were accepted earlier; no Android version change in this documentation step.
-2. **Decision D-104:** future Ambient user UI keeps F01 and excludes F02/F03. Existing Nano/ESP/Android source still contains F02/F03; do not pretend they were removed.
-3. **Idea only:** 12 candidate atmospheric scenes with 4 compact renderer families and separate brightness/dynamics, recorded in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md`. No IDs, API, UART, EEPROM schema or implementation are approved.
-4. Do not code presets or remove existing effect IDs without another explicit owner decision and a Nano flash/SRAM compile gate.
-5. Staged Nano/ESP reset-defaults / Ambient speed changes have not been physically uploaded. Router-less `ARDU-DIRECT` physical smoke remains pending.
-6. Battery/backup remains cancelled.
+1. **ФАКТ 2026-10-08:** владелец подтвердил, что все текущие hero-фоновые изображения Android («Фон», «Ночь», «Будильник») его устраивают. Прежняя повторная визуальная проверка Ambient hero закрыта подтверждением владельца; APK/version исходников не менялись.
+2. **План:** `04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md` — пошаговое внедрение атмосферных пресетов, memory gates, миграция и hardware acceptance. Подготовка плана **не** одобряет автоматический запуск новой прошивки.
+3. **D-104:** будущий Ambient UI оставляет F01 и исключает F02/F03. Существующие Android/Nano/ESP пока продолжают поддерживать F02/F03; P01…P12 — концепт с условными названиями, P12 требует выбора.
+4. Следующий исполняемый gate **при отдельной команде на реализацию**: уточнить окончательный каталог/release scope, заново собрать Nano/ESP baseline и оценить flash/SRAM/EEPROM, затем только три алгоритмически разные сцены P01/P04/P05.
+5. По `FINALIZATION_PLAN.md` не заменять работающую полную Nano v1 отдельными тестовыми скетчами; любые firmware uploads — через явно санкционированный полный release-кандидат и проверку памяти.
+6. Staged reset-defaults/Ambient speed Nano/ESP ещё не загружены физически; router-less `ARDU-DIRECT` smoke и двухкольцевой силовой тест остаются невыполненными. Battery/backup отменён.
 
 ## 12. База ColorMusic/FHT
 

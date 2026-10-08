@@ -4,7 +4,7 @@
 
 ## Текущий этап
 
-**ФИНАЛИЗАЦИЯ ARDU v1 — Android `0.22.5-ambient-hero-hotfix-rc1` source-ready for emulator review. Owner found broken/noisy image on Ambient («Фон») while Night and Alarm-Dawn heroes render correctly. Only `ardu_ambient_hero.webp` was replaced with a verified 640×360 RGB-room WebP derived from the approved cinematic source; Android versionCode is now 28. Asset blob SHA = `667b6bac57b4c32ff29cea9e6f18513bcae4db6a` and matches local verified source; the visual result still needs owner emulator check. Layout, RoomHeroView, Night, Alarm and Ambient presets are unchanged. D-104 owner decision: F01 remains the target manual Ambient effect; F02/F03 are not needed in the FUTURE user-facing Ambient model. The proposed 12-scene catalog / four-family engine is recorded as IDEA ONLY in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md`, with no stable IDs or protocol approval. Current app/firmware still contain F02/F03 for compatibility; no behavior/code changes were made by this decision. Nano/ESP hardware remains on previously accepted firmware; staged reset/speed source changes have not been uploaded. Next: `git pull` → Android Studio Emulator Run → check only «Фон» image; if bad, send emulator screenshot.**
+**ФИНАЛИЗАЦИЯ ARDU v1 — 2026-10-08 владелец принял все текущие hero-фоновые изображения Android для «Фон», «Ночь», «Будильник».** Android source остаётся `0.22.5-ambient-hero-hotfix-rc1` (versionCode 28), утверждённый v0.22 Home Hub без нового redesign. В `04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md` оформлен план расширения фоновых сцен (не реализация). D-104: будущая страница «Фон» сохраняет F01 и исключает F02/F03; текущие Nano/ESP/Android всё ещё поддерживают F02/F03; 12 сцен и P01…P12 остаются идеей без frozen IDs/API/EEPROM. Следующий технический gate при отдельной команде на реализацию: утвердить список/release scope, обновить Nano/ESP compile и EEPROM map, затем минимальные P01/P04/P05 с Flash/SRAM gate. Правила FINALIZATION_PLAN сохраняются; staged reset/speed Nano/ESP ещё не загружены, ARDU-DIRECT physical smoke и 44+44 load test ещё pending.
 
 ## Что подтверждено и решено
 
@@ -2260,3 +2260,11 @@ Owner explicitly stated that F02 and F03 are unnecessary and asked to save the r
 - detailed colors/movement/memory/implementation gates in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md`.
 
 The 12 IDs, API route, UART commands and EEPROM format are **NOT approved or frozen**. No changes to Android app version (`0.22.5-ambient-hero-hotfix-rc1`), firmware, protocols or hardware in this documentation-only step.
+
+### 2026-10-08 — герои утверждены; план реализации Ambient-пресетов сохранён
+
+- **ФАКТ со слов владельца:** «все фоновые картинки меня устраивают»; дополнительная визуальная проверка исправленной картинки «Фон» больше не является блокером.
+- **ДОКУМЕНТ:** `04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md` — этапы G0…G5: baseline/memory + EEPROM, P01/P04/P05, семейства оставшихся сцен, контракт/миграция, ESP/Android, физическая приёмка.
+- **РЕШЕНИЕ:** F01 остаётся, F02/F03 не нужны в будущем UI (D-104). Старые wire IDs не переписываются. P01…P12, включая P12 «Радуга», пока только условные кандидаты.
+- **ФАКТ:** в этом коммите меняется только документация; Android version, прошивки, HTTP/UART контракт, EEPROM и железо остаются без изменений.
+- **Следующее действие:** по отдельной команде на реализацию выполнить G0/G1; без новых одиночных test-sketch uploads. Сохранить отдельный gate v1/ARDU-DIRECT/two-ring acceptance.

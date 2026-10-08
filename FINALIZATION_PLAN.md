@@ -825,3 +825,9 @@ Firmware-affecting items (Ambient speed + reset defaults) are staged in source a
 Owner decided future Ambient UI retains F01 but does not need F02/F03. A 12-scene atmospheric preset model is stored for later consideration in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md`.
 
 This is **backlog idea only**, not a scope addition to the active release acceptance. Do not implement new IDs/API/UART/EEPROM, delete legacy effects, or request firmware upload until owner separately approves and flash/SRAM compile checks pass. Current Android/Nano/ESP source still implements F02/F03; this is a documentation-only update. Existing v0.22.5 emulator image gate stays next.
+
+## 31. Ambient hero visual PASS + отдельный план расширения Ambient — 2026-10-08
+
+Владелец подтвердил, что все новые фоновые изображения Android его устраивают. Повторный visual gate для исправленного hero «Фон» закрыт на основании ответа владельца.
+
+По запросу владельца создан `04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md`. План описывает **возможную следующую feature-итерацию**, но сам по себе **не** расширяет `v1` release scope и не отменяет правило полной прошивки/заморозки после acceptance. До реализации нужны утверждение списка, определение release scope и fresh Nano flash/SRAM/EEPROM gates. В текущем source F02/F03 и 4 app-макроса сохраняются; новые P IDs/API/UART/EEPROM не вводились.

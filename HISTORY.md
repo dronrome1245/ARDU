@@ -2624,3 +2624,10 @@ Documentation-only decision D-104:
 - twelve candidate scenes with example patterns/brightness, 4 compact algorithm families, UX, persistence, and staged hardware plan saved in `04_Прошивка/AMBIENT_PRESETS_CONCEPT.md` as **IDEA / NOT APPROVED FOR IMPLEMENTATION**.
 
 No code/firmware/application assets changed and no hardware retest claimed.
+
+## 2026-10-08 — Ambient heroes accepted; implementation plan stored
+
+- Владелец подтвердил принятие всех текущих фоновых Android hero-картинок; прежний blocker проверки исправленного `ardu_ambient_hero.webp` снят на основании сообщения владельца (не выдавать это за новый автотест эмулятора).
+- Создан `04_Прошивка/AMBIENT_PRESETS_IMPLEMENTATION_PLAN.md`: согласование будущего каталога, свежая compilation/EEPROM baseline, три P01/P04/P05 алгоритма, memory gates, дальнейший каталог, versioned persistence/API, ESP/Android, physical acceptance и rollback.
+- D-105 фиксирует принятие визуалов и последовательность работ; D-104 (F01 да, F02/F03 нет в будущем UI) сохраняется. P01…P12 не frozen IDs.
+- Документационное изменение: source прошивок, Android, UART/HTTP, EEPROM и физическое устройство **не изменены / не тестировались**.
