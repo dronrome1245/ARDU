@@ -1159,3 +1159,8 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - Новый полный `04_Прошивка/nano_ambient12_v4/nano_ambient12_v4.ino` и exact-source host test `04_Прошивка/nano_ambient12_v4/tests/preset_motion_host.cpp` — пиксельные эффекты P01..P10/P12; P11 byte-equal to R3. [Nano R4 workflow](https://github.com/dronrome1245/ARDU/actions/runs/37975908088). Без физического видео/измерения с R4 утверждать только программную проверку.
 
 - [Final source/CI Nano R4 run https://github.com/dronrome1245/ARDU/actions/runs/37975908088](https://github.com/dronrome1245/ARDU/actions/runs/37975908088): full one-.ino AVR Nano ATmega328P Old Bootloader compile **29410/30720 Flash, 1286/2048 SRAM globals**; из того же `.ino` извлечены функции для host 44-HSV-LED теста всех 12 сцен. R3 P11 unchanged source gate. P04 refined high-speed signal=487 (9 изменяющихся звёзд), P02/P07 min signal=624. Эффект на реальных WS2812B и запас runtime stack **не определяются** CI.
+
+## S-ARDU-2026-10-09-R4-MOTION-OWNER-PASS
+
+- Отдельное явное сообщение владельца 2026-10-09: «все задвигалось это хорошо. что осталось исправить?» — подтверждение движения всех P-сцен после коррекции Nano R4 **на реальной сборке**, без приложенных в этом сообщении видео, power measurement или точного `ARDU1 5` boot log. Принимать visual motion, но не полный color/EEPROM/stack/current/direct-mode PASS.
+- [Arduino Verify main 37976579921](https://github.com/dronrome1245/ARDU/actions/runs/37976579921) PASS, полный Nano Ambient12 R4 29410 Flash/1286 static SRAM, host 44-LED motion checks. Старый полный Nano R3 в репозитории для rollback.
