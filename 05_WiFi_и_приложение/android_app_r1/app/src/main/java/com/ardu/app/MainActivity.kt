@@ -1474,6 +1474,9 @@ class MainActivity : Activity() {
             ) view.isEnabled = online
         }
         listOf(lightPanel, musicPanel, ambientPanel, nightPanel, alarmPanel).forEach(::visit)
+        // Labels are separate clickable TextViews, not part of the Button cases.
+        ambientPresetLabels.values.forEach { it.isEnabled = online }
+        ambientExtraPresetLabels.values.forEach { it.isEnabled = online }
         currentLimitSeek.isEnabled = online
         findViewById<Button>(R.id.resetDefaultsButton).isEnabled = online
         findViewById<Button>(R.id.eventsButton).isEnabled = online
@@ -1724,6 +1727,8 @@ class MainActivity : Activity() {
         }
         ambientPresetButtons.values.forEach { it.isEnabled = p.supported }
         ambientExtraPresetButtons.values.forEach { it.isEnabled = p.supported }
+        ambientPresetLabels.values.forEach { it.isEnabled = p.supported }
+        ambientExtraPresetLabels.values.forEach { it.isEnabled = p.supported }
 
         ambientManualPanel.visibility = if (selected == null) View.VISIBLE else View.GONE
         ambientPresetControls.visibility = if (selected != null) View.VISIBLE else View.GONE
