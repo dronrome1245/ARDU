@@ -66,6 +66,41 @@ jobs:
           print("PASS: foreground 5s keepalive, Nano liveness and diagnostics preference")
           print("PASS: UX offline-state, tab scroll, music controls and scene ordering")
           print("PASS: 12 embedded WebP thumbnails and 4-column grid")
+          # Native Android launcher icons (standard / round / themed) are
+          # actual APK resources, not screenshots or website-only logos.
+          from xml.etree import ElementTree as ET
+          manifest=(root/"src/main/AndroidManifest.xml").read_text()
+          assert 'android:icon="@mipmap/ic_launcher"' in manifest
+          assert 'android:roundIcon="@mipmap/ic_launcher_round"' in manifest
+          for stem in ("ic_launcher","ic_launcher_round"):
+              icon=root/"src/main/res/mipmap-anydpi-v26"/f"{stem}.xml"
+              doc=ET.parse(icon).getroot()
+              assert doc.tag=="adaptive-icon"
+              assert [e.tag for e in doc]==["background","foreground","monochrome"]
+          for file in ("ardu_launcher_foreground.xml","ardu_launcher_monochrome.xml"):
+              vector=root/"src/main/res/drawable"/file
+              doc=ET.parse(vector).getroot()
+              assert doc.tag=="vector" and len(doc)>1
+          foreground=(root/"src/main/res/drawable/ardu_launcher_foreground.xml").read_text()
+          assert "#5DE2C5" in foreground and "#F3C969" in foreground
+          print("PASS: ARDU adaptive/round/themed desktop icon is bound in the APK manifest")
+
+          # Avoid false failure messages after a confirmed POST and failed GET;
+          # retry only read-only network requests and close finished HTTP sockets.
+          retry=(root/"src/main/java/com/ardu/app/net/HttpReadbackPolicy.kt").read_text()
+          api=(root/"src/main/java/com/ardu/app/net/ArduApiClient.kt").read_text()
+          wizard=(root/"src/main/java/com/ardu/app/ClapWizardUiPolicy.kt").read_text()
+          assert 'fun shouldRetryGet' in retry
+          assert 'HttpReadbackPolicy.shouldRetryGet(error)' in api
+          assert 'onAcknowledged?.invoke()' in kotlin
+          assert 'устройство подтвердило команду; состояние перечитывается' in kotlin
+          assert 'PREF_CLAP_WIZARD_DISMISSED' in kotlin
+          assert 'ClapWizardUiPolicy.shouldShow' in kotlin
+          assert 'clapSaveButton.setOnClickListener' in kotlin
+          assert 'onAcknowledged = { setClapWizardDismissed(true) }' in kotlin
+          assert 'android:icon="@mipmap/ic_launcher"' in manifest
+          print("PASS: command/readback recovery and CLAPCAL wizard completion")
+
           PY
 
       - name: Unit contract tests
@@ -74,10 +109,10 @@ jobs:
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
 
-      - name: Publish Android debug APK for Ambient12 smoke test
+      - name: Publish Android 0.22.10 launcher debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: ardu-android-ambient12-debug-apk
+          name: ardu-android-02210-launcher-debug-apk
           path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
