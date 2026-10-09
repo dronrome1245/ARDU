@@ -1950,3 +1950,12 @@ R3 не прошивался и не тестировался на железе.
 **РЕАЛИЗОВАНО:** из 12 утверждённых изображений локально сформированы WebP 192×192, 12 индивидуальных drawable ресурсов `ardu_preset_p01.webp`..`ardu_preset_p12.webp`. Экран «Фон» отображает 12 фото в три строки по четыре плитки, одинаковые высоты/подписи/выделение, сохраняет выбранный Home Hub визуальный стиль и рабочие semantic API выбора P. Версия Android `0.22.7-ambient12-photo-tiles-rc1`, code 30.
 
 **ИСТОЧНИК:** [коммит изображений](https://github.com/dronrome1245/ARDU/commit/4221b5b6d497b2bf32172aec638c1efb92d5f8ae); [Android CI 37838263956](https://github.com/dronrome1245/ARDU/actions/runs/37838263956) **PASS** после исправления относительного рабочего каталога теста. Android UI теперь source-ready; финальное визуальное принятие на телефоне **pending**. Nano/ESP скетчи не менялись.
+
+## D-112 — Android v0.22.8: offline/readback truth + photo-first Ambient and UX safety
+**Дата:** 2026-10-09. **Статус:** принято, Android source реализован; physical visual/replay acceptance владельца ожидается.
+
+**Основание:** владелец показал видео пяти страниц v0.22.7 и подтвердил все 12 фото. На видео ESP недоступна; предыдущий обзор выявил ложные начальные значения (80% в summary vs 0% на Focus Dial), передачу команд без связи, наследуемую ScrollView-прокрутку, слишком низкое положение сетки P01..P12, неявный Music stop/start, неоднозначные Night/Alarm состояния и риск >3000 мА.
+
+**РЕШЕНИЕ:** сделать Android-only, без новых UART/API/FW: до подтверждённого readback показывать «—» и блокировать команды (но оставить переходы между вкладками/настройки Wi-Fi); после failed-write перечитывать Nano или инвалидировать состояние; новый раздел начинать в начале ScrollView; атмосферные сцены сразу после hero, ручной F01 и его контролы ниже; отдельные Music start/stop; night switch + HH:MM validation, stop dawn только RUNNING/HOLD, отдельно подтверждать limit >3000; встроенный clap wizard не должен показывать подтверждённое сохранение до ответа устройства.
+
+Версия Android `0.22.8-ux-readback-rc1`, code 31. [Android Verify](https://github.com/dronrome1245/ARDU/actions/runs/37930295301); owner hardware readback, visuals after correction и лента ожидаются. **Сохранены:** D-109 функциональные 12 сцен и F01, D-111 approved assets, безопасная архитектура.
