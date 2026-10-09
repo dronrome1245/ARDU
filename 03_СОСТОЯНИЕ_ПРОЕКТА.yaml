@@ -3073,3 +3073,36 @@ android_0229_owner_phone_gate_2026_10_09:
   led_effects_physically_reviewed_from_video: false
   firmware_modified_for_video: false
   next: nano_continuous_dynamics_source_compile_gate
+
+# 2026-10-09 — Nano Ambient12 R2 source clock fix and compile/host gates
+nano_ambient12_speed_r2_2026_10_09:
+  decision: D-114
+  full_source: "04_Прошивка/nano_ambient12_v2/nano_ambient12_v2.ino"
+  original_full_source_preserved: "04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino"
+  new_boot_marker: "ARDU1 3"
+  uart_protocol_changed: false
+  eeprom_layout_changed: false
+  number_of_leds_per_ring: 44
+  ring_channels: [D6,D7]
+  new_scene_animation_phase_globals_bytes: 4
+  dynamics_monotonic_steps: 256
+  dynamics_rate_q16_per_ms_min: 512
+  dynamics_rate_q16_per_ms_max: 2042
+  breathing_cycle_s_low_approx: 16.4
+  breathing_cycle_s_high_approx: 4.1
+  ci: "https://github.com/dronrome1245/ARDU/actions/runs/37966945125"
+  ci_outcome: pass
+  ci_exact_renderer_host_tests: pass
+  old_full_flash_bytes: 29306
+  old_globals_sram_bytes: 1282
+  new_full_flash_bytes: 29336
+  new_globals_sram_bytes: 1286
+  compiled_flash_limit_bytes: 30720
+  globals_sram_limit_bytes: 2048
+  flash_soft_95_percent_target_exceeded_bytes: 152
+  runtime_stack_worst_case_measured: false
+  physical_upload_owner_confirmed: false
+  physical_led_motion_pass: false
+  current_limit_for_gate_ma: 3000
+  rollback_on_failure: "04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino"
+  next: "one_44_led_nano_r2_upload_and_velocity_visual_gate"

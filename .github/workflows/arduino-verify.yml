@@ -7,6 +7,7 @@ on:
       - "04_Прошивка/nano_ambient_preview_rc1/**"
       - "04_Прошивка/nano_ambient_preview_rc2/**"
       - "04_Прошивка/nano_ambient12_v1/**"
+      - "04_Прошивка/nano_ambient12_v2/**"
       - ".github/workflows/arduino-verify.yml"
   workflow_dispatch:
 
@@ -110,6 +111,40 @@ jobs:
             "$RUNNER_TEMP/nano_ambient_preview_rc2"
           echo "PASS: Nano Ambient Preview RC2 compiled with ONLY one .ino file"
 
+      - name: Host-test actual R2 preset clock and all 12 renderers
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path("04_Прошивка/nano_ambient12_v2")
+          src=(root/"nano_ambient12_v2.ino").read_text()
+          baseline=Path("04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino").read_text()
+          assert 'constexpr uint8_t FW_REV = 3;' in src
+          assert 'Serial.println(F("ARDU1 3"))' in src
+          assert 'presetCfg.dynamics[scene],presetPhaseQ16' in src
+          assert 'if(speed>170)' not in src and 'else if(speed<70)' not in src
+          assert 'static_assert(sizeof(PresetPersist)==29' in src
+          assert 'constexpr int PRESET_BASE = 512;' in baseline and 'constexpr int PRESET_BASE = 512;' in src
+          assert 'case 111:' in src and 'case 115:' in src
+          assert 'ambient_preset_probe.h' not in src, "One-file upload must have no local header dependency"
+          marker1="// PRESET_MOTION_BEGIN"
+          marker2="// PRESET_MOTION_END"
+          assert src.count(marker1)==1 and src.count(marker2)==1
+          motion=src.split(marker1,1)[1].split(marker2,1)[0]
+          head='uint8_t presetTri(uint8_t a){'
+          tail='void printPresets(){'
+          assert src.count(head)==1 and src.count(tail)==1
+          render=src.split(head,1)[1].split(tail,1)[0]
+          render=head+render
+          wrapper=(root/"tests/preset_motion_host.cpp").read_text()
+          assert wrapper.count("// @INJECT_PRESET_CLOCK")==1
+          assert wrapper.count("// @INJECT_PRESET_RENDERER")==1
+          output=wrapper.replace("// @INJECT_PRESET_CLOCK",motion).replace("// @INJECT_PRESET_RENDERER",render)
+          Path("build-nano-r2-preset-host.cpp").write_text(output)
+          print("PASS: host test uses exact Nano R2 clock and renderer source")
+          PY
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic             build-nano-r2-preset-host.cpp -o "$RUNNER_TEMP/ardu-nano-r2-preset-host"
+          "$RUNNER_TEMP/ardu-nano-r2-preset-host"
+
       - name: Compile full Nano v2 with twelve scenes
         run: |
           arduino-cli compile \
@@ -118,6 +153,38 @@ jobs:
             --build-path "$GITHUB_WORKSPACE/build-nano-ambient12-v1" \
             --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
             "04_Прошивка/nano_ambient12_v1"
+
+      - name: Compile full Nano Ambient12 R2 continuous-speed release candidate
+        run: |
+          arduino-cli compile             --fqbn arduino:avr:nano:cpu=atmega328old             --warnings default             --build-path "$GITHUB_WORKSPACE/build-nano-ambient12-v2"             --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries"             "04_Прошивка/nano_ambient12_v2"
+
+      - name: Verify full Nano R2 Flash and globals against R1 baseline
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import subprocess
+          sizes=list(Path.home().glob(".arduino15/packages/arduino/tools/avr-gcc/*/bin/avr-size"))
+          assert len(sizes)>0,"avr-size binary missing"
+          exe=str(sizes[-1])
+          def measure(folder):
+              elfs=list(Path(folder).rglob("*.elf"))
+              assert len(elfs)==1,(folder,elfs)
+              output=subprocess.check_output([exe,"-C","--mcu=atmega328p",str(elfs[0])],text=True)
+              print(folder,output)
+              p=re.search(r"Program:\s*(\d+) bytes",output)
+              d=re.search(r"Data:\s*(\d+) bytes",output)
+              assert p and d,output
+              return int(p.group(1)),int(d.group(1))
+          old_flash,old_globals=measure("build-nano-ambient12-v1")
+          new_flash,new_globals=measure("build-nano-ambient12-v2")
+          print(f"Baseline {old_flash}/{old_globals}, R2 {new_flash}/{new_globals}")
+          assert new_flash<=old_flash+400,(old_flash,new_flash,"unexpected Flash regression")
+          assert new_flash<=30000,(new_flash,"insufficient program margin")
+          assert new_globals<=old_globals+16,(old_globals,new_globals,"unexpected SRAM regression")
+          assert new_globals<=1350,(new_globals,"insufficient global SRAM margin")
+          print("PASS: full Nano R2 Flash/SRAM compile-size gate; runtime stack still physical gate")
+          PY
 
       - name: Size profile
         if: always()
@@ -139,6 +206,14 @@ jobs:
           echo "--- IDE preview RC1 firmware size ---"
           RC_ELF="$(find "$GITHUB_WORKSPACE/build-nano-ambient-preview-rc1" -name '*.elf' | head -n 1)"
           if [ -n "$RC_ELF" ]; then "$AVR_BIN/avr-size" -C --mcu=atmega328p "$RC_ELF"; fi
+
+      - name: Publish full Nano Ambient12 R2 continuous-speed HEX
+        uses: actions/upload-artifact@v4
+        with:
+          name: ardu-nano-ambient12-v2-velocity-rc2
+          path: build-nano-ambient12-v2/*.hex
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Publish full Nano v2 twelve-scene HEX
         uses: actions/upload-artifact@v4
