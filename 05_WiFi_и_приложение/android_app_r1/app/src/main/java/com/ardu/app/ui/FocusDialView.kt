@@ -64,6 +64,7 @@ class FocusDialView @JvmOverloads constructor(
     }
 
     private var currentValue = 0
+    private var hasValue = false
     private var previewListener: ((Int) -> Unit)? = null
     private var commitListener: ((Int) -> Unit)? = null
 
@@ -77,10 +78,16 @@ class FocusDialView @JvmOverloads constructor(
 
     fun setValue(value: Int, notify: Boolean = false) {
         val next = value.coerceIn(0, 255)
-        if (next == currentValue) return
+        if (next == currentValue && hasValue) return
         currentValue = next
+        hasValue = true
         invalidate()
         if (notify) previewListener?.invoke(currentValue)
+    }
+
+    fun setKnown(known: Boolean) {
+        hasValue = known
+        invalidate()
     }
 
     fun value(): Int = currentValue
@@ -132,10 +139,10 @@ class FocusDialView @JvmOverloads constructor(
         progressPaint.shader = ringShader
 
         glowPaint.strokeWidth = stroke + dp(12f)
-        canvas.drawArc(rect, startAngle, sweepAngle * fraction(), false, glowPaint)
+        if (hasValue) canvas.drawArc(rect, startAngle, sweepAngle * fraction(), false, glowPaint)
 
         progressPaint.strokeWidth = stroke
-        canvas.drawArc(rect, startAngle, sweepAngle * fraction(), false, progressPaint)
+        if (hasValue) canvas.drawArc(rect, startAngle, sweepAngle * fraction(), false, progressPaint)
         progressPaint.shader = null
 
         centerGlow.shader = RadialGradient(
@@ -169,7 +176,7 @@ class FocusDialView @JvmOverloads constructor(
         val ty = cy + sin(angle).toFloat() * radius
         thumbPaint.setShadowLayer(dp(9f), 0f, dp(2f), Color.argb(120, 0, 0, 0))
         setLayerType(LAYER_TYPE_SOFTWARE, thumbPaint)
-        canvas.drawCircle(tx, ty, dp(13f), thumbPaint)
+        if (hasValue) canvas.drawCircle(tx, ty, dp(13f), thumbPaint)
         thumbPaint.clearShadowLayer()
 
         val bulbY = cy - dp(55f)
@@ -182,13 +189,14 @@ class FocusDialView @JvmOverloads constructor(
         canvas.drawLine(cx - dp(8f), bulbY + dp(27f), cx + dp(8f), bulbY + dp(27f), bulbPaint)
 
         valuePaint.textSize = dp(39f)
-        canvas.drawText("${percent()}%", cx, cy + dp(8f), valuePaint)
+        canvas.drawText(if (hasValue) "${percent()}%" else "—", cx, cy + dp(8f), valuePaint)
 
         labelPaint.textSize = dp(14f)
         canvas.drawText("Яркость", cx, cy + dp(36f), labelPaint)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!isEnabled || !hasValue) return false
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 parent?.requestDisallowInterceptTouchEvent(true)

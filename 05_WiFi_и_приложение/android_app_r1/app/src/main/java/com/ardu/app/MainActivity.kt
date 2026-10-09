@@ -8,12 +8,14 @@ import android.os.Bundle
 import android.graphics.Color
 import android.provider.Settings
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
+import android.widget.ScrollView
 import android.widget.Switch
 import android.widget.TextView
 import com.ardu.app.net.ArduApiClient
@@ -35,6 +37,8 @@ class MainActivity : Activity() {
     private val api = ArduApiClient()
     private val worker = Executors.newSingleThreadExecutor()
     private var rendering = false
+    private var deviceOnline = false
+    private lateinit var contentScrollView: ScrollView
     private var latestSettings: ArduSettings? = null
     private var latestMode: String? = null
     private var sectionNavigation: List<Pair<ImageButton, LinearLayout>> = emptyList()
@@ -102,6 +106,8 @@ class MainActivity : Activity() {
     private lateinit var musicServiceButton: Button
     private lateinit var musicModeText: TextView
     private lateinit var musicModeButtons: LinearLayout
+    private lateinit var musicStartButton: Button
+    private lateinit var musicStopButton: Button
     private lateinit var musicBrightnessText: TextView
     private lateinit var musicBrightnessSeek: SmartSliderView
     private lateinit var musicBackgroundText: TextView
@@ -209,6 +215,7 @@ class MainActivity : Activity() {
     private lateinit var alarmRefreshButton: Button
     private lateinit var alarmServiceButton: Button
     private lateinit var alarmStateText: TextView
+    private lateinit var stopDawnButton: Button
     private lateinit var alarmRtcText: TextView
     private lateinit var alarmStartPreview: View
     private lateinit var alarmEndPreview: View
@@ -246,6 +253,7 @@ class MainActivity : Activity() {
         bindNight()
         bindAlarm()
         bindService()
+        showUnavailableDeviceState()
 
         val savedAddress = preferences().getString(PREF_ADDRESS, null)
         if (!savedAddress.isNullOrBlank()) {
@@ -263,6 +271,7 @@ class MainActivity : Activity() {
     }
 
     private fun bindViews() {
+        contentScrollView = findViewById(R.id.contentScrollView)
         globalHeaderPanel = findViewById(R.id.globalHeaderPanel)
         connectionText = findViewById(R.id.connectionText)
         modeText = findViewById(R.id.modeText)
@@ -318,6 +327,8 @@ class MainActivity : Activity() {
         musicServiceButton = findViewById(R.id.musicServiceButton)
         musicModeText = findViewById(R.id.musicModeText)
         musicModeButtons = findViewById(R.id.musicModeButtons)
+        musicStartButton = findViewById(R.id.musicStartButton)
+        musicStopButton = findViewById(R.id.musicStopButton)
         musicBrightnessText = findViewById(R.id.musicBrightnessText)
         musicBrightnessSeek = findViewById(R.id.musicBrightnessSeek)
         musicBackgroundText = findViewById(R.id.musicBackgroundText)
@@ -390,6 +401,7 @@ class MainActivity : Activity() {
         alarmRefreshButton = findViewById(R.id.alarmRefreshButton)
         alarmServiceButton = findViewById(R.id.alarmServiceButton)
         alarmStateText = findViewById(R.id.alarmStateText)
+        stopDawnButton = findViewById(R.id.stopDawnButton)
         alarmRtcText = findViewById(R.id.alarmRtcText)
         alarmStartPreview = findViewById(R.id.alarmStartPreview)
         alarmEndPreview = findViewById(R.id.alarmEndPreview)
@@ -436,7 +448,7 @@ class MainActivity : Activity() {
             else -> null
         }
 
-        if (targetMode == null || latestMode == targetMode) return
+        if (targetMode == null || !deviceOnline || latestMode == targetMode) return
 
         setOperationStatus(
             when (target) {
@@ -531,6 +543,8 @@ class MainActivity : Activity() {
         sectionLabels.forEach { (label, panel) ->
             label.isSelected = panel === target
         }
+        // Each tab opens at its top, not at the prior tab's scroll offset.
+        contentScrollView.scrollTo(0, 0)
     }
 
     private fun bindLight() {
@@ -665,11 +679,9 @@ class MainActivity : Activity() {
         clapFinishButton.setOnClickListener { finishClapCalibration() }
         clapSaveButton.setOnClickListener {
             runDeviceAction("Сохранение порога хлопков") { api.saveClapCalibration() }
-            clapCalibrationPanel.visibility = View.GONE
         }
         findViewById<Button>(R.id.clapCancelButton).setOnClickListener {
             runDeviceAction("Отмена калибровки хлопков") { api.cancelClapCalibration() }
-            clapCalibrationPanel.visibility = View.GONE
         }
     }
 
@@ -744,6 +756,8 @@ class MainActivity : Activity() {
     }
 
     private fun startClapCalibration() {
+        if (!deviceOnline) return
+
         clapCalibrationPanel.visibility = View.VISIBLE
         clapCalibrationText.text = "Соблюдайте тишину. Nano измеряет фон…"
         clapSampleButton.isEnabled = false
@@ -767,6 +781,8 @@ class MainActivity : Activity() {
     }
 
     private fun captureClapSample() {
+        if (!deviceOnline) return
+
         clapSampleButton.isEnabled = false
         clapCalibrationText.text = "Сделайте двойной хлопок…"
         worker.execute {
@@ -794,6 +810,8 @@ class MainActivity : Activity() {
     }
 
     private fun finishClapCalibration() {
+        if (!deviceOnline) return
+
         clapFinishButton.isEnabled = false
         worker.execute {
             try {
@@ -816,6 +834,12 @@ class MainActivity : Activity() {
     private fun bindMusic() {
         musicRefreshButton.setOnClickListener { refreshDevice() }
         musicServiceButton.setOnClickListener { openService() }
+        musicStartButton.setOnClickListener {
+            runDeviceAction("Запуск светомузыки") { api.setMode("music") }
+        }
+        musicStopButton.setOnClickListener {
+            runDeviceAction("Остановка светомузыки") { api.setMode("off") }
+        }
 
         val names = mapOf(
             "M01" to "Градиент",
@@ -978,6 +1002,9 @@ class MainActivity : Activity() {
         ambientPresetButtons.forEach { (id, button) ->
             button.setOnClickListener { applyAmbientPreset(id) }
         }
+        ambientPresetLabels.forEach { (id, label) ->
+            label.setOnClickListener { applyAmbientPreset(id) }
+        }
         ambientPresetExtraGrid = findViewById(R.id.ambientPresetExtraGrid)
         ambientPresetCapabilityText = findViewById(R.id.ambientPresetCapabilityText)
         ambientPresetControls = findViewById(R.id.ambientPresetControls)
@@ -1026,11 +1053,12 @@ class MainActivity : Activity() {
                 ))
                 val label = TextView(this).apply {
                     text = ambientSceneNames.getValue(id)
-                    textSize = 10f
+                    textSize = 11f
                     setTextColor(getColor(R.color.ardu_nav_icon_tint))
                     gravity = android.view.Gravity.CENTER
                     maxLines = 2
-                    minHeight = dp(26)
+                    minHeight = dp(32)
+                    setOnClickListener { applyAmbientPreset(id) }
                 }
                 tile.addView(label, LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -1183,6 +1211,11 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.nightSaveScheduleButton).setOnClickListener {
             val on = nightOnInput.text.toString().trim()
             val off = nightOffInput.text.toString().trim()
+            val validTime = Regex("^(?:[01][0-9]|2[0-3]):[0-5][0-9]$")
+            if (!validTime.matches(on) || !validTime.matches(off)) {
+                setOperationStatus("Расписание: укажите время ЧЧ:ММ (00:00–23:59)")
+                return@setOnClickListener
+            }
             runDeviceAction("Время ночника") {
                 api.updateNightSettings(scheduleOn = on, scheduleOff = off)
             }
@@ -1240,7 +1273,7 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.syncTimeButton).setOnClickListener {
             runDeviceAction("Синхронизация RTC") { api.syncTime() }
         }
-        findViewById<Button>(R.id.stopDawnButton).setOnClickListener {
+        stopDawnButton.setOnClickListener {
             runDeviceAction("Остановка рассвета") { api.stopDawn() }
         }
     }
@@ -1271,7 +1304,27 @@ class MainActivity : Activity() {
 
         bindSeek(currentLimitSeek,
             { currentLimitText.text = "Лимит тока: $it мА" },
-            { value -> runDeviceAction("Лимит тока") { api.setCurrentLimit(value) } }
+            { value ->
+                if (UiSafetyPolicy.needsCurrentLimitConfirmation(value)) {
+                    AlertDialog.Builder(this)
+                        .setTitle("Повышенный лимит тока")
+                        .setMessage(
+                            "Два кольца 44+44 ещё не прошли силовой тест. " +
+                                "До измерений рекомендуется не превышать 3000 мА. " +
+                                "Установить $value мА только после проверки питания и проводки?"
+                        )
+                        .setNegativeButton("Отмена") { _, _ ->
+                            currentLimitSeek.progress =
+                                latestSettings?.system?.currentLimitMa ?: UiSafetyPolicy.UNTESTED_LIMIT_MA
+                        }
+                        .setPositiveButton("Применить") { _, _ ->
+                            runDeviceAction("Лимит тока") { api.setCurrentLimit(value) }
+                        }
+                        .show()
+                } else {
+                    runDeviceAction("Лимит тока") { api.setCurrentLimit(value) }
+                }
+            }
         )
 
         findViewById<Button>(R.id.eventsButton).setOnClickListener {
@@ -1354,6 +1407,82 @@ class MainActivity : Activity() {
         alarmConnectionText.setTextColor(color)
     }
 
+
+    private fun showUnavailableDeviceState() {
+        deviceOnline = false
+        latestMode = null
+        latestSettings = null
+        setDeviceControlsEnabled(false)
+        lightFocusDial.setKnown(false)
+        lightOverviewBrightnessText.text = "—"
+        lightOverviewKelvinText.text = "—"
+        lightStateText.text = "Нет данных • подключите ARDU"
+        lightBrightnessText.text = "Яркость • —"
+        lightKelvinText.text = "— K"
+        lightRgbText.text = "RGB: —"
+        clapStateText.text = "Калибровка: нет данных"
+        clapCalibrationPanel.visibility = View.GONE
+        musicModeText.text = "Нет данных о режиме"
+        musicBrightnessText.text = "Эффект • —"
+        musicBackgroundText.text = "Фон • —"
+        musicCalibrationText.text = "Микрофон: нет данных"
+        ambientEffectText.text = "Нет данных о режиме"
+        ambientPresetCapabilityText.text = "12 сцен • подключите ARDU для управления"
+        ambientManualPanel.visibility = View.GONE
+        ambientPresetControls.visibility = View.GONE
+        nightStateText.text = "Нет данных о ночнике"
+        nightEnabledSwitch.text = "Ночник: нет данных"
+        nightHueText.text = "Цвет • —"
+        nightSaturationText.text = "Насыщенность • —"
+        nightBrightnessText.text = "Яркость • —"
+        nightOnInput.setText("")
+        nightOffInput.setText("")
+        alarmStateText.text = "Нет данных о будильнике"
+        alarmRtcText.text = "Время устройства неизвестно"
+        alarmFadeText.text = "Длительность • —"
+        alarmBrightnessText.text = "Макс. яркость • —"
+        alarmHourInput.setText("")
+        alarmMinuteInput.setText("")
+        timeText.text = "RTC —"
+        modeText.text = "Состояние неизвестно"
+        currentLimitText.text = "Лимит тока: нет данных"
+        systemSummaryText.text = "ARDU не подключена"
+        stopDawnButton.isEnabled = false
+    }
+
+    private fun setDeviceControlsEnabled(online: Boolean) {
+        // Always allow navigation, refresh and connection repair while offline.
+        val uiOnly = setOf(
+            R.id.lightRefreshButton, R.id.lightServiceButton,
+            R.id.musicRefreshButton, R.id.musicServiceButton,
+            R.id.ambientRefreshButton, R.id.ambientServiceButton,
+            R.id.nightRefreshButton, R.id.nightServiceButton,
+            R.id.alarmRefreshButton, R.id.alarmServiceButton,
+            R.id.lightOpenControlButton, R.id.lightBackButton
+        )
+        fun visit(view: View) {
+            if (view.id in uiOnly) return
+            if (view is ViewGroup) {
+                for (index in 0 until view.childCount) visit(view.getChildAt(index))
+            }
+            if (
+                view is Button || view is ImageButton || view is Switch ||
+                view is SeekBar || view is EditText || view is SmartSliderView ||
+                view is FocusDialView || view is ColorWheelView ||
+                view is SceneTileView || view is MusicModeTileView ||
+                view is AmbientEffectTileView
+            ) view.isEnabled = online
+        }
+        listOf(lightPanel, musicPanel, ambientPanel, nightPanel, alarmPanel).forEach(::visit)
+        // Labels are separate clickable TextViews, not part of the Button cases.
+        ambientPresetLabels.values.forEach { it.isEnabled = online }
+        ambientExtraPresetLabels.values.forEach { it.isEnabled = online }
+        currentLimitSeek.isEnabled = online
+        findViewById<Button>(R.id.resetDefaultsButton).isEnabled = online
+        findViewById<Button>(R.id.eventsButton).isEnabled = online
+        findViewById<Button>(R.id.sendRawButton).isEnabled = online
+    }
+
     private fun refreshDevice() {
         setConnectionStatus("Проверка…", R.color.ardu_text_secondary)
         refreshButton.isEnabled = false
@@ -1381,6 +1510,8 @@ class MainActivity : Activity() {
                     val connectionLabel =
                         if (ping.networkMode == "softap") "● Прямое подключение"
                         else "● Онлайн"
+                    deviceOnline = true
+                    setDeviceControlsEnabled(true)
                     setConnectionStatus(connectionLabel, R.color.ardu_accent)
                     if (!selectedAddress.isNullOrBlank()) {
                         addressInput.setText(selectedAddress.removePrefix("http://"))
@@ -1395,6 +1526,7 @@ class MainActivity : Activity() {
                 }
             } catch (error: Exception) {
                 runOnUiThread {
+                    showUnavailableDeviceState()
                     setConnectionStatus("● Нет связи", R.color.ardu_danger)
                     setOperationStatus(error.message ?: "Ошибка подключения")
                     refreshButton.isEnabled = true
@@ -1412,6 +1544,10 @@ class MainActivity : Activity() {
         Snapshot(api.status(), api.settings(), api.time())
 
     private fun runDeviceAction(label: String, action: () -> Unit) {
+        if (!UiSafetyPolicy.canSendCommand(deviceOnline)) {
+            setOperationStatus("Нет связи с ARDU — команда не отправлена")
+            return
+        }
         setOperationStatus("$label…")
         worker.execute {
             try {
@@ -1485,7 +1621,14 @@ class MainActivity : Activity() {
             clapCalibrationText.text =
                 "Калибровка ${clap.calibration.goodPairs}/${clap.calibration.targetPairs}, " +
                 "тишина=${clap.calibration.quietP99}, порог=${clap.calibration.suggestedThreshold}"
+        } else {
+            clapCalibrationPanel.visibility = View.GONE
         }
+        val hasAllPairs = clap.calibration.targetPairs > 0 &&
+            clap.calibration.goodPairs >= clap.calibration.targetPairs
+        clapSampleButton.isEnabled = clap.calibration.active && !hasAllPairs
+        clapFinishButton.isEnabled = clap.calibration.active && hasAllPairs
+        clapSaveButton.isEnabled = clap.calibration.finished
     }
 
     private fun renderMusic(snapshot: Snapshot) {
@@ -1493,9 +1636,14 @@ class MainActivity : Activity() {
         val id = settings.music.selected
         val cfg = settings.music.modes[id] ?: return
 
-        musicModeText.text =
-            if (snapshot.status.mode == "music") "${musicModeTitle(id)} • активно"
-            else "${musicModeTitle(id)} • выключено"
+        val musicActive = snapshot.status.mode == "music"
+        musicModeText.text = if (musicActive) {
+            musicModeTitle(id) + " • активно"
+        } else {
+            musicModeTitle(id) + " • выключено"
+        }
+        setChoiceState(musicStartButton, musicActive)
+        setChoiceState(musicStopButton, !musicActive)
         musicModeButtonMap.forEach { (modeId, tile) ->
             tile.isSelected = snapshot.status.mode == "music" && modeId == id
             tile.invalidate()
@@ -1579,6 +1727,8 @@ class MainActivity : Activity() {
         }
         ambientPresetButtons.values.forEach { it.isEnabled = p.supported }
         ambientExtraPresetButtons.values.forEach { it.isEnabled = p.supported }
+        ambientPresetLabels.values.forEach { it.isEnabled = p.supported }
+        ambientExtraPresetLabels.values.forEach { it.isEnabled = p.supported }
 
         ambientManualPanel.visibility = if (selected == null) View.VISIBLE else View.GONE
         ambientPresetControls.visibility = if (selected != null) View.VISIBLE else View.GONE
@@ -1612,6 +1762,7 @@ class MainActivity : Activity() {
         val n = settings.night
 
         nightEnabledSwitch.isChecked = n.enabled
+        nightEnabledSwitch.text = if (n.enabled) "Ночник включён" else "Ночник выключен"
         nightHueSeek.setValue(n.hue)
         nightSaturationSeek.setValue(n.saturation)
         nightBrightnessSeek.setValue(n.brightness)
@@ -1651,9 +1802,12 @@ class MainActivity : Activity() {
             String.format(Locale.US, "%02d:%02d", a.hour, a.minute) +
             if (a.dawnPhase != "idle") " • ${a.dawnPhase}" else ""
 
-        alarmRtcText.text =
-            if (snapshot.time.valid) "RTC ${snapshot.time.time?.take(5) ?: "--:--"}"
-            else "RTC —"
+        alarmRtcText.text = if (snapshot.time.valid) {
+            "RTC " + (snapshot.time.time?.take(5) ?: "--:--")
+        } else {
+            "Время устройства неизвестно"
+        }
+        stopDawnButton.isEnabled = UiSafetyPolicy.dawnCanBeStopped(a.dawnPhase)
 
         updateAlarmPreviews()
     }
@@ -1762,11 +1916,25 @@ class MainActivity : Activity() {
         }
 
     private fun showError(label: String, error: Exception) {
-        runOnUiThread {
-            setOperationStatus("$label: ${error.message ?: "ошибка"}")
-            refreshButton.isEnabled = true
-            lightRefreshButton.isEnabled = true
-            musicRefreshButton.isEnabled = true
+        val message = label + ": " + (error.message ?: "ошибка")
+        runOnUiThread { setOperationStatus(message) }
+        // On a failed write, discard local previews and re-read Nano settings.
+        worker.execute {
+            try {
+                val snapshot = readSnapshot()
+                runOnUiThread {
+                    deviceOnline = true
+                    setDeviceControlsEnabled(true)
+                    renderSnapshot(snapshot)
+                    setOperationStatus(message)
+                }
+            } catch (_: Exception) {
+                runOnUiThread {
+                    showUnavailableDeviceState()
+                    setConnectionStatus("● Нет связи", R.color.ardu_danger)
+                    setOperationStatus(message)
+                }
+            }
         }
     }
 

@@ -40,6 +40,17 @@ jobs:
           assert 'chunked(4)' in kotlin
           assert 'ambientExtraPresetButtons[id] = image' in kotlin
           assert 'ambientExtraPresetLabels[id] = label' in kotlin
+          # UX regressions from the 2026-10-09 physical-phone walkthrough.
+          assert layout.index('android:text="Атмосферные сцены"') < layout.index('android:text="Свой цвет"')
+          assert 'android:id="@+id/contentScrollView"' in layout
+          assert 'android:id="@+id/musicStartButton"' in layout
+          assert 'android:id="@+id/musicStopButton"' in layout
+          assert 'contentScrollView.scrollTo(0, 0)' in kotlin
+          assert 'UiSafetyPolicy.canSendCommand(deviceOnline)' in kotlin
+          assert 'showUnavailableDeviceState()' in kotlin
+          assert 'lightFocusDial.setKnown(false)' in kotlin
+          assert 'stopDawnButton.isEnabled = UiSafetyPolicy.dawnCanBeStopped' in kotlin
+          print("PASS: UX offline-state, tab scroll, music controls and scene ordering")
           print("PASS: 12 embedded WebP thumbnails and 4-column grid")
           PY
 
