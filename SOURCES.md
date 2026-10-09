@@ -1139,3 +1139,9 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - Видео владельца `18429670918804.mp4`, файл в переписке 2026-10-09, SHA256 `e98a017f109a29e4c129b5988f36352cdc78277e11418a4898a36f049d7656a6`, примерно 62.98 с, 578×1280. На записи показаны UI «Свет»/«Музыка», состояние «Онлайн», смена быстрых сцен и музыкальных режимов, контрастный текст кнопки запуска.
 - Отдельное сообщение владельца: «онлайн офлайн работает» — источник подтверждения фактического автоматического изменения статуса в 0.22.9. В самом видео power-off-переход не показан; точная задержка и независимая проверка не измерены.
 - [Android `main` CI PASS](https://github.com/dronrome1245/ARDU/actions/runs/37958705334) для `fb2b9144`; реальная электрическая приёмка двух колец/12 сцен этим не подтверждена.
+
+## S-ARDU-2026-10-09-NANO-R2 — исходник и проверки 256-уровневой скорости
+
+- `04_Прошивка/nano_ambient12_v2/nano_ambient12_v2.ino`: полный самостоятельный Nano Ambient12 scene-speed R2, boot `ARDU1 3`, непрерывный Q16 phase clock, P11 короткий цикл, EEPROM/UART/FHT/Music/Night/Alarm без изменений.
+- `04_Прошивка/nano_ambient12_v2/tests/preset_motion_host.cpp`: host test именно извлечённых функций из .ino (клок и 12 рендереров). Профиль [Arduino Verify run 37966945125](https://github.com/dronrome1245/ARDU/actions/runs/37966945125) **PASS**: R1 29306 Flash / 1282 global SRAM, R2 29336 Flash / 1286 global SRAM; прошивка собирается для Arduino Nano ATmega328P Old Bootloader, создан HEX `ardu-nano-ambient12-v2-velocity-rc2`. Test system не измеряет worst-case stack и не доказывает реальное свечение.
+- Отдельный owner 44-LED physical test и rollback plan: `04_Прошивка/AMBIENT12_SPEED_R2_TEST.md`. Старый проверявшийся source `04_Прошивка/nano_ambient12_v1` оставлен без изменения.
