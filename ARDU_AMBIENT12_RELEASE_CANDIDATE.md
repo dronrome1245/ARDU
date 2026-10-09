@@ -115,3 +115,9 @@ HTTP-запрос примера (после установки обеих пр�
 **Пока не проверено:** SRAM stack worst-case, светодиодные сцены на железе, два кольца 44+44, защита/нагрев блока питания и прямой Wi-Fi. Nano занимает 29306 байт Flash (~96% > 95% project target), ESP IRAM 92%; оба компилируются, но это ещё не доказанный final hardware PASS. S-30-5 (металлический корпус без PE) пригоден только для стенда, для потолка нужен финальный Class II БП по BOM.
 
 Если что-то не работает — зафиксировать результат конкретного gate и откатить **только** нарушенную подсистему; без серийных новых перепрошивок «на удачу».
+
+## 2026-10-09 — Addendum D-114: новая полная Nano Ambient12 R2 скорость; предыдущий пакет остаётся rollback
+
+Предыдущие инструкции про `nano_ambient12_v1` описывают исторический первый полный 12-scene candidate. По фактической обратной связи 2026-10-09 `dynamics` лишь выбирает 1 из 3 скоростей. Исправление сделано **не внутри** старого скетча, а в новом **полном** `04_Прошивка/nano_ambient12_v2/nano_ambient12_v2.ino` (one-file, boot `ARDU1 3`, 256 monotone speeds, P11 ~16..4 seconds). API ESP v2, Nano numeric UART v1, EEPROM presets, 44+44 geometry, FHT/Music/Light/Alarm, текущий блок питания и Android остаются прежними. Нельзя повторно OTA-прошивать ESP только ради скорости.
+
+[Arduino Verify 37966945125](https://github.com/dronrome1245/ARDU/actions/runs/37966945125) PASS: полная Nano R2 **29336/30720 Flash, 1286/2048 SRAM globals** (+30/+4 к сохранённой R1), exact-source host тест всех 12 рендереров, HEX artifact `ardu-nano-ambient12-v2-velocity-rc2`; стек в runtime не измерен, мягкий 95%-порог Flash превышен. Подробный безопасный upload/одно-кольцевой gate/rollback: [AMBIENT12_SPEED_R2_TEST.md](04_Прошивка/AMBIENT12_SPEED_R2_TEST.md). Реальный owner Upload/visual PASS пока ожидается, оба кольца не включать одновременно в этот тест.
