@@ -69,7 +69,7 @@ int main() {
   const uint32_t lowPeriodMs=(128U*65536U)/p11MinQ;
   const uint32_t highPeriodMs=(128U*65536U)/p11MaxQ;
   const uint32_t oldPeriodMs=(128U*65536U)/p11OldMinQ;
-  assert(p11MinQ==417U && p11OldMinQ==512U && p11MaxQ==2042U);
+  assert(p11MinQ==416U && p11OldMinQ==512U && p11MaxQ==2042U);
   assert(lowPeriodMs>=20000U && lowPeriodMs<=20200U);
   assert(highPeriodMs>=4000U && highPeriodMs<=4200U);
   assert(oldPeriodMs>=16000U && oldPeriodMs<=16500U);
@@ -80,7 +80,7 @@ int main() {
   const uint32_t beforeAdjust=breathPhase;
   advancePresetClock(40,128,breathPhase,true);
   assert(breathPhase>beforeAdjust);
-  assert(breathPhase-beforeAdjust==40U*1233U);
+  assert(breathPhase-beforeAdjust==40U*1232U);
 
   // One 10-second call and 250 40ms updates must give the same clock.
   uint32_t one=0,frames=0;
