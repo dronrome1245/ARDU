@@ -131,5 +131,5 @@ int main() {
   const uint8_t b=leds[0].v;
   assert(a!=b);
 
-  std::puts("PASS: R3 unchanged 11 preset rates, P11 20.1s min/4.1s max, 256 monotonic steps, no phase reset, 12 renderers");
+  std::puts("PASS: R3 unchanged 11 preset rates, P11 20.2s min/4.1s max, 256 monotonic steps, no phase reset, 12 renderers");
 }
