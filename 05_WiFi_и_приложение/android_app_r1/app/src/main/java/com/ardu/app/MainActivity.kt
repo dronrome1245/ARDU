@@ -1209,6 +1209,11 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.nightSaveScheduleButton).setOnClickListener {
             val on = nightOnInput.text.toString().trim()
             val off = nightOffInput.text.toString().trim()
+            val validTime = Regex("^(?:[01][0-9]|2[0-3]):[0-5][0-9]$")
+            if (!validTime.matches(on) || !validTime.matches(off)) {
+                setOperationStatus("Расписание: укажите время ЧЧ:ММ (00:00–23:59)")
+                return@setOnClickListener
+            }
             runDeviceAction("Время ночника") {
                 api.updateNightSettings(scheduleOn = on, scheduleOff = off)
             }
@@ -1297,7 +1302,27 @@ class MainActivity : Activity() {
 
         bindSeek(currentLimitSeek,
             { currentLimitText.text = "Лимит тока: $it мА" },
-            { value -> runDeviceAction("Лимит тока") { api.setCurrentLimit(value) } }
+            { value ->
+                if (UiSafetyPolicy.needsCurrentLimitConfirmation(value)) {
+                    AlertDialog.Builder(this)
+                        .setTitle("Повышенный лимит тока")
+                        .setMessage(
+                            "Два кольца 44+44 ещё не прошли силовой тест. " +
+                                "До измерений рекомендуется не превышать 3000 мА. " +
+                                "Установить $value мА только после проверки питания и проводки?"
+                        )
+                        .setNegativeButton("Отмена") { _, _ ->
+                            currentLimitSeek.progress =
+                                latestSettings?.system?.currentLimitMa ?: UiSafetyPolicy.UNTESTED_LIMIT_MA
+                        }
+                        .setPositiveButton("Применить") { _, _ ->
+                            runDeviceAction("Лимит тока") { api.setCurrentLimit(value) }
+                        }
+                        .show()
+                } else {
+                    runDeviceAction("Лимит тока") { api.setCurrentLimit(value) }
+                }
+            }
         )
 
         findViewById<Button>(R.id.eventsButton).setOnClickListener {
@@ -1599,9 +1624,14 @@ class MainActivity : Activity() {
         val id = settings.music.selected
         val cfg = settings.music.modes[id] ?: return
 
-        musicModeText.text =
-            if (snapshot.status.mode == "music") "${musicModeTitle(id)} • активно"
-            else "${musicModeTitle(id)} • выключено"
+        val musicActive = snapshot.status.mode == "music"
+        musicModeText.text = if (musicActive) {
+            musicModeTitle(id) + " • активно"
+        } else {
+            musicModeTitle(id) + " • выключено"
+        }
+        setChoiceState(musicStartButton, musicActive)
+        setChoiceState(musicStopButton, !musicActive)
         musicModeButtonMap.forEach { (modeId, tile) ->
             tile.isSelected = snapshot.status.mode == "music" && modeId == id
             tile.invalidate()
@@ -1718,6 +1748,7 @@ class MainActivity : Activity() {
         val n = settings.night
 
         nightEnabledSwitch.isChecked = n.enabled
+        nightEnabledSwitch.text = if (n.enabled) "Ночник включён" else "Ночник выключен"
         nightHueSeek.setValue(n.hue)
         nightSaturationSeek.setValue(n.saturation)
         nightBrightnessSeek.setValue(n.brightness)
@@ -1757,9 +1788,12 @@ class MainActivity : Activity() {
             String.format(Locale.US, "%02d:%02d", a.hour, a.minute) +
             if (a.dawnPhase != "idle") " • ${a.dawnPhase}" else ""
 
-        alarmRtcText.text =
-            if (snapshot.time.valid) "RTC ${snapshot.time.time?.take(5) ?: "--:--"}"
-            else "RTC —"
+        alarmRtcText.text = if (snapshot.time.valid) {
+            "RTC " + (snapshot.time.time?.take(5) ?: "--:--")
+        } else {
+            "Время устройства неизвестно"
+        }
+        stopDawnButton.isEnabled = UiSafetyPolicy.dawnCanBeStopped(a.dawnPhase)
 
         updateAlarmPreviews()
     }
