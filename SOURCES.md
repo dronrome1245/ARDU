@@ -1122,3 +1122,8 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - Пользователь прислал три утверждённых листа с 12 тематическими картинками, без сцен интерьера: P01…P04, P05…P08, P09…P12. Происхождение и мэппинг описаны в `05_WiFi_и_приложение/AMBIENT12_ARTWORK.md`; сами финальные 12 миниатюр размещены как **реальные WebP Git blobs** в `android_app_r1/app/src/main/res/drawable-nodpi/ardu_preset_p01.webp`..`ardu_preset_p12.webp` (192×192).
 - [GitHub commit 4221b5b](https://github.com/dronrome1245/ARDU/commit/4221b5b6d497b2bf32172aec638c1efb92d5f8ae) — файлы и Kotlin/XML mapping. [CI 37838263956](https://github.com/dronrome1245/ARDU/actions/runs/37838263956) confirms presence/RIFF-WEBP headers/12 resource refs, Android unit tests, APK build, [APK artifact 11576287564](https://github.com/dronrome1245/ARDU/actions/runs/37838263956/artifacts/11576287564).
 - Это **программное** свидетельство успешной сборки; реальный внешний вид сетки на телефоне будет подтверждён пользователем после `git pull`→Run.
+
+## S-ARDU-2026-10-09 — owner app walkthrough and Android UX regression evidence
+
+- Владелец 2026-10-09 подтвердил, что 12 фото-пресетов загружены в Android, и прикрепил видео `SVID_20261009_092631_1.mp4` в текущем чате. На записи «Нет связи», лента не подключена. Источник — **реальное визуальное представление телефона, не доказательство действительного переключения устройства**.
+- Source fixes: `05_WiFi_и_приложение/android_app_r1` Android v0.22.8, D-112; [Android CI source/tests/APK](https://github.com/dronrome1245/ARDU/actions/runs/37930295301). Устройство ESP/Nano/лента этим CI не проверяются.
