@@ -857,3 +857,9 @@ Owner explicitly approves P01..P12 including P12 Rainbow and retires F02/F03 fro
 ## 37. D-110 — ESP v2 R2 local manual credentials, single .ino (2026-10-08)
 
 Per latest owner request `wifi_secrets.h` is **not** part of ESP v2 R2. One complete `05_WiFi_и_приложение/esp8266_ardu_v2/esp8266_ardu_v2.ino` exposes four editable quoted values (Station SSID/pass, future OTA pass, ARDU-DIRECT WPA2 pass). Template values cannot compile for OTA, and real owner credentials must not be committed. [CI 37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) PASS for single-file compile and placeholder rejection; hardware not yet uploaded. Safe ESP Station→Nano→Android→Direct order unchanged in `ARDU_AMBIENT12_RELEASE_CANDIDATE.md`.
+
+## 38. Nano Ambient12 R2 continuous preset-speed correction — 2026-10-09
+
+Owner accepted Android 0.22.9 Online/Offline but reported P-scenes dynamics not changing their speed. Investigation found only 3 actual runtime speed groups in the full Nano Ambient12 R1. Independent full Nano candidate `04_Прошивка/nano_ambient12_v2/nano_ambient12_v2.ino` now uses a 256-step monotonic Q16 clock and P11 faster pulse, without modifying UART, EEPROM, ESP, Android, or the old R1 rollback sketch. [Arduino Verify 37966945125](https://github.com/dronrome1245/ARDU/actions/runs/37966945125) PASS: old 29306/1282 and new 29336/1286 Flash/globals SRAM. Still above the soft 95% Flash target by 152 bytes; runtime stack, 44 LED physical animation and two-ring power tests remain pending.
+
+Do not treat software CI as physical release acceptance. Next physical gate: `04_Прошивка/AMBIENT12_SPEED_R2_TEST.md`, one verified 44-LED channel, safe Nano USB upload with ESP TX→Nano D0 temporarily disconnected while unpowered, then UART reconnect + App preset motion readback. Keep current-limit <=3000 mA until two-ring power gate. Production freeze is NOT yet granted.
