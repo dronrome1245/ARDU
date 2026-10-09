@@ -9,6 +9,7 @@ on:
       - "04_Прошивка/nano_ambient12_v1/**"
       - "04_Прошивка/nano_ambient12_v2/**"
       - "04_Прошивка/nano_ambient12_v3/**"
+      - "04_Прошивка/nano_ambient12_v4/**"
       - ".github/workflows/arduino-verify.yml"
   workflow_dispatch:
 
@@ -180,6 +181,41 @@ jobs:
             build-nano-r3-preset-host.cpp -o "$RUNNER_TEMP/ardu-nano-r3-preset-host"
           "$RUNNER_TEMP/ardu-nano-r3-preset-host"
 
+      - name: Host-test all R4 scenes visibly animate on 44 LEDs
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path("04_Прошивка/nano_ambient12_v4")
+          src=(root/"nano_ambient12_v4.ino").read_text()
+          baseline=Path("04_Прошивка/nano_ambient12_v3/nano_ambient12_v3.ino").read_text()
+          assert 'constexpr uint8_t FW_REV = 5;' in src
+          assert 'Serial.println(F("ARDU1 5"))' in src
+          assert src.count('case 111:')==1 and src.count('case 115:')==1
+          assert 'static_assert(sizeof(PresetPersist)==29' in src
+          assert 'constexpr int PRESET_BASE = 512;' in src
+          assert 'ambient_preset_probe.h' not in src, "One-file Nano R4 must not need a local .h"
+          assert src.split('// PRESET_MOTION_BEGIN',1)[1].split('// PRESET_MOTION_END',1)[0] == \
+                 baseline.split('// PRESET_MOTION_BEGIN',1)[1].split('// PRESET_MOTION_END',1)[0], \
+                 "P11 clock MUST stay identical to approved R3"
+          def breathing_body(text):
+              return text.split('case 10: // breathing: whole circle slow pulse',1)[1].split('default: // rainbow',1)[0]
+          assert breathing_body(src)==breathing_body(baseline), "P11 renderer MUST remain bitwise identical"
+          head='uint8_t presetTri(uint8_t a){'
+          tail='void printPresets(){'
+          assert src.count(head)==1 and src.count(tail)==1
+          motion=src.split('// PRESET_MOTION_BEGIN',1)[1].split('// PRESET_MOTION_END',1)[0]
+          render=head+src.split(head,1)[1].split(tail,1)[0]
+          wrapper=(root/"tests/preset_motion_host.cpp").read_text()
+          assert wrapper.count('// @INJECT_PRESET_CLOCK')==1
+          assert wrapper.count('// @INJECT_PRESET_RENDERER')==1
+          output=wrapper.replace('// @INJECT_PRESET_CLOCK',motion).replace('// @INJECT_PRESET_RENDERER',render)
+          Path("build-nano-r4-visible-scenes-host.cpp").write_text(output)
+          print("PASS: extracted exact Nano R4 renderer and preserved R3 P11")
+          PY
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+            build-nano-r4-visible-scenes-host.cpp -o "$RUNNER_TEMP/ardu-nano-r4-scenes"
+          "$RUNNER_TEMP/ardu-nano-r4-scenes"
+
       - name: Compile full Nano v2 with twelve scenes
         run: |
           arduino-cli compile \
@@ -257,6 +293,46 @@ jobs:
           print("PASS: complete R3 Nano compile and memory; physical stack test still required")
           PY
 
+      - name: Compile R4 as standalone Nano sketch, isolated from local headers
+        run: |
+          mkdir -p "$RUNNER_TEMP/nano_ambient12_v4"
+          cp "04_Прошивка/nano_ambient12_v4/nano_ambient12_v4.ino" \
+             "$RUNNER_TEMP/nano_ambient12_v4/nano_ambient12_v4.ino"
+          test "$(find "$RUNNER_TEMP/nano_ambient12_v4" -maxdepth 1 -type f | wc -l)" -eq 1
+          arduino-cli compile \
+            --fqbn arduino:avr:nano:cpu=atmega328old \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-nano-ambient12-v4" \
+            --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
+            "$RUNNER_TEMP/nano_ambient12_v4"
+          echo "PASS: full 44+44 Nano R4 compiles from only one .ino"
+
+      - name: Compare complete R4 flash and SRAM against R3
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import subprocess
+          sizes=list(Path.home().glob(".arduino15/packages/arduino/tools/avr-gcc/*/bin/avr-size"))
+          assert sizes, "missing avr-size"
+          def usage(directory):
+              elf=list(Path(directory).rglob("*.elf"))
+              assert len(elf)==1,(directory,elf)
+              result=subprocess.check_output([str(sizes[-1]),"-C","--mcu=atmega328p",str(elf[0])],text=True)
+              print(directory,result)
+              flash=re.search(r"Program:\s*(\d+) bytes",result)
+              globals=re.search(r"Data:\s*(\d+) bytes",result)
+              assert flash and globals,result
+              return int(flash.group(1)),int(globals.group(1))
+          old_f,old_s=usage("build-nano-ambient12-v3")
+          new_f,new_s=usage("build-nano-ambient12-v4")
+          print(f"R3 {old_f} Flash/{old_s} global SRAM; R4 {new_f} Flash/{new_s} global SRAM")
+          assert new_f<=30720,("ATmega328P Nano Flash overflow",new_f)
+          assert new_s<=1360,("Nano global SRAM regression",new_s)
+          assert new_f<=30300,("Nano leaves under 420 bytes program margin",new_f)
+          print("PASS: full Nano R4 size; worst-case runtime stack/power must be tested on hardware")
+          PY
+
       - name: Size profile
         if: always()
         run: |
@@ -277,6 +353,14 @@ jobs:
           echo "--- IDE preview RC1 firmware size ---"
           RC_ELF="$(find "$GITHUB_WORKSPACE/build-nano-ambient-preview-rc1" -name '*.elf' | head -n 1)"
           if [ -n "$RC_ELF" ]; then "$AVR_BIN/avr-size" -C --mcu=atmega328p "$RC_ELF"; fi
+
+      - name: Publish full Nano Ambient12 R4 all-moving HEX
+        uses: actions/upload-artifact@v4
+        with:
+          name: ardu-nano-ambient12-v4-all-moving-rc1
+          path: build-nano-ambient12-v4/*.hex
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Publish complete Nano Ambient12 R3 P11-tune HEX
         uses: actions/upload-artifact@v4
