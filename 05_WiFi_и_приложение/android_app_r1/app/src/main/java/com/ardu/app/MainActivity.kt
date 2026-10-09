@@ -1246,7 +1246,7 @@ class MainActivity : Activity() {
             val off = nightOffInput.text.toString().trim()
             val validTime = Regex("^(?:[01][0-9]|2[0-3]):[0-5][0-9]$")
             if (!validTime.matches(on) || !validTime.matches(off)) {
-                setOperationStatus("Расписание: укажите время ЧЧ:ММ (00:00–23:59)")
+                setOperationStatus("Расписание: укажите время ЧЧ:ММ (00:00–23:59)", important = true)
                 return@setOnClickListener
             }
             runDeviceAction("Время ночника") {
@@ -1268,7 +1268,7 @@ class MainActivity : Activity() {
             val hour = alarmHourInput.text.toString().toIntOrNull()
             val minute = alarmMinuteInput.text.toString().toIntOrNull()
             if (hour == null || minute == null || hour !in 0..23 || minute !in 0..59) {
-                setOperationStatus("Неверное время будильника")
+                setOperationStatus("Неверное время будильника", important = true)
                 return@setOnClickListener
             }
             runDeviceAction("Время будильника") {
@@ -1560,10 +1560,12 @@ class MainActivity : Activity() {
 
         worker.execute {
             var espResponded = false
+            var nanoResponded = false
             try {
                 val ping = if (alreadyOnline) api.pingSelected() else api.ping()
                 espResponded = true
                 val status = api.status()
+                nanoResponded = true
                 // Full state readback only on reconnect or externally changed mode.
                 val snapshot = if (!alreadyOnline || oldMode != status.mode) {
                     readSnapshot()
@@ -1586,7 +1588,9 @@ class MainActivity : Activity() {
                     setConnectionStatus(label, R.color.ardu_accent)
                 }
             } catch (_: Exception) {
-                val health = DeviceConnectionPolicy.classify(espResponded, false)
+                val health = DeviceConnectionPolicy.classify(
+                    espResponded, nanoResponded, settingsAvailable = false
+                )
                 runOnUiThread {
                     heartbeatInFlight = false
                     if (!heartbeatEnabled) return@runOnUiThread
@@ -1594,18 +1598,19 @@ class MainActivity : Activity() {
                         showUnavailableDeviceState()
                         lastConnectionHealth = health
                         setConnectionStatus(
-                            if (health == DeviceConnectionHealth.ESP_ONLY) {
-                                "● Nano не отвечает"
-                            } else {
-                                "● Нет связи"
+                            when (health) {
+                                DeviceConnectionHealth.ESP_ONLY -> "● Nano не отвечает"
+                                DeviceConnectionHealth.SETTINGS_UNAVAILABLE -> "● Ошибка данных"
+                                else -> "● Нет связи"
                             },
                             R.color.ardu_danger
                         )
                         setOperationStatus(
-                            if (health == DeviceConnectionHealth.ESP_ONLY) {
-                                "ESP доступна, Nano не отвечает"
-                            } else {
-                                "Соединение с ARDU потеряно"
+                            when (health) {
+                                DeviceConnectionHealth.ESP_ONLY -> "ESP доступна, Nano не отвечает"
+                                DeviceConnectionHealth.SETTINGS_UNAVAILABLE ->
+                                    "ESP и Nano отвечают, но настройки не прочитаны"
+                                else -> "Соединение с ARDU потеряно"
                             },
                             important = true
                         )
