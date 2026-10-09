@@ -1037,15 +1037,6 @@ void loadPresets(){
      presetCfg.selected>PRESET_COUNT ||
      presetCfg.sum!=presetSum())presetDefaults();
 }
-uint8_t presetTri(uint8_t a){
-  return a<128?static_cast<uint8_t>(a<<1):
-               static_cast<uint8_t>((255U-a)<<1);
-}
-uint8_t presetHash(uint8_t v){
-  v^=static_cast<uint8_t>(v<<3);
-  v^=static_cast<uint8_t>(v>>5);
-  return static_cast<uint8_t>(v*29U);
-}
 // PRESET_MOTION_BEGIN
 // 256 distinct, monotonic Q16 rates: one logical tick per ~128..32 ms.
 // Delta-based integration preserves phase when speed changes, including millis wrap.
@@ -1055,6 +1046,16 @@ uint16_t advancePresetClock(uint32_t elapsedMs,uint8_t dynamics,uint32_t& phaseQ
   return static_cast<uint16_t>(phaseQ16>>16);
 }
 // PRESET_MOTION_END
+uint8_t presetTri(uint8_t a){
+  return a<128?static_cast<uint8_t>(a<<1):
+               static_cast<uint8_t>((255U-a)<<1);
+}
+uint8_t presetHash(uint8_t v){
+  v^=static_cast<uint8_t>(v<<3);
+  v^=static_cast<uint8_t>(v>>5);
+  return static_cast<uint8_t>(v*29U);
+}
+
 // No second RGB buffer, no Arduino String/delay, autonomous at loss of Wi-Fi.
 // Uses local colors and movement for twelve visibly distinct scene types.
 void renderPreset(uint8_t scene,uint16_t t){
