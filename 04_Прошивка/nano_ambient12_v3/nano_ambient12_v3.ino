@@ -1038,7 +1038,7 @@ void loadPresets(){
      presetCfg.sum!=presetSum())presetDefaults();
 }
 // PRESET_MOTION_BEGIN
-// All P scenes preserve R2 speed. Only P11 "Breathing" starts ~20s instead
+// All OTHER P scenes preserve R2 speed. Only P11 "Breathing" starts ~20s instead
 // of ~16s at dynamics=0; both reach the SAME maximum speed as R2.
 // Integer-only monotonic ramp; no jump or phase reset on parameter change.
 uint16_t advancePresetClock(uint32_t elapsedMs,uint8_t dynamics,
@@ -1046,7 +1046,7 @@ uint16_t advancePresetClock(uint32_t elapsedMs,uint8_t dynamics,
   uint16_t rate=static_cast<uint16_t>(512U+static_cast<uint16_t>(dynamics)*6U);
   if(breathing){
     rate-=static_cast<uint16_t>(
-        (static_cast<uint16_t>(255U-dynamics)*3U)>>3);
+        (static_cast<uint16_t>(255U-dynamics)*3U+7U)>>3);
   }
   phaseQ16+=elapsedMs*static_cast<uint32_t>(rate);
   return static_cast<uint16_t>(phaseQ16>>16);
