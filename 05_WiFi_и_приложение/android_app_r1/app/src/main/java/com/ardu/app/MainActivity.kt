@@ -51,6 +51,8 @@ class MainActivity : Activity() {
         }
     }
     private var rendering = false
+    private var showServiceMessages = false
+    private var lastOperationImportant = false
     private var deviceOnline = false
     private lateinit var contentScrollView: ScrollView
     private var latestSettings: ArduSettings? = null
@@ -252,6 +254,7 @@ class MainActivity : Activity() {
     private lateinit var eventsText: TextView
     private lateinit var developerPanel: LinearLayout
     private lateinit var developerToggleButton: Button
+    private lateinit var showServiceMessagesSwitch: Switch
     private lateinit var rawCommandInput: EditText
     private lateinit var rawResponseText: TextView
 
@@ -453,6 +456,7 @@ class MainActivity : Activity() {
         eventsText = findViewById(R.id.eventsText)
         developerPanel = findViewById(R.id.developerPanel)
         developerToggleButton = findViewById(R.id.developerToggleButton)
+        showServiceMessagesSwitch = findViewById(R.id.showServiceMessagesSwitch)
         rawCommandInput = findViewById(R.id.rawCommandInput)
         rawResponseText = findViewById(R.id.rawResponseText)
 
@@ -1308,6 +1312,15 @@ class MainActivity : Activity() {
     }
 
     private fun bindService() {
+        showServiceMessages = preferences().getBoolean(PREF_SHOW_SERVICE_MESSAGES, false)
+        showServiceMessagesSwitch.isChecked = showServiceMessages
+        showServiceMessagesSwitch.setOnCheckedChangeListener { _, show ->
+            showServiceMessages = show
+            preferences().edit().putBoolean(PREF_SHOW_SERVICE_MESSAGES, show).apply()
+            updateServiceMessageVisibility()
+        }
+        updateServiceMessageVisibility()
+
         findViewById<Button>(R.id.openWifiSettingsButton).setOnClickListener {
             val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 Intent(Settings.Panel.ACTION_WIFI)
@@ -1411,13 +1424,34 @@ class MainActivity : Activity() {
             .show()
     }
 
-    private fun setOperationStatus(text: String) {
-        operationText.text = text
-        lightOperationText.text = text
-        musicOperationText.text = text
-        ambientOperationText.text = text
-        nightOperationText.text = text
-        alarmOperationText.text = text
+    private fun setOperationStatus(text: String, important: Boolean = false) {
+        lastOperationImportant = important
+        listOf(
+            operationText, lightOperationText, musicOperationText,
+            ambientOperationText, nightOperationText, alarmOperationText
+        ).forEach { it.text = text }
+        updateServiceMessageVisibility()
+    }
+
+    private fun updateServiceMessageVisibility() {
+        // Connection badges are intentionally not controlled by this preference.
+        val showOperation = (showServiceMessages || lastOperationImportant) &&
+            operationText.text.isNotBlank()
+        listOf(
+            operationText, lightOperationText, musicOperationText,
+            ambientOperationText, nightOperationText, alarmOperationText
+        ).forEach { it.visibility = if (showOperation) View.VISIBLE else View.GONE }
+
+        clapStateText.visibility = if (showServiceMessages) View.VISIBLE else View.GONE
+        // Missing calibration / unsupported preset firmware are actionable warnings.
+        musicCalibrationText.visibility =
+            if (showServiceMessages ||
+                (deviceOnline && latestSettings?.system?.audioCalibrated == false)
+            ) View.VISIBLE else View.GONE
+        ambientPresetCapabilityText.visibility =
+            if (showServiceMessages ||
+                (deviceOnline && latestSettings?.ambientPresets?.supported == false)
+            ) View.VISIBLE else View.GONE
     }
 
     private fun setConnectionStatus(text: String, colorRes: Int) {
@@ -1477,6 +1511,7 @@ class MainActivity : Activity() {
         currentLimitText.text = "Лимит тока: нет данных"
         systemSummaryText.text = "ARDU не подключена"
         stopDawnButton.isEnabled = false
+        updateServiceMessageVisibility()
     }
 
     private fun setDeviceControlsEnabled(online: Boolean) {
@@ -1656,7 +1691,7 @@ class MainActivity : Activity() {
 
     private fun runDeviceAction(label: String, action: () -> Unit) {
         if (!UiSafetyPolicy.canSendCommand(deviceOnline)) {
-            setOperationStatus("Нет связи с ARDU — команда не отправлена")
+            setOperationStatus("Нет связи с ARDU — команда не отправлена", important = true)
             return
         }
         setOperationStatus("$label…")
@@ -1692,6 +1727,7 @@ class MainActivity : Activity() {
         renderNight(snapshot.settings)
         renderAlarm(snapshot)
         renderService(snapshot)
+        updateServiceMessageVisibility()
 
         rendering = false
     }
@@ -1753,7 +1789,9 @@ class MainActivity : Activity() {
         } else {
             musicModeTitle(id) + " • выключено"
         }
-        setChoiceState(musicStartButton, musicActive)
+        // Primary start button has a mint background; mint selected text is illegible.
+        musicStartButton.isSelected = musicActive
+        musicStartButton.setTextColor(getColor(R.color.ardu_on_accent))
         setChoiceState(musicStopButton, !musicActive)
         musicModeButtonMap.forEach { (modeId, tile) ->
             tile.isSelected = snapshot.status.mode == "music" && modeId == id
@@ -2028,7 +2066,7 @@ class MainActivity : Activity() {
 
     private fun showError(label: String, error: Exception) {
         val message = label + ": " + (error.message ?: "ошибка")
-        runOnUiThread { setOperationStatus(message) }
+        runOnUiThread { setOperationStatus(message, important = true) }
         // On a failed write, discard local previews and re-read Nano settings.
         worker.execute {
             try {
@@ -2037,13 +2075,13 @@ class MainActivity : Activity() {
                     deviceOnline = true
                     setDeviceControlsEnabled(true)
                     renderSnapshot(snapshot)
-                    setOperationStatus(message)
+                    setOperationStatus(message, important = true)
                 }
             } catch (_: Exception) {
                 runOnUiThread {
                     showUnavailableDeviceState()
                     setConnectionStatus("● Нет связи", R.color.ardu_danger)
-                    setOperationStatus(message)
+                    setOperationStatus(message, important = true)
                 }
             }
         }
@@ -2060,5 +2098,6 @@ class MainActivity : Activity() {
 
     companion object {
         private const val PREF_ADDRESS = "preferred_address"
+        private const val PREF_SHOW_SERVICE_MESSAGES = "show_service_messages"
     }
 }
