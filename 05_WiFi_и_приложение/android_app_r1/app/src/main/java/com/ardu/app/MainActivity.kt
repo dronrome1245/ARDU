@@ -8,12 +8,14 @@ import android.os.Bundle
 import android.graphics.Color
 import android.provider.Settings
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
+import android.widget.ScrollView
 import android.widget.Switch
 import android.widget.TextView
 import com.ardu.app.net.ArduApiClient
@@ -35,6 +37,8 @@ class MainActivity : Activity() {
     private val api = ArduApiClient()
     private val worker = Executors.newSingleThreadExecutor()
     private var rendering = false
+    private var deviceOnline = false
+    private lateinit var contentScrollView: ScrollView
     private var latestSettings: ArduSettings? = null
     private var latestMode: String? = null
     private var sectionNavigation: List<Pair<ImageButton, LinearLayout>> = emptyList()
@@ -102,6 +106,8 @@ class MainActivity : Activity() {
     private lateinit var musicServiceButton: Button
     private lateinit var musicModeText: TextView
     private lateinit var musicModeButtons: LinearLayout
+    private lateinit var musicStartButton: Button
+    private lateinit var musicStopButton: Button
     private lateinit var musicBrightnessText: TextView
     private lateinit var musicBrightnessSeek: SmartSliderView
     private lateinit var musicBackgroundText: TextView
@@ -209,6 +215,7 @@ class MainActivity : Activity() {
     private lateinit var alarmRefreshButton: Button
     private lateinit var alarmServiceButton: Button
     private lateinit var alarmStateText: TextView
+    private lateinit var stopDawnButton: Button
     private lateinit var alarmRtcText: TextView
     private lateinit var alarmStartPreview: View
     private lateinit var alarmEndPreview: View
@@ -246,6 +253,7 @@ class MainActivity : Activity() {
         bindNight()
         bindAlarm()
         bindService()
+        showUnavailableDeviceState()
 
         val savedAddress = preferences().getString(PREF_ADDRESS, null)
         if (!savedAddress.isNullOrBlank()) {
@@ -263,6 +271,7 @@ class MainActivity : Activity() {
     }
 
     private fun bindViews() {
+        contentScrollView = findViewById(R.id.contentScrollView)
         globalHeaderPanel = findViewById(R.id.globalHeaderPanel)
         connectionText = findViewById(R.id.connectionText)
         modeText = findViewById(R.id.modeText)
@@ -318,6 +327,8 @@ class MainActivity : Activity() {
         musicServiceButton = findViewById(R.id.musicServiceButton)
         musicModeText = findViewById(R.id.musicModeText)
         musicModeButtons = findViewById(R.id.musicModeButtons)
+        musicStartButton = findViewById(R.id.musicStartButton)
+        musicStopButton = findViewById(R.id.musicStopButton)
         musicBrightnessText = findViewById(R.id.musicBrightnessText)
         musicBrightnessSeek = findViewById(R.id.musicBrightnessSeek)
         musicBackgroundText = findViewById(R.id.musicBackgroundText)
@@ -390,6 +401,7 @@ class MainActivity : Activity() {
         alarmRefreshButton = findViewById(R.id.alarmRefreshButton)
         alarmServiceButton = findViewById(R.id.alarmServiceButton)
         alarmStateText = findViewById(R.id.alarmStateText)
+        stopDawnButton = findViewById(R.id.stopDawnButton)
         alarmRtcText = findViewById(R.id.alarmRtcText)
         alarmStartPreview = findViewById(R.id.alarmStartPreview)
         alarmEndPreview = findViewById(R.id.alarmEndPreview)
@@ -436,7 +448,7 @@ class MainActivity : Activity() {
             else -> null
         }
 
-        if (targetMode == null || latestMode == targetMode) return
+        if (targetMode == null || !deviceOnline || latestMode == targetMode) return
 
         setOperationStatus(
             when (target) {
@@ -531,6 +543,8 @@ class MainActivity : Activity() {
         sectionLabels.forEach { (label, panel) ->
             label.isSelected = panel === target
         }
+        // Each tab opens at its top, not at the prior tab's scroll offset.
+        contentScrollView.scrollTo(0, 0)
     }
 
     private fun bindLight() {
@@ -816,6 +830,12 @@ class MainActivity : Activity() {
     private fun bindMusic() {
         musicRefreshButton.setOnClickListener { refreshDevice() }
         musicServiceButton.setOnClickListener { openService() }
+        musicStartButton.setOnClickListener {
+            runDeviceAction("Запуск светомузыки") { api.setMode("music") }
+        }
+        musicStopButton.setOnClickListener {
+            runDeviceAction("Остановка светомузыки") { api.setMode("off") }
+        }
 
         val names = mapOf(
             "M01" to "Градиент",
@@ -1240,7 +1260,7 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.syncTimeButton).setOnClickListener {
             runDeviceAction("Синхронизация RTC") { api.syncTime() }
         }
-        findViewById<Button>(R.id.stopDawnButton).setOnClickListener {
+        stopDawnButton.setOnClickListener {
             runDeviceAction("Остановка рассвета") { api.stopDawn() }
         }
     }
