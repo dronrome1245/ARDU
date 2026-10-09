@@ -1083,7 +1083,7 @@ void renderPreset(uint8_t scene,uint16_t t){
       case 1: // P02 Bali: stable sunset palette, moving golden light
         h=i<25?static_cast<uint8_t>(10U+i/2U):
                   static_cast<uint8_t>(224U+(i-25U)/2U);
-        v=static_cast<uint8_t>(120U+(w>>2));
+        v=static_cast<uint8_t>(100U+(w>>1));
         break;
       case 2: // P03 ocean: rolling blue/cyan wave fronts
         h=static_cast<uint8_t>(151U-(w>>3));
@@ -1095,25 +1095,25 @@ void renderPreset(uint8_t scene,uint16_t t){
         if(seed<47U){
           h=static_cast<uint8_t>(148U+(seed>>2));sa=75;
           v=static_cast<uint8_t>(12U+
-             (presetTri(static_cast<uint8_t>((phase<<2)+seed*5U))>>1));
+             (presetTri(static_cast<uint8_t>(phase*3U+seed*5U))>>1));
         }
         break;
       }
       case 4: { // P05 fireplace: irregular orange flame flicker
         const uint8_t flick=presetTri(static_cast<uint8_t>(
-            (phase<<2)+presetHash(static_cast<uint8_t>(i*37U))));
+            phase*3U+presetHash(static_cast<uint8_t>(i*37U))));
         h=static_cast<uint8_t>(4U+(flick>>4));
         sa=250;v=static_cast<uint8_t>(50U+(flick>>1));
         break;
       }
       case 5: { // P06 candles: softer golden flicker
         const uint8_t flick=presetTri(static_cast<uint8_t>(
-            (phase<<1)+presetHash(static_cast<uint8_t>(i*11U))));
+            phase*3U+presetHash(static_cast<uint8_t>(i*11U))));
         h=19;sa=225;v=static_cast<uint8_t>(105U+(flick>>2));
         break;
       }
       case 6: // P07 moonlight: drifting shadows, muted icy blue
-        h=150;sa=48;v=static_cast<uint8_t>(105U+(w>>2));
+        h=150;sa=48;v=static_cast<uint8_t>(65U+(w>>1));
         break;
       case 7: // P08 forest: moving leaf shade and warm dappled sun
         h=static_cast<uint8_t>(84U+(w>>3));
