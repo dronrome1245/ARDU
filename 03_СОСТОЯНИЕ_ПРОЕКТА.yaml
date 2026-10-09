@@ -3058,3 +3058,18 @@ android_v0_22_9_2026_10_09:
   nano_dynamics_continuous_fix_done: false
   hardware_firmware_modified: false
   next: owner_pull_run_foreground_power_cycle_then_separate_nano_speed_candidate
+
+# 2026-10-09: owner confirms Android 0.22.9 live connectivity states
+android_0229_owner_phone_gate_2026_10_09:
+  app_version: "0.22.9-keepalive-diagnostics-rc1"
+  auto_online_offline_owner_reported_pass: true
+  owner_video: "18429670918804.mp4"
+  video_duration_approx_seconds: 63
+  video_includes_disconnection_moment: false
+  disconnection_latency_measured: false
+  video_light_music_ui_seen: true
+  music_start_text_visible: true
+  service_message_toggle_owner_verified: false
+  led_effects_physically_reviewed_from_video: false
+  firmware_modified_for_video: false
+  next: nano_continuous_dynamics_source_compile_gate
