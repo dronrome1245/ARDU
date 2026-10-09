@@ -3031,3 +3031,30 @@ android_ux_2026_10_09:
   nano_esp_firmware_modified: false
   actual_phone_test_v0_22_8_pass: false
   next: owner_git_pull_run_test_offline_then_connected
+
+# 2026-10-09: foreground heartbeat / optional service captions
+android_v0_22_9_2026_10_09:
+  version_code: 32
+  version_name: "0.22.9-keepalive-diagnostics-rc1"
+  decision: D-113
+  current_phase: android_source_ci_pass_owner_phone_pending
+  ci: "https://github.com/dronrome1245/ARDU/actions/runs/37958078703"
+  foreground_ping_seconds: 5
+  nano_status_checked_independently: true
+  lifecycle_on_stop_cancels_poll: true
+  auto_recovers_snapshot_after_reconnect: true
+  optional_work_messages_in_settings: true
+  work_messages_visible_by_default: false
+  errors_connection_badge_remain_visible: true
+  music_start_text_contrast_fixed: true
+  uploaded_videos_identical: true
+  owner_video_esp_fw: ARDU_ESP_V2_AMBIENT12
+  owner_video_nano_fw: ARDU_V2
+  owner_video_12_presets_present: true
+  reported_configured_current_limit_ma: 4500
+  measured_current_ma: null
+  led_animation_physically_reviewed: false
+  nano_dynamics_speed_three_steps_source_fact: true
+  nano_dynamics_continuous_fix_done: false
+  hardware_firmware_modified: false
+  next: owner_pull_run_foreground_power_cycle_then_separate_nano_speed_candidate

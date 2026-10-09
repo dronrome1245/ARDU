@@ -1127,3 +1127,9 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 
 - Владелец 2026-10-09 подтвердил, что 12 фото-пресетов загружены в Android, и прикрепил видео `SVID_20261009_092631_1.mp4` в текущем чате. На записи «Нет связи», лента не подключена. Источник — **реальное визуальное представление телефона, не доказательство действительного переключения устройства**.
 - Source fixes: `05_WiFi_и_приложение/android_app_r1` Android v0.22.8, D-112; [Android CI source/tests/APK](https://github.com/dronrome1245/ARDU/actions/runs/37930295301). Устройство ESP/Nano/лента этим CI не проверяются.
+
+## S-ARDU-2026-10-09-RC1 — owner v0.22.8 video + source speed diagnosis
+
+- User uploads in current chat `18428313537172 (4).mp4` / `18428313537172 (3).mp4`: verified byte-identical, both SHA256 `c7847fcdead3cc4dc3ec14da6050ce0dbbc525341b095adde63d6c9e12c9ae67`; 4:28,82 screen capture, 578×1280. Device display `Online`, ESP `ARDU_ESP_V2_AMBIENT12`, Nano `ARDU_V2`; app presents 12 P cards and reads settings, including 4500 mA current limit. This is a phone/UI evidence source, not physical LED/current measurement.
+- Source `04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino` `renderPreset`: dynamics maps into three exact branches `>170`, `<70`, else; sampled 182,190,225 are indistinguishable in output speed. Hardware behavior only reported by user; firmware not modified in Android RC.
+- [Android 0.22.9 CI verified](https://github.com/dronrome1245/ARDU/actions/runs/37958078703) checks foreground keepalive/test, service text toggle source, Kotlin/JVM tests and APK. Physical disconnect/reconnect test still pending.

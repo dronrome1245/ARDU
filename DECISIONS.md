@@ -1959,3 +1959,13 @@ R3 не прошивался и не тестировался на железе.
 **РЕШЕНИЕ:** сделать Android-only, без новых UART/API/FW: до подтверждённого readback показывать «—» и блокировать команды (но оставить переходы между вкладками/настройки Wi-Fi); после failed-write перечитывать Nano или инвалидировать состояние; новый раздел начинать в начале ScrollView; атмосферные сцены сразу после hero, ручной F01 и его контролы ниже; отдельные Music start/stop; night switch + HH:MM validation, stop dawn только RUNNING/HOLD, отдельно подтверждать limit >3000; встроенный clap wizard не должен показывать подтверждённое сохранение до ответа устройства.
 
 Версия Android `0.22.8-ux-readback-rc1`, code 31. [Android Verify](https://github.com/dronrome1245/ARDU/actions/runs/37930295301); owner hardware readback, visuals after correction и лента ожидаются. **Сохранены:** D-109 функциональные 12 сцен и F01, D-111 approved assets, безопасная архитектура.
+
+## D-113 — Android foreground heartbeat, switchable work messages; three-level Nano dynamics is a separate defect
+
+**Дата:** 2026-10-09. **Статус:** Android source реализован / CI PASS; физическая приёмка владельца ожидается.
+
+**ФАКТ из Android 0.22.8:** после успешного ручного/начального чтения приложение не опрашивает устройство периодически; зелёный `Онлайн` может остаться при полном отключении ARDU. Рабочие строки «…готово», `DC/VU/Spectrum`, текущие пороги и строки доступности сцен видимы постоянно. В музыке цвет надписи `Запустить` для активной primary-кнопки сливается с фоном. Владелец просит регулярный статус и скрываемые, но не удаляемые служебные надписи.
+
+**РЕШЕНИЕ:** Android-only 0.22.9/code32: foreground interval 5 с, ограниченный текущим ESP `pingSelected()` + Nano-backed `GET /api/status`; различать offline/ESP-only/Nano+ESP/неполные настройки, восстанавливать полный snapshot при reconnect, stop callbacks при `onStop`; действия при отсутствии Nano запрещать. Служебные сообщения хранятся и переключаются через `SharedPreferences`/общие Настройки (default OFF), но connection/status/errors и предупреждения остаются. Исправить цвет текста primary Music Start. Не менять действующие Nano/ESP firmware/API по этим Android-правкам. [Android CI PASS](https://github.com/dronrome1245/ARDU/actions/runs/37958078703); owner phone test pending.
+
+**ОТДЕЛЬНАЯ ФАКТИЧЕСКАЯ ПРОБЛЕМА Nano:** `renderPreset` из нового полного `nano_ambient12_v1.ino` переводит `dynamics` в 3 скорости; непрерывная настройка не реализована. Не перепрошивать вслепую; следующая отдельная source/size/hardware итерация с монотонной скоростью и оценкой поведения статичных P-сцен. Не объявлять такой firmware patch выполненным.

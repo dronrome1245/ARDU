@@ -2189,6 +2189,31 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <LinearLayout
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        style="@style/ARDU.CardTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Отображение" />
+                    <Switch
+                        android:id="@+id/showServiceMessagesSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Показывать служебные сообщения"
+                        android:textColor="@color/ardu_text" />
+                    <TextView
+                        style="@style/ARDU.Muted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Скрывает сообщения о выполнении команд и технические показатели на основных страницах. Ошибки и статус связи остаются видимыми." />
+                </LinearLayout>
+
                 <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                     <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Подключение" />
                     <TextView style="@style/ARDU.Muted" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Последний рабочий адрес сохраняется на телефоне" />

@@ -5,6 +5,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.graphics.Color
 import android.provider.Settings
 import android.view.View
@@ -36,7 +38,21 @@ import java.util.concurrent.Executors
 class MainActivity : Activity() {
     private val api = ArduApiClient()
     private val worker = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var heartbeatEnabled = false
+    private var heartbeatInFlight = false
+    private var refreshInProgress = false
+    private var lastConnectionHealth = DeviceConnectionHealth.DISCONNECTED
+    private val heartbeatRunnable = object : Runnable {
+        override fun run() {
+            if (!heartbeatEnabled) return
+            checkDeviceHeartbeat()
+            mainHandler.postDelayed(this, DeviceConnectionPolicy.HEARTBEAT_PERIOD_MS)
+        }
+    }
     private var rendering = false
+    private var showServiceMessages = false
+    private var lastOperationImportant = false
     private var deviceOnline = false
     private lateinit var contentScrollView: ScrollView
     private var latestSettings: ArduSettings? = null
@@ -238,6 +254,7 @@ class MainActivity : Activity() {
     private lateinit var eventsText: TextView
     private lateinit var developerPanel: LinearLayout
     private lateinit var developerToggleButton: Button
+    private lateinit var showServiceMessagesSwitch: Switch
     private lateinit var rawCommandInput: EditText
     private lateinit var rawResponseText: TextView
 
@@ -265,7 +282,22 @@ class MainActivity : Activity() {
         refreshDevice()
     }
 
+    override fun onStart() {
+        super.onStart()
+        heartbeatEnabled = true
+        mainHandler.removeCallbacks(heartbeatRunnable)
+        mainHandler.post(heartbeatRunnable)
+    }
+
+    override fun onStop() {
+        heartbeatEnabled = false
+        mainHandler.removeCallbacks(heartbeatRunnable)
+        super.onStop()
+    }
+
     override fun onDestroy() {
+        heartbeatEnabled = false
+        mainHandler.removeCallbacks(heartbeatRunnable)
         worker.shutdownNow()
         super.onDestroy()
     }
@@ -424,6 +456,7 @@ class MainActivity : Activity() {
         eventsText = findViewById(R.id.eventsText)
         developerPanel = findViewById(R.id.developerPanel)
         developerToggleButton = findViewById(R.id.developerToggleButton)
+        showServiceMessagesSwitch = findViewById(R.id.showServiceMessagesSwitch)
         rawCommandInput = findViewById(R.id.rawCommandInput)
         rawResponseText = findViewById(R.id.rawResponseText)
 
@@ -1213,7 +1246,7 @@ class MainActivity : Activity() {
             val off = nightOffInput.text.toString().trim()
             val validTime = Regex("^(?:[01][0-9]|2[0-3]):[0-5][0-9]$")
             if (!validTime.matches(on) || !validTime.matches(off)) {
-                setOperationStatus("Расписание: укажите время ЧЧ:ММ (00:00–23:59)")
+                setOperationStatus("Расписание: укажите время ЧЧ:ММ (00:00–23:59)", important = true)
                 return@setOnClickListener
             }
             runDeviceAction("Время ночника") {
@@ -1235,7 +1268,7 @@ class MainActivity : Activity() {
             val hour = alarmHourInput.text.toString().toIntOrNull()
             val minute = alarmMinuteInput.text.toString().toIntOrNull()
             if (hour == null || minute == null || hour !in 0..23 || minute !in 0..59) {
-                setOperationStatus("Неверное время будильника")
+                setOperationStatus("Неверное время будильника", important = true)
                 return@setOnClickListener
             }
             runDeviceAction("Время будильника") {
@@ -1279,6 +1312,15 @@ class MainActivity : Activity() {
     }
 
     private fun bindService() {
+        showServiceMessages = preferences().getBoolean(PREF_SHOW_SERVICE_MESSAGES, false)
+        showServiceMessagesSwitch.isChecked = showServiceMessages
+        showServiceMessagesSwitch.setOnCheckedChangeListener { _, show ->
+            showServiceMessages = show
+            preferences().edit().putBoolean(PREF_SHOW_SERVICE_MESSAGES, show).apply()
+            updateServiceMessageVisibility()
+        }
+        updateServiceMessageVisibility()
+
         findViewById<Button>(R.id.openWifiSettingsButton).setOnClickListener {
             val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 Intent(Settings.Panel.ACTION_WIFI)
@@ -1382,13 +1424,34 @@ class MainActivity : Activity() {
             .show()
     }
 
-    private fun setOperationStatus(text: String) {
-        operationText.text = text
-        lightOperationText.text = text
-        musicOperationText.text = text
-        ambientOperationText.text = text
-        nightOperationText.text = text
-        alarmOperationText.text = text
+    private fun setOperationStatus(text: String, important: Boolean = false) {
+        lastOperationImportant = important
+        listOf(
+            operationText, lightOperationText, musicOperationText,
+            ambientOperationText, nightOperationText, alarmOperationText
+        ).forEach { it.text = text }
+        updateServiceMessageVisibility()
+    }
+
+    private fun updateServiceMessageVisibility() {
+        // Connection badges are intentionally not controlled by this preference.
+        val showOperation = (showServiceMessages || lastOperationImportant) &&
+            operationText.text.isNotBlank()
+        listOf(
+            operationText, lightOperationText, musicOperationText,
+            ambientOperationText, nightOperationText, alarmOperationText
+        ).forEach { it.visibility = if (showOperation) View.VISIBLE else View.GONE }
+
+        clapStateText.visibility = if (showServiceMessages) View.VISIBLE else View.GONE
+        // Missing calibration / unsupported preset firmware are actionable warnings.
+        musicCalibrationText.visibility =
+            if (showServiceMessages ||
+                (deviceOnline && latestSettings?.system?.audioCalibrated == false)
+            ) View.VISIBLE else View.GONE
+        ambientPresetCapabilityText.visibility =
+            if (showServiceMessages ||
+                (deviceOnline && latestSettings?.ambientPresets?.supported == false)
+            ) View.VISIBLE else View.GONE
     }
 
     private fun setConnectionStatus(text: String, colorRes: Int) {
@@ -1448,6 +1511,7 @@ class MainActivity : Activity() {
         currentLimitText.text = "Лимит тока: нет данных"
         systemSummaryText.text = "ARDU не подключена"
         stopDawnButton.isEnabled = false
+        updateServiceMessageVisibility()
     }
 
     private fun setDeviceControlsEnabled(online: Boolean) {
@@ -1483,7 +1547,82 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.sendRawButton).isEnabled = online
     }
 
+    /**
+     * Checks the gateway AND actual Nano UART status while UI is foreground.
+     * A light GET never changes active light modes or saved settings.
+     * Single executor serializes these probes after any pending user write.
+     */
+    private fun checkDeviceHeartbeat() {
+        if (heartbeatInFlight || refreshInProgress) return
+        heartbeatInFlight = true
+        val alreadyOnline = deviceOnline
+        val oldMode = latestMode
+
+        worker.execute {
+            var espResponded = false
+            var nanoResponded = false
+            try {
+                val ping = if (alreadyOnline) api.pingSelected() else api.ping()
+                espResponded = true
+                val status = api.status()
+                nanoResponded = true
+                // Full state readback only on reconnect or externally changed mode.
+                val snapshot = if (!alreadyOnline || oldMode != status.mode) {
+                    readSnapshot()
+                } else null
+                runOnUiThread {
+                    heartbeatInFlight = false
+                    if (!heartbeatEnabled) return@runOnUiThread
+                    lastConnectionHealth = DeviceConnectionHealth.ONLINE
+                    lastEspFirmware = ping.firmware
+                    lastEspRssi = ping.rssi
+                    lastNetworkMode = ping.networkMode
+                    if (!deviceOnline) {
+                        deviceOnline = true
+                        setDeviceControlsEnabled(true)
+                    }
+                    snapshot?.let(::renderSnapshot)
+                    val label = if (ping.networkMode == "softap") {
+                        "● Прямое подключение"
+                    } else "● Онлайн"
+                    setConnectionStatus(label, R.color.ardu_accent)
+                }
+            } catch (_: Exception) {
+                val health = DeviceConnectionPolicy.classify(
+                    espResponded, nanoResponded, settingsAvailable = false
+                )
+                runOnUiThread {
+                    heartbeatInFlight = false
+                    if (!heartbeatEnabled) return@runOnUiThread
+                    if (deviceOnline || lastConnectionHealth != health) {
+                        showUnavailableDeviceState()
+                        lastConnectionHealth = health
+                        setConnectionStatus(
+                            when (health) {
+                                DeviceConnectionHealth.ESP_ONLY -> "● Nano не отвечает"
+                                DeviceConnectionHealth.SETTINGS_UNAVAILABLE -> "● Ошибка данных"
+                                else -> "● Нет связи"
+                            },
+                            R.color.ardu_danger
+                        )
+                        setOperationStatus(
+                            when (health) {
+                                DeviceConnectionHealth.ESP_ONLY -> "ESP доступна, Nano не отвечает"
+                                DeviceConnectionHealth.SETTINGS_UNAVAILABLE ->
+                                    "ESP и Nano отвечают, но настройки не прочитаны"
+                                else -> "Соединение с ARDU потеряно"
+                            },
+                            important = true
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     private fun refreshDevice() {
+        if (refreshInProgress) return
+        refreshInProgress = true
         setConnectionStatus("Проверка…", R.color.ardu_text_secondary)
         refreshButton.isEnabled = false
         lightRefreshButton.isEnabled = false
@@ -1494,8 +1633,10 @@ class MainActivity : Activity() {
         setOperationStatus("")
 
         worker.execute {
+            var espResponded = false
             try {
                 val ping = api.ping()
+                espResponded = true
                 lastEspFirmware = ping.firmware
                 lastEspRssi = ping.rssi
                 lastNetworkMode = ping.networkMode
@@ -1510,6 +1651,8 @@ class MainActivity : Activity() {
                     val connectionLabel =
                         if (ping.networkMode == "softap") "● Прямое подключение"
                         else "● Онлайн"
+                    refreshInProgress = false
+                    lastConnectionHealth = DeviceConnectionHealth.ONLINE
                     deviceOnline = true
                     setDeviceControlsEnabled(true)
                     setConnectionStatus(connectionLabel, R.color.ardu_accent)
@@ -1525,10 +1668,18 @@ class MainActivity : Activity() {
                     alarmRefreshButton.isEnabled = true
                 }
             } catch (error: Exception) {
+                val health = DeviceConnectionPolicy.classify(espResponded, false)
                 runOnUiThread {
+                    refreshInProgress = false
                     showUnavailableDeviceState()
-                    setConnectionStatus("● Нет связи", R.color.ardu_danger)
-                    setOperationStatus(error.message ?: "Ошибка подключения")
+                    lastConnectionHealth = health
+                    setConnectionStatus(
+                        if (health == DeviceConnectionHealth.ESP_ONLY) {
+                            "● Nano не отвечает"
+                        } else "● Нет связи",
+                        R.color.ardu_danger
+                    )
+                    setOperationStatus(error.message ?: "Ошибка подключения", important = true)
                     refreshButton.isEnabled = true
                     lightRefreshButton.isEnabled = true
                     musicRefreshButton.isEnabled = true
@@ -1545,7 +1696,7 @@ class MainActivity : Activity() {
 
     private fun runDeviceAction(label: String, action: () -> Unit) {
         if (!UiSafetyPolicy.canSendCommand(deviceOnline)) {
-            setOperationStatus("Нет связи с ARDU — команда не отправлена")
+            setOperationStatus("Нет связи с ARDU — команда не отправлена", important = true)
             return
         }
         setOperationStatus("$label…")
@@ -1581,6 +1732,7 @@ class MainActivity : Activity() {
         renderNight(snapshot.settings)
         renderAlarm(snapshot)
         renderService(snapshot)
+        updateServiceMessageVisibility()
 
         rendering = false
     }
@@ -1642,7 +1794,9 @@ class MainActivity : Activity() {
         } else {
             musicModeTitle(id) + " • выключено"
         }
-        setChoiceState(musicStartButton, musicActive)
+        // Primary start button has a mint background; mint selected text is illegible.
+        musicStartButton.isSelected = musicActive
+        musicStartButton.setTextColor(getColor(R.color.ardu_on_accent))
         setChoiceState(musicStopButton, !musicActive)
         musicModeButtonMap.forEach { (modeId, tile) ->
             tile.isSelected = snapshot.status.mode == "music" && modeId == id
@@ -1917,7 +2071,7 @@ class MainActivity : Activity() {
 
     private fun showError(label: String, error: Exception) {
         val message = label + ": " + (error.message ?: "ошибка")
-        runOnUiThread { setOperationStatus(message) }
+        runOnUiThread { setOperationStatus(message, important = true) }
         // On a failed write, discard local previews and re-read Nano settings.
         worker.execute {
             try {
@@ -1926,13 +2080,13 @@ class MainActivity : Activity() {
                     deviceOnline = true
                     setDeviceControlsEnabled(true)
                     renderSnapshot(snapshot)
-                    setOperationStatus(message)
+                    setOperationStatus(message, important = true)
                 }
             } catch (_: Exception) {
                 runOnUiThread {
                     showUnavailableDeviceState()
                     setConnectionStatus("● Нет связи", R.color.ardu_danger)
-                    setOperationStatus(message)
+                    setOperationStatus(message, important = true)
                 }
             }
         }
@@ -1949,5 +2103,6 @@ class MainActivity : Activity() {
 
     companion object {
         private const val PREF_ADDRESS = "preferred_address"
+        private const val PREF_SHOW_SERVICE_MESSAGES = "show_service_messages"
     }
 }
