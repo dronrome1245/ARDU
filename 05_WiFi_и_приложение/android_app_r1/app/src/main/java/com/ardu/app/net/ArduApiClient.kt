@@ -50,6 +50,20 @@ class ArduApiClient {
         throw IOException("ARDU не найден в домашней сети или ARDU-DIRECT", lastError)
     }
 
+    /**
+     * Lightweight liveness probe restricted to the active ESP address.
+     * Avoids searching all fallback hosts on each five-second foreground tick.
+     */
+    fun pingSelected(): PingResponse {
+        val url = selectedBaseUrl ?: preferredBaseUrl
+            ?: throw IOException("Адрес ARDU ещё не определён")
+        val response = parsePing(getJson(url, "/api/ping"))
+        if (response.device != "ARDU-ESP8266" || response.uartProtocol != 1) {
+            throw IOException("Ответ получен не от совместимого ARDU")
+        }
+        return response
+    }
+
     fun status(): DeviceStatus =
         parseStatus(getJson(requireBaseUrl(), "/api/status"))
 
