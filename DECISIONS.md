@@ -1979,3 +1979,15 @@ R3 не прошивался и не тестировался на железе.
 **ФАКТ ПО CI:** [Arduino Verify PASS](https://github.com/dronrome1245/ARDU/actions/runs/37966945125): 44-LED exact-source 12-renderer host test, все 256 скоростей, 182<190<225, rollover, плавная смена скорости; компиляция Arduino Nano ATmega328P Old Bootloader; **29336/30720 Flash, 1286/2048 globals SRAM** против 29306/1282 в R1, +30B Flash/+4B SRAM. EEPROM/Flash/число LED сохранены. Soft 95% Flash target 29184 превышен на 152B; worst-case runtime stack, физическое LED движение и силовой тест ещё НЕ подтверждены. Новый скомпилированный HEX `ardu-nano-ambient12-v2-velocity-rc2`, rollback HEX/скетч прежнего R1 в CI. Протокол и аппаратная архитектура не пересмотрены.
 
 **ПРИЁМКА:** только после безопасного USB R2 Upload и реального 44-LED теста согласно `04_Прошивка/AMBIENT12_SPEED_R2_TEST.md`; до этого говорить лишь «исправлено в source», не «исправлено на лампе». 
+
+## D-115 — Минимально медленнее P11 «Дыхание» при dynamics=0, без влияния на другие сцены
+
+**Дата:** 2026-10-09. **Статус:** отдельный Nano R3 source и CI PASS; физический тест R3 ожидается.
+
+**ФАКТ ПО ОБРАТНОЙ СВЯЗИ:** после Nano Ambient12 R2 владелец сообщил: «дыхание классно получилось. на нуле еще чуть чуть можно замедлить». Точная длительность на железе и boot-релиз не измерены — не интерпретировать отзыв как общий hardware PASS.
+
+**РЕШЕНИЕ:** не изменять работающий полный `nano_ambient12_v2`, а создать самостоятельную полную `nano_ambient12_v3/nano_ambient12_v3.ino`, boot `ARDU1 4`. В существующей 40-мс интеграции фазы Q16 применять только при P11 дополнительное снижение скорости `ceil(3*(255-dynamics)/8)` от прежнего Q16 rate `512 + 6*dynamics`: при 0 rate 416 (цикл ~20,2 с против 16,4), при 128 rate 1232 (~6,8 с), при 255 rate 2042 и прежние ~4,1 с. Для 0..254 P11 всегда немного медленнее R2, строго монотонен и без сброса фазы; 11 прочих эффектов сохраняют прежнее время и пиксельные функции. Сохраняются EEPROM layout, UART/API/ESP/Android, 44-LED зеркальный буфер, текущие настройки, лимит и алгоритмы остальных режимов.
+
+**ФАКТ CI:** [Arduino Verify https://github.com/dronrome1245/ARDU/actions/runs/37971273171](https://github.com/dronrome1245/ARDU/actions/runs/37971273171) PASS; exact-source 44-LED тест, R2 pixel renderers идентичны R3, все 256 скоростей, rollover, сборка полной Nano Old Bootloader, HEX `ardu-nano-ambient12-v3-breathing-slower-rc1`. Память R2 29336/1286 → R3 29376 Flash/1286 globals SRAM (+40B/+0B), 1344 байта Flash и 762 SRAM до абсолютных пределов компилятора; мягкий 95%-ориентир Flash превышен на 192B и runtime stack не измерен.
+
+**ПРИЁМКА:** на одной проверенной 44-LED ленте, безопасный Nano USB upload/ESP UART reconnect + P11 0/128/255, rollback к R2. `04_Прошивка/AMBIENT12_BREATHING_R3_TEST.md`. Реальное свечение на R3 не заявлять как проверенное до отчёта владельца.
