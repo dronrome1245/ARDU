@@ -3009,3 +3009,25 @@ android_ambient12_images_2026_10_08:
   nano_firmware_modified_for_images: false
   esp_firmware_modified_for_images: false
   next: git_pull_android_studio_run_owner_visual_smoke
+
+# 2026-10-09: Android UX corrections after first twelve-photo phone walkthrough
+android_ux_2026_10_09:
+  decision: D-112
+  version_code: 31
+  version_name: "0.22.8-ux-readback-rc1"
+  ci_run: "https://github.com/dronrome1245/ARDU/actions/runs/37930295301"
+  owner_all_twelve_photo_tiles_rendered: true
+  video_esp_connected: false
+  video_led_strip_connected: false
+  source_offline_command_guard: true
+  source_unconfirmed_state_placeholder: true
+  source_failed_write_readback: true
+  source_scroll_reset_each_tab: true
+  source_ambient_grid_first: true
+  source_manual_f01_retained: true
+  source_explicit_music_start_stop: true
+  source_night_alarm_clap_readback: true
+  current_limit_above_3000_requires_confirmation: true
+  nano_esp_firmware_modified: false
+  actual_phone_test_v0_22_8_pass: false
+  next: owner_git_pull_run_test_offline_then_connected
