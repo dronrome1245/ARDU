@@ -1133,3 +1133,9 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - User uploads in current chat `18428313537172 (4).mp4` / `18428313537172 (3).mp4`: verified byte-identical, both SHA256 `c7847fcdead3cc4dc3ec14da6050ce0dbbc525341b095adde63d6c9e12c9ae67`; 4:28,82 screen capture, 578×1280. Device display `Online`, ESP `ARDU_ESP_V2_AMBIENT12`, Nano `ARDU_V2`; app presents 12 P cards and reads settings, including 4500 mA current limit. This is a phone/UI evidence source, not physical LED/current measurement.
 - Source `04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino` `renderPreset`: dynamics maps into three exact branches `>170`, `<70`, else; sampled 182,190,225 are indistinguishable in output speed. Hardware behavior only reported by user; firmware not modified in Android RC.
 - [Android 0.22.9 CI verified](https://github.com/dronrome1245/ARDU/actions/runs/37958078703) checks foreground keepalive/test, service text toggle source, Kotlin/JVM tests and APK. Physical disconnect/reconnect test still pending.
+
+## S-ARDU-2026-10-09-0229 — owner 0.22.9 phone video and Online/Offline result
+
+- Видео владельца `18429670918804.mp4`, файл в переписке 2026-10-09, SHA256 `e98a017f109a29e4c129b5988f36352cdc78277e11418a4898a36f049d7656a6`, примерно 62.98 с, 578×1280. На записи показаны UI «Свет»/«Музыка», состояние «Онлайн», смена быстрых сцен и музыкальных режимов, контрастный текст кнопки запуска.
+- Отдельное сообщение владельца: «онлайн офлайн работает» — источник подтверждения фактического автоматического изменения статуса в 0.22.9. В самом видео power-off-переход не показан; точная задержка и независимая проверка не измерены.
+- [Android `main` CI PASS](https://github.com/dronrome1245/ARDU/actions/runs/37958705334) для `fb2b9144`; реальная электрическая приёмка двух колец/12 сцен этим не подтверждена.
