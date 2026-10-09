@@ -98,6 +98,12 @@ int main(){
                    scene+1,changed,(unsigned long)distance);
       return 1;
     }
+    // Fine-grained regression for scenes that formerly looked frozen at
+    // ordinary light levels. Differences are summed across 44 HSV pixels.
+    if((scene==1U || scene==6U) && distance<350U){
+      std::fprintf(stderr,"P%02u sunset/moonlight contrast too weak at minimum\n",scene+1);
+      return 4;
+    }
     renderPreset(scene,fast);
     const unsigned highChanged=changedPixels(first);
     const uint32_t highDelta=frameDistance(first);
@@ -105,6 +111,14 @@ int main(){
       std::fprintf(stderr,"Scene P%02u inactive at maximum: pixels=%u change=%lu\n",
                    scene+1,highChanged,(unsigned long)highDelta);
       return 2;
+    }
+    if(scene==3U && highDelta<200U){
+      std::fprintf(stderr,"P04 star twinkle at fast rate still too subtle\n");
+      return 5;
+    }
+    if(scene==4U && highDelta<450U){
+      std::fprintf(stderr,"P05 flame at fast rate still too subtle\n");
+      return 6;
     }
     // The slider must impact LEDs within two seconds, not just an EEPROM value.
     renderPreset(scene,slow);
