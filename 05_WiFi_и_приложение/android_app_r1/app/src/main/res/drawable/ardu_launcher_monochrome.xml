@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 13+ launcher themed-icon silhouette. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="3.8"
+        android:pathData="M54,28 C68.4,28 80,39.6 80,54 C80,68.4 68.4,80 54,80 C39.6,80 28,68.4 28,54 C28,39.6 39.6,28 54,28 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="4.2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M43,68 L54,42 L65,68 M48,58 L60,58" />
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M54,33 C56.2,33 58,34.8 58,37 C58,39.2 56.2,41 54,41 C51.8,41 50,39.2 50,37 C50,34.8 51.8,33 54,33 Z" />
+</vector>

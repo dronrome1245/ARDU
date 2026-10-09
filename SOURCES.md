@@ -1164,3 +1164,10 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 
 - Отдельное явное сообщение владельца 2026-10-09: «все задвигалось это хорошо. что осталось исправить?» — подтверждение движения всех P-сцен после коррекции Nano R4 **на реальной сборке**, без приложенных в этом сообщении видео, power measurement или точного `ARDU1 5` boot log. Принимать visual motion, но не полный color/EEPROM/stack/current/direct-mode PASS.
 - [Arduino Verify main 37976579921](https://github.com/dronrome1245/ARDU/actions/runs/37976579921) PASS, полный Nano Ambient12 R4 29410 Flash/1286 static SRAM, host 44-LED motion checks. Старый полный Nano R3 в репозитории для rollback.
+
+## S-ARDU-2026-10-09-ANDROID-02210-ICON-READBACK
+
+- Запрос владельца в текущем чате: «Хорошо. Измени значок сразу приложения на рабочем столе если возможно» после согласования следующего Android-пакета; визуальная иконка в устройстве ещё не подтверждена.
+- `05_WiFi_и_приложение/android_app_r1/app/src/main/AndroidManifest.xml` теперь задаёт `@mipmap/ic_launcher`, `@mipmap/ic_launcher_round`; `res/mipmap-anydpi-v26` — adaptive/round/themed icon, `res/drawable/ardu_launcher_foreground.xml` и `ardu_launcher_monochrome.xml` — точные VectorDrawable ресурсы.
+- Source `MainActivity.kt` / `ArduApiClient.kt` / `HttpReadbackPolicy.kt` / `ClapWizardUiPolicy.kt`: безопасный повтор только GET и разделение успешного POST ACK от readback, сохранение dismiss мастера CLAPCAL при Nano finished state.
+- [Android Verify https://github.com/dronrome1245/ARDU/actions/runs/37981648045](https://github.com/dronrome1245/ARDU/actions/runs/37981648045) **PASS**: Android 0.22.10 versionCode33, Kotlin tests, photo/launcher resource checks, debug APK artifact `ardu-android-02210-launcher-debug-apk`. Реальное устройство/иконка/HTTP retries и поведение CLAPCAL подтверждаются только последующим phone gate.

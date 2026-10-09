@@ -53,6 +53,7 @@ class MainActivity : Activity() {
     private var rendering = false
     private var showServiceMessages = false
     private var lastOperationImportant = false
+    private var clapWizardDismissed = false
     private var deviceOnline = false
     private lateinit var contentScrollView: ScrollView
     private var latestSettings: ArduSettings? = null
@@ -263,6 +264,7 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
 
         bindViews()
+        clapWizardDismissed = preferences().getBoolean(PREF_CLAP_WIZARD_DISMISSED, false)
         bindNavigation()
         bindLight()
         bindMusic()
@@ -711,7 +713,10 @@ class MainActivity : Activity() {
         clapSampleButton.setOnClickListener { captureClapSample() }
         clapFinishButton.setOnClickListener { finishClapCalibration() }
         clapSaveButton.setOnClickListener {
-            runDeviceAction("Сохранение порога хлопков") { api.saveClapCalibration() }
+            runDeviceAction(
+                "Сохранение порога хлопков",
+                onAcknowledged = { setClapWizardDismissed(true) }
+            ) { api.saveClapCalibration() }
         }
         findViewById<Button>(R.id.clapCancelButton).setOnClickListener {
             runDeviceAction("Отмена калибровки хлопков") { api.cancelClapCalibration() }
@@ -788,6 +793,12 @@ class MainActivity : Activity() {
         view.background.mutate().setTint(color)
     }
 
+    private fun setClapWizardDismissed(dismissed: Boolean) {
+        clapWizardDismissed = dismissed
+        preferences().edit().putBoolean(PREF_CLAP_WIZARD_DISMISSED, dismissed).apply()
+        if (dismissed) clapCalibrationPanel.visibility = View.GONE
+    }
+
     private fun startClapCalibration() {
         if (!deviceOnline) return
 
@@ -801,6 +812,8 @@ class MainActivity : Activity() {
             try {
                 val state = api.startClapCalibration(9)
                 runOnUiThread {
+                    setClapWizardDismissed(false)
+                    clapCalibrationPanel.visibility = View.VISIBLE
                     clapCalibrationText.text =
                         "Тишина измерена: ${state.quietP99}. Прогресс 0/${state.targetPairs}. " +
                         "Нажмите кнопку и сделайте двойной хлопок."
@@ -1694,22 +1707,46 @@ class MainActivity : Activity() {
     private fun readSnapshot(): Snapshot =
         Snapshot(api.status(), api.settings(), api.time())
 
-    private fun runDeviceAction(label: String, action: () -> Unit) {
+    private fun runDeviceAction(
+        label: String,
+        onAcknowledged: (() -> Unit)? = null,
+        action: () -> Unit
+    ) {
         if (!UiSafetyPolicy.canSendCommand(deviceOnline)) {
             setOperationStatus("Нет связи с ARDU — команда не отправлена", important = true)
             return
         }
         setOperationStatus("$label…")
         worker.execute {
+            // A successful POST response confirms the write; a later failed
+            // GET must never be presented as a failed command or cause replay.
             try {
                 action()
-                val snapshot = readSnapshot()
-                runOnUiThread {
+            } catch (error: Exception) {
+                showError("$label — нет подтверждения команды", error)
+                return@execute
+            }
+
+            val snapshot = try {
+                readSnapshot()
+            } catch (_: Exception) {
+                null
+            }
+            runOnUiThread {
+                onAcknowledged?.invoke()
+                if (snapshot != null) {
                     renderSnapshot(snapshot)
                     setOperationStatus("$label: готово")
+                } else {
+                    // Do not present stale readback/slider values as authoritative.
+                    // Foreground heartbeat restores the full snapshot on reconnect.
+                    showUnavailableDeviceState()
+                    setConnectionStatus("● Проверка состояния…", R.color.ardu_text_secondary)
+                    setOperationStatus(
+                        "$label: устройство подтвердило команду; состояние перечитывается",
+                        important = true
+                    )
                 }
-            } catch (error: Exception) {
-                showError(label, error)
             }
         }
     }
@@ -1768,19 +1805,27 @@ class MainActivity : Activity() {
             "Порог ${clap.threshold}, окно ${clap.timeoutMs} мс • " +
             if (clap.saved) "сохранён" else "не сохранён"
 
-        if (clap.calibration.active || clap.calibration.finished) {
-            clapCalibrationPanel.visibility = View.VISIBLE
+        // A new calibration started by another controller supersedes local
+        // dismissal, but Nano may keep "finished" true AFTER EEPROM save.
+        if (clap.calibration.active && clapWizardDismissed) {
+            setClapWizardDismissed(false)
+        }
+        val showClapWizard = ClapWizardUiPolicy.shouldShow(
+            clap.calibration.active, clap.calibration.finished, clapWizardDismissed
+        )
+        clapCalibrationPanel.visibility = if (showClapWizard) View.VISIBLE else View.GONE
+        if (showClapWizard) {
             clapCalibrationText.text =
                 "Калибровка ${clap.calibration.goodPairs}/${clap.calibration.targetPairs}, " +
                 "тишина=${clap.calibration.quietP99}, порог=${clap.calibration.suggestedThreshold}"
-        } else {
-            clapCalibrationPanel.visibility = View.GONE
         }
         val hasAllPairs = clap.calibration.targetPairs > 0 &&
             clap.calibration.goodPairs >= clap.calibration.targetPairs
-        clapSampleButton.isEnabled = clap.calibration.active && !hasAllPairs
-        clapFinishButton.isEnabled = clap.calibration.active && hasAllPairs
-        clapSaveButton.isEnabled = clap.calibration.finished
+        clapSampleButton.isEnabled = showClapWizard &&
+            clap.calibration.active && !hasAllPairs
+        clapFinishButton.isEnabled = showClapWizard &&
+            clap.calibration.active && hasAllPairs
+        clapSaveButton.isEnabled = showClapWizard && clap.calibration.finished
     }
 
     private fun renderMusic(snapshot: Snapshot) {
@@ -2104,5 +2149,6 @@ class MainActivity : Activity() {
     companion object {
         private const val PREF_ADDRESS = "preferred_address"
         private const val PREF_SHOW_SERVICE_MESSAGES = "show_service_messages"
+        private const val PREF_CLAP_WIZARD_DISMISSED = "clap_wizard_dismissed"
     }
 }

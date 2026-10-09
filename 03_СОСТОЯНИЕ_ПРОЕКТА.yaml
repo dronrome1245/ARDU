@@ -3173,3 +3173,25 @@ nano_r4_owner_motion_gate_2026_10_09:
   next_software_gate: android_http_write_readback_separation_and_clap_wizard_finish
   next_hardware_gate: mode_regression_then_direct_wifi_then_two_rings_power_class_ii
   ci_main_r4: "https://github.com/dronrome1245/ARDU/actions/runs/37976579921"
+
+# 2026-10-09: Android 0.22.10 native launcher icon, HTTP and CLAPCAL fixes
+android_02210_launcher_readback_clap_2026_10_09:
+  decision: D-117
+  application_id: "com.ardu.app"
+  version_code: 33
+  version_name: "0.22.10-launcher-readback-clap-rc1"
+  launcher_icon_standard: "@mipmap/ic_launcher"
+  launcher_icon_round: "@mipmap/ic_launcher_round"
+  launcher_icon_monochrome: "@drawable/ardu_launcher_monochrome"
+  approved_home_hub_focus_dial_design_preserved: true
+  broken_get_once_retry: true
+  never_retry_post_on_transport_error: true
+  post_ack_separate_from_get_readback: true
+  clap_wizard_closes_after_save_acknowledgment: true
+  clap_wizard_saved_dismissal_survives_app_restart: true
+  firmware_or_protocol_changed: false
+  ci: "https://github.com/dronrome1245/ARDU/actions/runs/37981648045"
+  ci_outcome: pass
+  android_debug_apk_artifact: "ardu-android-02210-launcher-debug-apk"
+  owner_phone_visual_and_functional_pass: false
+  next: "owner_git_pull_android_studio_run_verify_launcher_clap_music"

@@ -639,8 +639,17 @@ class ArduApiClient {
         )
     )
 
-    private fun getJson(baseUrl: String, path: String): JSONObject =
-        JSONObject(request(baseUrl, path, "GET", null))
+    private fun getJson(baseUrl: String, path: String): JSONObject {
+        // The ESP can close its HTTP socket while serving UART-backed reads.
+        // A broken GET is safe to repeat once. Mutating POSTs are NOT retried.
+        val body = try {
+            request(baseUrl, path, "GET", null)
+        } catch (error: IOException) {
+            if (!HttpReadbackPolicy.shouldRetryGet(error)) throw error
+            request(baseUrl, path, "GET", null)
+        }
+        return JSONObject(body)
+    }
 
     private fun requireOk(json: JSONObject) {
         if (!json.optBoolean("ok")) {
@@ -675,6 +684,7 @@ class ArduApiClient {
             connection.readTimeout = readTimeoutMs
             connection.useCaches = false
             connection.setRequestProperty("Accept", "application/json")
+            connection.setRequestProperty("Connection", "close")
 
             if (body != null) {
                 val bytes = body.toByteArray(StandardCharsets.UTF_8)
