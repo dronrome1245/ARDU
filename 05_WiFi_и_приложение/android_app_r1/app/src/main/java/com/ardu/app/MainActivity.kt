@@ -5,6 +5,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.graphics.Color
 import android.provider.Settings
 import android.view.View
@@ -36,6 +38,18 @@ import java.util.concurrent.Executors
 class MainActivity : Activity() {
     private val api = ArduApiClient()
     private val worker = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var heartbeatEnabled = false
+    private var heartbeatInFlight = false
+    private var refreshInProgress = false
+    private var lastConnectionHealth = DeviceConnectionHealth.DISCONNECTED
+    private val heartbeatRunnable = object : Runnable {
+        override fun run() {
+            if (!heartbeatEnabled) return
+            checkDeviceHeartbeat()
+            mainHandler.postDelayed(this, DeviceConnectionPolicy.HEARTBEAT_PERIOD_MS)
+        }
+    }
     private var rendering = false
     private var deviceOnline = false
     private lateinit var contentScrollView: ScrollView
@@ -265,7 +279,22 @@ class MainActivity : Activity() {
         refreshDevice()
     }
 
+    override fun onStart() {
+        super.onStart()
+        heartbeatEnabled = true
+        mainHandler.removeCallbacks(heartbeatRunnable)
+        mainHandler.post(heartbeatRunnable)
+    }
+
+    override fun onStop() {
+        heartbeatEnabled = false
+        mainHandler.removeCallbacks(heartbeatRunnable)
+        super.onStop()
+    }
+
     override fun onDestroy() {
+        heartbeatEnabled = false
+        mainHandler.removeCallbacks(heartbeatRunnable)
         worker.shutdownNow()
         super.onDestroy()
     }
@@ -1483,7 +1512,77 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.sendRawButton).isEnabled = online
     }
 
+    /**
+     * Checks the gateway AND actual Nano UART status while UI is foreground.
+     * A light GET never changes active light modes or saved settings.
+     * Single executor serializes these probes after any pending user write.
+     */
+    private fun checkDeviceHeartbeat() {
+        if (heartbeatInFlight || refreshInProgress) return
+        heartbeatInFlight = true
+        val alreadyOnline = deviceOnline
+        val oldMode = latestMode
+
+        worker.execute {
+            var espResponded = false
+            try {
+                val ping = if (alreadyOnline) api.pingSelected() else api.ping()
+                espResponded = true
+                val status = api.status()
+                // Full state readback only on reconnect or externally changed mode.
+                val snapshot = if (!alreadyOnline || oldMode != status.mode) {
+                    readSnapshot()
+                } else null
+                runOnUiThread {
+                    heartbeatInFlight = false
+                    if (!heartbeatEnabled) return@runOnUiThread
+                    lastConnectionHealth = DeviceConnectionHealth.ONLINE
+                    lastEspFirmware = ping.firmware
+                    lastEspRssi = ping.rssi
+                    lastNetworkMode = ping.networkMode
+                    if (!deviceOnline) {
+                        deviceOnline = true
+                        setDeviceControlsEnabled(true)
+                    }
+                    snapshot?.let(::renderSnapshot)
+                    val label = if (ping.networkMode == "softap") {
+                        "● Прямое подключение"
+                    } else "● Онлайн"
+                    setConnectionStatus(label, R.color.ardu_accent)
+                }
+            } catch (_: Exception) {
+                val health = DeviceConnectionPolicy.classify(espResponded, false)
+                runOnUiThread {
+                    heartbeatInFlight = false
+                    if (!heartbeatEnabled) return@runOnUiThread
+                    if (deviceOnline || lastConnectionHealth != health) {
+                        showUnavailableDeviceState()
+                        lastConnectionHealth = health
+                        setConnectionStatus(
+                            if (health == DeviceConnectionHealth.ESP_ONLY) {
+                                "● Nano не отвечает"
+                            } else {
+                                "● Нет связи"
+                            },
+                            R.color.ardu_danger
+                        )
+                        setOperationStatus(
+                            if (health == DeviceConnectionHealth.ESP_ONLY) {
+                                "ESP доступна, Nano не отвечает"
+                            } else {
+                                "Соединение с ARDU потеряно"
+                            },
+                            important = true
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     private fun refreshDevice() {
+        if (refreshInProgress) return
+        refreshInProgress = true
         setConnectionStatus("Проверка…", R.color.ardu_text_secondary)
         refreshButton.isEnabled = false
         lightRefreshButton.isEnabled = false
@@ -1494,8 +1593,10 @@ class MainActivity : Activity() {
         setOperationStatus("")
 
         worker.execute {
+            var espResponded = false
             try {
                 val ping = api.ping()
+                espResponded = true
                 lastEspFirmware = ping.firmware
                 lastEspRssi = ping.rssi
                 lastNetworkMode = ping.networkMode
@@ -1510,6 +1611,8 @@ class MainActivity : Activity() {
                     val connectionLabel =
                         if (ping.networkMode == "softap") "● Прямое подключение"
                         else "● Онлайн"
+                    refreshInProgress = false
+                    lastConnectionHealth = DeviceConnectionHealth.ONLINE
                     deviceOnline = true
                     setDeviceControlsEnabled(true)
                     setConnectionStatus(connectionLabel, R.color.ardu_accent)
@@ -1525,10 +1628,18 @@ class MainActivity : Activity() {
                     alarmRefreshButton.isEnabled = true
                 }
             } catch (error: Exception) {
+                val health = DeviceConnectionPolicy.classify(espResponded, false)
                 runOnUiThread {
+                    refreshInProgress = false
                     showUnavailableDeviceState()
-                    setConnectionStatus("● Нет связи", R.color.ardu_danger)
-                    setOperationStatus(error.message ?: "Ошибка подключения")
+                    lastConnectionHealth = health
+                    setConnectionStatus(
+                        if (health == DeviceConnectionHealth.ESP_ONLY) {
+                            "● Nano не отвечает"
+                        } else "● Нет связи",
+                        R.color.ardu_danger
+                    )
+                    setOperationStatus(error.message ?: "Ошибка подключения", important = true)
                     refreshButton.isEnabled = true
                     lightRefreshButton.isEnabled = true
                     musicRefreshButton.isEnabled = true
