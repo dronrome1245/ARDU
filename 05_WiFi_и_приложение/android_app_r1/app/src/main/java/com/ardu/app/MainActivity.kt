@@ -758,6 +758,8 @@ class MainActivity : Activity() {
     }
 
     private fun startClapCalibration() {
+        if (!deviceOnline) return
+
         clapCalibrationPanel.visibility = View.VISIBLE
         clapCalibrationText.text = "Соблюдайте тишину. Nano измеряет фон…"
         clapSampleButton.isEnabled = false
@@ -781,6 +783,8 @@ class MainActivity : Activity() {
     }
 
     private fun captureClapSample() {
+        if (!deviceOnline) return
+
         clapSampleButton.isEnabled = false
         clapCalibrationText.text = "Сделайте двойной хлопок…"
         worker.execute {
@@ -808,6 +812,8 @@ class MainActivity : Activity() {
     }
 
     private fun finishClapCalibration() {
+        if (!deviceOnline) return
+
         clapFinishButton.isEnabled = false
         worker.execute {
             try {
@@ -1374,6 +1380,79 @@ class MainActivity : Activity() {
         alarmConnectionText.setTextColor(color)
     }
 
+
+    private fun showUnavailableDeviceState() {
+        deviceOnline = false
+        latestMode = null
+        latestSettings = null
+        setDeviceControlsEnabled(false)
+        lightFocusDial.setKnown(false)
+        lightOverviewBrightnessText.text = "—"
+        lightOverviewKelvinText.text = "—"
+        lightStateText.text = "Нет данных • подключите ARDU"
+        lightBrightnessText.text = "Яркость • —"
+        lightKelvinText.text = "— K"
+        lightRgbText.text = "RGB: —"
+        clapStateText.text = "Калибровка: нет данных"
+        clapCalibrationPanel.visibility = View.GONE
+        musicModeText.text = "Нет данных о режиме"
+        musicBrightnessText.text = "Эффект • —"
+        musicBackgroundText.text = "Фон • —"
+        musicCalibrationText.text = "Микрофон: нет данных"
+        ambientEffectText.text = "Нет данных о режиме"
+        ambientPresetCapabilityText.text = "12 сцен • подключите ARDU для управления"
+        ambientManualPanel.visibility = View.GONE
+        ambientPresetControls.visibility = View.GONE
+        nightStateText.text = "Нет данных о ночнике"
+        nightEnabledSwitch.text = "Ночник: нет данных"
+        nightHueText.text = "Цвет • —"
+        nightSaturationText.text = "Насыщенность • —"
+        nightBrightnessText.text = "Яркость • —"
+        nightOnInput.setText("")
+        nightOffInput.setText("")
+        alarmStateText.text = "Нет данных о будильнике"
+        alarmRtcText.text = "Время устройства неизвестно"
+        alarmFadeText.text = "Длительность • —"
+        alarmBrightnessText.text = "Макс. яркость • —"
+        alarmHourInput.setText("")
+        alarmMinuteInput.setText("")
+        timeText.text = "RTC —"
+        modeText.text = "Состояние неизвестно"
+        currentLimitText.text = "Лимит тока: нет данных"
+        systemSummaryText.text = "ARDU не подключена"
+        stopDawnButton.isEnabled = false
+    }
+
+    private fun setDeviceControlsEnabled(online: Boolean) {
+        // Always allow navigation, refresh and connection repair while offline.
+        val uiOnly = setOf(
+            R.id.lightRefreshButton, R.id.lightServiceButton,
+            R.id.musicRefreshButton, R.id.musicServiceButton,
+            R.id.ambientRefreshButton, R.id.ambientServiceButton,
+            R.id.nightRefreshButton, R.id.nightServiceButton,
+            R.id.alarmRefreshButton, R.id.alarmServiceButton,
+            R.id.lightOpenControlButton, R.id.lightBackButton
+        )
+        fun visit(view: View) {
+            if (view.id in uiOnly) return
+            if (view is ViewGroup) {
+                for (index in 0 until view.childCount) visit(view.getChildAt(index))
+            }
+            if (
+                view is Button || view is ImageButton || view is Switch ||
+                view is SeekBar || view is EditText || view is SmartSliderView ||
+                view is FocusDialView || view is ColorWheelView ||
+                view is SceneTileView || view is MusicModeTileView ||
+                view is AmbientEffectTileView
+            ) view.isEnabled = online
+        }
+        listOf(lightPanel, musicPanel, ambientPanel, nightPanel, alarmPanel).forEach(::visit)
+        currentLimitSeek.isEnabled = online
+        findViewById<Button>(R.id.resetDefaultsButton).isEnabled = online
+        findViewById<Button>(R.id.eventsButton).isEnabled = online
+        findViewById<Button>(R.id.sendRawButton).isEnabled = online
+    }
+
     private fun refreshDevice() {
         setConnectionStatus("Проверка…", R.color.ardu_text_secondary)
         refreshButton.isEnabled = false
@@ -1401,6 +1480,8 @@ class MainActivity : Activity() {
                     val connectionLabel =
                         if (ping.networkMode == "softap") "● Прямое подключение"
                         else "● Онлайн"
+                    deviceOnline = true
+                    setDeviceControlsEnabled(true)
                     setConnectionStatus(connectionLabel, R.color.ardu_accent)
                     if (!selectedAddress.isNullOrBlank()) {
                         addressInput.setText(selectedAddress.removePrefix("http://"))
@@ -1415,6 +1496,7 @@ class MainActivity : Activity() {
                 }
             } catch (error: Exception) {
                 runOnUiThread {
+                    showUnavailableDeviceState()
                     setConnectionStatus("● Нет связи", R.color.ardu_danger)
                     setOperationStatus(error.message ?: "Ошибка подключения")
                     refreshButton.isEnabled = true
@@ -1432,6 +1514,10 @@ class MainActivity : Activity() {
         Snapshot(api.status(), api.settings(), api.time())
 
     private fun runDeviceAction(label: String, action: () -> Unit) {
+        if (!UiSafetyPolicy.canSendCommand(deviceOnline)) {
+            setOperationStatus("Нет связи с ARDU — команда не отправлена")
+            return
+        }
         setOperationStatus("$label…")
         worker.execute {
             try {
@@ -1782,11 +1868,25 @@ class MainActivity : Activity() {
         }
 
     private fun showError(label: String, error: Exception) {
-        runOnUiThread {
-            setOperationStatus("$label: ${error.message ?: "ошибка"}")
-            refreshButton.isEnabled = true
-            lightRefreshButton.isEnabled = true
-            musicRefreshButton.isEnabled = true
+        val message = label + ": " + (error.message ?: "ошибка")
+        runOnUiThread { setOperationStatus(message) }
+        // On a failed write, discard local previews and re-read Nano settings.
+        worker.execute {
+            try {
+                val snapshot = readSnapshot()
+                runOnUiThread {
+                    deviceOnline = true
+                    setDeviceControlsEnabled(true)
+                    renderSnapshot(snapshot)
+                    setOperationStatus(message)
+                }
+            } catch (_: Exception) {
+                runOnUiThread {
+                    showUnavailableDeviceState()
+                    setConnectionStatus("● Нет связи", R.color.ardu_danger)
+                    setOperationStatus(message)
+                }
+            }
         }
     }
 
