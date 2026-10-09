@@ -679,11 +679,9 @@ class MainActivity : Activity() {
         clapFinishButton.setOnClickListener { finishClapCalibration() }
         clapSaveButton.setOnClickListener {
             runDeviceAction("Сохранение порога хлопков") { api.saveClapCalibration() }
-            clapCalibrationPanel.visibility = View.GONE
         }
         findViewById<Button>(R.id.clapCancelButton).setOnClickListener {
             runDeviceAction("Отмена калибровки хлопков") { api.cancelClapCalibration() }
-            clapCalibrationPanel.visibility = View.GONE
         }
     }
 
@@ -1620,7 +1618,14 @@ class MainActivity : Activity() {
             clapCalibrationText.text =
                 "Калибровка ${clap.calibration.goodPairs}/${clap.calibration.targetPairs}, " +
                 "тишина=${clap.calibration.quietP99}, порог=${clap.calibration.suggestedThreshold}"
+        } else {
+            clapCalibrationPanel.visibility = View.GONE
         }
+        val hasAllPairs = clap.calibration.targetPairs > 0 &&
+            clap.calibration.goodPairs >= clap.calibration.targetPairs
+        clapSampleButton.isEnabled = clap.calibration.active && !hasAllPairs
+        clapFinishButton.isEnabled = clap.calibration.active && hasAllPairs
+        clapSaveButton.isEnabled = clap.calibration.finished
     }
 
     private fun renderMusic(snapshot: Snapshot) {
