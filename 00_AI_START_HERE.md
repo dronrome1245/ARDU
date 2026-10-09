@@ -123,10 +123,10 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-1. **Nano Ambient12 R2 (D-114) готов как source/CI, не загружен на железо:** `04_Прошивка/nano_ambient12_v2/nano_ambient12_v2.ino`, динамика P01..P12 теперь 256 монотонных коэффициентов без сброса фазы и P11 «Дыхание» ~16..4 c. Старый полный `nano_ambient12_v1` сохранён для отката. [Arduino Verify PASS](https://github.com/dronrome1245/ARDU/actions/runs/37966945125), 29336/30720 Flash, 1286/2048 SRAM globals (+30/+4 к предыдущей R1), runtime stack ещё НЕ измерен.
-2. **Следующий physical gate:** `git pull` → открыть новый `.ino` в Arduino IDE (Nano, ATmega328P Old Bootloader) → Verify → временно отключить ESP TX→Nano D0 **на полностью обесточенном стенде**, затем USB Upload → в Serial 115200 увидеть `ARDU1 3` → восстановить UART → проверить один 44-LED канал и P11/P01/P03/P05/P12 на скоростях 0/128/255; если ошибка — rollback R1. Детали `04_Прошивка/AMBIENT12_SPEED_R2_TEST.md`.
-3. **Android 0.22.9:** [CI PASS](https://github.com/dronrome1245/ARDU/actions/runs/37958705334); owner подтвердил Online/Offline на телефоне, новый Android сейчас не нужен. Отдельно проверить показываемые служебные сообщения, HTTP ошибки и завершение калибровки хлопков.
-4. **Открыты для физической приёмки:** ARDU-DIRECT без роутера, два кольца 44+44, ток/температура/stack, все 12 световых сцен. До двухкольцевого gate лимит 3000 мА, не 4500 мА. Аккумулятор отменён.
+1. **Nano R3 P11 slight-low-speed tune (D-115): source/CI PASS, физическая загрузка ещё не подтверждена.** Владелец положительно оценил реальное P11 «Дыхание» на предыдущей R2 и попросил чуть замедлить минимум. Новый полный отдельный `04_Прошивка/nano_ambient12_v3/nano_ambient12_v3.ino` (boot `ARDU1 4`) делает цикл P11 при dynamics=0 ~20,2 c вместо ~16,4; максимум 255 остаётся ~4,1 с; остальные 11 пресетов и EEPROM/UART/ESP/Android не меняются. Откат — прежний полный R2.
+2. **CI:** [Arduino Verify https://github.com/dronrome1245/ARDU/actions/runs/37971273171](https://github.com/dronrome1245/ARDU/actions/runs/37971273171) PASS. Компиляция R3: **29376/30720 Flash, 1286/2048 global SRAM** (+40B Flash/+0B SRAM к R2); худший runtime stack и фактическая скорость R3 на кольце ещё не проверены.
+3. **Следующий gate владельца:** `cd C:\ARDU` → `git pull` → Arduino IDE открыть `nano_ambient12_v3/nano_ambient12_v3.ino`, Nano/ATmega328P Old Bootloader, Verify, безопасный USB Upload после временного отсоединения ESP TX→Nano D0 **при снятом питании** → Serial `ARDU1 4`, вернуть провод и проверить P11 на одной 44-LED ленте при 0/128/255. Инструкция `04_Прошивка/AMBIENT12_BREATHING_R3_TEST.md`.
+4. Остаются открыты: worst-case SRAM stack, 44+44 power/current/temperature, ARDU-DIRECT, остальные 12 сцен на реальном железе. Лимит ≤3000 мА до силового gate. Android 0.22.9 Online/Offline владелец уже подтвердил; его не перепрошивать ради P11.
 
 ## 12. База ColorMusic/FHT
 

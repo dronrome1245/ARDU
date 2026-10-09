@@ -3106,3 +3106,26 @@ nano_ambient12_speed_r2_2026_10_09:
   current_limit_for_gate_ma: 3000
   rollback_on_failure: "04_Прошивка/nano_ambient12_v1/nano_ambient12_v1.ino"
   next: "one_44_led_nano_r2_upload_and_velocity_visual_gate"
+
+# 2026-10-09: owner-approved breathing visual feel; slightly slower P11 minimum in Nano R3
+nano_p11_r3_2026_10_09:
+  decision: D-115
+  user_feedback_p11_r2_visual_positive: true
+  physical_period_seconds_r2_measured: false
+  full_source: "04_Прошивка/nano_ambient12_v3/nano_ambient12_v3.ino"
+  previous_r2_rollback: "04_Прошивка/nano_ambient12_v2/nano_ambient12_v2.ino"
+  boot_marker: "ARDU1 4"
+  P11_cycle_at_0_seconds_approx: 20.2
+  P11_cycle_at_128_seconds_approx: 6.8
+  P11_cycle_at_255_seconds_approx: 4.1
+  other_11_preset_clocks_changed: false
+  all_12_preset_pixel_renderers_changed: false
+  eeprom_and_uart_changed: false
+  esp_and_android_changed: false
+  cli_ci: "https://github.com/dronrome1245/ARDU/actions/runs/37971273171"
+  ci_outcome: pass
+  ci_flash_bytes: 29376
+  ci_globals_sram_bytes: 1286
+  physical_upload_r3_confirmed: false
+  hardware_runtime_stack_pass: false
+  next: "one_44_led_p11_low_speed_visual_gate"
