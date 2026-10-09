@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 30
-        versionName = "0.22.7-ambient12-photo-tiles-rc1"
+        versionCode = 31
+        versionName = "0.22.8-ux-readback-rc1"
     }
 
     compileOptions {
