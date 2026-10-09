@@ -1004,6 +1004,9 @@ class MainActivity : Activity() {
         ambientPresetButtons.forEach { (id, button) ->
             button.setOnClickListener { applyAmbientPreset(id) }
         }
+        ambientPresetLabels.forEach { (id, label) ->
+            label.setOnClickListener { applyAmbientPreset(id) }
+        }
         ambientPresetExtraGrid = findViewById(R.id.ambientPresetExtraGrid)
         ambientPresetCapabilityText = findViewById(R.id.ambientPresetCapabilityText)
         ambientPresetControls = findViewById(R.id.ambientPresetControls)
@@ -1052,11 +1055,12 @@ class MainActivity : Activity() {
                 ))
                 val label = TextView(this).apply {
                     text = ambientSceneNames.getValue(id)
-                    textSize = 10f
+                    textSize = 11f
                     setTextColor(getColor(R.color.ardu_nav_icon_tint))
                     gravity = android.view.Gravity.CENTER
                     maxLines = 2
-                    minHeight = dp(26)
+                    minHeight = dp(32)
+                    setOnClickListener { applyAmbientPreset(id) }
                 }
                 tile.addView(label, LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
