@@ -50,6 +50,20 @@ jobs:
           assert 'showUnavailableDeviceState()' in kotlin
           assert 'lightFocusDial.setKnown(false)' in kotlin
           assert 'stopDawnButton.isEnabled = UiSafetyPolicy.dawnCanBeStopped' in kotlin
+          # Connection heartbeat must check real Nano status, not ping alone;
+          # verbose work messages remain available through a saved setting.
+          network=(root/"src/main/java/com/ardu/app/net/ArduApiClient.kt").read_text()
+          policy=(root/"src/main/java/com/ardu/app/DeviceConnectionPolicy.kt").read_text()
+          assert 'fun pingSelected()' in network
+          assert 'const val HEARTBEAT_PERIOD_MS = 5_000L' in policy
+          assert 'override fun onStart()' in kotlin and 'override fun onStop()' in kotlin
+          assert 'mainHandler.removeCallbacks(heartbeatRunnable)' in kotlin
+          assert 'api.status()' in kotlin and 'checkDeviceHeartbeat()' in kotlin
+          assert 'DeviceConnectionHealth.ESP_ONLY' in kotlin
+          assert 'showServiceMessagesSwitch' in kotlin and 'showServiceMessagesSwitch' in layout
+          assert 'PREF_SHOW_SERVICE_MESSAGES' in kotlin
+          assert 'important = true' in kotlin
+          print("PASS: foreground 5s keepalive, Nano liveness and diagnostics preference")
           print("PASS: UX offline-state, tab scroll, music controls and scene ordering")
           print("PASS: 12 embedded WebP thumbnails and 4-column grid")
           PY
