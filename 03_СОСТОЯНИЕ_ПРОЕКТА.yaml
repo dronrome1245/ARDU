@@ -3158,3 +3158,18 @@ nano_ambient12_r4_all_scenes_2026_10_09:
   full_two_ring_power_pass: false
   runtime_stack_worst_case_measured: false
   next: "owner_safe_r4_upload_then_all_12_p_scene_one_ring_visual_smoke"
+
+# 2026-10-09: owner confirms movement of all 12 presets on actual lamp
+nano_r4_owner_motion_gate_2026_10_09:
+  owner_statement: "все задвигалось это хорошо"
+  motion_present_on_real_hardware_by_owner_report: true
+  all_p01_to_p12_motion_gate: owner_pass
+  recorded_boot_revision_ardu1_5: false
+  per_scene_palette_quality_final_pass: false
+  individually_saved_scene_brightness_dynamics_power_cycle_verified: false
+  both_44_led_rings_power_pass: false
+  measured_voltage_current_heat_and_stack: false
+  android_0229_auto_online_offline_owner_pass: true
+  next_software_gate: android_http_write_readback_separation_and_clap_wizard_finish
+  next_hardware_gate: mode_regression_then_direct_wifi_then_two_rings_power_class_ii
+  ci_main_r4: "https://github.com/dronrome1245/ARDU/actions/runs/37976579921"
