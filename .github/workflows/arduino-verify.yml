@@ -8,6 +8,7 @@ on:
       - "04_Прошивка/nano_ambient_preview_rc2/**"
       - "04_Прошивка/nano_ambient12_v1/**"
       - "04_Прошивка/nano_ambient12_v2/**"
+      - "04_Прошивка/nano_ambient12_v3/**"
       - ".github/workflows/arduino-verify.yml"
   workflow_dispatch:
 
@@ -145,6 +146,40 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic             build-nano-r2-preset-host.cpp -o "$RUNNER_TEMP/ardu-nano-r2-preset-host"
           "$RUNNER_TEMP/ardu-nano-r2-preset-host"
 
+      - name: Host-test exact R3 P11 breathing rate and all 12 renderers
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path("04_Прошивка/nano_ambient12_v3")
+          src=(root/"nano_ambient12_v3.ino").read_text()
+          old=Path("04_Прошивка/nano_ambient12_v2/nano_ambient12_v2.ino").read_text()
+          assert 'constexpr uint8_t FW_REV = 4;' in src
+          assert 'Serial.println(F("ARDU1 4"))' in src
+          assert 'scene==10U' in src
+          assert 'static_assert(sizeof(PresetPersist)==29' in src
+          assert 'ambient_preset_probe.h' not in src
+          assert 'constexpr int PRESET_BASE = 512;' in src
+          assert 'case 111:' in src and 'case 115:' in src
+          head='uint8_t presetTri(uint8_t a){'
+          tail='void printPresets(){'
+          assert old.split(head,1)[1].split(tail,1)[0] == src.split(head,1)[1].split(tail,1)[0], \
+              "P01-P12 pixel renderers must remain byte-for-byte unchanged"
+          marker1="// PRESET_MOTION_BEGIN"
+          marker2="// PRESET_MOTION_END"
+          assert src.count(marker1)==1 and src.count(marker2)==1
+          motion=src.split(marker1,1)[1].split(marker2,1)[0]
+          render=head+src.split(head,1)[1].split(tail,1)[0]
+          wrapper=(root/"tests/preset_motion_host.cpp").read_text()
+          assert wrapper.count("// @INJECT_PRESET_CLOCK")==1
+          assert wrapper.count("// @INJECT_PRESET_RENDERER")==1
+          output=wrapper.replace("// @INJECT_PRESET_CLOCK",motion).replace("// @INJECT_PRESET_RENDERER",render)
+          Path("build-nano-r3-preset-host.cpp").write_text(output)
+          print("PASS: host test uses real R3 clock and byte-identical R2 renderers")
+          PY
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+            build-nano-r3-preset-host.cpp -o "$RUNNER_TEMP/ardu-nano-r3-preset-host"
+          "$RUNNER_TEMP/ardu-nano-r3-preset-host"
+
       - name: Compile full Nano v2 with twelve scenes
         run: |
           arduino-cli compile \
@@ -186,6 +221,42 @@ jobs:
           print("PASS: full Nano R2 Flash/SRAM compile-size gate; runtime stack still physical gate")
           PY
 
+      - name: Compile full Nano Ambient12 R3 P11 minimum-speed tune
+        run: |
+          arduino-cli compile \
+            --fqbn arduino:avr:nano:cpu=atmega328old \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-nano-ambient12-v3" \
+            --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
+            "04_Прошивка/nano_ambient12_v3"
+
+      - name: Verify full Nano R3 Flash and globals against approved R2
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import subprocess
+          sizes=list(Path.home().glob(".arduino15/packages/arduino/tools/avr-gcc/*/bin/avr-size"))
+          assert sizes, "avr-size missing"
+          def measure(folder):
+              elfs=list(Path(folder).rglob("*.elf"))
+              assert len(elfs)==1, (folder, elfs)
+              result=subprocess.check_output([str(sizes[-1]), "-C", "--mcu=atmega328p", str(elfs[0])],text=True)
+              print(folder,result)
+              a=re.search(r"Program:\s*(\d+) bytes",result)
+              b=re.search(r"Data:\s*(\d+) bytes",result)
+              assert a and b,result
+              return int(a.group(1)),int(b.group(1))
+          r2_flash,r2_globals=measure("build-nano-ambient12-v2")
+          r3_flash,r3_globals=measure("build-nano-ambient12-v3")
+          print(f"R2 {r2_flash}/{r2_globals}; R3 {r3_flash}/{r3_globals}")
+          assert r3_flash<=r2_flash+150, (r2_flash,r3_flash,"flash regression")
+          assert r3_flash<=30000, ("flash budget",r3_flash)
+          assert r3_globals<=r2_globals+8, (r2_globals,r3_globals,"SRAM regression")
+          assert r3_globals<=1350, ("global SRAM budget",r3_globals)
+          print("PASS: complete R3 Nano compile and memory; physical stack test still required")
+          PY
+
       - name: Size profile
         if: always()
         run: |
@@ -206,6 +277,14 @@ jobs:
           echo "--- IDE preview RC1 firmware size ---"
           RC_ELF="$(find "$GITHUB_WORKSPACE/build-nano-ambient-preview-rc1" -name '*.elf' | head -n 1)"
           if [ -n "$RC_ELF" ]; then "$AVR_BIN/avr-size" -C --mcu=atmega328p "$RC_ELF"; fi
+
+      - name: Publish complete Nano Ambient12 R3 P11-tune HEX
+        uses: actions/upload-artifact@v4
+        with:
+          name: ardu-nano-ambient12-v3-breathing-slower-rc1
+          path: build-nano-ambient12-v3/*.hex
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Publish full Nano Ambient12 R2 continuous-speed HEX
         uses: actions/upload-artifact@v4
