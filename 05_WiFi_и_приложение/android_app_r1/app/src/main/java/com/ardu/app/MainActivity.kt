@@ -1308,7 +1308,20 @@ class MainActivity : Activity() {
         alarmServiceButton.setOnClickListener { openService() }
 
         alarmEnabledSwitch.setOnCheckedChangeListener { _, checked ->
-            if (!rendering) runDeviceAction("Будильник") { api.updateAlarmSettings(enabled = checked) }
+            if (rendering) return@setOnCheckedChangeListener
+            if (checked && latestSettings?.alarm?.kelvinSupported != true) {
+                // Old Nano could still run a violet HSV dawn. Allow OFF on
+                // legacy firmware, but never enable that obsolete profile.
+                rendering = true
+                alarmEnabledSwitch.isChecked = false
+                rendering = false
+                setOperationStatus(
+                    "Для включения тёплого будильника нужны Nano R5 и ESP V3",
+                    important = true
+                )
+            } else {
+                runDeviceAction("Будильник") { api.updateAlarmSettings(enabled = checked) }
+            }
         }
         for (preset in DawnPresets.all) {
             alarmPresetButtons.getValue(preset.id).setOnClickListener {
@@ -2172,7 +2185,9 @@ class MainActivity : Activity() {
         }
         alarmStartHueSeek.isEnabled = kelvinSupported && deviceOnline
         alarmEndHueSeek.isEnabled = kelvinSupported && deviceOnline
-        alarmEnabledSwitch.isEnabled = kelvinSupported && deviceOnline
+        // Legacy alarm may already be ON. Keep its OFF control accessible,
+        // while the listener blocks new ON until warm dawn is supported.
+        alarmEnabledSwitch.isEnabled = deviceOnline
         alarmStateText.text =
             "${if (a.enabled) "Включён" else "Выключен"} • " +
             String.format(Locale.US, "%02d:%02d", a.hour, a.minute) +

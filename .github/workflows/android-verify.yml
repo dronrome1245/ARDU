@@ -284,6 +284,8 @@ jobs:
                      "alarmPresetEnergizing","alarmPresetSupportText"):
               assert "@+id/"+id in ids
           assert "a.kelvinSupported" in ui
+          assert "if (checked && latestSettings?.alarm?.kelvinSupported != true)" in ui
+          assert "alarmEnabledSwitch.isEnabled = deviceOnline" in ui
           assert "DawnPresets.matching" in ui
           assert "SmartSliderView.VisualMode.KELVIN" in ui
           assert "updateAlarmSettings(startKelvin = start, endKelvin = end)" in ui
