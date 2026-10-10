@@ -1042,9 +1042,9 @@ class MainActivity : Activity() {
             // A saved F01 legacy mode must not be reactivated through the
             // new preset-only Ambient screen.
             val selected = latestSettings?.ambientPresets?.selected
-            if (selected in ArduApiClient.PRESET_IDS) {
+            if (selected != null && selected in ArduApiClient.PRESET_IDS) {
                 runDeviceAction("Включение выбранной сцены") {
-                    api.selectAmbientPreset(selected!!)
+                    api.selectAmbientPreset(selected)
                 }
             } else {
                 setOperationStatus("Выберите одну из 12 атмосферных сцен", important = true)
