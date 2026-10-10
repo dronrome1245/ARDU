@@ -14,6 +14,7 @@ import android.graphics.Shader
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
+import com.ardu.app.LightQuickScenes
 import com.ardu.app.R
 import kotlin.math.max
 
@@ -27,6 +28,7 @@ class SceneTileView @JvmOverloads constructor(
 
     private val imagePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private val overlayPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val moodPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = dp(1f)
@@ -85,6 +87,26 @@ class SceneTileView @JvmOverloads constructor(
         val src = centerCropSource(bitmap, width, height)
         canvas.drawBitmap(bitmap, src, RectF(0f, 0f, w, h), imagePaint)
 
+        // Evening = inviting golden lamp light; Cinema = dark blue theater.
+        // Keep the existing real furniture photos, grade them independently.
+        moodPaint.shader = when (scene) {
+            Scene.EVENING -> LinearGradient(
+                0f, 0f, w, h,
+                Color.argb(50, 255, 188, 100), Color.argb(22, 255, 120, 44),
+                Shader.TileMode.CLAMP
+            )
+            Scene.WARM -> LinearGradient(
+                0f, 0f, w, h,
+                Color.argb(138, 7, 23, 60), Color.argb(104, 9, 15, 45),
+                Shader.TileMode.CLAMP
+            )
+            else -> null
+        }
+        if (moodPaint.shader != null) {
+            canvas.drawRect(0f, 0f, w, h, moodPaint)
+            moodPaint.shader = null
+        }
+
         overlayPaint.shader = LinearGradient(
             0f, h * .30f, 0f, h,
             intArrayOf(
@@ -110,10 +132,10 @@ class SceneTileView @JvmOverloads constructor(
             Scene.COOL -> "Чтение"
         }
         val subtitle = when (scene) {
-            Scene.EVENING -> "15%"
-            Scene.WARM -> "35%"
-            Scene.DAY -> "70%"
-            Scene.COOL -> "90%"
+            Scene.EVENING -> "${LightQuickScenes.EVENING.percent}%"
+            Scene.WARM -> "${LightQuickScenes.CINEMA.percent}%"
+            Scene.DAY -> "${LightQuickScenes.GUESTS.percent}%"
+            Scene.COOL -> "${LightQuickScenes.READING.percent}%"
         }
         canvas.drawText(title, w / 2f, h - dp(24f), titlePaint)
         canvas.drawText(subtitle, w / 2f, h - dp(9f), subtitlePaint)
