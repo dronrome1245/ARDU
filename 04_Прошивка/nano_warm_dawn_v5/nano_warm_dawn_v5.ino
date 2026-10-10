@@ -2346,6 +2346,9 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
     case 76:
       if(n!=1||a[0]>Cfg::DAWN_MAX_STEP || a[0]<dawnCfg.startStep)return uartErr(UE_RANGE);
       dawnCfg.endStep=a[0];uartAck(op);return;
+    case 78: // atomic warm Kelvin endpoints: 0..110 steps of 20 K above 1800 K
+      if(n!=2||a[0]>a[1]||a[1]>Cfg::DAWN_MAX_STEP)return uartErr(UE_RANGE);
+      dawnCfg.startStep=a[0];dawnCfg.endStep=a[1];uartAck(op);return;
     case 77:
       if(n)return uartErr(UE_PARSE);saveDawnSettings();uartAck(op);return;
     case 80:

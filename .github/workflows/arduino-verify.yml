@@ -344,6 +344,7 @@ jobs:
           assert "DEFAULT_DAWN_START_STEP = (2000-" in s
           assert "DEFAULT_DAWN_END_STEP = (3600-" in s
           assert "b[5]<=Cfg::DAWN_MAX_STEP" in s and "b[5]<=b[6]" in s
+          assert "case 78: // atomic warm Kelvin endpoints" in s
           assert "fill_solid(leds,Cfg::LED_COUNT,kelvinRgb(dawnKelvin(p)))" in s
           assert "dawnBrightness(p)" in s
           assert "CHSV(h,255,255)" not in s
