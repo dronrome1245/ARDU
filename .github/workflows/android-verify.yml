@@ -185,7 +185,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           from xml.etree import ElementTree as ET
-          root=Path("05_WiFi_и_приложение/android_app_r1/app/src/main")
+          root=Path("app/src/main")
           layout=ET.fromstring((root/"res/layout/activity_main.xml").read_text())
           ns="{http://schemas.android.com/apk/res/android}"
           dock=next(node for node in layout.iter() if node.get(ns+"id")=="@+id/bottomNavDock")
