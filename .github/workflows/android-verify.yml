@@ -245,16 +245,38 @@ jobs:
           print("PASS: heartbeat excluded during command/readback and no POST replay")
           PY
 
+      - name: Verify smooth cell-local nav glow and partial direct readback
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path("app/src/main")
+          glow=(root/"java/com/ardu/app/ui/NavGlowItemView.kt").read_text()
+          ui=(root/"java/com/ardu/app/MainActivity.kt").read_text()
+          api=(root/"java/com/ardu/app/net/ArduApiClient.kt").read_text()
+          assert "val safeRadius = min(w * 0.43f, h * 0.36f)" in glow
+          assert "val bottomRadius = min(w * 0.40f, dp(30f))" in glow
+          assert "floatArrayOf(0f, 0.48f, 1f)" in glow
+          assert "val inset = w * 0.23f" in glow
+          assert "Paint.Style.STROKE" not in glow
+          assert 'verifiedSettings ?: throw DirectPartialSettings(status)' in ui
+          assert 'if (!snapshot.settingsFresh)' in ui
+          assert "setDeviceControlsEnabled(false)" in ui
+          assert "val status = api.status()" in ui
+          assert "error is SocketTimeoutException" in api
+          assert "baseUrl == DirectConnectionPolicy.DIRECT_BASE_URL" in api
+          print("PASS: each glow fades before its cell boundary; partial readback stays read-only")
+          PY
+
       - name: Unit contract tests
         run: bash ./gradlew --no-daemon testDebugUnitTest
 
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
 
-      - name: Publish Android 0.22.13 debug APK
+      - name: Publish Android 0.22.14 debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: ardu-android-02213-direct-borderless-debug-apk
+          name: ardu-android-02214-direct-softreadback-glow-debug-apk
           path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30

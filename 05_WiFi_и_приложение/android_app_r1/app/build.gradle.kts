@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 36
-        versionName = "0.22.13-direct-stable-borderless-glow-rc1"
+        versionCode = 37
+        versionName = "0.22.14-direct-softreadback-glow-fade-rc1"
     }
 
     compileOptions {

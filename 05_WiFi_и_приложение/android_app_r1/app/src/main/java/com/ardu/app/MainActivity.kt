@@ -68,6 +68,10 @@ class MainActivity : Activity() {
     private var lastEspFirmware: String = "—"
     private var lastEspRssi: Int? = null
     private var lastNetworkMode: String = "unknown"
+    @Volatile private var verifiedSettings: ArduSettings? = null
+    @Volatile private var verifiedTime: TimeStatus? = null
+    private class DirectPartialSettings(val deviceStatus: DeviceStatus) :
+        Exception("Nano отвечает, но настройки пока не прочитаны")
     private val musicModeButtonMap = linkedMapOf<String, MusicModeTileView>()
     private var ambientEffectButtonMap: Map<String, AmbientEffectTileView> = emptyMap()
     private var musicSubmodeButtonMap: Map<Int, Button> = emptyMap()
@@ -1612,10 +1616,14 @@ class MainActivity : Activity() {
                         setDeviceControlsEnabled(true)
                     }
                     snapshot?.let(::renderSnapshot)
-                    val label = if (ping.networkMode == "softap") {
+                    val partial = snapshot?.settingsFresh == false
+                    val label = if (partial) {
+                        "● Прямое подключение • настройки уточняются"
+                    } else if (ping.networkMode == "softap") {
                         "● Прямое подключение"
                     } else "● Онлайн"
-                    setConnectionStatus(label, R.color.ardu_accent)
+                    setConnectionStatus(label,
+                        if (partial) R.color.ardu_warning else R.color.ardu_accent)
                 }
             } catch (_: Exception) {
                 val health = DeviceConnectionPolicy.classify(
@@ -1630,7 +1638,8 @@ class MainActivity : Activity() {
                         setConnectionStatus(
                             when (health) {
                                 DeviceConnectionHealth.ESP_ONLY -> "● Nano не отвечает"
-                                DeviceConnectionHealth.SETTINGS_UNAVAILABLE -> "● Ошибка данных"
+                                DeviceConnectionHealth.SETTINGS_UNAVAILABLE ->
+                                    "● Nano отвечает • настройки недоступны"
                                 else -> "● Нет связи"
                             },
                             R.color.ardu_danger
@@ -1690,6 +1699,12 @@ class MainActivity : Activity() {
                         addressInput.setText(selectedAddress.removePrefix("http://"))
                     }
                     renderSnapshot(snapshot)
+                    if (!snapshot.settingsFresh) {
+                        setOperationStatus(
+                            "Nano отвечает; временно недоступны свежие настройки. Повторите обновление.",
+                            important = true
+                        )
+                    }
                     refreshButton.isEnabled = true
                     lightRefreshButton.isEnabled = true
                     musicRefreshButton.isEnabled = true
@@ -1698,13 +1713,17 @@ class MainActivity : Activity() {
                     alarmRefreshButton.isEnabled = true
                 }
             } catch (error: Exception) {
-                val health = DeviceConnectionPolicy.classify(espResponded, false)
+                val health = if (error is DirectPartialSettings) {
+                    DeviceConnectionHealth.SETTINGS_UNAVAILABLE
+                } else DeviceConnectionPolicy.classify(espResponded, false)
                 runOnUiThread {
                     refreshInProgress = false
                     showUnavailableDeviceState()
                     lastConnectionHealth = health
                     setConnectionStatus(
-                        if (health == DeviceConnectionHealth.ESP_ONLY) {
+                        if (error is DirectPartialSettings) {
+                            "● Nano отвечает • настройки недоступны"
+                        } else if (health == DeviceConnectionHealth.ESP_ONLY) {
                             "● Nano не отвечает"
                         } else "● Нет связи",
                         R.color.ardu_danger
@@ -1721,8 +1740,30 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun readSnapshot(): Snapshot =
-        Snapshot(api.status(), api.settings(), api.time())
+    private fun readSnapshot(): Snapshot {
+        // A valid /api/status proves Nano is reachable even if the long
+        // /api/settings or /api/time exchange is interrupted on SoftAP.
+        val status = api.status()
+        val direct = lastNetworkMode == "softap" ||
+            api.selectedAddress() == "http://192.168.4.1"
+        var settingsFresh = true
+        val settings = try {
+            api.settings().also { verifiedSettings = it }
+        } catch (error: Exception) {
+            if (!direct) throw error
+            settingsFresh = false
+            verifiedSettings ?: throw DirectPartialSettings(status)
+        }
+        var timeFresh = true
+        val time = try {
+            api.time().also { verifiedTime = it }
+        } catch (error: Exception) {
+            if (!direct) throw error
+            timeFresh = false
+            verifiedTime ?: TimeStatus(valid = false, date = null, time = null, nanoRaw = "")
+        }
+        return Snapshot(status, settings, time, settingsFresh, timeFresh)
+    }
 
     private fun runDeviceAction(
         label: String,
@@ -1759,12 +1800,19 @@ class MainActivity : Activity() {
                 commandInProgress = false
                 if (writeError == null) onAcknowledged?.invoke()
                 if (snapshot != null) {
-                    deviceOnline = true
-                    lastConnectionHealth = DeviceConnectionHealth.ONLINE
-                    setDeviceControlsEnabled(true)
+                    deviceOnline = snapshot.settingsFresh
+                    lastConnectionHealth = if (snapshot.settingsFresh) {
+                        DeviceConnectionHealth.ONLINE
+                    } else DeviceConnectionHealth.SETTINGS_UNAVAILABLE
+                    setDeviceControlsEnabled(snapshot.settingsFresh)
                     renderSnapshot(snapshot)
-                    if (writeError == null) {
+                    if (writeError == null && snapshot.settingsFresh) {
                         setOperationStatus("$label: готово")
+                    } else if (writeError == null) {
+                        setOperationStatus(
+                            "$label: команда подтверждена; свежие настройки перечитываются",
+                            important = true
+                        )
                     } else {
                         setOperationStatus(
                             "$label — нет подтверждения команды: " +
@@ -1799,7 +1847,7 @@ class MainActivity : Activity() {
         latestMode = snapshot.status.mode
 
         modeText.text = modeTitle(snapshot.status.mode)
-        timeText.text = if (snapshot.time.valid) {
+        timeText.text = if (snapshot.timeFresh && snapshot.time.valid) {
             snapshot.time.time?.take(5) ?: "--:--"
         } else {
             "RTC —"
@@ -1811,6 +1859,14 @@ class MainActivity : Activity() {
         renderNight(snapshot.settings)
         renderAlarm(snapshot)
         renderService(snapshot)
+        if (!snapshot.settingsFresh) {
+            // Cached settings are a visual fallback, never a readback ACK.
+            // Disable writes until a fresh snapshot is obtained.
+            deviceOnline = false
+            lastConnectionHealth = DeviceConnectionHealth.SETTINGS_UNAVAILABLE
+            setDeviceControlsEnabled(false)
+            setConnectionStatus("● Прямое подключение • настройки уточняются", R.color.ardu_warning)
+        }
         updateServiceMessageVisibility()
 
         rendering = false
@@ -2206,7 +2262,9 @@ class MainActivity : Activity() {
     private data class Snapshot(
         val status: DeviceStatus,
         val settings: ArduSettings,
-        val time: TimeStatus
+        val time: TimeStatus,
+        val settingsFresh: Boolean = true,
+        val timeFresh: Boolean = true
     )
 
     companion object {

@@ -9,6 +9,7 @@ import android.net.NetworkCapabilities
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.Inet4Address
+import java.net.SocketTimeoutException
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.util.Calendar
@@ -649,7 +650,12 @@ class ArduApiClient(private val context: Context? = null) {
         val body = try {
             request(baseUrl, path, "GET", null)
         } catch (error: IOException) {
-            if (!HttpReadbackPolicy.shouldRetryGet(error)) throw error
+            // The direct AP may briefly pause during radio/channel recovery.
+            // Repeat read-only GET once, including a direct-network timeout.
+            // NEVER repeat POST: its ACK may have been lost after applying.
+            if (!HttpReadbackPolicy.shouldRetryGet(error) &&
+                !(baseUrl == DirectConnectionPolicy.DIRECT_BASE_URL &&
+                    error is SocketTimeoutException)) throw error
             request(baseUrl, path, "GET", null)
         }
         return JSONObject(body)
