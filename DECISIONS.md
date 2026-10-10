@@ -2028,10 +2028,10 @@ R3 не прошивался и не тестировался на железе.
 
 ## D-119 — Android 0.22.12: selected-tab cyan/mint glass glow без изменений контроллеров
 
-**Дата:** 2026-10-10. **Статус:** Android SOURCE в main, CI Gradle в процессе, физический visual PASS ожидается.
+**Дата:** 2026-10-10. **Статус:** Android SOURCE/CI PASS; физический visual PASS ожидается.
 
 **Основание:** владелец сообщил о проверке 0.22.11 и направил изображение-образец нижнего меню с активной тёмно-мятной капсулой и мягким свечением и попросил «делай свечение».
 
 **РЕШЕНИЕ:** минимальное Android-only изменение: оставить пять равных вкладок и текущие icons/text, для выбранной вкладки рисовать лёгкую стеклянную капсулу с radial mint/cyan halo, тонкой светящейся нижней кромкой и слабым text shadow. Иконки не кладутся в отдельные квадратные selected-shapes; остальные tabs без glow. Всей ячейкой можно нажимать, но accessible icon buttons остаются. Навигационная семантика `navigateToUserSection` / `showSection` и однократный режимный HTTP переход сохраняются. Без новых Android dependencies, без новых изображений, без пересборки ESP/Nano.
 
-**Source:** `05_WiFi_и_приложение/android_app_r1/app/src/main/java/com/ardu/app/ui/NavGlowItemView.kt`, `MainActivity.kt`, `activity_main.xml`, `styles.xml`; `0.22.12-nav-glow-rc1` versionCode35; static XML/UI guard в Android Verify. CI Gradle build и owner phone screenshot требуются для принятия результата. AP fallback — отдельный аппаратный gate, не часть изменения glow.
+**Source:** `05_WiFi_и_приложение/android_app_r1/app/src/main/java/com/ardu/app/ui/NavGlowItemView.kt`, `MainActivity.kt`, `activity_main.xml`, `styles.xml`; `0.22.12-nav-glow-rc1` versionCode35; static XML/UI guard в Android Verify. [Android Verify PASS 38046617214](https://github.com/dronrome1245/ARDU/actions/runs/38046617214) — пять равных glow tabs, Kotlin/JUnit unit tests, debug APK `ardu-android-02212-nav-glow-debug-apk` (artifact ID 11668260250). Реальное phone visual acceptance остаётся отдельным обязательным gate. AP fallback — отдельный аппаратный gate, не часть изменения glow.
