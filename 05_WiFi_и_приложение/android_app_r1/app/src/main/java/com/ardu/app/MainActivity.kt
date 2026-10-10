@@ -257,6 +257,8 @@ class MainActivity : Activity() {
     private lateinit var alarmStartHueSeek: SmartSliderView
     private lateinit var alarmEndHueText: TextView
     private lateinit var alarmEndHueSeek: SmartSliderView
+    private lateinit var alarmPresetSupportText: TextView
+    private var alarmPresetButtons: Map<String, Button> = emptyMap()
 
     private lateinit var addressInput: EditText
     private lateinit var systemSummaryText: TextView
@@ -462,6 +464,13 @@ class MainActivity : Activity() {
         alarmStartHueSeek = findViewById(R.id.alarmStartHueSeek)
         alarmEndHueText = findViewById(R.id.alarmEndHueText)
         alarmEndHueSeek = findViewById(R.id.alarmEndHueSeek)
+        alarmPresetSupportText = findViewById(R.id.alarmPresetSupportText)
+        alarmPresetButtons = mapOf(
+            "extra_gentle" to findViewById(R.id.alarmPresetExtraGentle),
+            "gentle" to findViewById(R.id.alarmPresetGentle),
+            "standard" to findViewById(R.id.alarmPresetStandard),
+            "energizing" to findViewById(R.id.alarmPresetEnergizing)
+        )
 
         addressInput = findViewById(R.id.addressInput)
         systemSummaryText = findViewById(R.id.systemSummaryText)
@@ -788,8 +797,12 @@ class MainActivity : Activity() {
     }
 
     private fun updateAlarmPreviews() {
-        setPreview(alarmStartPreview, hueColor(alarmStartHueSeek.value(), 255, 255))
-        setPreview(alarmEndPreview, hueColor(alarmEndHueSeek.value(), 255, 255))
+        fun warmKelvinColor(kelvin: Int): Int {
+            val p = (kelvin.coerceIn(1800, 4000) - 1800)
+            return Color.rgb(255, 147 + 81 * p / 2200, 41 + 165 * p / 2200)
+        }
+        setPreview(alarmStartPreview, warmKelvinColor(alarmStartHueSeek.value()))
+        setPreview(alarmEndPreview, warmKelvinColor(alarmEndHueSeek.value()))
     }
 
     private fun hueColor(hue: Int, saturation: Int, brightness: Int): Int =
@@ -1297,6 +1310,22 @@ class MainActivity : Activity() {
         alarmEnabledSwitch.setOnCheckedChangeListener { _, checked ->
             if (!rendering) runDeviceAction("Будильник") { api.updateAlarmSettings(enabled = checked) }
         }
+        for (preset in DawnPresets.all) {
+            alarmPresetButtons.getValue(preset.id).setOnClickListener {
+                if (latestSettings?.alarm?.kelvinSupported != true) {
+                    setOperationStatus("Тёплый рассвет требует прошивки Nano R5 и ESP V3", important = true)
+                } else {
+                    runDeviceAction("Рассвет: ${preset.title}") {
+                        api.updateAlarmSettings(
+                            fadeMinutes = preset.minutes,
+                            maxBrightness = preset.maxBrightness,
+                            startKelvin = preset.startKelvin,
+                            endKelvin = preset.endKelvin
+                        )
+                    }
+                }
+            }
+        }
 
         findViewById<Button>(R.id.alarmSaveTimeButton).setOnClickListener {
             val hour = alarmHourInput.text.toString().toIntOrNull()
@@ -1321,20 +1350,32 @@ class MainActivity : Activity() {
             { value -> runDeviceAction("Яркость рассвета") { api.updateAlarmSettings(maxBrightness = value) } }
         )
         bindSmartSlider(
-            alarmStartHueSeek, 0, 255, SmartSliderView.VisualMode.HUE,
+            alarmStartHueSeek, 1800, 4000, SmartSliderView.VisualMode.KELVIN,
             {
-                alarmStartHueText.text = "Начало • $it"
+                alarmStartHueText.text = "Начало • ${DawnPresets.quantizeKelvin(it)} K"
                 updateAlarmPreviews()
             },
-            { value -> runDeviceAction("Начальный цвет рассвета") { api.updateAlarmSettings(startHue = value) } }
+            { value ->
+                val start = DawnPresets.quantizeKelvin(value)
+                val end = maxOf(start, DawnPresets.quantizeKelvin(alarmEndHueSeek.value()))
+                runDeviceAction("Начальная температура рассвета") {
+                    api.updateAlarmSettings(startKelvin = start, endKelvin = end)
+                }
+            }
         )
         bindSmartSlider(
-            alarmEndHueSeek, 0, 255, SmartSliderView.VisualMode.HUE,
+            alarmEndHueSeek, 1800, 4000, SmartSliderView.VisualMode.KELVIN,
             {
-                alarmEndHueText.text = "Финиш • $it"
+                alarmEndHueText.text = "Финиш • ${DawnPresets.quantizeKelvin(it)} K"
                 updateAlarmPreviews()
             },
-            { value -> runDeviceAction("Конечный цвет рассвета") { api.updateAlarmSettings(endHue = value) } }
+            { value ->
+                val end = DawnPresets.quantizeKelvin(value)
+                val start = minOf(end, DawnPresets.quantizeKelvin(alarmStartHueSeek.value()))
+                runDeviceAction("Конечная температура рассвета") {
+                    api.updateAlarmSettings(startKelvin = start, endKelvin = end)
+                }
+            }
         )
 
         findViewById<Button>(R.id.syncTimeButton).setOnClickListener {
@@ -2108,13 +2149,30 @@ class MainActivity : Activity() {
         alarmMinuteInput.setText(a.minute.toString().padStart(2, '0'))
         alarmFadeSeek.setValue(a.fadeMinutes)
         alarmBrightnessSeek.setValue(a.maxBrightness)
-        alarmStartHueSeek.setValue(a.startHue)
-        alarmEndHueSeek.setValue(a.endHue)
+        val kelvinSupported = a.kelvinSupported &&
+            a.startKelvin != null && a.endKelvin != null
+        alarmStartHueSeek.setValue(a.startKelvin ?: 2000)
+        alarmEndHueSeek.setValue(a.endKelvin ?: 3600)
 
         alarmFadeText.text = "Длительность • ${a.fadeMinutes} мин"
         alarmBrightnessText.text = "Макс. яркость • ${brightnessPercent(a.maxBrightness)}%"
-        alarmStartHueText.text = "Начало • ${a.startHue}"
-        alarmEndHueText.text = "Финиш • ${a.endHue}"
+        alarmStartHueText.text = "Начало • ${a.startKelvin ?: "—"} K"
+        alarmEndHueText.text = "Финиш • ${a.endKelvin ?: "—"} K"
+        alarmPresetSupportText.text = if (kelvinSupported) {
+            "Тёплый свет 1800–4000 K · заканчивается ко времени будильника"
+        } else {
+            "Для тёплых сцен требуются Nano R5 + ESP V3. Старый HSV не используется."
+        }
+        for (p in DawnPresets.all) {
+            val button = alarmPresetButtons.getValue(p.id)
+            button.isEnabled = kelvinSupported && deviceOnline
+            setChoiceState(button, kelvinSupported &&
+                DawnPresets.matching(a.fadeMinutes, a.maxBrightness,
+                    a.startKelvin ?: 2000, a.endKelvin ?: 3600)?.id == p.id)
+        }
+        alarmStartHueSeek.isEnabled = kelvinSupported && deviceOnline
+        alarmEndHueSeek.isEnabled = kelvinSupported && deviceOnline
+        alarmEnabledSwitch.isEnabled = kelvinSupported && deviceOnline
         alarmStateText.text =
             "${if (a.enabled) "Включён" else "Выключен"} • " +
             String.format(Locale.US, "%02d:%02d", a.hour, a.minute) +

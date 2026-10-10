@@ -97,7 +97,10 @@ data class AlarmSettings(
     val startHue: Int,
     val endHue: Int,
     val dawnPhase: String,
-    val recovered: Boolean
+    val recovered: Boolean,
+    val kelvinSupported: Boolean = false,
+    val startKelvin: Int? = null,
+    val endKelvin: Int? = null
 )
 
 data class AmbientEffectSettings(

@@ -353,8 +353,20 @@ class ArduApiClient(private val context: Context? = null) {
         maxBrightness: Int? = null,
         startHue: Int? = null,
         endHue: Int? = null,
+        startKelvin: Int? = null,
+        endKelvin: Int? = null,
         persist: Boolean = true
     ) {
+        // Warm endpoints are sent together: the Nano validates op78 atomically.
+        require((startKelvin == null) == (endKelvin == null)) {
+            "Обе температуры рассвета обязательны"
+        }
+        if (startKelvin != null && endKelvin != null) {
+            require(startKelvin in 1800..4000 && endKelvin in 1800..4000 &&
+                startKelvin <= endKelvin &&
+                (startKelvin - 1800) % 20 == 0 &&
+                (endKelvin - 1800) % 20 == 0)
+        }
         val json = JSONObject()
         enabled?.let { json.put("enabled", it) }
         hour?.let { json.put("hour", it) }
@@ -363,6 +375,8 @@ class ArduApiClient(private val context: Context? = null) {
         maxBrightness?.let { json.put("max_brightness", it) }
         startHue?.let { json.put("start_hue", it) }
         endHue?.let { json.put("end_hue", it) }
+        startKelvin?.let { json.put("start_kelvin", it) }
+        endKelvin?.let { json.put("end_kelvin", it) }
         json.put("persist", persist)
         postApplied("/api/alarm/settings", json)
     }
@@ -589,7 +603,12 @@ class ArduApiClient(private val context: Context? = null) {
                 startHue = alarm.requiredInt("start_hue", 0..255),
                 endHue = alarm.requiredInt("end_hue", 0..255),
                 dawnPhase = alarm.requiredString("dawn_phase"),
-                recovered = alarm.optBoolean("recovered")
+                recovered = alarm.optBoolean("recovered"),
+                kelvinSupported = alarm.optBoolean("dawn_kelvin_supported"),
+                startKelvin = if (alarm.optBoolean("dawn_kelvin_supported"))
+                    alarm.requiredInt("start_kelvin", 1800..4000) else null,
+                endKelvin = if (alarm.optBoolean("dawn_kelvin_supported"))
+                    alarm.requiredInt("end_kelvin", 1800..4000) else null
             ),
             ambient = AmbientSettings(
                 effect = ambient.requiredString("effect"),

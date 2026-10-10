@@ -1982,7 +1982,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Плавный рассвет к выбранному времени"
+                            android:text="Тёплый рассвет завершается к выбранному времени"
                             android:textColor="@color/ardu_text"
                             android:textSize="13sp" />
 
@@ -2125,6 +2125,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Actual dawn presets require Nano R5 + ESP V3: no UI-only HSV shortcut. -->
                 <LinearLayout
                     style="@style/ARDU.Card"
                     android:layout_width="match_parent"
@@ -2135,7 +2136,82 @@
                         style="@style/ARDU.CardTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Параметры рассвета" />
+                        android:text="Сцена пробуждения" />
+
+                    <TextView
+                        android:id="@+id/alarmPresetSupportText"
+                        style="@style/ARDU.Label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Тёплый рассвет завершается к указанному времени." />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/alarmPresetExtraGentle"
+                            style="@style/Widget.ARDU.Button.Choice"
+                            android:layout_width="0dp"
+                            android:layout_height="76dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:text="Очень мягкий&#10;40 мин · 25%"
+                            android:textAllCaps="false" />
+
+                        <Button
+                            android:id="@+id/alarmPresetGentle"
+                            style="@style/Widget.ARDU.Button.Choice"
+                            android:layout_width="0dp"
+                            android:layout_height="76dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="1"
+                            android:text="Мягкий&#10;25 мин · 30%"
+                            android:textAllCaps="false" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/alarmPresetStandard"
+                            style="@style/Widget.ARDU.Button.Choice"
+                            android:layout_width="0dp"
+                            android:layout_height="76dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:text="Стандарт&#10;30 мин · 40%"
+                            android:textAllCaps="false" />
+
+                        <Button
+                            android:id="@+id/alarmPresetEnergizing"
+                            style="@style/Widget.ARDU.Button.Choice"
+                            android:layout_width="0dp"
+                            android:layout_height="76dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="1"
+                            android:text="Бодрый&#10;20 мин · 55%"
+                            android:textAllCaps="false" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/ARDU.CardTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Донастройка рассвета" />
 
                     <TextView
                         android:id="@+id/alarmFadeText"
@@ -2185,7 +2261,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Начало • 8" />
+                            android:text="Начало • 2000 K" />
                     </LinearLayout>
 
                     <com.ardu.app.ui.SmartSliderView
@@ -2214,7 +2290,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Финиш • 32" />
+                            android:text="Финиш • 3600 K" />
                     </LinearLayout>
 
                     <com.ardu.app.ui.SmartSliderView

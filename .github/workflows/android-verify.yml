@@ -267,16 +267,44 @@ jobs:
           print("PASS: each glow fades before its cell boundary; partial readback stays read-only")
           PY
 
+      - name: Verify warm Kelvin Dawn scene presets and backend capability gate
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          root=Path("app/src/main")
+          ui=(root/"java/com/ardu/app/MainActivity.kt").read_text()
+          model=(root/"java/com/ardu/app/net/Models.kt").read_text()
+          api=(root/"java/com/ardu/app/net/ArduApiClient.kt").read_text()
+          p=(root/"java/com/ardu/app/DawnPresets.kt").read_text()
+          layout=ET.fromstring((root/"res/layout/activity_main.xml").read_text())
+          ns="{http://schemas.android.com/apk/res/android}"
+          ids={n.get(ns+"id") for n in layout.iter() if n.get(ns+"id")}
+          for id in ("alarmPresetExtraGentle","alarmPresetGentle","alarmPresetStandard",
+                     "alarmPresetEnergizing","alarmPresetSupportText"):
+              assert "@+id/"+id in ids
+          assert "a.kelvinSupported" in ui
+          assert "DawnPresets.matching" in ui
+          assert "SmartSliderView.VisualMode.KELVIN" in ui
+          assert "updateAlarmSettings(startKelvin = start, endKelvin = end)" in ui
+          assert "start_kelvin" in api and "end_kelvin" in api
+          assert "dawn_kelvin_supported" in api
+          assert "kelvinSupported" in model
+          assert "DawnPreset(\"standard\", \"Стандарт\", 30, 2000, 3600, 102)" in p
+          assert "startHue = value" not in ui and "endHue = value" not in ui
+          print("PASS: four warm profiles, manual Kelvin tuning and fail-closed firmware capability")
+          PY
+
       - name: Unit contract tests
         run: bash ./gradlew --no-daemon testDebugUnitTest
 
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
 
-      - name: Publish Android 0.22.14 debug APK
+      - name: Publish Android 0.22.15 debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: ardu-android-02214-direct-softreadback-glow-debug-apk
+          name: ardu-android-02215-warm-dawn-presets-debug-apk
           path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
