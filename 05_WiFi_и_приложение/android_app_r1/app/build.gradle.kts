@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 33
-        versionName = "0.22.10-launcher-readback-clap-rc1"
+        versionCode = 34
+        versionName = "0.22.11-presets-submodes-scene-contrast-rc1"
     }
 
     compileOptions {
