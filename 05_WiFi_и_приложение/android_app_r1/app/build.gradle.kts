@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 35
-        versionName = "0.22.12-nav-glow-rc1"
+        versionCode = 36
+        versionName = "0.22.13-direct-stable-borderless-glow-rc1"
     }
 
     compileOptions {

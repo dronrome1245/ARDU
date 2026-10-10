@@ -2,13 +2,18 @@ package com.ardu.app.net
 
 import org.json.JSONArray
 import org.json.JSONObject
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import java.io.IOException
 import java.net.HttpURLConnection
+import java.net.Inet4Address
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.util.Calendar
 
-class ArduApiClient {
+class ArduApiClient(private val context: Context? = null) {
     @Volatile
     private var preferredBaseUrl: String? = null
 
@@ -23,13 +28,12 @@ class ArduApiClient {
     fun selectedAddress(): String? = selectedBaseUrl
 
     fun ping(): PingResponse {
-        val candidates = buildList {
-            preferredBaseUrl?.let(::add)
-            selectedBaseUrl?.let { if (it !in this) add(it) }
-            add("http://192.168.4.1")
-            add("http://ardu.local")
-            add("http://192.168.0.4")
-        }.distinct()
+        // A connected ARDU-DIRECT interface wins over saved Station endpoints.
+        // While its 192.168.4.x Wi-Fi link is active, never roam to an old IP
+        // merely because a local GET/POST was temporarily interrupted.
+        val candidates = DirectConnectionPolicy.candidates(
+            preferredBaseUrl, selectedBaseUrl, directWifiNetwork() != null
+        )
 
         var lastError: Exception? = null
 
@@ -669,6 +673,28 @@ class ArduApiClient {
         }
     }
 
+    /**
+     * Android may set its default network to cellular when ARDU-DIRECT has no Internet.
+     * Network.openConnection explicitly routes local HTTP over the phone's Wi-Fi
+     * interface; bind no process-global network and require no SSID/location access.
+     */
+    private fun directWifiNetwork(): Network? {
+        val manager = context?.getSystemService(Context.CONNECTIVITY_SERVICE)
+            as? ConnectivityManager ?: return null
+        return manager.allNetworks.firstOrNull { network ->
+            val capabilities = manager.getNetworkCapabilities(network)
+            if (capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) != true) {
+                false
+            } else {
+                manager.getLinkProperties(network)?.linkAddresses?.any { link ->
+                    val address = link.address
+                    address is Inet4Address &&
+                        DirectConnectionPolicy.isDirectWifiIpv4(address.address)
+                } == true
+            }
+        }
+    }
+
     private fun request(
         baseUrl: String,
         path: String,
@@ -677,11 +703,22 @@ class ArduApiClient {
         contentType: String = "application/json; charset=utf-8",
         readTimeoutMs: Int = 5_000
     ): String {
-        val connection = URL(baseUrl + path).openConnection() as HttpURLConnection
+        val url = URL(baseUrl + path)
+        val connection = if (baseUrl == DirectConnectionPolicy.DIRECT_BASE_URL &&
+            context != null) {
+            val wifiNetwork = directWifiNetwork()
+                ?: throw IOException("Подключите Wi-Fi ARDU-DIRECT: адрес 192.168.4.1 сейчас недоступен")
+            wifiNetwork.openConnection(url) as HttpURLConnection
+        } else {
+            url.openConnection() as HttpURLConnection
+        }
         try {
             connection.requestMethod = method
             connection.connectTimeout = 1_800
-            connection.readTimeout = readTimeoutMs
+            // Allow short AP/STA channel changes without replaying POST commands.
+            connection.readTimeout = if (baseUrl == DirectConnectionPolicy.DIRECT_BASE_URL) {
+                maxOf(readTimeoutMs, 8_000)
+            } else readTimeoutMs
             connection.useCaches = false
             connection.setRequestProperty("Accept", "application/json")
             connection.setRequestProperty("Connection", "close")

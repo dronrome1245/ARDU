@@ -13,9 +13,8 @@ import android.widget.LinearLayout
 import kotlin.math.max
 
 /**
- * A restrained cyan/mint illuminated capsule behind the currently selected bottom tab.
- * The draw path is purely local UI. It never sends commands to the lamp.
- * The inactive state draws nothing, so the five destinations remain quiet.
+ * Selected-tab lighting without any enclosing capsule, fill or border.
+ * Unselected tabs are painted transparent; icon and label stay native views.
  */
 class NavGlowItemView @JvmOverloads constructor(
     context: Context,
@@ -37,92 +36,71 @@ class NavGlowItemView @JvmOverloads constructor(
         val w = width.toFloat()
         val h = height.toFloat()
         if (w <= 0f || h <= 0f) return
-        val cx = w / 2f
+        val cx = w * 0.5f
 
-        // Reset the paint alpha after earlier selected draws; keep the halo stable.
+        paint.reset()
+        paint.isAntiAlias = true
         paint.color = Color.WHITE
         paint.style = Paint.Style.FILL
-        paint.strokeWidth = 0f
-        // Diffuse halo at the edges; it is confined to the chosen tab's cell.
-        val haloRadius = max(w * 0.72f, dp(36f))
+
+        // Wide atmospheric bloom with no rectangular/capsule edge.
+        val haloRadius = max(w * 0.70f, dp(36f))
         paint.shader = RadialGradient(
-            cx, h * 0.57f, haloRadius,
+            cx, h * 0.55f, haloRadius,
             intArrayOf(
-                Color.argb(65, 64, 215, 204),
-                Color.argb(24, 39, 155, 187),
+                Color.argb(48, 62, 232, 199),
+                Color.argb(18, 43, 172, 209),
                 Color.TRANSPARENT
             ),
-            floatArrayOf(0f, 0.55f, 1f),
+            floatArrayOf(0f, 0.50f, 1f),
             Shader.TileMode.CLAMP
         )
-        bounds.set(cx - haloRadius, dp(5f), cx + haloRadius, h + dp(3f))
+        bounds.set(cx - haloRadius, dp(5f), cx + haloRadius, h + dp(2f))
         canvas.drawOval(bounds, paint)
 
-        // A dark glass capsule instead of a solid accent rectangle.
-        bounds.set(dp(2f), dp(4f), w - dp(2f), h - dp(3.5f))
-        val radius = dp(17f)
-        paint.shader = LinearGradient(
-            0f, bounds.top, 0f, bounds.bottom,
-            intArrayOf(
-                Color.argb(210, 24, 61, 64),
-                Color.argb(190, 15, 38, 44),
-                Color.argb(222, 13, 27, 34)
-            ),
-            null,
-            Shader.TileMode.CLAMP
-        )
-        canvas.drawRoundRect(bounds, radius, radius, paint)
-
-        // The soft mint center sits behind the icon; vector icon/label remain crisp.
+        // Brighter but soft glow just behind the icon.
+        val iconRadius = dp(26f)
         paint.shader = RadialGradient(
-            cx, h * 0.36f, dp(27f),
+            cx, h * 0.37f, iconRadius,
             intArrayOf(
-                Color.argb(94, 90, 242, 210),
-                Color.argb(30, 63, 210, 204),
-                Color.TRANSPARENT
-            ),
-            floatArrayOf(0f, 0.52f, 1f),
-            Shader.TileMode.CLAMP
-        )
-        canvas.drawCircle(cx, h * 0.36f, dp(27f), paint)
-
-        // Subtle mint glass outline.
-        paint.shader = null
-        paint.color = Color.argb(75, 138, 239, 222)
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = dp(0.8f)
-        canvas.drawRoundRect(bounds, radius, radius, paint)
-
-        // Flattened radial bloom at the capsule's lower rim (no software blur layer).
-        paint.style = Paint.Style.FILL
-        val state = canvas.save()
-        canvas.translate(cx, h - dp(6f))
-        canvas.scale(1f, 0.22f)
-        paint.shader = RadialGradient(
-            0f, 0f, w * 0.49f,
-            intArrayOf(
-                Color.argb(188, 113, 253, 226),
-                Color.argb(65, 50, 205, 222),
+                Color.argb(108, 98, 247, 216),
+                Color.argb(40, 58, 227, 212),
                 Color.TRANSPARENT
             ),
             floatArrayOf(0f, 0.40f, 1f),
             Shader.TileMode.CLAMP
         )
-        canvas.drawCircle(0f, 0f, w * 0.49f, paint)
+        canvas.drawCircle(cx, h * 0.37f, iconRadius, paint)
+
+        // Diffused reflection under the label, not a button outline.
+        val state = canvas.save()
+        canvas.translate(cx, h - dp(6f))
+        canvas.scale(1f, 0.23f)
+        paint.shader = RadialGradient(
+            0f, 0f, w * 0.45f,
+            intArrayOf(
+                Color.argb(140, 113, 253, 226),
+                Color.argb(48, 50, 205, 222),
+                Color.TRANSPARENT
+            ),
+            floatArrayOf(0f, 0.38f, 1f),
+            Shader.TileMode.CLAMP
+        )
+        canvas.drawCircle(0f, 0f, w * 0.45f, paint)
         canvas.restoreToCount(state)
 
-        // A fine line gives a luminous lower edge without a thick neon strip.
+        // Thin floating mint underline: no stroke around the icon/tab.
         paint.shader = LinearGradient(
-            dp(7f), 0f, w - dp(7f), 0f,
+            dp(8f), 0f, w - dp(8f), 0f,
             intArrayOf(
                 Color.TRANSPARENT,
-                Color.argb(200, 113, 253, 226),
+                Color.argb(185, 113, 253, 226),
                 Color.TRANSPARENT
             ),
             floatArrayOf(0f, 0.5f, 1f),
             Shader.TileMode.CLAMP
         )
-        bounds.set(dp(7f), h - dp(5f), w - dp(7f), h - dp(3.8f))
+        bounds.set(dp(8f), h - dp(5f), w - dp(8f), h - dp(3.8f))
         canvas.drawRoundRect(bounds, dp(2f), dp(2f), paint)
         paint.shader = null
     }

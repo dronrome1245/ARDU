@@ -37,12 +37,15 @@ import java.util.Locale
 import java.util.concurrent.Executors
 
 class MainActivity : Activity() {
-    private val api = ArduApiClient()
+    // Context is used only to route ARDU-DIRECT HTTP over Wi-Fi when the OS
+    // prefers cellular data for Internet traffic.
+    private val api = ArduApiClient(this)
     private val worker = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
     private var heartbeatEnabled = false
     private var heartbeatInFlight = false
     private var refreshInProgress = false
+    private var commandInProgress = false
     private var lastConnectionHealth = DeviceConnectionHealth.DISCONNECTED
     private val heartbeatRunnable = object : Runnable {
         override fun run() {
@@ -490,29 +493,9 @@ class MainActivity : Activity() {
 
         if (targetMode == null || !deviceOnline || latestMode == targetMode) return
 
-        setOperationStatus(
-            when (target) {
-                lightPanel -> "Включение света…"
-                musicPanel -> "Запуск светомузыки…"
-                ambientPanel -> "Запуск фона…"
-                nightPanel -> "Переход в ночной режим…"
-                alarmPanel -> "Остановка текущего режима…"
-                else -> "Переключение режима…"
-            }
-        )
-
-        worker.execute {
-            try {
-                api.setMode(targetMode)
-                val snapshot = readSnapshot()
-                runOnUiThread {
-                    renderSnapshot(snapshot)
-                    setOperationStatus("")
-                }
-            } catch (error: Exception) {
-                showError("Переключение режима", error)
-            }
-        }
+        // All user mode writes share the same heartbeat exclusion and readback
+        // path as sliders/buttons. No parallel status probe during mode changes.
+        runDeviceAction("Переключение режима") { api.setMode(targetMode) }
     }
 
     private fun bindNavigation() {
@@ -1600,7 +1583,7 @@ class MainActivity : Activity() {
      * Single executor serializes these probes after any pending user write.
      */
     private fun checkDeviceHeartbeat() {
-        if (heartbeatInFlight || refreshInProgress) return
+        if (heartbeatInFlight || refreshInProgress || commandInProgress) return
         heartbeatInFlight = true
         val alreadyOnline = deviceOnline
         val oldMode = latestMode
@@ -1619,7 +1602,7 @@ class MainActivity : Activity() {
                 } else null
                 runOnUiThread {
                     heartbeatInFlight = false
-                    if (!heartbeatEnabled) return@runOnUiThread
+                    if (!heartbeatEnabled || commandInProgress) return@runOnUiThread
                     lastConnectionHealth = DeviceConnectionHealth.ONLINE
                     lastEspFirmware = ping.firmware
                     lastEspRssi = ping.rssi
@@ -1640,7 +1623,7 @@ class MainActivity : Activity() {
                 )
                 runOnUiThread {
                     heartbeatInFlight = false
-                    if (!heartbeatEnabled) return@runOnUiThread
+                    if (!heartbeatEnabled || commandInProgress) return@runOnUiThread
                     if (deviceOnline || lastConnectionHealth != health) {
                         showUnavailableDeviceState()
                         lastConnectionHealth = health
@@ -1668,7 +1651,7 @@ class MainActivity : Activity() {
     }
 
     private fun refreshDevice() {
-        if (refreshInProgress) return
+        if (refreshInProgress || commandInProgress) return
         refreshInProgress = true
         setConnectionStatus("Проверка…", R.color.ardu_text_secondary)
         refreshButton.isEnabled = false
@@ -1746,38 +1729,63 @@ class MainActivity : Activity() {
         onAcknowledged: (() -> Unit)? = null,
         action: () -> Unit
     ) {
+        if (commandInProgress) {
+            setOperationStatus("Дождитесь завершения предыдущей команды", important = true)
+            return
+        }
         if (!UiSafetyPolicy.canSendCommand(deviceOnline)) {
             setOperationStatus("Нет связи с ARDU — команда не отправлена", important = true)
             return
         }
+        // Set on the UI thread before enqueueing work. Heartbeat may already be
+        // running, but the shared worker prevents simultaneous ESP requests.
+        commandInProgress = true
         setOperationStatus("$label…")
         worker.execute {
-            // A successful POST response confirms the write; a later failed
-            // GET must never be presented as a failed command or cause replay.
-            try {
+            // Do not repeat POST if the HTTP ACK was lost. Read back once on
+            // the same worker before releasing the foreground command lock.
+            val writeError = try {
                 action()
+                null
             } catch (error: Exception) {
-                showError("$label — нет подтверждения команды", error)
-                return@execute
+                error
             }
-
             val snapshot = try {
                 readSnapshot()
             } catch (_: Exception) {
                 null
             }
             runOnUiThread {
-                onAcknowledged?.invoke()
+                commandInProgress = false
+                if (writeError == null) onAcknowledged?.invoke()
                 if (snapshot != null) {
+                    deviceOnline = true
+                    lastConnectionHealth = DeviceConnectionHealth.ONLINE
+                    setDeviceControlsEnabled(true)
                     renderSnapshot(snapshot)
-                    setOperationStatus("$label: готово")
+                    if (writeError == null) {
+                        setOperationStatus("$label: готово")
+                    } else {
+                        setOperationStatus(
+                            "$label — нет подтверждения команды: " +
+                                (writeError.message ?: "ошибка связи"),
+                            important = true
+                        )
+                    }
                 } else {
-                    // Do not present stale readback/slider values as authoritative.
-                    // Foreground heartbeat restores the full snapshot on reconnect.
+                    // Without Nano readback do not display stale slider states.
                     showUnavailableDeviceState()
-                    setConnectionStatus("● Проверка состояния…", R.color.ardu_text_secondary)
+                    setConnectionStatus(
+                        if (writeError == null) "● Проверка состояния…" else "● Нет связи",
+                        if (writeError == null) R.color.ardu_text_secondary else R.color.ardu_danger
+                    )
                     setOperationStatus(
-                        "$label: устройство подтвердило команду; состояние перечитывается",
+                        if (writeError == null) {
+                            "$label: устройство подтвердило команду; состояние перечитывается"
+                        } else {
+                            "$label — нет подтверждения команды: " +
+                                (writeError.message ?: "ошибка связи")
+                        },
                         important = true
                     )
                 }

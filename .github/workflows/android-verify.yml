@@ -180,7 +180,7 @@ jobs:
           print("PASS: music background color truth and visibly distinct Evening/Cinema")
           PY
 
-      - name: Verify v0.22.12 selected tab capsule and mint glow
+      - name: Verify selected tab mint glow and full-width touch area
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -213,16 +213,48 @@ jobs:
           print("PASS: five equal-width selectable neon capsules; invisible inactive glow; whole-cell tap")
           PY
 
+      - name: Verify Android 0.22.13 DIRECT Wi-Fi transport and borderless nav
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path("app/src/main")
+          manifest=(root/"AndroidManifest.xml").read_text()
+          assert 'android.permission.ACCESS_NETWORK_STATE' in manifest
+          api=(root/"java/com/ardu/app/net/ArduApiClient.kt").read_text()
+          policy=(root/"java/com/ardu/app/net/DirectConnectionPolicy.kt").read_text()
+          kotlin=(root/"java/com/ardu/app/MainActivity.kt").read_text()
+          glow=(root/"java/com/ardu/app/ui/NavGlowItemView.kt").read_text()
+          assert "DirectConnectionPolicy.candidates(" in api
+          assert "directWifiNetwork() != null" in api
+          assert "wifiNetwork.openConnection(url)" in api
+          assert "NetworkCapabilities.TRANSPORT_WIFI" in api
+          assert "if (baseUrl == DirectConnectionPolicy.DIRECT_BASE_URL)" in api
+          assert 'fun isDirectWifiIpv4' in policy
+          assert "if (directWifiConnected) return listOf(DIRECT_BASE_URL)" in policy
+          assert "if (heartbeatInFlight || refreshInProgress || commandInProgress) return" in kotlin
+          assert "if (!heartbeatEnabled || commandInProgress) return@runOnUiThread" in kotlin
+          assert "commandInProgress = true" in kotlin
+          assert "if (writeError == null) onAcknowledged?.invoke()" in kotlin
+          assert 'runDeviceAction("Переключение режима")' in kotlin
+          assert "if (!isSelected) return" in glow
+          assert "RadialGradient(" in glow and "LinearGradient(" in glow
+          assert "glass capsule" not in glow.lower()
+          assert "Paint.Style.STROKE" not in glow
+          assert "canvas.drawRoundRect(bounds, radius, radius, paint)" not in glow
+          print("PASS: native no-border selected glow; DIRECT pinned by Wi-Fi subnet and routed explicitly")
+          print("PASS: heartbeat excluded during command/readback and no POST replay")
+          PY
+
       - name: Unit contract tests
         run: bash ./gradlew --no-daemon testDebugUnitTest
 
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
 
-      - name: Publish Android 0.22.12 debug APK
+      - name: Publish Android 0.22.13 debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: ardu-android-02212-nav-glow-debug-apk
+          name: ardu-android-02213-direct-borderless-debug-apk
           path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
