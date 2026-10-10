@@ -39,6 +39,8 @@ class NavGlowItemView @JvmOverloads constructor(
         if (w <= 0f || h <= 0f) return
         val cx = w / 2f
 
+        // Reset the paint alpha after earlier selected draws; keep the halo stable.
+        paint.color = Color.WHITE
         paint.style = Paint.Style.FILL
         paint.strokeWidth = 0f
         // Diffuse halo at the edges; it is confined to the chosen tab's cell.
