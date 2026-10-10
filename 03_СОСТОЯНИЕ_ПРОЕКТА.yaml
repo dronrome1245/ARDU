@@ -3195,3 +3195,32 @@ android_02210_launcher_readback_clap_2026_10_09:
   android_debug_apk_artifact: "ardu-android-02210-launcher-debug-apk"
   owner_phone_visual_and_functional_pass: false
   next: "owner_git_pull_android_studio_run_verify_launcher_clap_music"
+
+# 2026-10-10 — video-driven Android v0.22.11 four UX fixes
+android_02211_ambient_music_scenes_2026_10_10:
+  decision: D-118
+  owner_video: "18437905058452.mp4"
+  owner_video_duration_s_approx: 368.98
+  android_version_code: 34
+  android_version_name: "0.22.11-presets-submodes-scene-contrast-rc1"
+  ambient_only_12_preset_tiles_visible: true
+  ambient_legacy_F01_hidden_not_deleted_from_api: true
+  ambient_legacy_manual_auto_ui_hidden: true
+  ambient_on_off_buttons_visible: true
+  music_submode_four_equal_width_buttons: true
+  music_submode_above_effect_sliders: true
+  music_submode_selected_strong_mint_fill: true
+  music_background_color_independently_adjustable: false
+  music_background_brightness_existing_api: true
+  music_M09_unused_bg_slider_hidden: true
+  evening_kelvin: 2700
+  evening_brightness: 115
+  cinema_kelvin: 1800
+  cinema_brightness: 18
+  guests_reading_unchanged: true
+  nano_esp_firmware_changed: false
+  ci: "https://github.com/dronrome1245/ARDU/actions/runs/38035137524"
+  ci_result: pass
+  ci_debug_apk: "ardu-android-02211-presets-music-scenes-debug-apk"
+  physical_phone_test_completed: false
+  next: "owner_git_pull_run_02211_verify_four_changes"

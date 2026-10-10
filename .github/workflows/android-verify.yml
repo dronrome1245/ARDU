@@ -103,16 +103,93 @@ jobs:
 
           PY
 
+      - name: Verify Android v0.22.11 preset-only Ambient, Music submode layout and quick-scene contrast
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          root=Path("app/src/main")
+          xml=(root/"res/layout/activity_main.xml").read_text()
+          layout=ET.fromstring(xml)
+          ns="{http://schemas.android.com/apk/res/android}"
+          nodes={node.get(ns+"id","").replace("@+id/",""):node for node in layout.iter() if node.get(ns+"id")}
+          parents={child:parent for parent in layout.iter() for child in parent}
+          def hidden_by_ancestor(node):
+              # The whole Ambient tab starts GONE until user navigation.
+              # Ignore that root; only legacy inner cards must remain hidden.
+              while node in parents:
+                  node=parents[node]
+                  if node.get(ns+"id")=="@+id/ambientPanel":
+                      return False
+                  if node.get(ns+"visibility")=="gone":
+                      return True
+              return False
+
+          # Legacy F01 manual controls remain only as invisible binding targets
+          # so the device's existing EEPROM / F01 API needs no firmware migration.
+          for name in ("ambientF01Button","ambientHueSeek","ambientSaturationSeek",
+                       "ambientBrightnessSeek","ambientSpeedSeek","ambientAutoSwitch"):
+              assert hidden_by_ancestor(nodes[name]), name
+          for name in ("ambientOnButton","ambientOffButton","ambientPresetAurora",
+                       "ambientPresetSunset","ambientPresetOcean","ambientPresetCosmos"):
+              assert not hidden_by_ancestor(nodes[name]), name
+          assert xml.index('android:text="Атмосферные сцены"') < xml.index('android:text="Свой цвет"')
+
+          # M05/M08 frequency submodes are a real full-width 4-column row
+          # before every effect slider, not a clipped horizontal scroll.
+          assert xml.index('android:id="@+id/musicSubmodeGroup"') < \
+                 xml.index('android:id="@+id/musicBrightnessText"')
+          sub=nodes["musicSubmodeGroup"]
+          subButtons=("musicSubThree","musicSubLow","musicSubMid","musicSubHigh")
+          for name in subButtons:
+              n=nodes[name]
+              assert n.get(ns+"layout_width")=="0dp",name
+              assert n.get(ns+"layout_weight")=="1",name
+              assert n.get(ns+"background")=="@drawable/ardu_music_submode_choice",name
+              p=n
+              while p is not sub:
+                  assert p in parents,name
+                  p=parents[p]
+              assert n.get(ns+"singleLine")=="true",name
+          drawable=(root/"res/drawable/ardu_music_submode_choice.xml").read_text()
+          assert 'android:state_selected="true"' in drawable
+          assert "@color/ardu_accent" in drawable
+          assert nodes["musicBackgroundColorInfo"].get(ns+"layout_width")=="match_parent"
+
+          kotlin=(root/"java/com/ardu/app/MainActivity.kt").read_text()
+          scenes=(root/"java/com/ardu/app/LightQuickScenes.kt").read_text()
+          preview=(root/"java/com/ardu/app/ui/SceneTileView.kt").read_text()
+          bgpolicy=(root/"java/com/ardu/app/MusicBackgroundUiPolicy.kt").read_text()
+          assert "musicSubmodeGroup.visibility" in kotlin
+          assert 'button.isSelected = chosen' in kotlin
+          assert "R.color.ardu_on_accent" in kotlin
+          assert 'MusicBackgroundUiPolicy.usesBackgroundBrightness(id)' in kotlin
+          assert 'MusicBackgroundUiPolicy.colorExplanation(id)' in kotlin
+          assert 'musicBackgroundGroup.visibility' in kotlin
+          assert 'ambientManualPanel.visibility = View.GONE' in kotlin
+          assert 'api.selectAmbientPreset(selected)' in kotlin
+          assert "LightQuickScenes.EVENING" in kotlin and "LightQuickScenes.CINEMA" in kotlin
+          assert 'LightQuickScene(kelvin = 2700, brightness = 115)' in scenes
+          assert 'LightQuickScene(kelvin = 1800, brightness = 18)' in scenes
+          assert "LightQuickScenes.CINEMA.percent" in preview
+          assert "Scene.WARM -> LinearGradient(" in preview
+          assert "Scene.EVENING -> LinearGradient(" in preview
+          assert "background_brightness" not in bgpolicy, \
+              "color policy should not fake independent background API fields"
+          print("PASS: preset-only Ambient, full-width selected Music row above sliders")
+          print("PASS: music background color truth and visibly distinct Evening/Cinema")
+          PY
+
       - name: Unit contract tests
         run: bash ./gradlew --no-daemon testDebugUnitTest
 
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
 
-      - name: Publish Android 0.22.10 launcher debug APK
+      - name: Publish Android 0.22.11 debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: ardu-android-02210-launcher-debug-apk
+          name: ardu-android-02211-presets-music-scenes-debug-apk
           path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30

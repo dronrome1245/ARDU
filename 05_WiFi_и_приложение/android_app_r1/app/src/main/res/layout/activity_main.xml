@@ -890,6 +890,98 @@
                         android:layout_height="wrap_content"
                         android:text="Параметры эффекта" />
 
+                    <LinearLayout
+                        android:id="@+id/musicSubmodeGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            style="@style/ARDU.Label"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="7dp"
+                            android:text="Частотный подрежим" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="4">
+                            <Button
+                                android:id="@+id/musicSubThree"
+                                style="@style/Widget.ARDU.Button.Choice"
+                                android:layout_width="0dp"
+                                android:layout_height="48dp"
+                                android:layout_weight="1"
+                                android:layout_marginStart="0dp"
+                                android:layout_marginEnd="2dp"
+                                android:background="@drawable/ardu_music_submode_choice"
+                                android:paddingStart="2dp"
+                                android:paddingEnd="2dp"
+                                android:singleLine="true"
+                                android:ellipsize="end"
+                                android:gravity="center"
+                                android:text="3 полосы"
+                                android:textSize="11sp" />
+
+                            <Button
+                                android:id="@+id/musicSubLow"
+                                style="@style/Widget.ARDU.Button.Choice"
+                                android:layout_width="0dp"
+                                android:layout_height="48dp"
+                                android:layout_weight="1"
+                                android:layout_marginStart="2dp"
+                                android:layout_marginEnd="2dp"
+                                android:background="@drawable/ardu_music_submode_choice"
+                                android:paddingStart="2dp"
+                                android:paddingEnd="2dp"
+                                android:singleLine="true"
+                                android:ellipsize="end"
+                                android:gravity="center"
+                                android:text="Низ"
+                                android:textSize="11sp" />
+
+                            <Button
+                                android:id="@+id/musicSubMid"
+                                style="@style/Widget.ARDU.Button.Choice"
+                                android:layout_width="0dp"
+                                android:layout_height="48dp"
+                                android:layout_weight="1"
+                                android:layout_marginStart="2dp"
+                                android:layout_marginEnd="2dp"
+                                android:background="@drawable/ardu_music_submode_choice"
+                                android:paddingStart="2dp"
+                                android:paddingEnd="2dp"
+                                android:singleLine="true"
+                                android:ellipsize="end"
+                                android:gravity="center"
+                                android:text="Средние"
+                                android:textSize="11sp" />
+
+                            <Button
+                                android:id="@+id/musicSubHigh"
+                                style="@style/Widget.ARDU.Button.Choice"
+                                android:layout_width="0dp"
+                                android:layout_height="48dp"
+                                android:layout_weight="1"
+                                android:layout_marginStart="2dp"
+                                android:layout_marginEnd="0dp"
+                                android:background="@drawable/ardu_music_submode_choice"
+                                android:paddingStart="2dp"
+                                android:paddingEnd="2dp"
+                                android:singleLine="true"
+                                android:ellipsize="end"
+                                android:gravity="center"
+                                android:text="Верх"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+
+
                     <TextView android:id="@+id/musicBrightnessText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="Яркость эффекта: 128" />
                     <com.ardu.app.ui.SmartSliderView
                         android:id="@+id/musicBrightnessSeek"
@@ -897,12 +989,33 @@
                         android:layout_height="54dp"
                         android:layout_marginTop="4dp" />
 
-                    <TextView android:id="@+id/musicBackgroundText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Фоновая яркость: 20" />
-                    <com.ardu.app.ui.SmartSliderView
-                        android:id="@+id/musicBackgroundSeek"
+                    <LinearLayout
+                        android:id="@+id/musicBackgroundGroup"
                         android:layout_width="match_parent"
-                        android:layout_height="54dp"
-                        android:layout_marginTop="4dp" />
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/musicBackgroundText"
+                            style="@style/ARDU.Value"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Фоновые светодиоды • яркость" />
+                        <com.ardu.app.ui.SmartSliderView
+                            android:id="@+id/musicBackgroundSeek"
+                            android:layout_width="match_parent"
+                            android:layout_height="54dp"
+                            android:layout_marginTop="4dp" />
+                        <TextView
+                            android:id="@+id/musicBackgroundColorInfo"
+                            style="@style/ARDU.Muted"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Цвет фона задаётся музыкальным режимом"
+                            android:textSize="12sp" />
+                    </LinearLayout>
 
                     <LinearLayout android:id="@+id/musicSmoothingGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                         <TextView android:id="@+id/musicSmoothingText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Плавность: 40" />
@@ -920,18 +1033,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
                         android:layout_marginTop="4dp" />
-                    </LinearLayout>
-
-                    <LinearLayout android:id="@+id/musicSubmodeGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="vertical" android:visibility="gone">
-                        <TextView style="@style/ARDU.Label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Подрежим" />
-                        <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
-                            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
-                                <Button android:id="@+id/musicSubThree" style="@style/Widget.ARDU.Button.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3 полосы" />
-                                <Button android:id="@+id/musicSubLow" style="@style/Widget.ARDU.Button.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Низ" />
-                                <Button android:id="@+id/musicSubMid" style="@style/Widget.ARDU.Button.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Середина" />
-                                <Button android:id="@+id/musicSubHigh" style="@style/Widget.ARDU.Button.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Верх" />
-                            </LinearLayout>
-                        </HorizontalScrollView>
                     </LinearLayout>
 
                     <LinearLayout android:id="@+id/musicSpeedGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
@@ -1248,6 +1349,31 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="Проверка поддержки сцен…" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/ambientOnButton"
+                            style="@style/Widget.ARDU.Button.Choice"
+                            android:layout_width="0dp"
+                            android:layout_height="52dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:text="Включить" />
+
+                        <Button
+                            android:id="@+id/ambientOffButton"
+                            style="@style/Widget.ARDU.Button.Choice"
+                            android:layout_width="0dp"
+                            android:layout_height="52dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="1"
+                            android:text="Выключить" />
+                    </LinearLayout>
                 </LinearLayout>
                 <LinearLayout
                     android:id="@+id/ambientPresetControls"
@@ -1292,7 +1418,8 @@
                     style="@style/ARDU.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <TextView
                         style="@style/ARDU.CardTitle"
@@ -1329,33 +1456,11 @@
                             android:layout_weight="1" />
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal">
 
-                        <Button
-                            android:id="@+id/ambientOnButton"
-                            style="@style/Widget.ARDU.Button.Choice"
-                            android:layout_width="0dp"
-                            android:layout_height="52dp"
-                            android:layout_marginEnd="5dp"
-                            android:layout_weight="1"
-                            android:text="Включить" />
-
-                        <Button
-                            android:id="@+id/ambientOffButton"
-                            style="@style/Widget.ARDU.Button.Choice"
-                            android:layout_width="0dp"
-                            android:layout_height="52dp"
-                            android:layout_marginStart="5dp"
-                            android:layout_weight="1"
-                            android:text="Выключить" />
-                    </LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+                    android:visibility="gone">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
                         <TextView style="@style/ARDU.CardTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Ручная настройка цвета" />
                         <View android:id="@+id/ambientColorPreview" android:layout_width="54dp" android:layout_height="54dp" android:background="@drawable/ardu_color_preview" />
@@ -1403,7 +1508,8 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                <LinearLayout style="@style/ARDU.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+                    android:visibility="gone">
                     <TextView style="@style/ARDU.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Автоперебор" />
                     <Switch android:id="@+id/ambientAutoSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Менять эффекты автоматически" android:textColor="@color/ardu_text" />
                     <TextView android:id="@+id/ambientPeriodText" style="@style/ARDU.Value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Период: 10 с" />
