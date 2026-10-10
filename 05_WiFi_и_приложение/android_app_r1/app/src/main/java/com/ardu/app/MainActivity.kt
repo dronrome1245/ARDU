@@ -29,6 +29,7 @@ import com.ardu.app.ui.ColorWheelView
 import com.ardu.app.ui.FocusDialView
 import com.ardu.app.ui.FocalCropImageView
 import com.ardu.app.ui.MusicModeTileView
+import com.ardu.app.ui.NavGlowItemView
 import com.ardu.app.ui.RoomHeroView
 import com.ardu.app.ui.SceneTileView
 import com.ardu.app.ui.SmartSliderView
@@ -531,9 +532,10 @@ class MainActivity : Activity() {
         )
 
         sectionNavigation.forEach { (button, panel) ->
-            button.setOnClickListener {
-                navigateToUserSection(panel)
-            }
+            // Either the icon or any free space in its illuminated tab switches pages.
+            val openSection = { navigateToUserSection(panel) }
+            button.setOnClickListener { openSection() }
+            (button.parent as? NavGlowItemView)?.setOnClickListener { openSection() }
         }
 
         findViewById<Button>(R.id.navServiceButton).setOnClickListener {
@@ -577,10 +579,21 @@ class MainActivity : Activity() {
             else View.VISIBLE
 
         sectionNavigation.forEach { (button, panel) ->
-            button.isSelected = panel === target
+            val chosen = panel === target
+            button.isSelected = chosen
+            (button.parent as? NavGlowItemView)?.isSelected = chosen
         }
         sectionLabels.forEach { (label, panel) ->
-            label.isSelected = panel === target
+            val chosen = panel === target
+            label.isSelected = chosen
+            if (chosen) {
+                label.setShadowLayer(
+                    5f * resources.displayMetrics.density, 0f, 0f,
+                    Color.argb(146, 93, 226, 197)
+                )
+            } else {
+                label.setShadowLayer(0f, 0f, 0f, Color.TRANSPARENT)
+            }
         }
         // Each tab opens at its top, not at the prior tab's scroll offset.
         contentScrollView.scrollTo(0, 0)

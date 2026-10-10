@@ -2396,30 +2396,30 @@
         android:paddingRight="5dp"
         android:paddingBottom="4dp">
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+        <com.ardu.app.ui.NavGlowItemView android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:importantForAccessibility="no">
             <ImageButton android:id="@+id/navLightButton" style="@style/Widget.ARDU.Button.NavIcon" android:layout_width="46dp" android:layout_height="46dp" android:contentDescription="Свет" android:src="@drawable/ic_nav_light" android:tint="@color/ardu_nav_icon_tint" />
             <TextView android:id="@+id/navLightLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:text="Свет" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
-        </LinearLayout>
+        </com.ardu.app.ui.NavGlowItemView>
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+        <com.ardu.app.ui.NavGlowItemView android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:importantForAccessibility="no">
             <ImageButton android:id="@+id/navMusicButton" style="@style/Widget.ARDU.Button.NavIcon" android:layout_width="46dp" android:layout_height="46dp" android:contentDescription="Музыка" android:src="@drawable/ic_nav_music" android:tint="@color/ardu_nav_icon_tint" />
             <TextView android:id="@+id/navMusicLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:text="Музыка" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
-        </LinearLayout>
+        </com.ardu.app.ui.NavGlowItemView>
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+        <com.ardu.app.ui.NavGlowItemView android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:importantForAccessibility="no">
             <ImageButton android:id="@+id/navAmbientButton" style="@style/Widget.ARDU.Button.NavIcon" android:layout_width="46dp" android:layout_height="46dp" android:contentDescription="Фон" android:src="@drawable/ic_nav_ambient" android:tint="@color/ardu_nav_icon_tint" />
             <TextView android:id="@+id/navAmbientLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:text="Фон" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
-        </LinearLayout>
+        </com.ardu.app.ui.NavGlowItemView>
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+        <com.ardu.app.ui.NavGlowItemView android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:importantForAccessibility="no">
             <ImageButton android:id="@+id/navNightButton" style="@style/Widget.ARDU.Button.NavIcon" android:layout_width="46dp" android:layout_height="46dp" android:contentDescription="Ночь" android:src="@drawable/ic_nav_night" android:tint="@color/ardu_nav_icon_tint" />
             <TextView android:id="@+id/navNightLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:text="Ночь" android:textColor="@color/ardu_nav_icon_tint" android:textSize="10sp" />
-        </LinearLayout>
+        </com.ardu.app.ui.NavGlowItemView>
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+        <com.ardu.app.ui.NavGlowItemView android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:orientation="vertical" android:importantForAccessibility="no">
             <ImageButton android:id="@+id/navAlarmButton" style="@style/Widget.ARDU.Button.NavIcon" android:layout_width="46dp" android:layout_height="46dp" android:contentDescription="Будильник" android:src="@drawable/ic_nav_alarm" android:tint="@color/ardu_nav_icon_tint" />
             <TextView android:id="@+id/navAlarmLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:text="Будильник" android:textColor="@color/ardu_nav_icon_tint" android:textSize="9sp" />
-        </LinearLayout>
+        </com.ardu.app.ui.NavGlowItemView>
     </LinearLayout>
 
 </LinearLayout>

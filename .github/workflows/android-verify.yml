@@ -180,16 +180,49 @@ jobs:
           print("PASS: music background color truth and visibly distinct Evening/Cinema")
           PY
 
+      - name: Verify v0.22.12 selected tab capsule and mint glow
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          root=Path("05_WiFi_и_приложение/android_app_r1/app/src/main")
+          layout=ET.fromstring((root/"res/layout/activity_main.xml").read_text())
+          ns="{http://schemas.android.com/apk/res/android}"
+          dock=next(node for node in layout.iter() if node.get(ns+"id")=="@+id/bottomNavDock")
+          tabs=list(dock)
+          assert len(tabs)==5
+          assert all(t.tag=="com.ardu.app.ui.NavGlowItemView" for t in tabs)
+          for tab in tabs:
+              children=list(tab)
+              assert len(children)==2
+              assert children[0].tag=="ImageButton"
+              assert children[1].tag=="TextView"
+              assert children[0].get(ns+"id") and children[1].get(ns+"id")
+              assert tab.get(ns+"layout_weight")=="1"
+          src=(root/"java/com/ardu/app/ui/NavGlowItemView.kt").read_text()
+          assert "RadialGradient(" in src
+          assert "LinearGradient(" in src
+          assert "if (!isSelected) return" in src
+          act=(root/"java/com/ardu/app/MainActivity.kt").read_text()
+          assert "(button.parent as? NavGlowItemView)?.isSelected = chosen" in act
+          assert "(button.parent as? NavGlowItemView)?.setOnClickListener" in act
+          assert "label.setShadowLayer" in act
+          style=(root/"res/values/styles.xml").read_text()
+          assert 'name="Widget.ARDU.Button.NavIcon"' in style
+          assert '<item name="android:background">@android:color/transparent</item>' in style
+          print("PASS: five equal-width selectable neon capsules; invisible inactive glow; whole-cell tap")
+          PY
+
       - name: Unit contract tests
         run: bash ./gradlew --no-daemon testDebugUnitTest
 
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
 
-      - name: Publish Android 0.22.11 debug APK
+      - name: Publish Android 0.22.12 debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: ardu-android-02211-presets-music-scenes-debug-apk
+          name: ardu-android-02212-nav-glow-debug-apk
           path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
