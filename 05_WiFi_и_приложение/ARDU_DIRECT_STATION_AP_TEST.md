@@ -48,3 +48,7 @@
 6. Включить роутер, подключить телефон к домашней Wi-Fi сети, нажать «Обновить»; проверить Station ping и L01. Функция прямого закрепления снимается при уходе телефона из Wi-Fi подсети 192.168.4.x.
 
 **Критерий PASS:** три direct ping подряд + direct status + пять управляющих циклов с Nano readback + возврат Station. Если тест на физическом телефоне не прошёл, CI Android не закрывает аппаратную проблему; следующий слой — отдельно исследовать ESP `maintainWifi()` (попытки Station каждые 10 с при AP) и Nano UART timeout, не менять одновременно их и Android.
+
+## Last-chance Direct trial — ESP V3 + Android 0.22.15
+
+Owner-provided independent `/api/ping` **and** `/api/status` from `192.168.4.1` succeeded on installed ESP V2 while app control remained intermittent; this separates intermittent failure from permanent ESP/Nano unreachability. New ESP V3 does not rescan Station while `WiFi.softAPgetStationNum()>0`, and Android v0.22.15 tolerates direct transient `settings/time` GET as **read-only partial data**. To run last real test: install ESP V3 over Station and Nano R5; connect phone Wi-Fi to ARDU-DIRECT with mobile data off; check `/api/ping` `softap_clients >= 1`, `/api/status` valid; run 5 L01 ON/OFF with readback and 1 safe P-scene; restore Station after manually leaving direct Wi-Fi. If error repeats, collect both endpoint results and mark this feature **deferred / not accepted**; continue with Station as owner instructed, without more experimental Direct changes in v1.

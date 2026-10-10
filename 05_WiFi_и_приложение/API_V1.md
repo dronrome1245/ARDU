@@ -502,3 +502,15 @@ Private `wifi_secrets.h` (home SSID/password, OTA password, new WPA2 `ARDU-DIREC
 ### D-110 credential packaging note — ESP v2 R2 (2026-10-08)
 
 The earlier instruction requiring `wifi_secrets.h` is superseded **for current ESP v2**. The source `esp8266_ardu_v2.ino` is one file with 4 editable macros at its top: `ARDU_WIFI_SSID`, `ARDU_WIFI_PASSWORD`, `ARDU_OTA_PASSWORD` and `ARDU_SOFTAP_PASSWORD`. No local .h or configuration flag. Default placeholder values deliberately fail compile; real values must remain on an owner's local copy outside Git. [Single-file ESP CI 37823238584](https://github.com/dronrome1245/ARDU/actions/runs/37823238584) PASS, physical OTA not yet done.
+
+## D-121 — ESP V3 / Nano R5 warm natural dawn fields (2026-10-10)
+
+Backward-compatible additive fields within `GET /api/settings` JSON `alarm`: `"dawn_kelvin_supported":true`, `"start_kelvin":2000`, `"end_kelvin":3600` **only when** 10th numeric value in Nano `D 3 3` is marker `1`; otherwise `dawn_kelvin_supported:false` and no Kelvin numbers. Existing `start_hue/end_hue` fields remain for old parsers but on Nano R5 contain 20K steps, **not HSV**, and must not be displayed as editable colors in the new Android app.
+
+Atomic `POST /api/alarm/settings` example:
+```json
+{"fade_minutes":30,"max_brightness":102,"start_kelvin":2000,"end_kelvin":3600,"persist":true}
+```
+ESP requires **both** Kelvin fields when either is present; each multiple of 20 between 1800–4000, start<=end. Validated before any writes, checks real Nano marker, sends numeric `78 10 90`, `73/74` for other values and `77` EEPROM commit. On older Nano returns HTTP 409 `DAWN_KELVIN_REQUIRES_NANO_R5` rather than pretending to apply. Settings persist/readback remain from Nano. The Android preset names are not new protocol IDs.
+
+**Direct transport final try (ESP V3):** when `softAPgetStationNum()>0`, suspend STA reconnection/channel scan; resume when no clients, so in-use direct control is prioritized over immediate automatic return to router. `GET /api/ping` includes `softap_clients` diagnostic; existing fields preserved. Do not assume physical PASS from CI. `RELEASE_WARM_DAWN_DIRECT_ACCEPTANCE.md`.

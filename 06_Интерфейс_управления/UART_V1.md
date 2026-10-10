@@ -220,3 +220,11 @@ Other UART v1 numeric commands for L01/Music/Night/RTC/Clap remain unchanged. Op
 After `D 115 1` exactly **26** numbers: selected=0 for F01 or 1..12, active=1 iff Nano mode=AMBIENT and selected P, then 12 brightness/dynamics pairs. Independent versioned+checksummed EEPROM block 29 bytes at 512..540, magic 0xA1D2 version1; old settings untouched.
 
 ESP v2 bridges numeric UART to semantic HTTP, Android never sends raw opcode. Old Nano returning E1 for 115 causes ESP to report presets supported:false. [Nano CI 37818601346](https://github.com/dronrome1245/ARDU/actions/runs/37818601346) compile PASS; physical UART/EEPROM smoke pending.
+
+## D-121 (2026-10-10) — additive warm-Kelvin dawn capability on Nano R5
+
+- Full Nano `nano_warm_dawn_v5/nano_warm_dawn_v5.ino`, banner `ARDU1 6`. `D 3 3` now contains **10 numeric values**: the previous nine (alarmEnabled, hour, minute, fadeMinutes, maxBrightness, startStep, endStep, phase, recovered) plus final `1` capability marker. Old Nano has only 9 values.
+- Existing `75 step`, `76 step` are now **warm Kelvin 20K steps 0..110** and are no longer HSV values on Nano R5; `78 startStep endStep` adds **atomic** pair validation `0<=start<=end<=110`, responds `O 78`; `77` persists this pair in Dawn EEPROM version 2 at the unchanged 16..23 byte block. Converting `K` to wire step: `(K-1800)/20`, K must be divisible by 20, 1800..4000.
+- Old HSV EEPROM version1 ignored on R5 and replaced with default warm 2000→3600K when loading; alarm enabled/HH:MM and RTC stored independently and preserved.
+- When Nano R5 is not present, ESP V3 **must not** send opcode78 and returns `DAWN_KELVIN_REQUIRES_NANO_R5`; Android only enables Kelvin presets when `/api/settings` reports `alarm.dawn_kelvin_supported:true`. No repurposing of old ESP firmware's ambiguous `start_hue` fields into Kelvin.
+- Alarm HH:MM is the wake/end time; Nano starts the ramp at modulo-day `wakeMinute - fadeMinutes`, including the previous day. `DAWN STOP` opcode71 and recovery behaviour remain.

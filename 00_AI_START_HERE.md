@@ -123,10 +123,13 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-1. **Android 0.22.13/code36 в `main`**, `0.22.13-direct-stable-borderless-glow-rc1` — soft mint glow выбранной вкладки без капсулы/stroke; `ArduApiClient` направляет `192.168.4.1` через Wi-Fi Network на direct subnet, pin direct while connected, `MainActivity` не выполняет heartbeat во время команды/readback. [Android Verify 38048024255](https://github.com/dronrome1245/ARDU/actions/runs/38048024255) **PASS**: static direct route/glow checks, Kotlin/JUnit, debug APK `ardu-android-02213-direct-borderless-debug-apk` (artifact ID 11668866174). Не перепрошивать Nano/ESP.
-2. **Повторный owner direct-test:** видео `18442333063828.mp4` показало partial AP PASS/unstable commands; код не утверждать аппаратно рабочим, пока владелец не сделает `git pull` → Run 0.22.13 и повторит 5 ON/OFF с реальным readback при отключённом роутере. Также проверить glow на 5 выбранных вкладках и восстановление Station после включения роутера.
-3. **При отказах:** на телефоне в ARDU-DIRECT отдельно открыть `http://192.168.4.1/api/ping` и `/api/status` в момент ошибки, записать HTTP-ответы/время, сравнить ESP reachability и Nano UART. Исполнять `05_WiFi_и_приложение/ARDU_DIRECT_STATION_AP_TEST.md`. Прежний Home Hub/12 P-сцен/прошивки не менять без результата этого gate.
-4. **После direct gate:** regression Music, L01/clap, Night, Alarm/Dawn, EEPROM, 44+44 питание/ток/тепло/stack и Class II БП, текущий лимит ≤3000 мА до физических измерений.
+**SOURCE/CI PACK готов, hardware install пока не выполнен.** В main: Nano `nano_warm_dawn_v5` boot `ARDU1 6`, ESP `esp8266_warm_dawn_v3` fw `ARDU_ESP_V3_WARM_DAWN`, Android `0.22.15-warm-dawn-presets-rc1` code38. Android 4 тёплых пресета; light L01/Music/P01..P12/Night/RTC сохранены. [Nano PASS](https://github.com/dronrome1245/ARDU/actions/runs/38050231423) 29534/1286, [ESP PASS](https://github.com/dronrome1245/ARDU/actions/runs/38050334769), [Android PASS](https://github.com/dronrome1245/ARDU/actions/runs/38050719704), физические испытания ещё впереди.
+
+1. Выполнить `RELEASE_WARM_DAWN_DIRECT_ACCEPTANCE.md`: через домашний Station безопасно установить ESP V3 (локальные приватные credentials только вне Git), Nano R5 (USB Old Bootloader, временно разомкнуть ESP TX→Nano RX), затем `git pull` → Android Studio Run.
+2. Проверить `/api/settings` `alarm.dawn_kelvin_supported:true`; на старой комбинации Nano/ESP Kelvin UI отключён, старый будильник можно выключить. `HH:MM` теперь **конец**, fade начинается заранее; проверить ускоренный аппаратный цикл с fade 1 мин. Default 30мин 2000→3600K/40%.
+3. Последний ARDU-DIRECT gate: ESP V3 блокирует STA scans при подключённом SoftAP-клиенте, Android терпит partial GET. После нового неуспешного физического теста прекратить доработки direct и продолжать в Station по явному решению владельца.
+4. Glow: выбранная вкладка без рамки с alpha 0 внутри границ ячейки, финальный визуальный screenshot PASS ожидается.
+5. В присланном Nano статусе `current_limit_ma=3025`: вернуть ≤3000 мА перед силовым тестом, не менять без измерений. Остаются 44+44 power/current/heat/stack, Class II БП, regression остальных режимов.
 
 ## 12. База ColorMusic/FHT
 
