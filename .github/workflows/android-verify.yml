@@ -115,8 +115,12 @@ jobs:
           nodes={node.get(ns+"id","").replace("@+id/",""):node for node in layout.iter() if node.get(ns+"id")}
           parents={child:parent for parent in layout.iter() for child in parent}
           def hidden_by_ancestor(node):
+              # The whole Ambient tab starts GONE until user navigation.
+              # Ignore that root; only legacy inner cards must remain hidden.
               while node in parents:
                   node=parents[node]
+                  if node.get(ns+"id")=="@+id/ambientPanel":
+                      return False
                   if node.get(ns+"visibility")=="gone":
                       return True
               return False
