@@ -400,3 +400,9 @@ After owner emulator screenshot showed visual corruption, only the Ambient hero 
 `git pull` → Android Studio → **Run** in the Pixel emulator → open **Фон** and confirm the TV with cyan/magenta ambient backlight is visible. The Night/Alarm backgrounds and preset behavior are unchanged.
 
 Current version: `0.22.5-ambient-hero-hotfix-rc1`, versionCode 28.
+
+## Android v0.22.12 — выбранная вкладка светится (2026-10-10)
+
+Текущая source-версия: `0.22.12-nav-glow-rc1`, versionCode35. Пять пунктов нижнего dock рисуются через `NavGlowItemView`: активный пункт получает стеклянную капсулу, нежный mint/cyan halo вокруг иконки и тонкое свечение внизу; неактивные не подсвечены. Подписи остаются Native TextView, иконки прежние vector XML. Выбранное состояние передаётся из `MainActivity.showSection()`. Вся ширина ячейки кликабельна, работа режима лампы и HTTP API не меняются.
+
+Владелец проверил предыдущую v0.22.11 без детализации результата, v0.22.12 пока требуется проверить: `git pull` → Android Studio Run → по очереди нажать 5 вкладок и сравнить с присланной картинкой; проверить selected/inactive и отсутствие обрезанного glow. [Android Verify 38046617214](https://github.com/dronrome1245/ARDU/actions/runs/38046617214) — CI для этой версии. ARDU-DIRECT физически проверять по `../ARDU_DIRECT_STATION_AP_TEST.md`.
