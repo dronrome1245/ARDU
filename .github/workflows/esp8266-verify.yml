@@ -5,6 +5,7 @@ on:
     paths:
       - "05_WiFi_и_приложение/esp8266_ardu_v1/**"
       - "05_WiFi_и_приложение/esp8266_ardu_v2/**"
+      - "05_WiFi_и_приложение/esp8266_warm_dawn_v3/**"
       - ".github/workflows/esp8266-verify.yml"
   workflow_dispatch:
 
@@ -71,6 +72,50 @@ jobs:
             --build-path "$GITHUB_WORKSPACE/build-esp-v2-manual" \
             "$RUNNER_TEMP/esp8266_ardu_v2"
           echo "PASS: manually filled single-file ESP v2 compiles without wifi_secrets.h"
+
+      - name: Verify ESP V3 AP channel hold and capability-gated dawn
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path("05_WiFi_и_приложение/esp8266_warm_dawn_v3/esp8266_warm_dawn_v3.ino").read_text()
+          assert "WiFi.softAPgetStationNum()>0" in s
+          assert "WiFi.setAutoReconnect(false)" in s
+          assert "WiFi.disconnect(false)" in s
+          assert "if(hasDirectClient){" in s
+          assert "dawn_kelvin_supported" in s
+          assert "DAWN_KELVIN_REQUIRES_NANO_R5" in s
+          assert 'makeCommand(78,(startKelvin-1800)/20,(endKelvin-1800)/20)' in s
+          assert 'constexpr char FW_NAME[] = "ARDU_ESP_V3_WARM_DAWN"' in s
+          assert "ARDU_SOFTAP_PASSWORD" in s
+          print("PASS: associated AP clients hold channel, warm-Kelvin needs Nano R5")
+          PY
+
+      - name: Compile ESP V3 manually configured one-file source
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,re
+          source=Path("05_WiFi_и_приложение/esp8266_warm_dawn_v3/esp8266_warm_dawn_v3.ino").read_text()
+          assert '#include "wifi_secrets.h"' not in source
+          for k,v in {
+            "ARDU_WIFI_SSID":"CI_HOME_WIFI",
+            "ARDU_WIFI_PASSWORD":"CI_HOME_PASSWORD",
+            "ARDU_OTA_PASSWORD":"CI_OTA_PASSWORD",
+            "ARDU_SOFTAP_PASSWORD":"CI_DIRECT_PASSWORD"
+          }.items():
+            pat=rf'(?m)^(#define\s+{k}\s+)"PUT_[A-Z_]+_HERE"$'
+            source,n=re.subn(pat,lambda m:m[1]+'"'+v+'"',source)
+            assert n==1,k
+          out=Path(os.environ["RUNNER_TEMP"])/"esp8266_warm_dawn_v3"
+          out.mkdir(parents=True,exist_ok=True)
+          (out/"esp8266_warm_dawn_v3.ino").write_text(source)
+          assert len(list(out.iterdir()))==1
+          PY
+          arduino-cli compile \
+            --fqbn esp8266:esp8266:generic \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-esp-v3-warm-dawn" \
+            "$RUNNER_TEMP/esp8266_warm_dawn_v3"
 
       - name: Compile ARDU ESP8266 v1
         run: |
