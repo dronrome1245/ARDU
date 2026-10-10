@@ -128,6 +128,8 @@ class MainActivity : Activity() {
     private lateinit var musicBrightnessText: TextView
     private lateinit var musicBrightnessSeek: SmartSliderView
     private lateinit var musicBackgroundText: TextView
+    private lateinit var musicBackgroundGroup: LinearLayout
+    private lateinit var musicBackgroundColorInfo: TextView
     private lateinit var musicBackgroundSeek: SmartSliderView
     private lateinit var musicSmoothingGroup: LinearLayout
     private lateinit var musicSmoothingText: TextView
@@ -366,6 +368,8 @@ class MainActivity : Activity() {
         musicBrightnessText = findViewById(R.id.musicBrightnessText)
         musicBrightnessSeek = findViewById(R.id.musicBrightnessSeek)
         musicBackgroundText = findViewById(R.id.musicBackgroundText)
+        musicBackgroundGroup = findViewById(R.id.musicBackgroundGroup)
+        musicBackgroundColorInfo = findViewById(R.id.musicBackgroundColorInfo)
         musicBackgroundSeek = findViewById(R.id.musicBackgroundSeek)
         musicSmoothingGroup = findViewById(R.id.musicSmoothingGroup)
         musicSmoothingText = findViewById(R.id.musicSmoothingText)
@@ -616,11 +620,19 @@ class MainActivity : Activity() {
         }
         findViewById<SceneTileView>(R.id.lightSceneEveningButton).apply {
             setScene(SceneTileView.Scene.EVENING)
-            setOnClickListener { applyLightScene("Вечер", 2200, 38) }
+            setOnClickListener {
+                applyLightScene(
+                    "Вечер", LightQuickScenes.EVENING.kelvin, LightQuickScenes.EVENING.brightness
+                )
+            }
         }
         findViewById<SceneTileView>(R.id.light2700Button).apply {
             setScene(SceneTileView.Scene.WARM)
-            setOnClickListener { applyLightScene("Кино", 2700, 90) }
+            setOnClickListener {
+                applyLightScene(
+                    "Кино", LightQuickScenes.CINEMA.kelvin, LightQuickScenes.CINEMA.brightness
+                )
+            }
         }
         findViewById<SceneTileView>(R.id.light4000Button).apply {
             setScene(SceneTileView.Scene.DAY)
@@ -941,7 +953,7 @@ class MainActivity : Activity() {
         )
         bindSmartSlider(
             musicBackgroundSeek, 0, 255, SmartSliderView.VisualMode.BRIGHTNESS,
-            { value -> musicBackgroundText.text = "Фон • ${brightnessPercent(value)}%" },
+            { value -> musicBackgroundText.text = "Яркость фоновых светодиодов • ${brightnessPercent(value)}%" },
             { value -> runDeviceAction("Фон музыки") { api.updateMusicSettings(backgroundBrightness = value) } }
         )
         bindSmartSlider(
@@ -1027,7 +1039,16 @@ class MainActivity : Activity() {
         ambientServiceButton.setOnClickListener { openService() }
 
         ambientOnButton.setOnClickListener {
-            runDeviceAction("Включение фона") { api.setMode("ambient") }
+            // A saved F01 legacy mode must not be reactivated through the
+            // new preset-only Ambient screen.
+            val selected = latestSettings?.ambientPresets?.selected
+            if (selected in ArduApiClient.PRESET_IDS) {
+                runDeviceAction("Включение выбранной сцены") {
+                    api.selectAmbientPreset(selected!!)
+                }
+            } else {
+                setOperationStatus("Выберите одну из 12 атмосферных сцен", important = true)
+            }
         }
         ambientOffButton.setOnClickListener {
             runDeviceAction("Выключение фона") { api.setMode("off") }
@@ -1855,7 +1876,16 @@ class MainActivity : Activity() {
         musicSpeedSeek.setValue(cfg.speed.coerceIn(1, 255))
 
         musicBrightnessText.text = "Эффект • ${brightnessPercent(cfg.brightness)}%"
-        musicBackgroundText.text = "Фон • ${brightnessPercent(cfg.backgroundBrightness)}%"
+        musicBackgroundText.text =
+            "Яркость фоновых светодиодов • ${brightnessPercent(cfg.backgroundBrightness)}%"
+        musicBackgroundColorInfo.text = when (id) {
+            "M01", "M02", "M05", "M08" ->
+                "Цвет фона: фиолетовый, задан прошивкой Nano"
+            "M03", "M04" ->
+                "Цвет фона: красный / зелёный / жёлтый по частотам"
+            else ->
+                "Отдельный цвет фона в этом режиме не поддерживается"
+        }
         musicSmoothingText.text = "Плавность • ${cfg.smoothing}"
         musicSensitivityText.text = "Чувствительность • ${cfg.sensitivity}"
         musicSpeedText.text = "Скорость • ${cfg.speed}"
@@ -1863,7 +1893,18 @@ class MainActivity : Activity() {
         updateMusicVisibility(id)
 
         musicSubmodeButtonMap.forEach { (submode, button) ->
-            setChoiceState(button, submode == cfg.submode)
+            val chosen = submode == cfg.submode
+            button.isSelected = chosen
+            // This row uses a filled mint selection instead of a thin border.
+            button.setTextColor(
+                getColor(if (chosen) R.color.ardu_on_accent else R.color.ardu_text)
+            )
+            button.setTypeface(
+                null,
+                if (chosen) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL
+            )
+            button.contentDescription = button.text.toString() +
+                if (chosen) " — выбран" else ""
         }
 
         when (id) {
@@ -1890,6 +1931,8 @@ class MainActivity : Activity() {
     }
 
     private fun updateMusicVisibility(id: String) {
+        // M09 spectrum uses computed color bands and ignores backgroundBrightness.
+        musicBackgroundGroup.visibility = if (id == "M09") View.GONE else View.VISIBLE
         musicSmoothingGroup.visibility =
             if (id in setOf("M01", "M02", "M03", "M04", "M05")) View.VISIBLE else View.GONE
         musicSensitivityGroup.visibility =
@@ -1908,10 +1951,15 @@ class MainActivity : Activity() {
         val cfg = a.effects["F01"] ?: return
         val ambientActive = latestMode == "ambient"
 
-        ambientEffectText.text = (
-            if (selected != null) ambientSceneNames[selected] ?: selected
-            else "Постоянный цвет"
-        ) + if (ambientActive) " • активно" else " • выключено"
+        // F01 still exists for EEPROM/UART compatibility, but the Ambient
+        // page now exclusively offers P01..P12; no hidden manual-color action.
+        ambientEffectText.text = when {
+            selected != null ->
+                (ambientSceneNames[selected] ?: selected) +
+                    if (ambientActive) " • активно" else " • выключено"
+            ambientActive -> "Ручной режим из старых настроек • выберите пресет"
+            else -> "Выберите атмосферную сцену"
+        }
         setChoiceState(ambientOnButton, ambientActive)
         setChoiceState(ambientOffButton, !ambientActive)
         ambientEffectButtonMap.forEach { (_, tile) ->
@@ -1929,7 +1977,7 @@ class MainActivity : Activity() {
         ambientPresetLabels.values.forEach { it.isEnabled = p.supported }
         ambientExtraPresetLabels.values.forEach { it.isEnabled = p.supported }
 
-        ambientManualPanel.visibility = if (selected == null) View.VISIBLE else View.GONE
+        ambientManualPanel.visibility = View.GONE // F01 controls moved to Light page
         ambientPresetControls.visibility = if (selected != null) View.VISIBLE else View.GONE
         if (selected != null) {
             val scene = p.scenes[selected]
