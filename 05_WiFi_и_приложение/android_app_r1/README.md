@@ -406,3 +406,9 @@ Current version: `0.22.5-ambient-hero-hotfix-rc1`, versionCode 28.
 Текущая source-версия: `0.22.12-nav-glow-rc1`, versionCode35. Пять пунктов нижнего dock рисуются через `NavGlowItemView`: активный пункт получает стеклянную капсулу, нежный mint/cyan halo вокруг иконки и тонкое свечение внизу; неактивные не подсвечены. Подписи остаются Native TextView, иконки прежние vector XML. Выбранное состояние передаётся из `MainActivity.showSection()`. Вся ширина ячейки кликабельна, работа режима лампы и HTTP API не меняются.
 
 Владелец проверил предыдущую v0.22.11 без детализации результата, v0.22.12 пока требуется проверить: `git pull` → Android Studio Run → по очереди нажать 5 вкладок и сравнить с присланной картинкой; проверить selected/inactive и отсутствие обрезанного glow. [Android Verify 38046617214](https://github.com/dronrome1245/ARDU/actions/runs/38046617214) — CI для этой версии. ARDU-DIRECT физически проверять по `../ARDU_DIRECT_STATION_AP_TEST.md`.
+
+## Android 0.22.13 — Direct Wi-Fi route + borderless mint glow (2026-10-10)
+
+Source version `0.22.13-direct-stable-borderless-glow-rc1`, versionCode36. В активном bottom tab теперь нет glass/pill/stroke: только glow под иконкой и подписью, мягкая мятная подложка без края и нижняя тонкая светящаяся линия. При direct-mode клиент выбирает Wi-Fi интерфейс телефона с IPv4 `192.168.4.x` и отправляет запросы на `192.168.4.1` через `Network.openConnection`, не через default мобильный интерфейс. Пока телефон подключён к direct подсети — не переключаться на сохранённые Station адреса; после перехода в домашний Wi-Fi снова искать Station. Команды и readback блокируют foreground heartbeat. HTTP POST не повторяется автоматически.
+
+Owner `18442333063828.mp4` продемонстрировал работающую сеть AP, но нестабильность readback/команд на предыдущем приложении — не объявлять исправленной до повторного физического теста. Подробный gate: `../ARDU_DIRECT_STATION_AP_TEST.md`. Без обновления Nano/ESP.

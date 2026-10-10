@@ -1185,3 +1185,8 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - Source ESP `esp8266_ardu_v2.ino`: `ARDU_SOFTAP_PASSWORD` WPA2 guard, `startSoftAp()` на `192.168.4.1`, `maintainWifi()` возвращает Station; `ArduApiClient.kt` уже проверяет URL `http://192.168.4.1`. Аппаратный Station→AP→Station тест ещё не выполнен.
 
 - [Android Verify PASS 38046617214](https://github.com/dronrome1245/ARDU/actions/runs/38046617214) — пять равных glow tabs, Kotlin/JUnit unit tests, debug APK `ardu-android-02212-nav-glow-debug-apk` (artifact ID 11668260250). Реальный телефон 0.22.12 и переключение ARDU-DIRECT продолжают ожидать аппаратной проверки.
+
+## S-ARDU-2026-10-10-OWNER-DIRECT-VIDEO
+
+- Пользовательский файл `18442333063828.mp4` (≈106,7 с; 578×1280), просмотрен в чате 2026-10-10. Прямое подключение к Wi-Fi `ARDU-DIRECT` действительно присутствует в настройках Android, статус прямого режима и данные L01 хотя бы один раз появляются, далее показана нестабильность/ошибка данных при ON/OFF. В видео нет separate browser `/api/ping` в момент сбоя, нет ESP serial log, измерения питания или Nano RESET-флагов. Это не доказательство причины ошибки, только предмет регрессионного теста.
+- [Исходник Android исправления](https://github.com/dronrome1245/ARDU/commit/a2211723729c039d3ee75bad42f91c1a7ab49169): `DirectConnectionPolicy.kt` с pure Kotlin test, `ArduApiClient` с Wi-Fi Network binding и `MainActivity` с guard команд/heartbeat, `NavGlowItemView` без selected border. [Android CI](https://github.com/dronrome1245/ARDU/actions/runs/38048024255) требует full Gradle PASS и последующего теста владельца.

@@ -123,11 +123,10 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-1. **Android 0.22.12 nav glow — source/CI PASS, телефон ожидается:** после визуального референса владельца создана `0.22.12-nav-glow-rc1` (versionCode35), `NavGlowItemView` и подсветка только выбранного таба, полный фон/5 вкладок и API прежние. GitHub [Android Verify 38046617214](https://github.com/dronrome1245/ARDU/actions/runs/38046617214) **PASS**, APK artifact `ardu-android-02212-nav-glow-debug-apk`. Владелец сообщил, что проверил 0.22.11, без перечисления результатов по каждому исправлению.
-2. **Следующий phone gate:** `cd C:\ARDU` → `git pull` → Android Studio **Run**; проверить мятную капсулу и нижний glow при переключении всех пяти вкладок, текст и иконки, отсутствие визуальных квадратов и обрезания; реальный Android визуально пока не утверждён.
-3. **ARDU-DIRECT physical gate:** код защищённого SoftAP ESP v2 есть, Android знает `192.168.4.1`, но отключение роутера физически ещё не проверяли. Пошаговая инструкция `05_WiFi_и_приложение/ARDU_DIRECT_STATION_AP_TEST.md`: Station→выключить только роутер→подключить телефон к `ARDU-DIRECT`→`GET /api/ping` `network_mode:softap`→управление→возврат Station. Пароли в публичный GitHub/чат не передавать.
-4. **Android 0.22.11 details:** страница «Фон» только P01..P12, M05/M08 4 кнопки над sliders, Music background — яркость (не самостоятельный hue), вечер 2700K/115 vs кино 1800K/18; источник `STATUS.md` / D-118.
-5. **После phone+Direct:** Music/L01/Night/Alarm/EEPROM regression, 44+44 LED power/current/heat/stack, Class II БП; до реальных замеров лимит ≤3000 мА. Для Android glow Nano/ESP **не перепрошивать**.
+1. **Android 0.22.13/code36 в `main`**, `0.22.13-direct-stable-borderless-glow-rc1` — soft mint glow выбранной вкладки без капсулы/stroke; `ArduApiClient` направляет `192.168.4.1` через Wi-Fi Network на direct subnet, pin direct while connected, `MainActivity` не выполняет heartbeat во время команды/readback. [Android Verify 38048024255](https://github.com/dronrome1245/ARDU/actions/runs/38048024255) на момент записи выполняется. Не перепрошивать Nano/ESP.
+2. **Повторный owner direct-test:** видео `18442333063828.mp4` показало partial AP PASS/unstable commands; код не утверждать аппаратно рабочим, пока владелец не сделает `git pull` → Run 0.22.13 и повторит 5 ON/OFF с реальным readback при отключённом роутере. Также проверить glow на 5 выбранных вкладках и восстановление Station после включения роутера.
+3. **При отказах:** на телефоне в ARDU-DIRECT отдельно открыть `http://192.168.4.1/api/ping` и `/api/status` в момент ошибки, записать HTTP-ответы/время, сравнить ESP reachability и Nano UART. Исполнять `05_WiFi_и_приложение/ARDU_DIRECT_STATION_AP_TEST.md`. Прежний Home Hub/12 P-сцен/прошивки не менять без результата этого gate.
+4. **После direct gate:** regression Music, L01/clap, Night, Alarm/Dawn, EEPROM, 44+44 питание/ток/тепло/stack и Class II БП, текущий лимит ≤3000 мА до физических измерений.
 
 ## 12. База ColorMusic/FHT
 
