@@ -1878,14 +1878,7 @@ class MainActivity : Activity() {
         musicBrightnessText.text = "Эффект • ${brightnessPercent(cfg.brightness)}%"
         musicBackgroundText.text =
             "Яркость фоновых светодиодов • ${brightnessPercent(cfg.backgroundBrightness)}%"
-        musicBackgroundColorInfo.text = when (id) {
-            "M01", "M02", "M05", "M08" ->
-                "Цвет фона: фиолетовый, задан прошивкой Nano"
-            "M03", "M04" ->
-                "Цвет фона: красный / зелёный / жёлтый по частотам"
-            else ->
-                "Отдельный цвет фона в этом режиме не поддерживается"
-        }
+        musicBackgroundColorInfo.text = MusicBackgroundUiPolicy.colorExplanation(id)
         musicSmoothingText.text = "Плавность • ${cfg.smoothing}"
         musicSensitivityText.text = "Чувствительность • ${cfg.sensitivity}"
         musicSpeedText.text = "Скорость • ${cfg.speed}"
@@ -1932,7 +1925,8 @@ class MainActivity : Activity() {
 
     private fun updateMusicVisibility(id: String) {
         // M09 spectrum uses computed color bands and ignores backgroundBrightness.
-        musicBackgroundGroup.visibility = if (id == "M09") View.GONE else View.VISIBLE
+        musicBackgroundGroup.visibility =
+            if (MusicBackgroundUiPolicy.usesBackgroundBrightness(id)) View.VISIBLE else View.GONE
         musicSmoothingGroup.visibility =
             if (id in setOf("M01", "M02", "M03", "M04", "M05")) View.VISIBLE else View.GONE
         musicSensitivityGroup.visibility =
