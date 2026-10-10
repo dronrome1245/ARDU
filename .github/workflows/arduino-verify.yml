@@ -10,6 +10,7 @@ on:
       - "04_Прошивка/nano_ambient12_v2/**"
       - "04_Прошивка/nano_ambient12_v3/**"
       - "04_Прошивка/nano_ambient12_v4/**"
+      - "04_Прошивка/nano_warm_dawn_v5/**"
       - ".github/workflows/arduino-verify.yml"
   workflow_dispatch:
 
@@ -333,6 +334,63 @@ jobs:
           print("PASS: full Nano R4 size; worst-case runtime stack/power must be tested on hardware")
           PY
 
+      - name: Verify Nano R5 warmth, RTC wake-time, and EEPROM migration guards
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("04_Прошивка/nano_warm_dawn_v5/nano_warm_dawn_v5.ino")
+          s=p.read_text()
+          assert "constexpr uint8_t DAWN_VER = 2;" in s
+          assert "DEFAULT_DAWN_START_STEP = (2000-" in s
+          assert "DEFAULT_DAWN_END_STEP = (3600-" in s
+          assert "b[5]<=Cfg::DAWN_MAX_STEP" in s and "b[5]<=b[6]" in s
+          assert "fill_solid(leds,Cfg::LED_COUNT,kelvinRgb(dawnKelvin(p)))" in s
+          assert "dawnBrightness(p)" in s
+          assert "CHSV(h,255,255)" not in s
+          assert "if(minuteOfDay(now.hour,now.minute)==start" in s
+          assert "wake+1440U-dawnCfg.fadeMinutes" in s
+          assert 'Serial.println(F("ARDU1 6"))' in s
+          for start,end in [(1800,3200),(2000,3600),(2200,4000),(1800,3000)]:
+              a=(start-1800)//20;b=(end-1800)//20
+              assert start%20==0 and end%20==0 and 0<=a<=b<=110
+              assert 1800+20*a==start and 1800+20*b==end
+              for p in range(0,1001):
+                  k=1800+20*(a+(b-a)*p//1000)
+                  assert start<=k<=end
+              assert 1800+20*(a+(b-a)*1000//1000)==end
+          for wake,fade,start in [(420,30,390),(10,30,1420),(0,40,1400)]:
+              assert (wake+1440-fade)%1440==start
+          print("PASS: R5 never uses HSV dawn; 4 real warm presets, wake-before-alarm")
+          PY
+
+      - name: Compile full standalone Nano R5 warm dawn
+        run: |
+          mkdir -p "$RUNNER_TEMP/nano_warm_dawn_v5"
+          cp "04_Прошивка/nano_warm_dawn_v5/nano_warm_dawn_v5.ino"              "$RUNNER_TEMP/nano_warm_dawn_v5/nano_warm_dawn_v5.ino"
+          arduino-cli compile             --fqbn arduino:avr:nano:cpu=atmega328old             --warnings default             --build-path "$GITHUB_WORKSPACE/build-nano-warm-dawn-v5"             --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries"             "$RUNNER_TEMP/nano_warm_dawn_v5"
+
+      - name: Measure R5 flash/SRAM vs last verified R4
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,subprocess
+          sizes=sorted(Path.home().glob(".arduino15/packages/arduino/tools/avr-gcc/*/bin/avr-size"))
+          assert sizes
+          def mem(folder):
+              files=list(Path(folder).rglob("*.elf"))
+              assert len(files)==1,(folder,files)
+              out=subprocess.check_output([str(sizes[-1]),"-C","--mcu=atmega328p",str(files[0])],text=True)
+              print(out)
+              flash=int(re.search(r"Program:\s*(\d+) bytes",out).group(1))
+              ram=int(re.search(r"Data:\s*(\d+) bytes",out).group(1))
+              return flash,ram
+          a=mem("build-nano-ambient12-v4");b=mem("build-nano-warm-dawn-v5")
+          print("R4:",a,"R5:",b)
+          assert b[0]<=30300,("flash margin",b)
+          assert b[1]<=1360,("globals SRAM guard",b)
+          print("PASS: Nano R5 remains within AVR project memory budget; stack still needs physical test")
+          PY
+
       - name: Size profile
         if: always()
         run: |
@@ -353,6 +411,14 @@ jobs:
           echo "--- IDE preview RC1 firmware size ---"
           RC_ELF="$(find "$GITHUB_WORKSPACE/build-nano-ambient-preview-rc1" -name '*.elf' | head -n 1)"
           if [ -n "$RC_ELF" ]; then "$AVR_BIN/avr-size" -C --mcu=atmega328p "$RC_ELF"; fi
+
+      - name: Publish full Nano R5 warm Kelvin sunrise HEX
+        uses: actions/upload-artifact@v4
+        with:
+          name: ardu-nano-warm-dawn-v5-rc1
+          path: build-nano-warm-dawn-v5/*.hex
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Publish full Nano Ambient12 R4 all-moving HEX
         uses: actions/upload-artifact@v4
