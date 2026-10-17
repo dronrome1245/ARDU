@@ -1,0 +1,127 @@
+name: ARDU Nano Remote Flash Builder
+
+on:
+  push:
+    paths:
+      - ".github/ardu-nano-remote-flash.trigger"
+
+permissions:
+  contents: write
+
+jobs:
+  build-remote-flash:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate ESP V4, helper and docs
+        run: |
+          python3 .github/ardu-nano-remote-flash-builder.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/flash_nano_over_wifi.ps1')
+          s=p.read_text(encoding='utf-8')
+          old='''$arm = Invoke-RestMethod \\\n    "http://$DeviceIp/api/system/nano-program/arm" \\\n    -Method Post \\\n    -ContentType "application/json" \\\n    -Body $payload \\\n    -TimeoutSec 5'''
+          new='''$arm = Invoke-RestMethod -Uri "http://$DeviceIp/api/system/nano-program/arm" `
+    -Method Post `
+    -ContentType "application/json" `
+    -Body $payload `
+    -TimeoutSec 5'''
+          assert old in s, 'PowerShell continuation pattern not found'
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          assert 'Invoke-RestMethod \\' not in s
+          assert '-P", $netPort' in s
+          assert '"-D"' in s
+          assert '"-V"' not in s
+          print('PASS: PowerShell helper syntax + AVRDUDE verify policy')
+          PY
+
+      - name: Static remote-programmer contract checks
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('05_WiFi_и_приложение/esp8266_nano_remote_v4/esp8266_nano_remote_v4.ino').read_text()
+          checks=[
+            'ARDU_ESP_V4_NANO_REMOTE',
+            'constexpr uint16_t NANO_PROGRAM_PORT = 3280;',
+            'constexpr unsigned long NANO_PROGRAM_BAUD = 57600UL;',
+            'constexpr uint8_t NANO_RESET_GPIO = 4;',
+            'server.client().remoteIP()',
+            'WiFi.status() != WL_CONNECTED',
+            'supplied == OTA_PASSWORD',
+            'nanoProgramArmDeadlineMs = millis() + Cfg::NANO_PROGRAM_ARM_MS;',
+            'digitalWrite(Cfg::NANO_RESET_GPIO, HIGH);',
+            'digitalWrite(Cfg::NANO_RESET_GPIO, LOW);',
+            'Serial.begin(Cfg::NANO_PROGRAM_BAUD);',
+            'Serial.begin(Cfg::NANO_BAUD);',
+            '/api/system/nano-program/arm',
+            '/api/system/nano-program/status',
+            'if(serviceNanoProgramBridge()) return;',
+            'nano_remote_flash',
+          ]
+          for needle in checks:
+            assert needle in s, needle
+          assert 'Nano RESET (5 V pull-up domain) directly' in s
+          print('PASS: authenticated IP-bound Station programmer + external reset contract')
+          PY
+
+      - uses: arduino/setup-arduino-cli@v2
+
+      - name: Install ESP8266 core
+        run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp8266:esp8266
+
+      - name: Prepare configured one-file ESP V4
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,re
+          p=Path('05_WiFi_и_приложение/esp8266_nano_remote_v4/esp8266_nano_remote_v4.ino')
+          s=p.read_text()
+          for key,value in {
+            'ARDU_WIFI_SSID':'CI_HOME_WIFI',
+            'ARDU_WIFI_PASSWORD':'CI_HOME_PASSWORD',
+            'ARDU_OTA_PASSWORD':'CI_OTA_PASSWORD',
+            'ARDU_SOFTAP_PASSWORD':'CI_DIRECT_PASSWORD',
+          }.items():
+            pat=rf'(?m)^(#define\s+{key}\s+)"PUT_[A-Z_]+_HERE"$'
+            s,n=re.subn(pat,lambda m:m[1]+'"'+value+'"',s)
+            assert n==1,key
+          out=Path(os.environ['RUNNER_TEMP'])/'esp8266_nano_remote_v4'
+          out.mkdir(parents=True,exist_ok=True)
+          (out/'esp8266_nano_remote_v4.ino').write_text(s)
+          assert len(list(out.iterdir()))==1
+          PY
+
+      - name: Compile ESP V4
+        run: |
+          arduino-cli compile \
+            --fqbn esp8266:esp8266:generic \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-esp-v4-nano-remote" \
+            "$RUNNER_TEMP/esp8266_nano_remote_v4"
+
+      - name: Publish verified source to staging branch
+        env:
+          BRANCH: ai-nano-remote-flash-20261017
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git add \
+            "05_WiFi_и_приложение/esp8266_nano_remote_v4/esp8266_nano_remote_v4.ino" \
+            "tools/flash_nano_over_wifi.ps1" \
+            "02_Архитектура_и_решения/NANO_REMOTE_FLASH.md" \
+            "DECISIONS.md" "HISTORY.md" "SOURCES.md" "STATUS.md" "00_AI_START_HERE.md" \
+            "02_КОМПОНЕНТЫ_BOM.md" "02_Наши_детали/ИНВЕНТАРЬ.md" \
+            "02_Архитектура_и_решения/АРХИТЕКТУРА_СИСТЕМЫ.md" \
+            "05_WiFi_и_приложение/API_V1.md" \
+            "01_СТАТУС_ПРОЕКТА.md" "02_СЛЕДУЮЩИЙ_ШАГ.md" "03_СОСТОЯНИЕ_ПРОЕКТА.yaml"
+          git commit -m "D-126: add authenticated Wi-Fi programming path for Nano"
+          git push origin "HEAD:refs/heads/$BRANCH"
