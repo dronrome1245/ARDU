@@ -22,18 +22,19 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           p=Path('tools/flash_nano_over_wifi.ps1')
+          lines=p.read_text(encoding='utf-8').splitlines()
+          marker='$arm = Invoke-RestMethod \\'
+          idx=lines.index(marker)
+          lines[idx]='$arm = Invoke-RestMethod -Uri "http://$DeviceIp/api/system/nano-program/arm" `'
+          lines[idx+1]='    -Method Post `'
+          lines[idx+2]='    -ContentType "application/json" `'
+          lines[idx+3]='    -Body $payload `'
+          lines[idx+4]='    -TimeoutSec 5'
+          del lines[idx+5]
+          p.write_text('\n'.join(lines)+'\n',encoding='utf-8')
           s=p.read_text(encoding='utf-8')
-          old='''$arm = Invoke-RestMethod \\\n    "http://$DeviceIp/api/system/nano-program/arm" \\\n    -Method Post \\\n    -ContentType "application/json" \\\n    -Body $payload \\\n    -TimeoutSec 5'''
-          new='''$arm = Invoke-RestMethod -Uri "http://$DeviceIp/api/system/nano-program/arm" `
-    -Method Post `
-    -ContentType "application/json" `
-    -Body $payload `
-    -TimeoutSec 5'''
-          assert old in s, 'PowerShell continuation pattern not found'
-          s=s.replace(old,new,1)
-          p.write_text(s,encoding='utf-8')
           assert 'Invoke-RestMethod \\' not in s
-          assert '-P", $netPort' in s
+          assert '"-P", $netPort' in s
           assert '"-D"' in s
           assert '"-V"' not in s
           print('PASS: PowerShell helper syntax + AVRDUDE verify policy')
