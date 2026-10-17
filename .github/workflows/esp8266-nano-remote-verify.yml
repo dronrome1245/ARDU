@@ -20,19 +20,28 @@ jobs:
           from pathlib import Path
           s=Path('05_WiFi_и_приложение/esp8266_nano_remote_v4/esp8266_nano_remote_v4.ino').read_text()
           for needle in [
-            'ARDU_ESP_V4_NANO_REMOTE',
+            'ARDU_ESP_V4_NANO_REMOTE_R2',
             'NANO_PROGRAM_PORT = 3280',
             'NANO_PROGRAM_BAUD = 57600UL',
             'NANO_RESET_GPIO = 4',
+            'NANO_PROGRAM_UART_RX_BUFFER = 512',
+            'NANO_PROGRAM_IO_STALL_MS = 5000UL',
             'supplied == OTA_PASSWORD',
             'server.client().remoteIP()',
             'nanoProgramArmDeadlineMs = millis() + Cfg::NANO_PROGRAM_ARM_MS',
             'if(serviceNanoProgramBridge()) return;',
             'nano_remote_flash',
+            'writeNanoProgramTcpAll',
+            'writeNanoProgramSerialAll',
+            'nanoProgramClient.availableForWrite()',
+            'Serial.availableForWrite()',
+            'Serial.read(buf, static_cast<size_t>(available))',
           ]:
             assert needle in s, needle
+          assert 'nanoProgramClient.write(buf, static_cast<size_t>(got));' not in s
+          assert 'Serial.write(buf, static_cast<size_t>(got));' not in s
           assert 'Nano RESET (5 V pull-up domain) directly' in s
-          print('PASS: V4 auth/reset/bridge contract')
+          print('PASS: V4 R2 auth/reset/lossless bridge contract')
           PY
 
       - name: Parse PowerShell helper
@@ -53,7 +62,7 @@ jobs:
           arduino-cli core update-index
           arduino-cli core install esp8266:esp8266
 
-      - name: Prepare configured one-file ESP V4
+      - name: Prepare configured one-file ESP V4 R2
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -74,10 +83,10 @@ jobs:
           assert len(list(out.iterdir()))==1
           PY
 
-      - name: Compile ESP V4
+      - name: Compile ESP V4 R2
         run: |
           arduino-cli compile \
             --fqbn esp8266:esp8266:generic \
             --warnings default \
-            --build-path "$GITHUB_WORKSPACE/build-esp-v4-nano-remote" \
+            --build-path "$RUNNER_TEMP/build-esp-v4-nano-remote-r2" \
             "$RUNNER_TEMP/esp8266_nano_remote_v4"
