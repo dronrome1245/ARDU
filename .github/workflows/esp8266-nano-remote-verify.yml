@@ -1,0 +1,83 @@
+name: ESP8266 Nano Remote Verify
+
+on:
+  push:
+    paths:
+      - "05_WiFi_и_приложение/esp8266_nano_remote_v4/**"
+      - "tools/flash_nano_over_wifi.ps1"
+      - ".github/workflows/esp8266-nano-remote-verify.yml"
+  workflow_dispatch:
+
+jobs:
+  esp-v4-nano-remote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify remote programming contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('05_WiFi_и_приложение/esp8266_nano_remote_v4/esp8266_nano_remote_v4.ino').read_text()
+          for needle in [
+            'ARDU_ESP_V4_NANO_REMOTE',
+            'NANO_PROGRAM_PORT = 3280',
+            'NANO_PROGRAM_BAUD = 57600UL',
+            'NANO_RESET_GPIO = 4',
+            'supplied == OTA_PASSWORD',
+            'server.client().remoteIP()',
+            'nanoProgramArmDeadlineMs = millis() + Cfg::NANO_PROGRAM_ARM_MS',
+            'if(serviceNanoProgramBridge()) return;',
+            'nano_remote_flash',
+          ]:
+            assert needle in s, needle
+          assert 'Nano RESET (5 V pull-up domain) directly' in s
+          print('PASS: V4 auth/reset/bridge contract')
+          PY
+
+      - name: Parse PowerShell helper
+        shell: pwsh
+        run: |
+          $source = Get-Content -Raw "tools/flash_nano_over_wifi.ps1"
+          [scriptblock]::Create($source) | Out-Null
+          if ($source -match '"-V"') { throw "AVRDUDE verify must remain enabled" }
+          if ($source -notmatch 'net:\$DeviceIp') { throw "network avrdude port missing" }
+          Write-Host "PASS: PowerShell helper parses and keeps AVRDUDE verify"
+
+      - uses: arduino/setup-arduino-cli@v2
+
+      - name: Install ESP8266 core
+        run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp8266:esp8266
+
+      - name: Prepare configured one-file ESP V4
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,re
+          source=Path('05_WiFi_и_приложение/esp8266_nano_remote_v4/esp8266_nano_remote_v4.ino').read_text()
+          for key,value in {
+            'ARDU_WIFI_SSID':'CI_HOME_WIFI',
+            'ARDU_WIFI_PASSWORD':'CI_HOME_PASSWORD',
+            'ARDU_OTA_PASSWORD':'CI_OTA_PASSWORD',
+            'ARDU_SOFTAP_PASSWORD':'CI_DIRECT_PASSWORD',
+          }.items():
+            pat=rf'(?m)^(#define\s+{key}\s+)"PUT_[A-Z_]+_HERE"$'
+            source,n=re.subn(pat,lambda m:m[1]+'"'+value+'"',source)
+            assert n==1,key
+          out=Path(os.environ['RUNNER_TEMP'])/'esp8266_nano_remote_v4'
+          out.mkdir(parents=True,exist_ok=True)
+          (out/'esp8266_nano_remote_v4.ino').write_text(source)
+          assert len(list(out.iterdir()))==1
+          PY
+
+      - name: Compile ESP V4
+        run: |
+          arduino-cli compile \
+            --fqbn esp8266:esp8266:generic \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-esp-v4-nano-remote" \
+            "$RUNNER_TEMP/esp8266_nano_remote_v4"
