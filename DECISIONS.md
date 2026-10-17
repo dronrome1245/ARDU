@@ -2114,3 +2114,23 @@ R3 не прошивался и не тестировался на железе.
 **Почему не software-reset Nano:** если приложение Nano будет повреждено неудачной записью, оно уже не сможет принять команду входа в bootloader. Отдельный аппаратный RESET от ESP сохраняет удалённый recovery path.
 
 Подробно: `02_Архитектура_и_решения/NANO_REMOTE_FLASH.md`.
+
+
+---
+
+## D-127 — Nano remote upload считается успешным только после полного AVRDUDE verify
+
+**Дата:** 2026-10-17
+**Статус:** ДЕЙСТВУЕТ
+
+**Основание:** первый фактический Wi-Fi upload R6 записал 29 722 B до 100%, но verify потерял STK500 sync примерно на 22%.
+
+**РЕШЕНИЕ:**
+1. Не использовать `-V` и не считать `Writing 100%` достаточным подтверждением firmware.
+2. ESP bridge обязан учитывать фактическое число байт, принятое `WiFiClient.write`/`HardwareSerial.write`, и досылать остаток вместо молчаливой потери.
+3. UART→TCP programming path использует неблокирующий `HardwareSerial::read`; programming RX buffer увеличен до 512 B.
+4. При невозможности продвинуть передачу в течение 5 s сеанс завершается явным transport result, а не продолжает испорченный STK500 stream.
+5. Hardware PASS удалённого обновления Nano = `signature + full write + full verify + восстановленный /api/status`.
+6. До такого PASS USB остаётся recovery-путём.
+
+**Ревизия:** `ARDU_ESP_V4_NANO_REMOTE_R2`.

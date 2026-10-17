@@ -123,7 +123,7 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
-**Обновление 2026-10-17 / D-126:** добавлен source-кандидат ESP `ARDU_ESP_V4_NANO_REMOTE` и service reset architecture для последующих Nano updates по Wi-Fi: GPIO4 через BC548 управляет RESET Nano, стандартный AVRDUDE работает через TCP bridge 3280 на штатный Old Bootloader 57600. Первый physical remote write/verify ещё pending; до него USB остаётся recovery.
+**Обновление 2026-10-17 / D-126+D-127:** физический GPIO4→BC548→Nano RESET уже PASS. Первый реальный AVRDUDE upload через ESP V4 записал Nano R6 HEX до 100%, но verify потерял sync примерно на 22%, поэтому hardware upload PASS ещё нет. Текущая source-ревизия `ARDU_ESP_V4_NANO_REMOTE_R2` делает TCP↔UART forwarding lossless по фактическому return count `write()`, оставляя AVRDUDE verify обязательным. Следующий gate: OTA R2 → повторный полный write+verify → `/api/status`; USB остаётся recovery до PASS.
 
 
 **Обновление 2026-10-17:** source-кандидат Nano `nano_warm_dawn_v6`, boot `ARDU1 7`, добавляет D-125: событийное расписание Night с ручным Night вне окна. Установленная физическая Nano пока остаётся R5/FW_REV6; R6 потребует следующего USB-доступа к Nano. Физический RTC/alarm start на R5 подтверждён через Station; `current_limit_ma=3000`.

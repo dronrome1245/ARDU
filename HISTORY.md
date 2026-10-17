@@ -2801,3 +2801,13 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - Добавлен Windows helper `tools/flash_nano_over_wifi.ps1`, использующий AVRDUDE из Arduino IDE и стандартный write+verify.
 - Добавлен монтажный/приёмочный документ `02_Архитектура_и_решения/NANO_REMOTE_FLASH.md`.
 - One-shot CI компилирует полный ESP V4 как Generic ESP8266 с четырьмя тестовыми credentials до публикации исходника. Физический reset-транзистор, реальный Wi-Fi Nano upload и recovery retry владельцем ещё не проверены.
+
+
+## 2026-10-17 — первый реальный удалённый upload Nano: запись 100%, verify transport FAIL
+
+- ESP V4 и физическая GPIO4→BC548→Nano RESET цепь уже подтвердили удалённый reset: Nano `uptime_ms` 890258 → 9488 ms.
+- Владелец запустил `tools/flash_nano_over_wifi.ps1` на фактическом `nano_warm_dawn_v6.ino.hex`.
+- AVRDUDE 8.0-arduino.1 через TCP 3280 / STK500v1 / 57600 определил ATmega328P signature `1E 95 0F`, прочитал HEX 29 722 B и выполнил запись Flash до 100%.
+- Verify остановился примерно на 22%: `protocol expects sync byte 0x14 but got 0xe6`, затем `0xff`, `programmer is out of sync`, `unable to read byte at address 0x0000`, затем `0xc4`.
+- Результат классифицирован как **WRITE COMPLETE / VERIFY FAIL**, а не как успешная прошивка. Отключение verify (`-V`) не допускается.
+- Подготовлена ESP `ARDU_ESP_V4_NANO_REMOTE_R2`: lossless forwarding с учётом фактического return count `write()`, `availableForWrite()`, неблокирующим UART read и 512-B RX buffer. Повторный physical write+verify pending.

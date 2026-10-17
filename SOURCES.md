@@ -1213,3 +1213,12 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - White Adapter / ESP8266 pin references: GPIO4/GPIO5 являются обычными GPIO, в отличие от boot strap GPIO0/GPIO2/GPIO15; существующая white adapter routes ESP-12 signals to headers. Источники уже зафиксированы как S-010/S-011; дополнительная pin table: `https://homeding.github.io/boards/pins.htm`.
 
 Эти источники определяют software/protocol assumptions. Фактическая транзисторная RESET-цепь и первый remote flash Nano остаются hardware gate.
+
+
+## Дополнение D-127 — ESP8266 Arduino core WiFiClient / HardwareSerial transport contract
+
+Официальный upstream ESP8266 Arduino core:
+- `https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClient.cpp` — `WiFiClient::write()` возвращает `size_t` фактически переданных байт; доступен `availableForWrite()`.
+- `https://github.com/esp8266/Arduino/blob/master/cores/esp8266/HardwareSerial.h` — `HardwareSerial::read(buffer,size)` является чтением без timeout, `write()` возвращает число принятых байт, доступен `availableForWrite()` и настройка RX buffer.
+
+Использовано в D-127, чтобы TCP↔UART bridge не предполагал, что один вызов `write()` всегда принимает весь буфер.

@@ -4,6 +4,9 @@
 
 ## Текущий этап
 
+**2026-10-17 — D-127 / первый реальный Nano Wi-Fi upload: WRITE 100%, VERIFY FAIL на ~22%; готов ESP V4 R2 lossless bridge, повторный physical gate pending.** На фактическом железе `avrdude 8.0-arduino.1` через `net:192.168.0.4:3280`, `arduino`, 57600 успешно синхронизировался с ATmega328P (`1E 95 0F`) и записал 29 722 B Nano R6 до 100%. На фазе verify чтение дошло примерно до 22% и протокол потерял синхронизацию (`expected 0x14`, получены `0xe6/0xff/0xc4`). Это **не hardware PASS**: R6 нельзя считать подтверждённой без полного readback verify. В ESP V4 R2 мост больше не игнорирует частичные `write()`: TCP↔UART передаётся до полного количества байт, UART→TCP читает неблокирующим `HardwareSerial::read`, RX buffer programming mode = 512 B, stall имеет явный fail вместо молчаливой потери. AVRDUDE verify остаётся обязательным; `-V` запрещён. Следующий gate: OTA V4 R2 → повтор того же Nano R6 HEX → требовать полный `write + verify + /api/status`.
+
+
 **2026-10-17 — D-126 / удалённая прошивка Nano: ESP V4 SOURCE + compile gate PASS; hardware gate pending.** Подготовлен `esp8266_nano_remote_v4`: существующий ESP ArduinoOTA сохраняется, дополнительно Station-only service arm с текущим OTA password и IP binding открывает TCP 3280; при подключении стандартного AVRDUDE ESP переключает общий UART на Nano Old Bootloader 57600 и через GPIO4/NPN аппаратно сбрасывает Nano. Добавлен `tools/flash_nano_over_wifi.ps1`. Требуется один раз физически собрать reset stage из имеющихся BC548 + 1,5 kΩ + 4,7 kΩ; после первого реального write+verify будущие Nano updates можно выполнять по Wi-Fi без USB-доступа. Подробно: `02_Архитектура_и_решения/NANO_REMOTE_FLASH.md`.
 
 

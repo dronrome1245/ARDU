@@ -81,3 +81,7 @@ cd C:\ARDU
 После успешного `POST /api/system/nano-program/arm` (`armed:true`) тестовое TCP-подключение к порту 3280 вызвало аппаратный reset Nano через GPIO4/BC548. До reset Nano сообщала `uptime_ms=890258`; через ~10 секунд после теста — `uptime_ms=9488`. `/api/status` снова отвечал штатно, RTC оставался valid, а `/api/system/nano-program/status` вернул `active:false`, `armed:false`, `last_result:"disconnected"`. В `/api/events` появился `warm_reset` (code 9); перед `ARDU1 6` наблюдался один нечитаемый байт на границе переключения UART, что не помешало восстановлению протокола.
 
 **Вывод:** физическая reset-цепь `ESP GPIO4 → 1.5 kΩ → BC548 B`, `4.7 kΩ B→GND`, `E→GND`, `C→Nano RESET` подтверждена на собранном устройстве. Следующий gate — первый реальный `avrdude write + verify` Nano R6 по Wi-Fi и post-flash `/api/status`.
+
+## 6. Physical gate 2026-10-17 / R2 transport fix
+
+Фактический reset через GPIO4/BC548 подтверждён (`uptime_ms` 890258 → 9488). Первый AVRDUDE upload распознал ATmega328P и записал 29 722 B до 100%, но verify потерял STK500 `0x14` примерно на 22%. Поэтому firmware не считается принятой. V4 R2 заменяет one-shot UART/TCP writes на complete-write loops, использует `availableForWrite()`, неблокирующий `HardwareSerial::read` и 512-B programming RX buffer. `-V` не использовать. Критерий PASS остаётся: полный write + полный verify + `/api/status` после возврата UART 115200.

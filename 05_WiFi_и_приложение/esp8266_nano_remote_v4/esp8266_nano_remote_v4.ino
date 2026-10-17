@@ -1,5 +1,5 @@
 /*
-  ARDU ESP8266 V4: Warm Dawn V3 + authenticated remote Nano programming bridge.
+  ARDU ESP8266 V4 R2: Warm Dawn V3 + lossless authenticated remote Nano programming bridge.
 
   External contract:
     Android / LAN -> semantic HTTP API -> ESP8266 -> compact numeric UART v1 -> Nano
@@ -77,7 +77,7 @@ constexpr uint16_t HTTP_PORT = 80;
 constexpr uint16_t OTA_PORT = 8266;
 constexpr char HOSTNAME[] = "ardu";
 constexpr char SOFTAP_SSID[] = "ARDU-DIRECT";
-constexpr char FW_NAME[] = "ARDU_ESP_V4_NANO_REMOTE";
+constexpr char FW_NAME[] = "ARDU_ESP_V4_NANO_REMOTE_R2";
 constexpr uint8_t UART_PROTOCOL = 1;
 
 constexpr unsigned long WIFI_CONNECT_TIMEOUT_MS = 15000UL;
@@ -96,6 +96,8 @@ constexpr unsigned long NANO_PROGRAM_BAUD = 57600UL;
 constexpr uint8_t NANO_RESET_GPIO = 4; // GPIO4 -> resistor -> NPN base; collector -> Nano RESET
 constexpr unsigned long NANO_PROGRAM_ARM_MS = 30000UL;
 constexpr unsigned long NANO_PROGRAM_IDLE_MS = 15000UL;
+constexpr unsigned long NANO_PROGRAM_IO_STALL_MS = 5000UL;
+constexpr size_t NANO_PROGRAM_UART_RX_BUFFER = 512;
 
 constexpr size_t MAX_COMMAND_LENGTH = 80;
 constexpr size_t MAX_NANO_RESPONSE = 1800;
@@ -1607,11 +1609,66 @@ void startNanoProgramSession(WiFiClient client) {
   while (Serial.available() > 0) (void)Serial.read();
   Serial.end();
   delay(10);
+  Serial.setRxBufferSize(Cfg::NANO_PROGRAM_UART_RX_BUFFER);
   Serial.begin(Cfg::NANO_PROGRAM_BAUD);
   Serial.setTimeout(50);
 
   pulseNanoReset();
   nanoProgramLastTrafficMs = millis();
+}
+
+// A transparent programming bridge must never silently drop a partial write.
+// Both Arduino Client::write() and HardwareSerial::write() return the actual
+// number of bytes accepted. Keep forwarding until the whole chunk is accepted
+// or the peer stalls/disconnects.
+bool writeNanoProgramTcpAll(const uint8_t* data, size_t length) {
+  size_t offset = 0;
+  unsigned long lastProgressMs = millis();
+
+  while (offset < length) {
+    if (!nanoProgramClient || !nanoProgramClient.connected()) return false;
+
+    const int room = nanoProgramClient.availableForWrite();
+    if (room > 0) {
+      size_t chunk = length - offset;
+      if (chunk > static_cast<size_t>(room)) chunk = static_cast<size_t>(room);
+      const size_t wrote = nanoProgramClient.write(data + offset, chunk);
+      if (wrote > 0) {
+        offset += wrote;
+        nanoProgramLastTrafficMs = millis();
+        lastProgressMs = nanoProgramLastTrafficMs;
+        continue;
+      }
+    }
+
+    if (millis() - lastProgressMs > Cfg::NANO_PROGRAM_IO_STALL_MS) return false;
+    yield();
+  }
+  return true;
+}
+
+bool writeNanoProgramSerialAll(const uint8_t* data, size_t length) {
+  size_t offset = 0;
+  unsigned long lastProgressMs = millis();
+
+  while (offset < length) {
+    const int room = Serial.availableForWrite();
+    if (room > 0) {
+      size_t chunk = length - offset;
+      if (chunk > static_cast<size_t>(room)) chunk = static_cast<size_t>(room);
+      const size_t wrote = Serial.write(data + offset, chunk);
+      if (wrote > 0) {
+        offset += wrote;
+        nanoProgramLastTrafficMs = millis();
+        lastProgressMs = nanoProgramLastTrafficMs;
+        continue;
+      }
+    }
+
+    if (millis() - lastProgressMs > Cfg::NANO_PROGRAM_IO_STALL_MS) return false;
+    yield();
+  }
+  return true;
 }
 
 bool serviceNanoProgramBridge() {
@@ -1629,7 +1686,10 @@ bool serviceNanoProgramBridge() {
       if (available > static_cast<int>(sizeof(buf))) available = sizeof(buf);
       const int got = nanoProgramClient.read(buf, available);
       if (got > 0) {
-        Serial.write(buf, static_cast<size_t>(got));
+        if (!writeNanoProgramSerialAll(buf, static_cast<size_t>(got))) {
+          finishNanoProgramSession("uart_write_stall");
+          return false;
+        }
         traffic = true;
       }
     }
@@ -1637,9 +1697,12 @@ bool serviceNanoProgramBridge() {
     available = Serial.available();
     if (available > 0) {
       if (available > static_cast<int>(sizeof(buf))) available = sizeof(buf);
-      const int got = Serial.readBytes(buf, static_cast<size_t>(available));
+      const int got = Serial.read(buf, static_cast<size_t>(available));
       if (got > 0) {
-        nanoProgramClient.write(buf, static_cast<size_t>(got));
+        if (!writeNanoProgramTcpAll(buf, static_cast<size_t>(got))) {
+          finishNanoProgramSession("tcp_write_stall");
+          return false;
+        }
         traffic = true;
       }
     }
