@@ -40,7 +40,7 @@ jobs:
         run: |
           $source = Get-Content -Raw "tools/flash_nano_over_wifi.ps1"
           [scriptblock]::Create($source) | Out-Null
-          if ($source -match '"-V"') { throw "AVRDUDE verify must remain enabled" }
+          if ($source -cmatch '"-V"') { throw "AVRDUDE verify must remain enabled" }
           if ($source -notmatch 'net:\$DeviceIp') { throw "network avrdude port missing" }
           Write-Host "PASS: PowerShell helper parses and keeps AVRDUDE verify"
 
