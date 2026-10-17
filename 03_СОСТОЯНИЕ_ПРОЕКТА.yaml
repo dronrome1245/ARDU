@@ -3224,3 +3224,5 @@ android_02211_ambient_music_scenes_2026_10_10:
   ci_debug_apk: "ardu-android-02211-presets-music-scenes-debug-apk"
   physical_phone_test_completed: false
   next: "owner_git_pull_run_02211_verify_four_changes"
+
+# 2026-10-17 D-126: ESP V4 remote Nano programming source/CI ready; physical reset-stage + first remote write/verify pending.

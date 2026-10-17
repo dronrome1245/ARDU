@@ -525,3 +525,16 @@ ESP requires **both** Kelvin fields when either is present; each multiple of 20 
 - `schedule_on` / `schedule_off` — границы автоматического ON/OFF.
 
 При `schedule_on` Nano автоматически выбирает `NIGHT`, кроме случая активного `DAWN`. После этого пользователь может вручную выбрать другой режим, и расписание не возвращает Night до следующей границы. При `schedule_off` Nano выключает свет только если текущий режим всё ещё `NIGHT`; `LIGHT`, `MUSIC` и `AMBIENT` не выключаются. Ручной `NIGHT` работает и вне расписания. При старте устройства внутри активного окна расписания Night включается автоматически.
+
+
+## 11. Service: remote Nano programming — ESP V4 / D-126
+
+Не является пользовательским режимом лампы. Это сервисный maintenance path для владельца.
+
+- `GET /api/system/nano-program/status` — capability/state (`supported`, `active`, `armed`, `port=3280`, `baud=57600`, `reset_gpio=4`, `last_result`).
+- `POST /api/system/nano-program/arm` body `{"password":"<current ESP OTA password>"}` — открыть на 30 s TCP programming window для IP инициатора.
+- только Station; в ARDU-DIRECT arm возвращает conflict; пароль не возвращается API.
+- после TCP connect normal Nano UART API временно suspended; ESP переключает UART0 115200→57600 и аппаратно сбрасывает Nano.
+- TCP endpoint используется стандартным AVRDUDE `-P net:<ESP_IP>:3280 -c arduino -p atmega328p -b 57600`; после disconnect ESP возвращает normal UART 115200.
+
+PowerShell helper: `tools/flash_nano_over_wifi.ps1`. Подробная электрическая схема/приёмка: `02_Архитектура_и_решения/NANO_REMOTE_FLASH.md`.

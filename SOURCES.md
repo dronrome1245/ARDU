@@ -1204,3 +1204,12 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - Сообщение владельца: «все получилось. давай перейдем к монтажу второго кольца. у меня есть три провода 1х1,5мм2. Хочу сразу соединить потом монтаж на потолок.» Это **свидетельство наличия трёх проводов с номинальным сечением** и общего успеха предыдущего функционального этапа, не доказательство конкретного LED/Direct/силового PASS.
 - [Finalization physical topology](FINALIZATION_PLAN.md): ≈2 м, отдельно D6/D7, три сигнала +5V/GND/DATA второго корпуса, запрет питать Open-frame S-30-5 без PE на потолке.
 - [`02_Архитектура_и_решения/RING_B_44LED_МОНТАЖ_И_ПРОВЕРКА.md`](02_Архитектура_и_решения/RING_B_44LED_МОНТАЖ_И_ПРОВЕРКА.md) — рекомендуемая схема Ring B и последовательность низковольтной приёмки; не подтверждает, что пользователь её реализовал.
+
+
+## S-NANO-OTA-001 — официальные основания remote Nano programming, 2026-10-17
+
+- Arduino `ArduinoCore-avr/boards.txt`: `nano.menu.cpu.atmega328old` использует `upload.protocol=arduino`, `upload.maximum_size=30720`, `upload.speed=57600`, bootloader `ATmegaBOOT_168_atmega328.hex`. Источник: `https://github.com/arduino/ArduinoCore-avr/blob/master/boards.txt`.
+- AVRDUDE 8.0 documentation: для serial-программаторов `-P net:host:port` создаёт TCP connection к terminal/console server, который прозрачно соединяет network stream с serial programmer. Источник: `https://avrdudes.github.io/avrdude/8.0/avrdude_4.html`.
+- White Adapter / ESP8266 pin references: GPIO4/GPIO5 являются обычными GPIO, в отличие от boot strap GPIO0/GPIO2/GPIO15; существующая white adapter routes ESP-12 signals to headers. Источники уже зафиксированы как S-010/S-011; дополнительная pin table: `https://homeding.github.io/boards/pins.htm`.
+
+Эти источники определяют software/protocol assumptions. Фактическая транзисторная RESET-цепь и первый remote flash Nano остаются hardware gate.

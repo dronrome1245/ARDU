@@ -2792,3 +2792,12 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - Ускоренный будильник с `fade_minutes=1` физически перешёл в `mode:dawn`; `/api/events` выдал `V 6` (alarm trigger) и `V 2 1 60` (alarm dawn start). Владелец подтвердил, что свет позже стал ярким; начало текущей квадратичной кривой визуально очень тёмное.
 - Выявлено ограничение текущего R5: повторный будильник в ту же календарную дату блокируется сохранённым `lastTrigger`; отдельное исправление остаётся будущей задачей.
 - По новому явному требованию владельца подготовлен Nano R6: расписание Night работает как события ON/OFF, а ручной NIGHT больше не ограничивается временным окном.
+
+
+## 2026-10-17 — Nano remote flashing R1 source/CI
+
+- По прямой команде владельца подготовлен ESP `ARDU_ESP_V4_NANO_REMOTE` поверх работающего Warm Dawn V3.
+- Реализован Station-only authenticated arm, IP-bound 30 s window, TCP port 3280, прозрачный `avrdude ↔ ESP UART0 ↔ Nano Old Bootloader` bridge на 57600 и GPIO4 reset control через NPN.
+- Добавлен Windows helper `tools/flash_nano_over_wifi.ps1`, использующий AVRDUDE из Arduino IDE и стандартный write+verify.
+- Добавлен монтажный/приёмочный документ `02_Архитектура_и_решения/NANO_REMOTE_FLASH.md`.
+- One-shot CI компилирует полный ESP V4 как Generic ESP8266 с четырьмя тестовыми credentials до публикации исходника. Физический reset-транзистор, реальный Wi-Fi Nano upload и recovery retry владельцем ещё не проверены.
