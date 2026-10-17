@@ -514,3 +514,14 @@ Atomic `POST /api/alarm/settings` example:
 ESP requires **both** Kelvin fields when either is present; each multiple of 20 between 1800–4000, start<=end. Validated before any writes, checks real Nano marker, sends numeric `78 10 90`, `73/74` for other values and `77` EEPROM commit. On older Nano returns HTTP 409 `DAWN_KELVIN_REQUIRES_NANO_R5` rather than pretending to apply. Settings persist/readback remain from Nano. The Android preset names are not new protocol IDs.
 
 **Direct transport final try (ESP V3):** when `softAPgetStationNum()>0`, suspend STA reconnection/channel scan; resume when no clients, so in-use direct control is prioritized over immediate automatic return to router. `GET /api/ping` includes `softap_clients` diagnostic; existing fields preserved. Do not assume physical PASS from CI. `RELEASE_WARM_DAWN_DIRECT_ACCEPTANCE.md`.
+
+
+### Night schedule semantics — D-125 / 2026-10-17
+
+Для `POST /api/night/settings` поля имеют независимый смысл:
+
+- `enabled` — ручное включение/выключение Night и **не отключает** сохранённое расписание;
+- `schedule_enabled` — включает/выключает только автоматические события расписания;
+- `schedule_on` / `schedule_off` — границы автоматического ON/OFF.
+
+При `schedule_on` Nano автоматически выбирает `NIGHT`, кроме случая активного `DAWN`. После этого пользователь может вручную выбрать другой режим, и расписание не возвращает Night до следующей границы. При `schedule_off` Nano выключает свет только если текущий режим всё ещё `NIGHT`; `LIGHT`, `MUSIC` и `AMBIENT` не выключаются. Ручной `NIGHT` работает и вне расписания. При старте устройства внутри активного окна расписания Night включается автоматически.

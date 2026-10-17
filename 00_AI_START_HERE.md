@@ -123,6 +123,8 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
+**Обновление 2026-10-17:** source-кандидат Nano `nano_warm_dawn_v6`, boot `ARDU1 7`, добавляет D-125: событийное расписание Night с ручным Night вне окна. Установленная физическая Nano пока остаётся R5/FW_REV6; R6 потребует следующего USB-доступа к Nano. Физический RTC/alarm start на R5 подтверждён через Station; `current_limit_ma=3000`.
+
 **SOURCE/CI PACK готов, hardware install пока не выполнен.** В main: Nano `nano_warm_dawn_v5` boot `ARDU1 6`, ESP `esp8266_warm_dawn_v3` fw `ARDU_ESP_V3_WARM_DAWN`, Android `0.22.15-warm-dawn-presets-rc1` code38. Android 4 тёплых пресета; light L01/Music/P01..P12/Night/RTC сохранены. [Nano PASS](https://github.com/dronrome1245/ARDU/actions/runs/38050231423) 29534/1286, [ESP PASS](https://github.com/dronrome1245/ARDU/actions/runs/38050334769), [Android PASS](https://github.com/dronrome1245/ARDU/actions/runs/38050719704), физические испытания ещё впереди.
 
 1. Выполнить `RELEASE_WARM_DAWN_DIRECT_ACCEPTANCE.md`: через домашний Station безопасно установить ESP V3 (локальные приватные credentials только вне Git), Nano R5 (USB Old Bootloader, временно разомкнуть ESP TX→Nano RX), затем `git pull` → Android Studio Run.
