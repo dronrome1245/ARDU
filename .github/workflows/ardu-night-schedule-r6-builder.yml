@@ -60,7 +60,6 @@ jobs:
           git switch -c "$BRANCH"
           git add \
             "04_Прошивка/nano_warm_dawn_v6/nano_warm_dawn_v6.ino" \
-            ".github/workflows/arduino-verify.yml" \
             "00_AI_START_HERE.md" \
             "STATUS.md" \
             "DECISIONS.md" \
