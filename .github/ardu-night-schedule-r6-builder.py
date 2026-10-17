@@ -1,0 +1,344 @@
+from pathlib import Path
+
+
+def replace_once(text, old, new, label):
+    count = text.count(old)
+    assert count == 1, f"{label}: expected one match, got {count}"
+    return text.replace(old, new, 1)
+
+
+root = Path('.')
+old_path = root / '04_Прошивка/nano_warm_dawn_v5/nano_warm_dawn_v5.ino'
+new_dir = root / '04_Прошивка/nano_warm_dawn_v6'
+new_dir.mkdir(parents=True, exist_ok=True)
+new_path = new_dir / 'nano_warm_dawn_v6.ino'
+s = old_path.read_text(encoding='utf-8')
+
+s = replace_once(
+    s,
+    '/*\n  ARDU Ambient12 R4: all P01..P12 are visibly animated; preserve P11 R3.\n',
+    '/*\n  ARDU Nano R6: event-driven Night schedule; manual NIGHT is independent of schedule window.\n  Based on the hardware-tested Warm Dawn R5 / Ambient12 R4 feature set.\n',
+    'header')
+s = replace_once(s, 'constexpr uint8_t FW_REV = 6;', 'constexpr uint8_t FW_REV = 7;', 'FW_REV')
+s = replace_once(s, 'Serial.println(F("ARDU1 6"));', 'Serial.println(F("ARDU1 7"));', 'boot marker')
+
+old_reconcile = '''bool reconcileNight(bool announce=false){
+  if(!nightCfg.scheduleEnabled){
+    nightWindowActive=false;
+    nightEffectivePower=nightCfg.manualEnabled;
+  } else {
+    RtcTime now;
+    if(!rtcValidNow(&now)){
+      nightWindowActive=false; nightEffectivePower=false; return false;
+    }
+    const bool before=nightEffectivePower;
+    nightWindowActive=insideNightWindow(now);
+    nightEffectivePower=nightWindowActive;
+    if(announce && before!=nightEffectivePower){
+      emitEvent2(1,nightEffectivePower?1:0);
+    }
+  }
+
+  if(currentMode==SystemMode::NIGHT){
+    if(nightEffectivePower){
+      fill_solid(leds,Cfg::LED_COUNT,CHSV(nightCfg.hue,nightCfg.saturation,255));
+      requestedBrightness=static_cast<uint8_t>(nightCfg.brightness);
+    } else {
+      prepareOff();
+      return true;
+    }
+    frameDirty=true;
+  }
+  return true;
+}
+'''
+new_reconcile = '''bool reconcileNight(bool announce=false){
+  (void)announce;
+  if(nightCfg.scheduleEnabled){
+    RtcTime now;
+    if(rtcValidNow(&now))nightWindowActive=insideNightWindow(now);
+  } else {
+    nightWindowActive=false;
+  }
+
+  // Schedule is automation, not a permission gate. If NIGHT is selected
+  // manually, render it at any time of day regardless of the schedule window.
+  nightEffectivePower=currentMode==SystemMode::NIGHT;
+  if(currentMode==SystemMode::NIGHT){
+    fill_solid(leds,Cfg::LED_COUNT,CHSV(nightCfg.hue,nightCfg.saturation,255));
+    requestedBrightness=static_cast<uint8_t>(nightCfg.brightness);
+    frameDirty=true;
+  }
+  return true;
+}
+
+void applyMode(SystemMode m,bool persist);
+
+bool syncNightSchedule(const RtcTime& now,bool announce=false,bool forceOn=false){
+  if(!nightCfg.scheduleEnabled){
+    nightWindowActive=false;
+    return true;
+  }
+
+  const bool before=nightWindowActive;
+  const bool active=insideNightWindow(now);
+  const bool changed=active!=before;
+  nightWindowActive=active;
+
+  // ON boundary has priority over ordinary user modes, but never interrupts
+  // an active dawn. After the boundary the user may select another mode.
+  if(active && (changed||forceOn)){
+    if(currentMode!=SystemMode::DAWN)applyMode(SystemMode::NIGHT,false);
+  } else if(!active && changed && currentMode==SystemMode::NIGHT){
+    // OFF boundary switches off NIGHT only. A manually selected LIGHT/MUSIC/
+    // AMBIENT mode is left untouched.
+    applyMode(SystemMode::OFF,true);
+  }
+
+  nightEffectivePower=currentMode==SystemMode::NIGHT;
+  if(announce&&changed)emitEvent2(1,active?1:0);
+  return true;
+}
+
+bool syncNightScheduleNow(bool announce=false,bool forceOn=false){
+  if(!nightCfg.scheduleEnabled){
+    nightWindowActive=false;
+    return true;
+  }
+  RtcTime now;
+  if(!rtcValidNow(&now))return false;
+  return syncNightSchedule(now,announce,forceOn);
+}
+'''
+s = replace_once(s, old_reconcile, new_reconcile, 'night scheduler core')
+
+s = replace_once(
+    s,
+    '''  if(currentMode==SystemMode::NIGHT && nightCfg.scheduleEnabled){
+    (void)reconcileNight(true);
+  }
+''',
+    '''  if(nightCfg.scheduleEnabled){
+    (void)syncNightSchedule(now,true,false);
+  }
+''',
+    'alarm schedule polling')
+
+s = replace_once(
+    s,
+    '''    case 50:
+      if(n!=1||a[0]>1)return uartErr(UE_RANGE);
+      nightCfg.scheduleEnabled=false;nightCfg.manualEnabled=a[0];saveNight();applyMode(SystemMode::NIGHT,true);uartAck(op);return;
+''',
+    '''    case 50:
+      if(n!=1||a[0]>1)return uartErr(UE_RANGE);
+      nightCfg.manualEnabled=a[0];saveNight();
+      if(a[0])applyMode(SystemMode::NIGHT,true);
+      else if(currentMode==SystemMode::NIGHT)applyMode(SystemMode::OFF,true);
+      uartAck(op);return;
+''',
+    'manual night opcode')
+
+s = replace_once(
+    s,
+    '''    case 54:
+      if(n!=1||a[0]>1)return uartErr(UE_RANGE);
+      if(a[0]&&!rtcValidNow())return uartErr(UE_RTC);
+      nightCfg.scheduleEnabled=a[0];saveNight();currentMode=SystemMode::NIGHT;saveCore();(void)reconcileNight(false);uartAck(op);return;
+''',
+    '''    case 54:
+      if(n!=1||a[0]>1)return uartErr(UE_RANGE);
+      if(a[0]&&!rtcValidNow())return uartErr(UE_RTC);
+      nightCfg.scheduleEnabled=a[0];saveNight();
+      if(a[0]){
+        if(!syncNightScheduleNow(false,true))return uartErr(UE_RTC);
+      } else {
+        nightWindowActive=false;
+        (void)reconcileNight(false);
+      }
+      uartAck(op);return;
+''',
+    'schedule enable opcode')
+
+s = replace_once(
+    s,
+    '      saveNight();if(nightCfg.scheduleEnabled)(void)reconcileNight(false);uartAck(op);return;\n',
+    '      saveNight();\n      if(nightCfg.scheduleEnabled && !syncNightScheduleNow(false,true))return uartErr(UE_RTC);\n      uartAck(op);return;\n',
+    'schedule time opcode')
+
+s = replace_once(
+    s,
+    '''    }
+  }
+
+  showIfSafe();
+  printCompactStatus();
+}
+''',
+    '''    }
+  }
+
+  // Power/reset inside an active schedule window must enter NIGHT immediately;
+  // outside the window the normal startup mode is left untouched.
+  if(!recovered && nightCfg.scheduleEnabled){
+    (void)syncNightScheduleNow(false,true);
+  }
+
+  showIfSafe();
+  printCompactStatus();
+}
+''',
+    'boot schedule sync')
+
+new_path.write_text(s, encoding='utf-8')
+
+# Standard Arduino CI: include R6 in path trigger, compile/static gate,
+# memory guard and artifact for future changes.
+wf_path = root / '.github/workflows/arduino-verify.yml'
+wf = wf_path.read_text(encoding='utf-8')
+wf = replace_once(
+    wf,
+    '      - "04_Прошивка/nano_warm_dawn_v5/**"\n',
+    '      - "04_Прошивка/nano_warm_dawn_v5/**"\n      - "04_Прошивка/nano_warm_dawn_v6/**"\n',
+    'arduino workflow path')
+
+r6_steps = '''      - name: Verify Nano R6 Night schedule semantics
+        run: |
+          python3 - <<'PY2'
+          from pathlib import Path
+          s=Path("04_Прошивка/nano_warm_dawn_v6/nano_warm_dawn_v6.ino").read_text()
+          assert 'constexpr uint8_t FW_REV = 7;' in s
+          assert 'Serial.println(F("ARDU1 7"))' in s
+          assert 'Schedule is automation, not a permission gate' in s
+          assert 'syncNightSchedule(now,true,false)' in s
+          assert 'if(!recovered && nightCfg.scheduleEnabled)' in s
+          assert 'nightCfg.scheduleEnabled=false;nightCfg.manualEnabled' not in s
+          assert 'if(a[0])applyMode(SystemMode::NIGHT,true);' in s
+          assert 'else if(currentMode==SystemMode::NIGHT)applyMode(SystemMode::OFF,true);' in s
+          print("PASS: R6 manual NIGHT and event-driven schedule contract present")
+          PY2
+
+      - name: Compile full standalone Nano R6 Night schedule
+        run: |
+          mkdir -p "$RUNNER_TEMP/nano_warm_dawn_v6"
+          cp "04_Прошивка/nano_warm_dawn_v6/nano_warm_dawn_v6.ino" \
+             "$RUNNER_TEMP/nano_warm_dawn_v6/nano_warm_dawn_v6.ino"
+          arduino-cli compile \
+            --fqbn arduino:avr:nano:cpu=atmega328old \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-nano-warm-dawn-v6" \
+            --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
+            "$RUNNER_TEMP/nano_warm_dawn_v6"
+
+      - name: Measure R6 flash/SRAM
+        run: |
+          python3 - <<'PY2'
+          from pathlib import Path
+          import re,subprocess
+          sizes=sorted(Path.home().glob(".arduino15/packages/arduino/tools/avr-gcc/*/bin/avr-size"))
+          assert sizes
+          files=list(Path("build-nano-warm-dawn-v6").rglob("*.elf"))
+          assert len(files)==1,files
+          out=subprocess.check_output([str(sizes[-1]),"-C","--mcu=atmega328p",str(files[0])],text=True)
+          print(out)
+          flash=int(re.search(r"Program:\\s*(\\d+) bytes",out).group(1))
+          ram=int(re.search(r"Data:\\s*(\\d+) bytes",out).group(1))
+          assert flash<=30300,("flash margin",flash)
+          assert ram<=1360,("global SRAM guard",ram)
+          print(f"PASS: Nano R6 memory {flash} Flash / {ram} global SRAM")
+          PY2
+
+'''
+wf = replace_once(wf, '      - name: Size profile\n', r6_steps + '      - name: Size profile\n', 'R6 CI steps')
+wf = replace_once(
+    wf,
+    '      - name: Publish full Nano R5 warm Kelvin sunrise HEX\n',
+    '''      - name: Publish full Nano R6 Night schedule HEX
+        uses: actions/upload-artifact@v4
+        with:
+          name: ardu-nano-warm-dawn-v6-night-schedule-rc1
+          path: build-nano-warm-dawn-v6/*.hex
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish full Nano R5 warm Kelvin sunrise HEX
+''',
+    'R6 artifact')
+wf_path.write_text(wf, encoding='utf-8')
+
+# Decision log.
+dec_path = root / 'DECISIONS.md'
+dec = dec_path.read_text(encoding='utf-8')
+dec += '''\n\n---\n\n## D-125 — расписание ночника является автоматикой по границам, а не запретом ручного NIGHT\n\n**Дата:** 2026-10-17  \n**Статус:** ДЕЙСТВУЕТ\n\n**Решение:** при включённом расписании Night время `schedule_on` является автоматическим событием включения режима `NIGHT`, а `schedule_off` — событием выключения именно режима `NIGHT`. Ручной выбор `NIGHT` должен зажигать ночник в любое время суток, в том числе вне заданного интервала. Выключенное расписание полностью убирает автоматические переходы, но не меняет ручное управление ночником.\n\nПосле автоматического включения пользователь может вручную перейти в `LIGHT`, `AMBIENT`, `MUSIC` или `OFF`; расписание не возвращает `NIGHT` непрерывно до следующей границы. На границе `schedule_off` другой вручную выбранный режим не выключается. Активный `DAWN` имеет приоритет над событием включения Night. При загрузке/перезапуске внутри активного окна расписания `NIGHT` применяется сразу.\n\n**Причина:** владелец явно потребовал, чтобы расписание регламентировало только автоматические включение/выключение ночника и не запрещало использовать сам Night вне временного окна.\n'''
+dec_path.write_text(dec, encoding='utf-8')
+
+# History: today's physical alarm result plus source change.
+hist_path = root / 'HISTORY.md'
+hist = hist_path.read_text(encoding='utf-8')
+hist += '''\n\n## 2026-10-17 — физическая проверка RTC-рассвета и новая семантика Night\n\n- На установленной однокольцевой ARDU через Station `192.168.0.4` подтверждены ESP `ARDU_ESP_V3_WARM_DAWN`, валидный RTC и связь ESP↔Nano.\n- Сервисный лимит тока возвращён с 4500 мА на 3000 мА.\n- Ускоренный будильник с `fade_minutes=1` физически перешёл в `mode:dawn`; `/api/events` выдал `V 6` (alarm trigger) и `V 2 1 60` (alarm dawn start). Владелец подтвердил, что свет позже стал ярким; начало текущей квадратичной кривой визуально очень тёмное.\n- Выявлено ограничение текущего R5: повторный будильник в ту же календарную дату блокируется сохранённым `lastTrigger`; отдельное исправление остаётся будущей задачей.\n- По новому явному требованию владельца подготовлен Nano R6: расписание Night работает как события ON/OFF, а ручной NIGHT больше не ограничивается временным окном.\n'''
+hist_path.write_text(hist, encoding='utf-8')
+
+status_path = root / 'STATUS.md'
+status = status_path.read_text(encoding='utf-8')
+status = status.replace('Дата состояния: 2026-10-09', 'Дата состояния: 2026-10-17', 1)
+status = replace_once(
+    status,
+    '## Текущий этап\n',
+    '''## Текущий этап
+
+**2026-10-17 — D-125 / Nano R6 Night schedule semantics: SOURCE + isolated Arduino compile gate PASS в one-shot builder; физическая загрузка R6 pending.** Владелец уточнил конечную модель Night: расписание задаёт два автоматических события (ON/OFF), но не ограничивает ручной Night временным окном. Подготовлен `04_Прошивка/nano_warm_dawn_v6/nano_warm_dawn_v6.ino`, boot `ARDU1 7`: `schedule_on` автоматически переводит в NIGHT (кроме активного DAWN), `schedule_off` выключает NIGHT, но не трогает вручную выбранный LIGHT/MUSIC/AMBIENT; после автоматического ON ручная смена режима разрешена до следующей границы; ручной NIGHT работает 24/7; при загрузке внутри окна расписания NIGHT применяется сразу. Установленная на потолке Nano остаётся R5/FW_REV6 до следующего физического USB-доступа. ESP/Android менять для этой семантики не требуется.
+
+**2026-10-17 — физический RTC/Dawn partial PASS на установленной однокольцевой лампе.** Через `192.168.0.4` подтверждены ESP V3, валидный RTC, UART Nano и автономный запуск ускоренного будильника: `mode:dawn`, `dawn_phase:running`, события `V 6` и `V 2 1 60`; владелец визуально подтвердил позднюю яркую фазу. `current_limit_ma` возвращён на 3000. Начало текущей квадратичной яркости визуально очень тёмное; 5-минутное наблюдение подтвердило работающий running-state, но окончательная настройка кривой остаётся отдельной задачей. Также подтверждено ограничение R5: сохранённый `lastTrigger` запрещает второй автоматический alarm в ту же дату.
+
+''',
+    'STATUS current stage')
+status_path.write_text(status, encoding='utf-8')
+
+modes_path = root / '04_Прошивка/РЕЖИМЫ_РАБОТЫ.md'
+modes = modes_path.read_text(encoding='utf-8')
+modes += '''\n\n## Night schedule semantics — D-125 / 2026-10-17\n\nРасписание Night является автоматикой по границам, а не разрешением/запретом режима:\n\n- `schedule_on` автоматически выбирает `NIGHT`; активный `DAWN` выше по приоритету;\n- `schedule_off` выключает лампу только если в этот момент активен `NIGHT`; другой вручную выбранный режим не выключается;\n- после автоматического включения Night пользователь может вручную выбрать другой режим — до следующей границы расписание его не возвращает;\n- ручной выбор `NIGHT` работает в любое время суток, даже вне окна;\n- при `schedule_enabled=false` автоматических переходов нет, ручной Night работает обычно;\n- загрузка/перезапуск внутри активного окна включает Night автоматически.\n'''
+modes_path.write_text(modes, encoding='utf-8')
+
+fm_path = root / '05_WiFi_и_приложение/ФУНКЦИОНАЛЬНАЯ_МОДЕЛЬ.md'
+fm = fm_path.read_text(encoding='utf-8')
+fm += '''\n\n### Night schedule semantics — D-125 / 2026-10-17\n\nПереключатель расписания не блокирует ручной Night. При включённом расписании `schedule_on` и `schedule_off` являются одноразовыми автоматическими событиями на соответствующих границах. Ручной выбор Night вне окна должен включать ночник; ручной выбор другого режима после автоматического ON должен выполняться немедленно и не отменяться расписанием до следующей границы. На OFF-границе выключается только активный Night. Dawn имеет более высокий приоритет.\n'''
+fm_path.write_text(fm, encoding='utf-8')
+
+api_path = root / '05_WiFi_и_приложение/API_V1.md'
+api = api_path.read_text(encoding='utf-8')
+api += '''\n\n### Night schedule semantics — D-125 / 2026-10-17\n\nДля `POST /api/night/settings` поля имеют независимый смысл:\n\n- `enabled` — ручное включение/выключение Night и **не отключает** сохранённое расписание;\n- `schedule_enabled` — включает/выключает только автоматические события расписания;\n- `schedule_on` / `schedule_off` — границы автоматического ON/OFF.\n\nПри `schedule_on` Nano автоматически выбирает `NIGHT`, кроме случая активного `DAWN`. После этого пользователь может вручную выбрать другой режим, и расписание не возвращает Night до следующей границы. При `schedule_off` Nano выключает свет только если текущий режим всё ещё `NIGHT`; `LIGHT`, `MUSIC` и `AMBIENT` не выключаются. Ручной `NIGHT` работает и вне расписания. При старте устройства внутри активного окна расписания Night включается автоматически.\n'''
+api_path.write_text(api, encoding='utf-8')
+
+start_path = root / '00_AI_START_HERE.md'
+start = start_path.read_text(encoding='utf-8')
+marker = '## 11. Текущий следующий шаг\n\n'
+assert marker in start
+note = '''**Обновление 2026-10-17:** source-кандидат Nano `nano_warm_dawn_v6`, boot `ARDU1 7`, добавляет D-125: событийное расписание Night с ручным Night вне окна. Установленная физическая Nano пока остаётся R5/FW_REV6; R6 потребует следующего USB-доступа к Nano. Физический RTC/alarm start на R5 подтверждён через Station; `current_limit_ma=3000`.\n\n'''
+start = start.replace(marker, marker + note, 1)
+start_path.write_text(start, encoding='utf-8')
+
+# Compact behavioral model tests for the agreed semantics.
+def edge(prev_window, active, mode, force_on=False):
+    changed = active != prev_window
+    if active and (changed or force_on):
+        if mode != 'dawn':
+            mode = 'night'
+    elif (not active) and changed and mode == 'night':
+        mode = 'off'
+    return active, mode
+
+w, m = edge(False, False, 'night')
+assert m == 'night'                         # manual Night at 08:00
+w, m = edge(False, True, 'light')
+assert m == 'night'                         # 00:00 ON overrides Light
+w, m = edge(True, True, 'light')
+assert m == 'light'                         # manual Light after ON is respected
+w, m = edge(True, False, 'light')
+assert m == 'light'                         # 06:00 does not kill Light
+w, m = edge(True, False, 'night')
+assert m == 'off'                           # 06:00 turns off Night
+w, m = edge(False, True, 'dawn')
+assert m == 'dawn'                          # Dawn priority
+w, m = edge(False, True, 'light', True)
+assert m == 'night'                         # boot inside window
+print('PASS: D-125 behavioral model')
