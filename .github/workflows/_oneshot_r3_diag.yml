@@ -1,0 +1,157 @@
+name: One-shot Nano Bridge R3 Diagnostics
+
+on:
+  push:
+    paths:
+      - ".github/workflows/_oneshot_r3_diag.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch ESP R3 diagnostics and project status
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          src_path = Path('05_WiFi_и_приложение/esp8266_nano_remote_v4/esp8266_nano_remote_v4.ino')
+          s = src_path.read_text()
+
+          def once(old, new, label):
+              global s
+              n = s.count(old)
+              assert n == 1, f'{label}: expected 1 match, got {n}'
+              s = s.replace(old, new, 1)
+
+          once('ARDU ESP8266 V4 R2: Warm Dawn V3 + lossless authenticated remote Nano programming bridge.',
+               'ARDU ESP8266 V4 R3 DIAG: Warm Dawn V3 + instrumented authenticated remote Nano programming bridge.',
+               'banner')
+          once('constexpr char FW_NAME[] = "ARDU_ESP_V4_NANO_REMOTE_R2";',
+               'constexpr char FW_NAME[] = "ARDU_ESP_V4_NANO_REMOTE_R3_DIAG";',
+               'fw name')
+
+          once('String nanoProgramLastResult = "never";\n',
+               '''String nanoProgramLastResult = "never";\n\n// Latched diagnostics for the most recently started Nano programming session.\n// ESP8266 HardwareSerial::hasOverrun()/hasRxError() return-and-clear their\n// core flags, so we preserve evidence until the next session starts.\nbool nanoProgramUartOverrun = false;\nbool nanoProgramUartRxError = false;\nuint32_t nanoProgramTcpToUartBytes = 0;\nuint32_t nanoProgramUartToTcpBytes = 0;\nuint32_t nanoProgramMaxSerialAvailable = 0;\nuint32_t nanoProgramMaxTcpAvailable = 0;\n''',
+               'diag globals')
+
+          once('''void finishNanoProgramSession(const char* result) {\n  if (nanoProgramClient) nanoProgramClient.stop();\n  restoreNormalNanoUart();\n  nanoProgramActive = false;\n  clearNanoProgramArm(result);\n  nanoProgramLastTrafficMs = millis();\n}\n\nvoid startNanoProgramSession(WiFiClient client) {''',
+               '''void latchNanoProgramUartErrors() {\n  if (Serial.hasOverrun()) nanoProgramUartOverrun = true;\n  if (Serial.hasRxError()) nanoProgramUartRxError = true;\n}\n\nvoid finishNanoProgramSession(const char* result) {\n  // Capture UART hardware/software RX faults before Serial.end() destroys the\n  // programming UART instance. The flags are exposed by the status endpoint.\n  latchNanoProgramUartErrors();\n  if (nanoProgramClient) nanoProgramClient.stop();\n  restoreNormalNanoUart();\n  nanoProgramActive = false;\n  clearNanoProgramArm(result);\n  nanoProgramLastTrafficMs = millis();\n}\n\nvoid startNanoProgramSession(WiFiClient client) {''',
+               'finish helper')
+
+          once('''  Serial.setRxBufferSize(Cfg::NANO_PROGRAM_UART_RX_BUFFER);\n  Serial.begin(Cfg::NANO_PROGRAM_BAUD);\n  Serial.setTimeout(50);\n\n  pulseNanoReset();''',
+               '''  Serial.setRxBufferSize(Cfg::NANO_PROGRAM_UART_RX_BUFFER);\n  Serial.begin(Cfg::NANO_PROGRAM_BAUD);\n  Serial.setTimeout(50);\n\n  nanoProgramUartOverrun = false;\n  nanoProgramUartRxError = false;\n  nanoProgramTcpToUartBytes = 0;\n  nanoProgramUartToTcpBytes = 0;\n  nanoProgramMaxSerialAvailable = 0;\n  nanoProgramMaxTcpAvailable = 0;\n  // Clear any stale core flags before this programming session begins.\n  (void)Serial.hasOverrun();\n  (void)Serial.hasRxError();\n\n  pulseNanoReset();''',
+               'start diagnostics')
+
+          once('''    bool traffic = false;\n    uint8_t buf[128];\n\n    int available = nanoProgramClient.available();\n    if (available > 0) {''',
+               '''    bool traffic = false;\n    uint8_t buf[128];\n\n    latchNanoProgramUartErrors();\n\n    int available = nanoProgramClient.available();\n    if (available > 0) {\n      if (static_cast<uint32_t>(available) > nanoProgramMaxTcpAvailable) {\n        nanoProgramMaxTcpAvailable = static_cast<uint32_t>(available);\n      }''',
+               'tcp max')
+
+          once('''        if (!writeNanoProgramSerialAll(buf, static_cast<size_t>(got))) {\n          finishNanoProgramSession("uart_write_stall");\n          return false;\n        }\n        traffic = true;''',
+               '''        if (!writeNanoProgramSerialAll(buf, static_cast<size_t>(got))) {\n          finishNanoProgramSession("uart_write_stall");\n          return false;\n        }\n        nanoProgramTcpToUartBytes += static_cast<uint32_t>(got);\n        traffic = true;''',
+               'tcp->uart count')
+
+          once('''    available = Serial.available();\n    if (available > 0) {\n      if (available > static_cast<int>(sizeof(buf))) available = sizeof(buf);''',
+               '''    available = Serial.available();\n    if (available > 0) {\n      if (static_cast<uint32_t>(available) > nanoProgramMaxSerialAvailable) {\n        nanoProgramMaxSerialAvailable = static_cast<uint32_t>(available);\n      }\n      if (available > static_cast<int>(sizeof(buf))) available = sizeof(buf);''',
+               'uart max')
+
+          once('''        if (!writeNanoProgramTcpAll(buf, static_cast<size_t>(got))) {\n          finishNanoProgramSession("tcp_write_stall");\n          return false;\n        }\n        traffic = true;''',
+               '''        if (!writeNanoProgramTcpAll(buf, static_cast<size_t>(got))) {\n          finishNanoProgramSession("tcp_write_stall");\n          return false;\n        }\n        nanoProgramUartToTcpBytes += static_cast<uint32_t>(got);\n        latchNanoProgramUartErrors();\n        traffic = true;''',
+               'uart->tcp count')
+
+          once('''  body += F(",\\\"reset_gpio\\\":"); body += Cfg::NANO_RESET_GPIO;\n  body += F(",\\\"last_result\\\":\\\""); body += jsonEscape(nanoProgramLastResult); body += '\"';''',
+               '''  body += F(",\\\"reset_gpio\\\":"); body += Cfg::NANO_RESET_GPIO;\n  body += F(",\\\"last_result\\\":\\\""); body += jsonEscape(nanoProgramLastResult); body += '\"';\n  body += F(",\\\"uart_rx_buffer_size\\\":"); body += Cfg::NANO_PROGRAM_UART_RX_BUFFER;\n  body += F(",\\\"uart_overrun\\\":"); body += nanoProgramUartOverrun ? F("true") : F("false");\n  body += F(",\\\"uart_rx_error\\\":"); body += nanoProgramUartRxError ? F("true") : F("false");\n  body += F(",\\\"tcp_to_uart_bytes\\\":"); body += nanoProgramTcpToUartBytes;\n  body += F(",\\\"uart_to_tcp_bytes\\\":"); body += nanoProgramUartToTcpBytes;\n  body += F(",\\\"max_uart_available\\\":"); body += nanoProgramMaxSerialAvailable;\n  body += F(",\\\"max_tcp_available\\\":"); body += nanoProgramMaxTcpAvailable;''',
+               'status diagnostics')
+
+          # Event buffer is for asynchronous V/ARDU1 lines only. R2 accepted any\n          # complete residual UART line, which misclassified a stale D 2 reply after\n          # a programming session. Also tolerate one or more stale binary bytes\n          # before the Nano boot marker when the UART baud is restored.\n          once('''      if (asyncLength) {\n        asyncLine[asyncLength] = '\\0';\n        pushEventLine(asyncLine);\n        asyncLength = 0;\n      }''',
+               '''      if (asyncLength) {\n        asyncLine[asyncLength] = '\\0';\n        char* boot = strstr(asyncLine, "ARDU1 ");\n        if (boot) pushEventLine(boot);\n        else if (asyncLine[0] == 'V' && asyncLine[1] == ' ') pushEventLine(asyncLine);\n        asyncLength = 0;\n      }''',
+               'async filter')
+
+          src_path.write_text(s)
+
+          status = Path('STATUS.md')
+          t = status.read_text()
+          marker = '## Текущий этап\n'
+          assert marker in t
+          note = '''\n**2026-10-17 — D-127 / R6 фактически запускается, но полный Wi-Fi verify всё ещё FAIL; подготовлен ESP V4 R3 DIAG.** На физическом ESP R2 повторный Nano upload снова дал `write 29 722 B = 100%`, а verify сорвался почти сразу. Отдельный `flash:v:` в новом bootloader-сеансе дошёл до 48% и потерял sync с тем же `expected 0x14`, затем эксперимент с 64-byte flash page дошёл только до 7%; значит переход write→verify и размер страницы не являются достаточным объяснением. После холодного старта Nano штатно отвечает `/api/status`, а аппаратный reset-only сеанс дал сырую startup-строку `�ARDU1 7` + `V 9 1`, что является физическим доказательством запуска Nano R6/FW_REV7, но **не заменяет обязательный byte-for-byte AVRDUDE verify**. R3 DIAG сохраняет R2 transport и добавляет latch `Serial.hasOverrun()/hasRxError()`, счётчики байтов и максимальную очередь UART/TCP в `/api/system/nano-program/status`; также фильтрует residual `D ...` из `/api/events` и очищает мусорный префикс перед `ARDU1`. Следующий gate: OTA R3 DIAG → только verify → сразу status diagnostics; Nano больше не записывать до этого результата.\n\n'''
+          t = t.replace(marker, marker + note, 1)
+          status.write_text(t)
+
+          hist = Path('HISTORY.md')
+          h = hist.read_text()
+          h += '''\n## 2026-10-17 — повторный Nano Wi-Fi verify и физическое подтверждение R6 startup\n\n- На физическом ESP `ARDU_ESP_V4_NANO_REMOTE_R2` повторный upload Nano R6 через `net:192.168.0.4:3280`, 57600 снова записал 29 722 B до 100%, но verify потерял STK500 sync почти сразу.\n- Отдельный verify-only в новом bootloader-сеансе дошёл до 48% и завершился теми же `expected 0x14`, `0xe6/0xff/0xc4`; вариант с 64-byte flash page дошёл до 7% и также FAIL.\n- После полного power-cycle `/api/status` снова PASS: RTC valid, current limit 3000 mA, normal UART работает.\n- Reset-only через ESP GPIO4 дал сырую startup-строку `�ARDU1 7` и событие `V 9 1`; следовательно, записанная Nano R6/FW_REV7 фактически стартует на железе. Это не отменяет требование полного AVRDUDE verify для remote-programming hardware PASS.\n- Подготовлен ESP V4 R3 DIAG: latched UART overrun/RX-error, byte counters/max queue diagnostics и фильтрация residual UART строк в events.\n'''
+          hist.write_text(h)
+
+          srcs = Path('SOURCES.md')
+          q = srcs.read_text()
+          nums = [int(x) for x in re.findall(r'^## S-(\\d+)', q, re.M)]
+          nxt = max(nums) + 1 if nums else 1
+          q += f'''\n## S-{nxt:03d} — Nano R6 remote-programming diagnostics 2026-10-17\n\nПользовательские аппаратные логи: R2 upload Nano R6 (`29 722 B`) дважды достигал write 100%, но полный verify терял STK500 sync; verify-only в отдельном сеансе достигал 48%, эксперимент с 64-byte page — 7%. После power-cycle нормальный API восстановился. Reset-only через GPIO4 дал `�ARDU1 7` и `V 9 1`, физически подтверждая запуск FW_REV7.\n\nДля диагностики ESP8266 Arduino Core использованы официальные `HardwareSerial::hasOverrun()` / `hasRxError()`; нижний UART HAL документирует их как return-and-clear flags. Источники: `https://github.com/esp8266/Arduino/blob/master/cores/esp8266/HardwareSerial.h`, `https://github.com/esp8266/Arduino/blob/master/cores/esp8266/uart.h`.\n'''
+          srcs.write_text(q)
+
+          remote = Path('02_Архитектура_и_решения/NANO_REMOTE_FLASH.md')
+          r = remote.read_text()
+          r += '''\n## R3 DIAG — локализация нестабильного verify (2026-10-17)\n\nФизические тесты R2 показали, что полный write устойчиво доходит до 100%, тогда как длинный Nano→ESP→TCP readback verify падает в непостоянной точке (около 1/7/22/48%). Отдельный verify-only исключил переход write→verify; 64-byte page test не устранил ошибку. R6 при этом физически запускается (`ARDU1 7`).\n\nR3 DIAG не ослабляет критерий PASS и не отключает verify. В `/api/system/nano-program/status` после сеанса сохраняются: `uart_overrun`, `uart_rx_error`, `tcp_to_uart_bytes`, `uart_to_tcp_bytes`, `max_uart_available`, `max_tcp_available`, `uart_rx_buffer_size`. Следующий тест — verify-only и немедленное чтение этих полей.\n'''
+          remote.write_text(r)
+
+          start = Path('00_AI_START_HERE.md')
+          a = start.read_text()
+          key = '## 11. Текущий следующий шаг\n'
+          assert key in a
+          latest = '''\n**Обновление 2026-10-17 / D-127 R3 DIAG:** Nano R6 теперь физически подтверждена по startup `ARDU1 7` после ESP-driven reset, но remote-programming hardware PASS всё ещё закрыт, потому что полный AVRDUDE verify нестабилен. R2 write достигает 100%; verify-only падал в разных точках до 48%, 64-byte page не помог. Следующий gate: OTA `ARDU_ESP_V4_NANO_REMOTE_R3_DIAG` → verify-only → `/api/system/nano-program/status` с UART overrun/RX-error и byte/queue counters. Не переписывать Nano до этого диагностического результата.\n\n'''
+          a = a.replace(key, key + latest, 1)
+          start.write_text(a)
+          PY
+
+      - uses: arduino/setup-arduino-cli@v2
+
+      - name: Install ESP8266 core
+        run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp8266:esp8266
+
+      - name: Compile configured ESP V4 R3 DIAG
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,re
+          source=Path('05_WiFi_и_приложение/esp8266_nano_remote_v4/esp8266_nano_remote_v4.ino').read_text()
+          for key,value in {
+            'ARDU_WIFI_SSID':'CI_HOME_WIFI',
+            'ARDU_WIFI_PASSWORD':'CI_HOME_PASSWORD',
+            'ARDU_OTA_PASSWORD':'CI_OTA_PASSWORD',
+            'ARDU_SOFTAP_PASSWORD':'CI_DIRECT_PASSWORD',
+          }.items():
+            pat=rf'(?m)^(#define\\s+{key}\\s+)"PUT_[A-Z_]+_HERE"$'
+            source,n=re.subn(pat,lambda m:m[1]+'"'+value+'"',source)
+            assert n==1,key
+          out=Path(os.environ['RUNNER_TEMP'])/'esp8266_nano_remote_v4'
+          out.mkdir(parents=True,exist_ok=True)
+          (out/'esp8266_nano_remote_v4.ino').write_text(source)
+          PY
+          arduino-cli compile \
+            --fqbn esp8266:esp8266:generic \
+            --warnings default \
+            --build-path "$RUNNER_TEMP/build-r3-diag" \
+            "$RUNNER_TEMP/esp8266_nano_remote_v4"
+
+      - name: Publish R3 diagnostics
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            "05_WiFi_и_приложение/esp8266_nano_remote_v4/esp8266_nano_remote_v4.ino" \
+            "STATUS.md" "HISTORY.md" "SOURCES.md" "00_AI_START_HERE.md" \
+            "02_Архитектура_и_решения/NANO_REMOTE_FLASH.md"
+          git diff --cached --quiet && { echo "Nothing to publish"; exit 1; }
+          git commit -m "diag: instrument Nano verify UART path"
+          git push origin HEAD:main
