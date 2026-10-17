@@ -18,7 +18,40 @@ jobs:
 
       - name: Generate ESP V4, helper and docs
         run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.github/ardu-nano-remote-flash-builder.py')
+          g=p.read_text(encoding='utf-8')
+          label="'ping capability')"
+          pos=g.index(label)
+          start=g.rfind('\ns = replace_once(',0,pos)+1
+          end=g.find('\ns = replace_once(',pos)
+          assert start>0 and end>start
+          g=g[:start]+g[end+1:]
+          g=g.replace("    'nano_remote_flash',\n",'',1)
+          p.write_text(g,encoding='utf-8')
+          print('PASS: removed fragile ping text matcher from temporary generator')
+          PY
           python3 .github/ardu-nano-remote-flash-builder.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('05_WiFi_и_приложение/esp8266_nano_remote_v4/esp8266_nano_remote_v4.ino')
+          lines=p.read_text(encoding='utf-8').splitlines()
+          matches=[i for i,line in enumerate(lines) if line.strip()=='body += Cfg::OTA_PORT;']
+          assert len(matches)==1,matches
+          i=matches[0]
+          assert lines[i+1].strip()=="body += '}';"
+          insert=[
+            '  body += F(",\\"nano_remote_flash\\":true,\\"nano_program_port\\":");',
+            '  body += Cfg::NANO_PROGRAM_PORT;',
+            '  body += F(",\\"nano_program_baud\\":");',
+            '  body += Cfg::NANO_PROGRAM_BAUD;',
+          ]
+          lines[i+1:i+1]=insert
+          p.write_text('\n'.join(lines)+'\n',encoding='utf-8')
+          assert 'nano_remote_flash' in p.read_text(encoding='utf-8')
+          print('PASS: /api/ping remote-programming capability added line-safely')
+          PY
           python3 - <<'PY'
           from pathlib import Path
           p=Path('tools/flash_nano_over_wifi.ps1')
