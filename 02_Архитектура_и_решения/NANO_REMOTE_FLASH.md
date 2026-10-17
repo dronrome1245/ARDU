@@ -1,7 +1,7 @@
 # Удалённая прошивка Arduino Nano через ESP8266 — R1
 
 Дата: 2026-10-17  
-Статус: SOURCE/CI PASS; физический монтаж reset-цепи и первый Wi-Fi upload владельцем pending.
+Статус: ESP V4 SOURCE/CI PASS + hardware RESET PASS; первый реальный Wi-Fi write+verify Nano R6 pending.
 
 ## 1. Что реализовано
 
@@ -72,4 +72,12 @@ cd C:\ARDU
 4. OTA установить ESP V4 и убедиться, что `/api/ping` содержит `nano_remote_flash:true`.
 5. Первый раз удалённо записать Nano R6 HEX скриптом.
 6. После verify проверить `/api/status`, `/api/settings`, `/api/time`, L01 и Night.
-7. Не считать механизм hardware-PASS до первого реального write+verify+post-status.
+7. Не считать механизм полного remote-flash hardware-PASS до первого реального write+verify+post-status.
+
+## 6. Физическая проверка RESET — PASS, 2026-10-17
+
+Владелец установил ESP V4 по ArduinoOTA и получил `/api/ping` с `fw:"ARDU_ESP_V4_NANO_REMOTE"`, `nano_remote_flash:true`, `nano_program_port:3280`, `nano_program_baud:57600`.
+
+После успешного `POST /api/system/nano-program/arm` (`armed:true`) тестовое TCP-подключение к порту 3280 вызвало аппаратный reset Nano через GPIO4/BC548. До reset Nano сообщала `uptime_ms=890258`; через ~10 секунд после теста — `uptime_ms=9488`. `/api/status` снова отвечал штатно, RTC оставался valid, а `/api/system/nano-program/status` вернул `active:false`, `armed:false`, `last_result:"disconnected"`. В `/api/events` появился `warm_reset` (code 9); перед `ARDU1 6` наблюдался один нечитаемый байт на границе переключения UART, что не помешало восстановлению протокола.
+
+**Вывод:** физическая reset-цепь `ESP GPIO4 → 1.5 kΩ → BC548 B`, `4.7 kΩ B→GND`, `E→GND`, `C→Nano RESET` подтверждена на собранном устройстве. Следующий gate — первый реальный `avrdude write + verify` Nano R6 по Wi-Fi и post-flash `/api/status`.
