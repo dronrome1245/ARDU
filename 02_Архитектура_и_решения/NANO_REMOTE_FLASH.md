@@ -85,3 +85,9 @@ cd C:\ARDU
 ## 6. Physical gate 2026-10-17 / R2 transport fix
 
 Фактический reset через GPIO4/BC548 подтверждён (`uptime_ms` 890258 → 9488). Первый AVRDUDE upload распознал ATmega328P и записал 29 722 B до 100%, но verify потерял STK500 `0x14` примерно на 22%. Поэтому firmware не считается принятой. V4 R2 заменяет one-shot UART/TCP writes на complete-write loops, использует `availableForWrite()`, неблокирующий `HardwareSerial::read` и 512-B programming RX buffer. `-V` не использовать. Критерий PASS остаётся: полный write + полный verify + `/api/status` после возврата UART 115200.
+
+## R3 DIAG — локализация нестабильного verify (2026-10-17)
+
+Физические тесты R2 показали, что полный write устойчиво доходит до 100%, тогда как длинный Nano→ESP→TCP readback verify падает в непостоянной точке (около 1/7/22/48%). Отдельный verify-only исключил переход write→verify; 64-byte page test не устранил ошибку. R6 при этом физически запускается (`ARDU1 7`).
+
+R3 DIAG не ослабляет критерий PASS и не отключает verify. В `/api/system/nano-program/status` после сеанса сохраняются: `uart_overrun`, `uart_rx_error`, `tcp_to_uart_bytes`, `uart_to_tcp_bytes`, `max_uart_available`, `max_tcp_available`, `uart_rx_buffer_size`. Следующий тест — verify-only и немедленное чтение этих полей.

@@ -123,6 +123,9 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
+**Обновление 2026-10-17 / D-127 R3 DIAG:** Nano R6 теперь физически подтверждена по startup `ARDU1 7` после ESP-driven reset, но remote-programming hardware PASS всё ещё закрыт, потому что полный AVRDUDE verify нестабилен. R2 write достигает 100%; verify-only падал в разных точках до 48%, 64-byte page не помог. Следующий gate: OTA `ARDU_ESP_V4_NANO_REMOTE_R3_DIAG` → verify-only → `/api/system/nano-program/status` с UART overrun/RX-error и byte/queue counters. Не переписывать Nano до этого диагностического результата.
+
+
 **Обновление 2026-10-17 / D-126+D-127:** физический GPIO4→BC548→Nano RESET уже PASS. Первый реальный AVRDUDE upload через ESP V4 записал Nano R6 HEX до 100%, но verify потерял sync примерно на 22%, поэтому hardware upload PASS ещё нет. Текущая source-ревизия `ARDU_ESP_V4_NANO_REMOTE_R2` делает TCP↔UART forwarding lossless по фактическому return count `write()`, оставляя AVRDUDE verify обязательным. Следующий gate: OTA R2 → повторный полный write+verify → `/api/status`; USB остаётся recovery до PASS.
 
 

@@ -2811,3 +2811,11 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - Verify остановился примерно на 22%: `protocol expects sync byte 0x14 but got 0xe6`, затем `0xff`, `programmer is out of sync`, `unable to read byte at address 0x0000`, затем `0xc4`.
 - Результат классифицирован как **WRITE COMPLETE / VERIFY FAIL**, а не как успешная прошивка. Отключение verify (`-V`) не допускается.
 - Подготовлена ESP `ARDU_ESP_V4_NANO_REMOTE_R2`: lossless forwarding с учётом фактического return count `write()`, `availableForWrite()`, неблокирующим UART read и 512-B RX buffer. Повторный physical write+verify pending.
+
+## 2026-10-17 — повторный Nano Wi-Fi verify и физическое подтверждение R6 startup
+
+- На физическом ESP `ARDU_ESP_V4_NANO_REMOTE_R2` повторный upload Nano R6 через `net:192.168.0.4:3280`, 57600 снова записал 29 722 B до 100%, но verify потерял STK500 sync почти сразу.
+- Отдельный verify-only в новом bootloader-сеансе дошёл до 48% и завершился теми же `expected 0x14`, `0xe6/0xff/0xc4`; вариант с 64-byte flash page дошёл до 7% и также FAIL.
+- После полного power-cycle `/api/status` снова PASS: RTC valid, current limit 3000 mA, normal UART работает.
+- Reset-only через ESP GPIO4 дал сырую startup-строку `�ARDU1 7` и событие `V 9 1`; следовательно, записанная Nano R6/FW_REV7 фактически стартует на железе. Это не отменяет требование полного AVRDUDE verify для remote-programming hardware PASS.
+- Подготовлен ESP V4 R3 DIAG: latched UART overrun/RX-error, byte counters/max queue diagnostics и фильтрация residual UART строк в events.

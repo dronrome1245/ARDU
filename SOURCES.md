@@ -1222,3 +1222,9 @@ All mains/relay/DC-DC candidates remain subject to final ARDU two-ring voltage-d
 - `https://github.com/esp8266/Arduino/blob/master/cores/esp8266/HardwareSerial.h` — `HardwareSerial::read(buffer,size)` является чтением без timeout, `write()` возвращает число принятых байт, доступен `availableForWrite()` и настройка RX buffer.
 
 Использовано в D-127, чтобы TCP↔UART bridge не предполагал, что один вызов `write()` всегда принимает весь буфер.
+
+## S-096 — Nano R6 remote-programming diagnostics 2026-10-17
+
+Пользовательские аппаратные логи: R2 upload Nano R6 (`29 722 B`) дважды достигал write 100%, но полный verify терял STK500 sync; verify-only в отдельном сеансе достигал 48%, эксперимент с 64-byte page — 7%. После power-cycle нормальный API восстановился. Reset-only через GPIO4 дал `�ARDU1 7` и `V 9 1`, физически подтверждая запуск FW_REV7.
+
+Для диагностики ESP8266 Arduino Core использованы официальные `HardwareSerial::hasOverrun()` / `hasRxError()`; нижний UART HAL документирует их как return-and-clear flags. Источники: `https://github.com/esp8266/Arduino/blob/master/cores/esp8266/HardwareSerial.h`, `https://github.com/esp8266/Arduino/blob/master/cores/esp8266/uart.h`.

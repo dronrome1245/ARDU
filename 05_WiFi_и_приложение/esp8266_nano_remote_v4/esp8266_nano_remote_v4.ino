@@ -1,5 +1,5 @@
 /*
-  ARDU ESP8266 V4 R2: Warm Dawn V3 + lossless authenticated remote Nano programming bridge.
+  ARDU ESP8266 V4 R3 DIAG: Warm Dawn V3 + instrumented authenticated remote Nano programming bridge.
 
   External contract:
     Android / LAN -> semantic HTTP API -> ESP8266 -> compact numeric UART v1 -> Nano
@@ -77,7 +77,7 @@ constexpr uint16_t HTTP_PORT = 80;
 constexpr uint16_t OTA_PORT = 8266;
 constexpr char HOSTNAME[] = "ardu";
 constexpr char SOFTAP_SSID[] = "ARDU-DIRECT";
-constexpr char FW_NAME[] = "ARDU_ESP_V4_NANO_REMOTE_R2";
+constexpr char FW_NAME[] = "ARDU_ESP_V4_NANO_REMOTE_R3_DIAG";
 constexpr uint8_t UART_PROTOCOL = 1;
 
 constexpr unsigned long WIFI_CONNECT_TIMEOUT_MS = 15000UL;
@@ -130,6 +130,16 @@ IPAddress nanoProgramAuthorizedIp;
 unsigned long nanoProgramArmDeadlineMs = 0;
 unsigned long nanoProgramLastTrafficMs = 0;
 String nanoProgramLastResult = "never";
+
+// Latched diagnostics for the most recently started Nano programming session.
+// ESP8266 HardwareSerial::hasOverrun()/hasRxError() return-and-clear their
+// core flags, so preserve evidence until the next session starts.
+bool nanoProgramUartOverrun = false;
+bool nanoProgramUartRxError = false;
+uint32_t nanoProgramTcpToUartBytes = 0;
+uint32_t nanoProgramUartToTcpBytes = 0;
+uint32_t nanoProgramMaxSerialAvailable = 0;
+uint32_t nanoProgramMaxTcpAvailable = 0;
 
 // ---------------------------------------------------------------------------
 // HTTP / JSON helpers
@@ -335,7 +345,9 @@ void drainNanoAsync() {
     if (c == '\n') {
       if (asyncLength) {
         asyncLine[asyncLength] = '\0';
-        pushEventLine(asyncLine);
+        char* boot = strstr(asyncLine, "ARDU1 ");
+        if (boot) pushEventLine(boot);
+        else if (asyncLine[0] == 'V' && asyncLine[1] == ' ') pushEventLine(asyncLine);
         asyncLength = 0;
       }
       continue;
@@ -1589,7 +1601,14 @@ void restoreNormalNanoUart() {
   while (Serial.available() > 0) (void)Serial.read();
 }
 
+void latchNanoProgramUartErrors() {
+  if (Serial.hasOverrun()) nanoProgramUartOverrun = true;
+  if (Serial.hasRxError()) nanoProgramUartRxError = true;
+}
+
 void finishNanoProgramSession(const char* result) {
+  // Capture UART RX faults before Serial.end() destroys the programming UART.
+  latchNanoProgramUartErrors();
   if (nanoProgramClient) nanoProgramClient.stop();
   restoreNormalNanoUart();
   nanoProgramActive = false;
@@ -1612,6 +1631,16 @@ void startNanoProgramSession(WiFiClient client) {
   Serial.setRxBufferSize(Cfg::NANO_PROGRAM_UART_RX_BUFFER);
   Serial.begin(Cfg::NANO_PROGRAM_BAUD);
   Serial.setTimeout(50);
+
+  nanoProgramUartOverrun = false;
+  nanoProgramUartRxError = false;
+  nanoProgramTcpToUartBytes = 0;
+  nanoProgramUartToTcpBytes = 0;
+  nanoProgramMaxSerialAvailable = 0;
+  nanoProgramMaxTcpAvailable = 0;
+  // Clear stale core flags before this programming session begins.
+  (void)Serial.hasOverrun();
+  (void)Serial.hasRxError();
 
   pulseNanoReset();
   nanoProgramLastTrafficMs = millis();
@@ -1681,8 +1710,13 @@ bool serviceNanoProgramBridge() {
     bool traffic = false;
     uint8_t buf[128];
 
+    latchNanoProgramUartErrors();
+
     int available = nanoProgramClient.available();
     if (available > 0) {
+      if (static_cast<uint32_t>(available) > nanoProgramMaxTcpAvailable) {
+        nanoProgramMaxTcpAvailable = static_cast<uint32_t>(available);
+      }
       if (available > static_cast<int>(sizeof(buf))) available = sizeof(buf);
       const int got = nanoProgramClient.read(buf, available);
       if (got > 0) {
@@ -1690,12 +1724,16 @@ bool serviceNanoProgramBridge() {
           finishNanoProgramSession("uart_write_stall");
           return false;
         }
+        nanoProgramTcpToUartBytes += static_cast<uint32_t>(got);
         traffic = true;
       }
     }
 
     available = Serial.available();
     if (available > 0) {
+      if (static_cast<uint32_t>(available) > nanoProgramMaxSerialAvailable) {
+        nanoProgramMaxSerialAvailable = static_cast<uint32_t>(available);
+      }
       if (available > static_cast<int>(sizeof(buf))) available = sizeof(buf);
       const int got = Serial.read(buf, static_cast<size_t>(available));
       if (got > 0) {
@@ -1703,6 +1741,8 @@ bool serviceNanoProgramBridge() {
           finishNanoProgramSession("tcp_write_stall");
           return false;
         }
+        nanoProgramUartToTcpBytes += static_cast<uint32_t>(got);
+        latchNanoProgramUartErrors();
         traffic = true;
       }
     }
@@ -1751,6 +1791,13 @@ void handleNanoProgramStatus() {
   body += F(",\"baud\":"); body += Cfg::NANO_PROGRAM_BAUD;
   body += F(",\"reset_gpio\":"); body += Cfg::NANO_RESET_GPIO;
   body += F(",\"last_result\":\""); body += jsonEscape(nanoProgramLastResult); body += '"';
+  body += F(",\"uart_rx_buffer_size\":"); body += Cfg::NANO_PROGRAM_UART_RX_BUFFER;
+  body += F(",\"uart_overrun\":"); body += nanoProgramUartOverrun ? F("true") : F("false");
+  body += F(",\"uart_rx_error\":"); body += nanoProgramUartRxError ? F("true") : F("false");
+  body += F(",\"tcp_to_uart_bytes\":"); body += nanoProgramTcpToUartBytes;
+  body += F(",\"uart_to_tcp_bytes\":"); body += nanoProgramUartToTcpBytes;
+  body += F(",\"max_uart_available\":"); body += nanoProgramMaxSerialAvailable;
+  body += F(",\"max_tcp_available\":"); body += nanoProgramMaxTcpAvailable;
   if (nanoProgramArmStillValid()) {
     body += F(",\"arm_remaining_ms\":");
     body += static_cast<unsigned long>(nanoProgramArmDeadlineMs - millis());
