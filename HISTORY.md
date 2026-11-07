@@ -2819,3 +2819,10 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - После полного power-cycle `/api/status` снова PASS: RTC valid, current limit 3000 mA, normal UART работает.
 - Reset-only через ESP GPIO4 дал сырую startup-строку `�ARDU1 7` и событие `V 9 1`; следовательно, записанная Nano R6/FW_REV7 фактически стартует на железе. Это не отменяет требование полного AVRDUDE verify для remote-programming hardware PASS.
 - Подготовлен ESP V4 R3 DIAG: latched UART overrun/RX-error, byte counters/max queue diagnostics и фильтрация residual UART строк в events.
+
+## 2026-11-07 — Night D-125: безопасный read-only gate для Nano R6 через Wi-Fi
+
+- Проверены актуальные `STATUS.md`, `DECISIONS.md`, `NANO_REMOTE_FLASH.md`, прошивка Nano R6 (`ARDU1 7`) и ESP V4 R3 DIAG; исходный алгоритм расписания D-125 уже реализован.
+- Изменён `tools/flash_nano_over_wifi.ps1`: добавлен `-VerifyOnly` с `avrdude -U flash:v`, вывод latched R3 UART/TCP диагностик даже после неуспешного AVRDUDE, и отдельная проверка восстановления `/api/status`. Обычный режим записи сохранил обязательный write+verify.
+- Добавлен `04_Прошивка/NIGHT_R6_WIFI_ACCEPTANCE.md`: последовательность установки R3 по OTA, read-only сравнение установленного R6 HEX и проверки семантики ручного Night, границ ON/OFF и приоритета DAWN.
+- Исходный Nano/ESP код в этой итерации не изменён. Операций OTA, readback или проверки устройства по локальной сети из GitHub-коннектора не выполнялось; hardware gate остаётся открытым.
