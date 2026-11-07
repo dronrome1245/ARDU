@@ -2852,3 +2852,11 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - `GET /api/time` сразу после записи вернул `ok:true`, `valid:true`, `date:2026-11-07`, `time:21:25:28`, Nano `D 4 1 2026 11 7 21 25 28`.
 - DS3231 доступна на чтение и запись, автоматические функции по времени снова можно испытывать. Первопричина прежнего `valid:false` и удержание хода при отключении питания пока не проверены.
 - Следующий шаг: прочитать сохранённые настройки `/api/settings` и тестировать Night D-125 без новой прошивки.
+
+## 2026-11-07 — первая полностью подтверждённая Wi-Fi прошивка Arduino Nano R6
+
+- Владелец выполнил `tools/flash_nano_over_wifi.ps1` **без** `-VerifyOnly` из Windows PowerShell; HEX `04_Прошивка/nano_warm_dawn_v6/build/arduino.avr.nano/nano_warm_dawn_v6.ino.hex` (29 378 байт); ESP R3 DIAG, TCP `192.168.0.4:3280`, STK500 v1 / 57600 бод / ATmega328P Old Bootloader.
+- AVRDUDE 8.0-arduino.1: `Writing 29378 bytes to flash`, `Writing 100% 13.92 s`; `Reading 100% 12.47 s`; **`29378 bytes of flash verified`**, штатное завершение (exit code 0).
+- ESP R3 diagnostics после сеанса: `last_result=disconnected`, `active=false`, `UART overrun=false`, `rx_error=false`, `RX buffer=512`, TCP→UART `33648 B`, UART→TCP `31450 B`, max available TCP=133, UART=102.
+- Скрипт вывел **`PASS: AVRDUDE write + byte-for-byte verify succeeded`**, затем **`PASS: Nano application responds. mode=light, rtc_valid=True, current_limit_ma=3000`**.
+- **АППАРАТНЫЙ PASS механизма удалённой загрузки Nano (D-127)**: запись + побайтовая проверка + восстановление приложения без снятия потолочной лампы. **Функциональные сценарии Night D-125 ещё не проверены**; они остаются отдельным gate.
