@@ -2834,3 +2834,8 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - AVRDUDE выполнил `Reading 100% 11.29 s` без прежней ошибки STK500 sync; ESP диагностировал `uart_overrun=false`, `uart_rx_error=false`, `uart_rx_buffer_size=512`, `tcp_to_uart_bytes=2129`, `uart_to_tcp_bytes=30398`, `max_tcp_available=22`, `max_uart_available=114`, `last_result=disconnected`, `active=false`.
 - **Строгий verify FAIL:** `flash verification mismatch`, первое видимое отличие на 0x002e (device 0x88, input 0xf5); сравниваемый HEX 29378 B, тогда как предыдущая запись R6 содержала 29722 B. Возможна разница компилятора/библиотек/сборки, но причины пока не подтверждены.
 - Не было команды `flash:w`: Nano НЕ перезаписывалась. Не объявлять физический full verify PASS или write+verify PASS. Из-за исключения скрипт не выполнил post-session `/api/status`, нужно проверить его отдельно; далее функциональный тест D-125.
+
+## 2026-11-07 — постпроверка Nano: HTTP восстановлен, RTC invalid
+
+- После аппаратного `-VerifyOnly` владелец запросил `/api/status`: `ok:true`, `nano_fw:ARDU_V2`, `mode:light`, `rtc_valid:false`, `current_limit_ma:3000`, `uptime_ms:214617`, статус Nano `D 2 1 0 0 70 500 3000 1 0 0 214617`.
+- Подтверждено: UART/HTTP приложение Nano работает после выхода из bootloader. Но DS3231 сейчас сообщает невалидное время (причина не установлена); Night schedule и Alarm запускать на время до выяснения нельзя. Следующий безвредный шаг — `/api/time` без записи настроек.
