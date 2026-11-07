@@ -1,8 +1,10 @@
 # Статус проекта ARDU
 
-Дата состояния: 2026-10-17
+Дата состояния: 2026-11-07
 
 ## Текущий этап
+
+**2026-11-07 — D-125 Night / Wi-Fi verification gate:** источник Nano R6 с событийным расписанием уже присутствует в main, на устройстве ранее зарегистрирован startup `ARDU1 7`, но полного AVRDUDE verify и функционального hardware PASS пока нет. Инструмент `tools/flash_nano_over_wifi.ps1` получил `-VerifyOnly` (только readback-сравнение HEX, без записи) и автоматический вывод ESP R3 UART/TCP диагностик даже после ошибки. Добавлен `04_Прошивка/NIGHT_R6_WIFI_ACCEPTANCE.md` со сценариями ON/OFF/manual/DAWN/restart. **Следующий аппаратный шаг:** установить ESP V4 R3 DIAG через существующий OTA → проверить готовый Nano R6 HEX командой `-VerifyOnly` → сохранить UART counters/errors и результат `/api/status` → затем проверить сценарии Night. До результата verify Nano не перезаписывать. Исходники ESP/Nano в этой итерации не менялись, устройство удалённо не прошивалось.
 
 **2026-10-17 — D-127 / R6 фактически запускается, но полный Wi-Fi verify всё ещё FAIL; подготовлен ESP V4 R3 DIAG.** На физическом ESP R2 повторный Nano upload снова дал `write 29 722 B = 100%`, а verify сорвался почти сразу. Отдельный `flash:v:` в новом bootloader-сеансе дошёл до 48% и потерял sync с тем же `expected 0x14`, затем эксперимент с 64-byte flash page дошёл только до 7%; значит переход write→verify и размер страницы не являются достаточным объяснением. После холодного старта Nano штатно отвечает `/api/status`, а аппаратный reset-only сеанс дал сырую startup-строку `�ARDU1 7` + `V 9 1`, что является физическим доказательством запуска Nano R6/FW_REV7, но **не заменяет обязательный byte-for-byte AVRDUDE verify**. R3 DIAG сохраняет R2 transport и добавляет latch `Serial.hasOverrun()/hasRxError()`, счётчики байтов и максимальную очередь UART/TCP в `/api/system/nano-program/status`; также фильтрует residual `D ...` из `/api/events` и очищает мусорный префикс перед `ARDU1`. Следующий gate: OTA R3 DIAG → только verify → сразу status diagnostics; Nano больше не записывать до этого результата.
 
