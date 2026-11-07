@@ -1,7 +1,7 @@
 # Удалённая прошивка Arduino Nano через ESP8266 — R3 DIAG
 
 Дата: 2026-10-17  
-Статус: source ESP V4 R3 DIAG подготовлен; аппаратный RESET и R6 startup PASS, полная запись+verify по Wi-Fi всё ещё НЕ PASS.
+Статус: **аппаратный Wi-Fi Nano upload PASS (2026-11-07)**: ESP V4 R3 DIAG, AVRDUDE write+byte-for-byte verify 29 378 B, post-session `/api/status` PASS. Night D-125 функционально ещё не принят.
 
 ## 1. Что реализовано
 
@@ -108,3 +108,7 @@ cd C:\ARDU
 ## 2026-11-07 — R3 DIAG physical verify-only: чтение восстановлено, сравнение FAIL
 
 На устройстве реально установлена ESP `ARDU_ESP_V4_NANO_REMOTE_R3_DIAG`. Первый `-VerifyOnly` со вновь собранным R6 HEX прочитал 29378 B (AVRDUDE Reading 100% за 11.29 с) без потери STK500 sync. R3: `uart_overrun=false`, `uart_rx_error=false`, RX 512 B, TCP→UART 2129 B, UART→TCP 30398 B, max TCP=22, max UART=114. Дальнейший verify сообщил **flash verification mismatch** уже на `0x002e`; локальная сборка 29378 B отличается по размеру от ранее записанного HEX 29722 B. Неизвестно, были ли эти HEX побайтово идентичны; причины расхождения пока не установлены. Это успешный полный сеанс чтения, **не успешная верификация** прошивки. Поскольку PowerShell остановился исключением после AVRDUDE, восстановление `/api/status` нужно отдельно проверить. Запись Nano не выполнялась. Следующий шаг — статус/RTC и функциональные тесты Night, без перезаписи.
+
+## 2026-11-07 — D-127 / Nano remote flash hardware PASS
+
+Подтверждён успешный штатный вызов `tools/flash_nano_over_wifi.ps1` **без** `-VerifyOnly`: ESP V4 R3 DIAG, ATmega328P old bootloader, 57600 baud, AVRDUDE 8.0-arduino.1; `Writing 100%` за 13.92 с, `Reading 100%` за 12.47 с, **`29378 bytes of flash verified`**. UART `overrun=false`, `rx_error=false`, RX buffer=512, TCP→UART=33648, UART→TCP=31450, max TCP=133, max UART=102, `last_result=disconnected`, `active=false`. `/api/status` восстановлен, `mode=light`, `rtc_valid=true`, `current_limit_ma=3000`. **D-127 технический gate записи + verify + восстановления приложения выполнен.** Требуется отдельная приёмка поведения Night D-125; снятие Nano не потребовалось.
