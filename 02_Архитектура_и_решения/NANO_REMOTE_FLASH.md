@@ -1,7 +1,7 @@
-# Удалённая прошивка Arduino Nano через ESP8266 — R1
+# Удалённая прошивка Arduino Nano через ESP8266 — R3 DIAG
 
 Дата: 2026-10-17  
-Статус: ESP V4 SOURCE/CI PASS + hardware RESET PASS; первый реальный Wi-Fi write+verify Nano R6 pending.
+Статус: source ESP V4 R3 DIAG подготовлен; аппаратный RESET и R6 startup PASS, полная запись+verify по Wi-Fi всё ещё НЕ PASS.
 
 ## 1. Что реализовано
 
@@ -91,3 +91,16 @@ cd C:\ARDU
 Физические тесты R2 показали, что полный write устойчиво доходит до 100%, тогда как длинный Nano→ESP→TCP readback verify падает в непостоянной точке (около 1/7/22/48%). Отдельный verify-only исключил переход write→verify; 64-byte page test не устранил ошибку. R6 при этом физически запускается (`ARDU1 7`).
 
 R3 DIAG не ослабляет критерий PASS и не отключает verify. В `/api/system/nano-program/status` после сеанса сохраняются: `uart_overrun`, `uart_rx_error`, `tcp_to_uart_bytes`, `uart_to_tcp_bytes`, `max_uart_available`, `max_tcp_available`, `uart_rx_buffer_size`. Следующий тест — verify-only и немедленное чтение этих полей.
+
+## 2026-11-07 — безопасная проверка уже установленной Nano R6
+
+В `tools/flash_nano_over_wifi.ps1` добавлен `-VerifyOnly`: стандартный AVRDUDE сравнивает содержимое Nano с переданным R6 HEX через `flash:v`, **не выполняя запись**. Скрипт после завершения AVRDUDE (включая FAIL) запрашивает `/api/system/nano-program/status` и выводит latched `uart_overrun`, `uart_rx_error`, TCP/UART byte counters и максимальные очереди. После успешного verify он отдельно требует восстановления `/api/status`.
+
+```powershell
+cd C:\ARDU
+.\tools\flash_nano_over_wifi.ps1 `
+  -HexPath ".\04_Прошивка\nano_warm_dawn_v6\nano_warm_dawn_v6.ino.hex" `
+  -DeviceIp 192.168.0.4 -VerifyOnly
+```
+
+Это **следующий тест после OTA установки ESP `ARDU_ESP_V4_NANO_REMOTE_R3_DIAG`**, а не доказательство, что он уже выполнен. До получения диагностики R3 Nano не перезаписывать. Функциональный сценарий D-125 и критерии hardware PASS: `04_Прошивка/NIGHT_R6_WIFI_ACCEPTANCE.md`. Отсутствие ошибок при verify-only подтверждает путь чтения, но не полный write+verify нового обновления.
