@@ -2826,3 +2826,11 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - Изменён `tools/flash_nano_over_wifi.ps1`: добавлен `-VerifyOnly` с `avrdude -U flash:v`, вывод latched R3 UART/TCP диагностик даже после неуспешного AVRDUDE, и отдельная проверка восстановления `/api/status`. Обычный режим записи сохранил обязательный write+verify.
 - Добавлен `04_Прошивка/NIGHT_R6_WIFI_ACCEPTANCE.md`: последовательность установки R3 по OTA, read-only сравнение установленного R6 HEX и проверки семантики ручного Night, границ ON/OFF и приоритета DAWN.
 - Исходный Nano/ESP код в этой итерации не изменён. Операций OTA, readback или проверки устройства по локальной сети из GitHub-коннектора не выполнялось; hardware gate остаётся открытым.
+
+## 2026-11-07 — аппаратный тест R3 DIAG: Nano readback 100%, HEX mismatch
+
+- Подтверждено владельцем: `/api/ping` ESP `ARDU_ESP_V4_NANO_REMOTE_R3_DIAG`, сеть Station `192.168.0.4`, сервис Nano remote flash на TCP 3280.
+- Выполнен PowerShell `tools/flash_nano_over_wifi.ps1 -VerifyOnly` с HEX `04_Прошивка/nano_warm_dawn_v6/build/arduino.avr.nano/nano_warm_dawn_v6.ino.hex`, скомпилированным локально до 29378 байт. Использован штатный AVRDUDE `8.0-arduino.1`, `ATmega328P` signature `1E 95 0F`, 57600 baud.
+- AVRDUDE выполнил `Reading 100% 11.29 s` без прежней ошибки STK500 sync; ESP диагностировал `uart_overrun=false`, `uart_rx_error=false`, `uart_rx_buffer_size=512`, `tcp_to_uart_bytes=2129`, `uart_to_tcp_bytes=30398`, `max_tcp_available=22`, `max_uart_available=114`, `last_result=disconnected`, `active=false`.
+- **Строгий verify FAIL:** `flash verification mismatch`, первое видимое отличие на 0x002e (device 0x88, input 0xf5); сравниваемый HEX 29378 B, тогда как предыдущая запись R6 содержала 29722 B. Возможна разница компилятора/библиотек/сборки, но причины пока не подтверждены.
+- Не было команды `flash:w`: Nano НЕ перезаписывалась. Не объявлять физический full verify PASS или write+verify PASS. Из-за исключения скрипт не выполнил post-session `/api/status`, нужно проверить его отдельно; далее функциональный тест D-125.
