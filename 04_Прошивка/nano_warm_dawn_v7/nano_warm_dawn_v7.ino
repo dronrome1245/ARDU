@@ -756,29 +756,34 @@ void loadAlarm() {
   alarmCfg.storageValid=true;
 }
 
-void saveFamilyAlarm() {
-  uint8_t b[8];
-  b[0]=Cfg::FAMILY_ALARM_MAGIC&0xFF; b[1]=Cfg::FAMILY_ALARM_MAGIC>>8;
-  b[2]=Cfg::FAMILY_ALARM_VER;
-  b[3]=familyAlarm.weekdaysEnabled?1:0;
-  b[4]=familyAlarm.weekendsEnabled?1:0;
-  b[5]=familyAlarm.weekendHour; b[6]=familyAlarm.weekendMinute;
-  b[7]=familyAlarm.holdMinutes;
-  for(uint8_t i=0;i<8;++i)EEPROM.update(Cfg::FAMILY_ALARM_BASE+i,b[i]);
-  EEPROM.update(Cfg::FAMILY_ALARM_BASE+8,checksum(b,8));
+struct FamilyAlarmPersist {
+  uint16_t magic;
+  uint8_t version,weekdayFlag,weekendFlag,hour,minute,hold,sum;
+};
+static_assert(sizeof(FamilyAlarmPersist)==9,"FamilyAlarm EEPROM ABI must be 9 bytes");
+
+void saveFamilyAlarm(){
+  FamilyAlarmPersist d={
+      Cfg::FAMILY_ALARM_MAGIC,Cfg::FAMILY_ALARM_VER,
+      static_cast<uint8_t>(familyAlarm.weekdaysEnabled),
+      static_cast<uint8_t>(familyAlarm.weekendsEnabled),
+      familyAlarm.weekendHour,familyAlarm.weekendMinute,familyAlarm.holdMinutes,0
+  };
+  d.sum=checksum(reinterpret_cast<const uint8_t*>(&d),8);
+  EEPROM.put(Cfg::FAMILY_ALARM_BASE,d);
 }
-void loadFamilyAlarm() {
-  uint8_t b[8];
-  for(uint8_t i=0;i<8;++i)b[i]=EEPROM.read(Cfg::FAMILY_ALARM_BASE+i);
-  const uint16_t magic=static_cast<uint16_t>(b[0])|(static_cast<uint16_t>(b[1])<<8);
-  if(magic!=Cfg::FAMILY_ALARM_MAGIC||b[2]!=Cfg::FAMILY_ALARM_VER||
-     b[5]>23||b[6]>59||b[7]>120||
-     EEPROM.read(Cfg::FAMILY_ALARM_BASE+8)!=checksum(b,8)){
+void loadFamilyAlarm(){
+  FamilyAlarmPersist d{};
+  EEPROM.get(Cfg::FAMILY_ALARM_BASE,d);
+  if(d.magic!=Cfg::FAMILY_ALARM_MAGIC||d.version!=Cfg::FAMILY_ALARM_VER||
+     d.hour>23||d.minute>59||d.hold>120||
+     d.sum!=checksum(reinterpret_cast<const uint8_t*>(&d),8)){
     familyAlarm=FamilyAlarmSettings();return;
   }
-  familyAlarm.weekdaysEnabled=b[3]!=0;familyAlarm.weekendsEnabled=b[4]!=0;
-  familyAlarm.weekendHour=b[5];familyAlarm.weekendMinute=b[6];
-  familyAlarm.holdMinutes=b[7];
+  familyAlarm.weekdaysEnabled=d.weekdayFlag!=0;
+  familyAlarm.weekendsEnabled=d.weekendFlag!=0;
+  familyAlarm.weekendHour=d.hour;familyAlarm.weekendMinute=d.minute;
+  familyAlarm.holdMinutes=d.hold;
 }
 
 void saveDawnSettings() {
