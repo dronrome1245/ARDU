@@ -185,6 +185,7 @@ class MainActivity : Activity() {
     private lateinit var ambientPresetButtons: Map<String, ImageButton>
     private lateinit var ambientPresetLabels: Map<String, TextView>
     private lateinit var ambientPresetExtraGrid: LinearLayout
+    private lateinit var ambientFavoritesRow: LinearLayout
     private lateinit var ambientPresetCapabilityText: TextView
     private lateinit var ambientPresetControls: LinearLayout
     private lateinit var ambientPresetStatusText: TextView
@@ -1070,10 +1071,14 @@ class MainActivity : Activity() {
         )
         ambientPresetButtons.forEach { (id, button) ->
             button.setOnClickListener { applyAmbientPreset(id) }
+            button.setOnLongClickListener { toggleAmbientFavorite(id); true }
         }
         ambientPresetLabels.forEach { (id, label) ->
             label.setOnClickListener { applyAmbientPreset(id) }
+            label.setOnLongClickListener { toggleAmbientFavorite(id); true }
         }
+        ambientFavoritesRow = findViewById(R.id.ambientFavoritesRow)
+        refreshAmbientFavorites()
         ambientPresetExtraGrid = findViewById(R.id.ambientPresetExtraGrid)
         ambientPresetCapabilityText = findViewById(R.id.ambientPresetCapabilityText)
         ambientPresetControls = findViewById(R.id.ambientPresetControls)
@@ -1116,6 +1121,7 @@ class MainActivity : Activity() {
                     setImageResource(ambientSceneImageResources.getValue(id))
                     contentDescription = ambientSceneNames.getValue(id)
                     setOnClickListener { applyAmbientPreset(id) }
+                    setOnLongClickListener { toggleAmbientFavorite(id); true }
                 }
                 tile.addView(image, LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, dp(76)
@@ -1128,6 +1134,7 @@ class MainActivity : Activity() {
                     maxLines = 2
                     minHeight = dp(32)
                     setOnClickListener { applyAmbientPreset(id) }
+                    setOnLongClickListener { toggleAmbientFavorite(id); true }
                 }
                 tile.addView(label, LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -1216,7 +1223,61 @@ class MainActivity : Activity() {
         runDeviceAction(label) { api.selectAmbientPreset(id) }
     }
 
+    // Favorites are a local UI convenience only. Selection and scene settings
+    // still come from Nano via readback; no local preference can override them.
+    private fun ambientFavoriteIds(): List<String> {
+        val saved = preferences().getString("ambient_favorites_v1", null)
+        val ids = (saved ?: "P05,P06,P11,P01").split(",")
+        return ids.filter { it in ambientSceneNames }.distinct().take(4)
+    }
+
+    private fun toggleAmbientFavorite(id: String) {
+        if (id !in ambientSceneNames) return
+        val ids = ambientFavoriteIds().toMutableList()
+        if (id in ids) ids.remove(id)
+        else {
+            if (ids.size >= 4) ids.removeAt(0)
+            ids.add(id)
+        }
+        preferences().edit().putString("ambient_favorites_v1", ids.joinToString(",")).apply()
+        refreshAmbientFavorites()
+        setOperationStatus(if (id in ids) "Сцена добавлена в избранное"
+                           else "Сцена удалена из избранного", important = false)
+    }
+
+    private fun refreshAmbientFavorites() {
+        ambientFavoritesRow.removeAllViews()
+        val ids = ambientFavoriteIds()
+        if (ids.isEmpty()) {
+            ambientFavoritesRow.addView(TextView(this).apply {
+                text = "Удерживайте карточку сцены, чтобы добавить её сюда"
+                textSize = 12f
+                setTextColor(getColor(R.color.ardu_text_secondary))
+            })
+            return
+        }
+        ids.forEach { id ->
+            val button = Button(this).apply {
+                text = ambientSceneNames.getValue(id)
+                isAllCaps = false
+                textSize = 11f
+                isEnabled = deviceOnline
+                setOnClickListener { applyAmbientPreset(id) }
+                setOnLongClickListener { toggleAmbientFavorite(id); true }
+                isSelected = latestSettings?.ambientPresets?.selected == id &&
+                    latestMode == "ambient"
+            }
+            ambientFavoritesRow.addView(button, LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+            ).apply {
+                marginStart = dp(2)
+                marginEnd = dp(2)
+            })
+        }
+    }
+
     private fun setAmbientPresetSelection(selectedId: String?) {
+        refreshAmbientFavorites()
         ambientPresetButtons.forEach { (id, button) ->
             button.isSelected = id == selectedId
         }
