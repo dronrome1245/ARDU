@@ -2391,9 +2391,9 @@ void printCompactSettings(){
   dataPrefix(3,4);
   Serial.print(x.effect);Serial.print(' ');Serial.print(x.autoCycle);Serial.print(' ');Serial.print(x.autoPeriodSec);Serial.print(' ');
   Serial.print(x.f01Hue);Serial.print(' ');Serial.print(x.f01Sat);Serial.print(' ');Serial.print(x.f01Brightness);Serial.print(' ');
-  Serial.print(x.f02Hue);Serial.print(' ');Serial.print(x.f02Sat);Serial.print(' ');Serial.print(x.f02Brightness);Serial.print(' ');
-  Serial.print(x.f02Speed);Serial.print(' ');Serial.print(x.f03Hue);Serial.print(' ');Serial.print(x.f03Brightness);Serial.print(' ');
-  Serial.print(x.f03Speed);Serial.print(' ');Serial.println(x.f03Step10);
+  // F02/F03 were retired in D-109. Preserve the v1 14-field wire shape
+  // for ESP V4 rollback, without serializing unused legacy effect settings.
+  Serial.println(F("0 255 64 100 0 64 1 5"));
 
   for(uint8_t i=0;i<static_cast<uint8_t>(MusicMode::COUNT);++i){
     const MusicModeSettings& m=extCfg.music[i];
