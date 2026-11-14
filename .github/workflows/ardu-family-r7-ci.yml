@@ -1,0 +1,81 @@
+name: ARDU Family R7 Candidates
+
+on:
+  push:
+    paths:
+      - "04_Прошивка/nano_warm_dawn_v7/**"
+      - "05_WiFi_и_приложение/esp8266_family_v5/**"
+      - ".github/workflows/ardu-family-r7-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nano-family-r7:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+      - name: Install AVR core and FastLED
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr
+          arduino-cli lib install FastLED
+      - name: Compile isolated Nano R7
+        run: |
+          mkdir -p "$RUNNER_TEMP/nano_warm_dawn_v7"
+          cp "04_Прошивка/nano_warm_dawn_v7/nano_warm_dawn_v7.ino" "$RUNNER_TEMP/nano_warm_dawn_v7/"
+          arduino-cli compile \
+            --fqbn arduino:avr:nano:cpu=atmega328old \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-nano-family-r7" \
+            --libraries "$GITHUB_WORKSPACE/04_Прошивка/libraries" \
+            "$RUNNER_TEMP/nano_warm_dawn_v7"
+      - name: Nano memory safety check
+        run: |
+          AVR_SIZE="$(find "$HOME/.arduino15/packages/arduino/tools/avr-gcc" -type f -name avr-size | head -n 1)"
+          ELF="$(find "$GITHUB_WORKSPACE/build-nano-family-r7" -name '*.elf' | head -n 1)"
+          test -n "$AVR_SIZE" && test -n "$ELF"
+          "$AVR_SIZE" -C --mcu=atmega328p "$ELF" | tee /tmp/ardu-r7-size.txt
+          FLASH="$(awk '/Program:/ {print $2}' /tmp/ardu-r7-size.txt)"
+          RAM="$(awk '/Data:/ {print $2}' /tmp/ardu-r7-size.txt)"
+          test "$FLASH" -le 30300
+          test "$RAM" -le 1400
+          echo "PASS: Nano R7 ${FLASH} flash / ${RAM} SRAM"
+
+  esp-family-v5:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+      - name: Install ESP8266 board core
+        run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp8266:esp8266
+      - name: Prepare credential-free CI sketch and compile
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,re
+          src=Path("05_WiFi_и_приложение/esp8266_family_v5/esp8266_family_v5.ino").read_text()
+          for key,value in {
+              "ARDU_WIFI_SSID":"CI_HOME_WIFI",
+              "ARDU_WIFI_PASSWORD":"CI_TEST_HOME_PASSWORD",
+              "ARDU_OTA_PASSWORD":"CI_TEST_OTA_PASSWORD",
+              "ARDU_SOFTAP_PASSWORD":"CI_TEST_DIRECT_PASSWORD"
+          }.items():
+              pat=rf'(?m)^(#define\s+{key}\s+)"PUT_[A-Z_]+_HERE"$'
+              src,n=re.subn(pat,lambda m:m[1]+'"'+value+'"',src)
+              assert n==1,key
+          out=Path(os.environ["RUNNER_TEMP"])/"esp8266_family_v5"
+          out.mkdir(parents=True,exist_ok=True)
+          (out/"esp8266_family_v5.ino").write_text(src)
+          PY
+          arduino-cli compile \
+            --fqbn esp8266:esp8266:generic \
+            --warnings default \
+            --build-path "$GITHUB_WORKSPACE/build-esp-family-v5" \
+            "$RUNNER_TEMP/esp8266_family_v5"
