@@ -2352,7 +2352,8 @@ void printCompactSettings(){
   Serial.print(clapCalQuietP99);Serial.print(' ');Serial.println(clapCalSuggested);
 
   dataPrefix(3,2);
-  Serial.print(nightCfg.manualEnabled?1:0);Serial.print(' ');Serial.print(nightCfg.hue);Serial.print(' ');
+  // Night status must show actual light, including schedule-driven activation.
+  Serial.print(currentMode==SystemMode::NIGHT?1:0);Serial.print(' ');Serial.print(nightCfg.hue);Serial.print(' ');
   Serial.print(nightCfg.saturation);Serial.print(' ');Serial.print(nightCfg.brightness);Serial.print(' ');
   Serial.print(nightCfg.scheduleEnabled?1:0);Serial.print(' ');Serial.print(nightCfg.onHour);Serial.print(' ');
   Serial.print(nightCfg.onMinute);Serial.print(' ');Serial.print(nightCfg.offHour);Serial.print(' ');
@@ -2673,6 +2674,11 @@ void setup(){
   // outside the window the normal startup mode is left untouched.
   if(!recovered && nightCfg.scheduleEnabled){
     (void)syncNightScheduleNow(false,true);
+    // At a cold mains start the LEDs were still black. Fade up from zero,
+    // never show the bright L01 startup profile for one frame at night.
+    if(coldBoot && currentMode==SystemMode::NIGHT && nightFade.active){
+      nightFade.from=0;requestedBrightness=0;frameDirty=true;
+    }
   }
 
   showIfSafe();
