@@ -41,10 +41,10 @@ struct NanoResult {
 // To update an already installed ESP by OTA, Arduino IDE will ask for the
 // password of the CURRENT installed firmware, not the new value below.
 // ---------------------------------------------------------------------------
-#define ARDU_WIFI_SSID        "PUT_YOUR_WIFI_SSID_HERE"
-#define ARDU_WIFI_PASSWORD    "PUT_YOUR_WIFI_PASSWORD_HERE"
-#define ARDU_OTA_PASSWORD     "PUT_A_STRONG_OTA_PASSWORD_HERE"
-#define ARDU_SOFTAP_PASSWORD  "PUT_A_STRONG_AP_PASSWORD_HERE"
+#define ARDU_WIFI_SSID        "Real214"
+#define ARDU_WIFI_PASSWORD    "Zzxaas1105268920"
+#define ARDU_OTA_PASSWORD     "Zzxaas1105268920"
+#define ARDU_SOFTAP_PASSWORD  "Zzxaas1105268920"
 
 // Safety gate: stop a real OTA build if any quoted string remains a placeholder.
 // No extra flags or configuration headers are needed once the four fields are
