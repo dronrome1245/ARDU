@@ -63,6 +63,22 @@ jobs:
           assert 'showServiceMessagesSwitch' in kotlin and 'showServiceMessagesSwitch' in layout
           assert 'PREF_SHOW_SERVICE_MESSAGES' in kotlin
           assert 'important = true' in kotlin
+          # RTC sync is deliberately on each foreground session and on
+          # reconnect, after Nano replied. A normal 5s heartbeat MUST NOT
+          # repeat the POST, including after an uncertain/lost acknowledgement.
+          rtc_gate=(root/"src/main/java/com/ardu/app/RtcAutoSyncGate.kt").read_text()
+          assert "rtcAutoSyncGate.onForegroundStarted()" in kotlin
+          assert "rtcAutoSyncGate.onConnectionLost()" in kotlin
+          assert "rtcAutoSyncGate.claimAfterNanoContact()" in kotlin
+          assert "val rtcSyncAttempt = syncRtcOnceAfterConnection()" in kotlin
+          assert "rtcSyncAttempt = syncRtcOnceAfterConnection()" in kotlin
+          assert "rtcSyncAttempt.attempted" in kotlin
+          assert "afterStatus?.invoke() == true" in kotlin
+          assert "api.syncTime()" in kotlin and "reportRtcSync(" in kotlin
+          assert "pending = false" in rtc_gate and "return false" in rtc_gate
+          assert '"/api/time/sync"' in network and "Calendar.getInstance()" in network
+          assert "onConnectionLost()" in rtc_gate
+          print("PASS: foreground/reconnect RTC sync is one-shot, Nano-gated and read back")
           print("PASS: foreground 5s keepalive, Nano liveness and diagnostics preference")
           print("PASS: UX offline-state, tab scroll, music controls and scene ordering")
           print("PASS: 12 embedded WebP thumbnails and 4-column grid")
@@ -331,10 +347,10 @@ jobs:
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
 
-      - name: Publish Android 0.22.17 Ambient simple UX APK
+      - name: Publish Android 0.22.18 RTC auto-sync APK
         uses: actions/upload-artifact@v4
         with:
-          name: ardu-android-02217-ambient-simple-rest-debug-apk
+          name: ardu-android-02218-rtc-auto-sync-debug-apk
           path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
