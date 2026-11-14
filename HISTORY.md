@@ -2889,3 +2889,11 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - Созданы **отдельные source-кандидаты** Nano `nano_warm_dawn_v7` (boot `ARDU1 8`, семейный EEPROM блок, wake-date weekday logic, ручной/событийный Night fade, alarm-only hold timeout) и ESP `esp8266_family_v5` (HTTP JSON + UART family opcode62, строгая проверка версии Nano). Старые R6/ESP V4 оставлены неизменными.
 - Android Verify [43593418689](https://github.com/dronrome1245/ARDU/actions/runs/43593418689) **PASS** после замены устаревшего теста, требовавшего команду смены режима при открытии вкладки. ESP V5 compile PASS в Family R7 workflow. В первых запусках Nano R7 возникло переполнение flash; в отдельной кандидатной сборке идёт оптимизация. **До успешной CI memory-gate и физического Nano write+verify не объявлять новые Night/Alarm режимы установленными или аппаратно пройденными.**
 - Не вмешивались в питание, проводку или физическую лампу; совместный тест 44+44 и Class II PSU остаются обязательными.
+
+
+## 2026-11-14 — CI PASS семейного Nano R7 и ESP V5 после оптимизации flash
+
+- Первоначальная Nano R7 source не помещалась в flash, до 31 050 B. Оптимизированы календарный расчёт дня недели (8-bit с учётом високосных лет 2000..2099), плавное обновление яркости, хранение FamilyAlarm через EEPROM.get/put, сериализация только действующих атмосферных полей с сохранением 14-значного wire-format для старого ESP.
+- Окончательный результат GitHub Actions [ARDU Family R7 Candidates, run 43595155594](https://github.com/dronrome1245/ARDU/actions/runs/43595155594): **Nano compile/memory PASS 30 712/30 720 Flash, 1 076/2 048 global SRAM**; ESP V5 one-file (CI dummy credentials) compile PASS. В CI отдельно выдано предупреждение о **всего 8 байтах оставшегося flash**: последующие функции требуют сокращения прошивки.
+- Android [run 43593418689](https://github.com/dronrome1245/ARDU/actions/runs/43593418689) **PASS**: unit tests, debug APK `ardu-android-02216-family-schedule-debug-apk`; новые вкладки, фавориты, экран семейного будильника в коде.
+- Ни R7, ни ESP V5 этим действием физически не установлены. Не заявлять hardware PASS Night/Alarm, пока не пройдены AVRDUDE verify и полный протокол `04_Прошивка/FAMILY_R7_ACCEPTANCE.md`.
