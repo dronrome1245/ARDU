@@ -408,7 +408,6 @@ struct NightFade {
   unsigned long started = 0;
 };
 NightFade nightFade;
-unsigned long lastNightFadeFrame = 0;
 
 unsigned long lastDawnFrameMs = 0;
 unsigned long dawnStartMs = 0;
@@ -1310,17 +1309,13 @@ void applyMode(SystemMode m,bool persist);
 void beginNightFade(uint8_t from,uint8_t to,bool offAtEnd) {
   nightFade.active=true;nightFade.offAtEnd=offAtEnd;
   nightFade.from=from;nightFade.to=to;nightFade.started=millis();
-  lastNightFadeFrame=0;
   requestedBrightness=from;frameDirty=true;
 }
 
 void updateNightFade() {
   if(!nightFade.active)return;
   if(currentMode!=SystemMode::NIGHT){nightFade.active=false;return;}
-  const unsigned long now=millis();
-  if(now-lastNightFadeFrame<50UL)return;
-  lastNightFadeFrame=now;
-  const unsigned long dt=now-nightFade.started;
+  const unsigned long dt=millis()-nightFade.started;
   if(dt>=Cfg::NIGHT_FADE_MS){
     nightFade.active=false;
     if(nightFade.offAtEnd)applyMode(SystemMode::OFF,true);
@@ -1329,9 +1324,11 @@ void updateNightFade() {
   }
   // 64 ms quantization gives 256 smooth steps over 16.32 s.
   // FastLED provides an efficient AVR 8-bit interpolation.
-  requestedBrightness=lerp8by8(nightFade.from,nightFade.to,
+  const uint8_t value=lerp8by8(nightFade.from,nightFade.to,
       static_cast<uint8_t>(dt>>6));
-  frameDirty=true;
+  if(value!=requestedBrightness){
+    requestedBrightness=value;frameDirty=true;
+  }
 }
 
 bool syncNightSchedule(const RtcTime& now,bool announce=false,bool forceOn=false){
