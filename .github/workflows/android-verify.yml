@@ -235,7 +235,11 @@ jobs:
           assert "if (!heartbeatEnabled || commandInProgress) return@runOnUiThread" in kotlin
           assert "commandInProgress = true" in kotlin
           assert "if (writeError == null) onAcknowledged?.invoke()" in kotlin
-          assert 'runDeviceAction("Переключение режима")' in kotlin
+          # Tabs are view-only. Explicit buttons and scenes are the only writes.
+          navigation=kotlin.split('private fun navigateToUserSection(',1)[1].split('private fun bindNavigation()',1)[0]
+          assert 'api.setMode(' not in navigation
+          assert 'runDeviceAction(' not in navigation
+          assert 'showSection(target)' in navigation
           assert "if (!isSelected) return" in glow
           assert "RadialGradient(" in glow and "LinearGradient(" in glow
           assert "glass capsule" not in glow.lower()
