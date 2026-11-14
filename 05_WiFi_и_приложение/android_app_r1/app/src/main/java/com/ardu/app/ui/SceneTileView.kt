@@ -87,8 +87,9 @@ class SceneTileView @JvmOverloads constructor(
         val src = centerCropSource(bitmap, width, height)
         canvas.drawBitmap(bitmap, src, RectF(0f, 0f, w, h), imagePaint)
 
-        // Evening = inviting golden lamp light; Rest = calm warm dim lighting.
-        // Keep the existing real furniture photos, grade them independently.
+        // Evening photo: amber-lit interior. Rest photo: separate blue-hour
+        // bedroom-like lounge with a single warm reading lamp, much darker.
+        // Keep its night-blue shadows visible instead of tinting them brown.
         moodPaint.shader = when (scene) {
             Scene.EVENING -> LinearGradient(
                 0f, 0f, w, h,
@@ -97,7 +98,7 @@ class SceneTileView @JvmOverloads constructor(
             )
             Scene.WARM -> LinearGradient(
                 0f, 0f, w, h,
-                Color.argb(85, 90, 53, 27), Color.argb(75, 53, 39, 29),
+                Color.argb(18, 30, 45, 85), Color.argb(30, 10, 25, 50),
                 Shader.TileMode.CLAMP
             )
             else -> null
