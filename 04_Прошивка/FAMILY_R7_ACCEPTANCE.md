@@ -1,11 +1,11 @@
 # D-128 — приемка семейного Night/Alarm (Nano R7 + ESP V5 + Android 0.22.16)
 
-Статус: **план испытаний, не аппаратный PASS**. Существующая физическая Nano R6 сохраняется до compile/memory/AVRDUDE write+verify и проверки источника питания.
+Статус: **план испытаний, не аппаратный PASS**. Существующая физическая Nano R6 сохраняется до **AVRDUDE write+byte-for-byte verify и функционального испытания R7**. Source compile/memory Nano R7 и ESP V5 уже PASS в GitHub CI.
 
 ## 0. Перед испытаниями
 
 - Не подключать и не переподключать 230 В. Не монтировать лампы до отдельного Class II + 44+44 электрического gate. Для испытаний использовать уже безопасно запитанный низковольтный стенд.
-- Проверить GitHub Actions compile Nano R7 <=30720 B (целевой запас <=30300 B), глобальный SRAM <=1400 B; ESP V5 compile и Android CI PASS.
+- CI [run 43595155594](https://github.com/dronrome1245/ARDU/actions/runs/43595155594): Nano R7 **30 712/30 720 B flash** (только 8 B запаса) и **1 076/2 048 B global SRAM**, ESP V5 PASS. Android [run 43593418689](https://github.com/dronrome1245/ARDU/actions/runs/43593418689) PASS. Новые функции Nano без уменьшения размера запрещены.
 - Сохранить `GET /api/status`, `GET /api/settings`, `GET /api/time` для возврата параметров. RTC должен быть валиден, временной пояс устройства должен соответствовать локальному времени.
 - ESP V5 (Station/OTA с частными локальными credentials) → `GET /api/ping` показывает V5. Только после подтверждения прошивки ESP и её UART связи программировать Nano R7 через **проверенный** `tools/flash_nano_over_wifi.ps1`, AVRDUDE **write+byte-for-byte verify**, без `-V`; `/api/status` вновь отвечает; startup `ARDU1 8`.
 - Проверить `GET /api/settings` → `alarm.family_schedule_supported:true`, `weekday_enabled:true`, `weekend_enabled:false`, `hold_minutes:15` на новых настройках (у уже настроенного устройства могут быть сохранённые значения). До этого Android должен скрывать элементы новой автоматики.
