@@ -103,7 +103,7 @@ jobs:
 
           PY
 
-      - name: Verify Android v0.22.11 preset-only Ambient, Music submode layout and quick-scene contrast
+      - name: Verify Ambient single-tap UX, Music layout and Light scene contrast
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -167,7 +167,15 @@ jobs:
           assert 'MusicBackgroundUiPolicy.colorExplanation(id)' in kotlin
           assert 'musicBackgroundGroup.visibility' in kotlin
           assert 'ambientManualPanel.visibility = View.GONE' in kotlin
-          assert 'api.selectAmbientPreset(selected)' in kotlin
+          # Owner revision: no favorites strip; ON starts first preset P01;
+          # a single tap of any image/text card starts its own Pxx.
+          assert 'ambientFavoritesRow' not in xml and 'ambientFavoritesRow' not in kotlin
+          assert 'toggleAmbientFavorite' not in kotlin
+          assert 'api.selectAmbientPreset("P01")' in kotlin
+          assert 'button.setOnClickListener { applyAmbientPreset(id) }' in kotlin
+          assert 'label.setOnClickListener { applyAmbientPreset(id) }' in kotlin
+          assert 'setOnClickListener { applyAmbientPreset(id) }' in kotlin
+          assert 'if (latestMode == "ambient")' in kotlin
           assert "LightQuickScenes.EVENING" in kotlin and "LightQuickScenes.CINEMA" in kotlin
           assert 'LightQuickScene(kelvin = 2700, brightness = 115)' in scenes
           assert 'LightQuickScene(kelvin = 1800, brightness = 18)' in scenes
@@ -177,7 +185,7 @@ jobs:
           assert "background_brightness" not in bgpolicy, \
               "color policy should not fake independent background API fields"
           print("PASS: preset-only Ambient, full-width selected Music row above sliders")
-          print("PASS: music background color truth and visibly distinct Evening/Cinema")
+          print("PASS: music background color truth and distinct Evening/Rest scenes")
           PY
 
       - name: Verify selected tab mint glow and full-width touch area
@@ -235,10 +243,17 @@ jobs:
           assert "if (!heartbeatEnabled || commandInProgress) return@runOnUiThread" in kotlin
           assert "commandInProgress = true" in kotlin
           assert "if (writeError == null) onAcknowledged?.invoke()" in kotlin
-          # Tabs are view-only. Explicit buttons and scenes are the only writes.
+          # Tabs are read-only, except that returning to the Ambient tab
+          # explicitly stops a running Ambient scene; it must never stop a
+          # Light, Night, Dawn or Music mode.
           navigation=kotlin.split('private fun navigateToUserSection(',1)[1].split('private fun bindNavigation()',1)[0]
-          assert 'api.setMode(' not in navigation
-          assert 'runDeviceAction(' not in navigation
+          before_ambient=navigation.split('if (target === ambientPanel',1)[0]
+          assert 'api.setMode(' not in before_ambient
+          assert 'runDeviceAction(' not in before_ambient
+          assert 'previous !== ambientPanel' in navigation
+          assert 'latestMode == "ambient" && deviceOnline' in navigation
+          assert navigation.count('api.setMode("off")')==1
+          assert navigation.count('runDeviceAction(')==1
           assert 'showSection(target)' in navigation
           assert "if (!isSelected) return" in glow
           assert "RadialGradient(" in glow and "LinearGradient(" in glow
