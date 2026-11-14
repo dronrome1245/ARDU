@@ -772,7 +772,7 @@ void loadFamilyAlarm() {
   for(uint8_t i=0;i<8;++i)b[i]=EEPROM.read(Cfg::FAMILY_ALARM_BASE+i);
   const uint16_t magic=static_cast<uint16_t>(b[0])|(static_cast<uint16_t>(b[1])<<8);
   if(magic!=Cfg::FAMILY_ALARM_MAGIC||b[2]!=Cfg::FAMILY_ALARM_VER||
-     b[3]>1||b[4]>1||b[5]>23||b[6]>59||b[7]>120||
+     b[5]>23||b[6]>59||b[7]>120||
      EEPROM.read(Cfg::FAMILY_ALARM_BASE+8)!=checksum(b,8)){
     familyAlarm=FamilyAlarmSettings();return;
   }
@@ -1929,7 +1929,7 @@ void updateAlarm(){
     (void)syncNightSchedule(now,true,false);
   }
 
-  if(!alarmCfg.enabled)return;
+  if(!alarmCfg.enabled || (!familyAlarm.weekdaysEnabled && !familyAlarm.weekendsEnabled))return;
   // Mon=0..Sun=6. January 1st 2000 was Saturday (index 5).
   // Check the weekday of the WAKE DATE, not the preceding fade-start date.
   for(uint8_t kind=0;kind<2;++kind){
@@ -2375,7 +2375,7 @@ void printCompactSettings(){
   Serial.print(dawnCfg.endStep);Serial.print(' ');Serial.print(static_cast<uint8_t>(dawnPhase));Serial.print(' ');
   Serial.print(dawnRecoveredAtBoot?1:0);Serial.println(F(" 1")); // warm Kelvin capability
   dataPrefix(3,21);
-  Serial.print(1);Serial.print(' '); // family alarm / auto-off capability
+  Serial.print(F("1 ")); // family alarm / auto-off capability
   Serial.print(familyAlarm.weekdaysEnabled?1:0);Serial.print(' ');
   Serial.print(familyAlarm.weekendsEnabled?1:0);Serial.print(' ');
   Serial.print(familyAlarm.weekendHour);Serial.print(' ');
