@@ -303,10 +303,10 @@ jobs:
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
 
-      - name: Publish Android 0.22.15 debug APK
+      - name: Publish Android 0.22.16 family debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: ardu-android-02215-warm-dawn-presets-debug-apk
+          name: ardu-android-02216-family-schedule-debug-apk
           path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
