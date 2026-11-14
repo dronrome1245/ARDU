@@ -2906,3 +2906,10 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - Новый WebP тёмного ночного интерьера для «Отдых» — ardu_scene_warm.webp (4118 B, blob 11f35e79be48509f59fb5d4c93fdde35c1541db7), фотография «Вечер» осталась прежней. Kelvin/brightness не изменены.
 - VersionCode 40, versionName 0.22.17-ambient-simple-rest-rc1. Устаревшие CI проверки обновлены; регрессии подтверждают отсутствие избранного, P01 по ON, 12 карточек, охрану NIGHT и независимое фото «Отдых».
 - [Android CI PASS: 43630189306](https://github.com/dronrome1245/ARDU/actions/runs/43630189306) — Android static checks, unit tests, debug APK. [APK artifact 14128055962](https://github.com/dronrome1245/ARDU/actions/runs/43630189306/artifacts/14128055962). Установка на реальный телефон и поведение лампы — PENDING. Nano/ESP не перепрошивались.
+
+
+## 2026-11-14 — Владелец подтвердил Android 0.22.17 на телефоне; семейные firmware ещё кандидаты
+
+- После команды git pull → Android Studio Run и проверки владельцем трёх сценариев D-129 получено «все сработало». Зафиксирован **user-reported phone PASS**, а не измерение платы. CI [Android 0.22.17 PASS](https://github.com/dronrome1245/ARDU/actions/runs/43630189306).
+- Проверен GitHub текущей ветки main: кандидаты ESP V5 и Nano R7 созданы, [Family R7 compile/memory CI PASS](https://github.com/dronrome1245/ARDU/actions/runs/43595155594), **аппаратная установка не выполнялась**. Текущие физические ESP V4 R3 DIAG и Nano R6 оставлены без изменения.
+- Приведён в соответствие D-129 план приемки 04_Прошивка/FAMILY_R7_ACCEPTANCE.md (без избранного, исключение Ambient OFF при переходе). Дальнейшие действия: сохранить настройки и время, ESP V5 OTA, проверить связь, Nano R7 AVRDUDE write+verify по Wi-Fi, пройти автономные Night/Alarm сценарии, затем независимый 44+44/Class II gate.
