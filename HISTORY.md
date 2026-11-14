@@ -2897,3 +2897,12 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - Окончательный результат GitHub Actions [ARDU Family R7 Candidates, run 43595155594](https://github.com/dronrome1245/ARDU/actions/runs/43595155594): **Nano compile/memory PASS 30 712/30 720 Flash, 1 076/2 048 global SRAM**; ESP V5 one-file (CI dummy credentials) compile PASS. В CI отдельно выдано предупреждение о **всего 8 байтах оставшегося flash**: последующие функции требуют сокращения прошивки.
 - Android [run 43593418689](https://github.com/dronrome1245/ARDU/actions/runs/43593418689) **PASS**: unit tests, debug APK `ardu-android-02216-family-schedule-debug-apk`; новые вкладки, фавориты, экран семейного будильника в коде.
 - Ни R7, ни ESP V5 этим действием физически не установлены. Не заявлять hardware PASS Night/Alarm, пока не пройдены AVRDUDE verify и полный протокол `04_Прошивка/FAMILY_R7_ACCEPTANCE.md`.
+
+
+## 2026-11-14 — D-129: Android 0.22.17, прямой выбор фона, другое фото «Отдыха»
+
+- С убранной панели «Фон» удалены 4 избранных и onLongClick; ON запускает P01, один тап на любом фото или названии запускает соответствующий Pxx.
+- Переход из иной вкладки в «Фон» гасит только работающий AMBIENT через API OFF. Другие режимы при входе в раздел не меняются. Тап по уже открытой вкладке не выключает сцену.
+- Новый WebP тёмного ночного интерьера для «Отдых» — ardu_scene_warm.webp (4118 B, blob 11f35e79be48509f59fb5d4c93fdde35c1541db7), фотография «Вечер» осталась прежней. Kelvin/brightness не изменены.
+- VersionCode 40, versionName 0.22.17-ambient-simple-rest-rc1. Устаревшие CI проверки обновлены; регрессии подтверждают отсутствие избранного, P01 по ON, 12 карточек, охрану NIGHT и независимое фото «Отдых».
+- [Android CI PASS: 43630189306](https://github.com/dronrome1245/ARDU/actions/runs/43630189306) — Android static checks, unit tests, debug APK. [APK artifact 14128055962](https://github.com/dronrome1245/ARDU/actions/runs/43630189306/artifacts/14128055962). Установка на реальный телефон и поведение лампы — PENDING. Nano/ESP не перепрошивались.
