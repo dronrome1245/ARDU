@@ -1529,9 +1529,10 @@ void handleAlarmSettings() {
     sendError(400,F("BAD_FAMILY_SCHEDULE"));return;
   }
   const bool familyWrite=jwd==JSON_OK||jwe==JSON_OK||jwh==JSON_OK||jhold==JSON_OK;
+  uint32_t family[8]={0};
   if(familyWrite){
     const NanoResult sr=nanoSettings();
-    uint32_t family[8];uint8_t count=0;
+    uint8_t count=0;
     if(!sr.ok){sendNanoFailure(sr);return;}
     if(!getSettingLine(sr,21,family,8,count)||count<6||family[0]!=1){
       sendError(409,F("FAMILY_SCHEDULE_REQUIRES_NANO_R7"));return;
@@ -1549,12 +1550,18 @@ void handleAlarmSettings() {
   if(jh==JSON_BAD||jm==JSON_BAD){sendError(400,F("BAD_ALARM_TIME"));return;}
   if((jh==JSON_OK)!=(jm==JSON_OK)){sendError(400,F("HOUR_AND_MINUTE_REQUIRED"));return;}
   if(jh==JSON_OK){if(!runAck(61,makeCommand(61,hour,minute)))return;any=true;}
-  if(jwd==JSON_OK){if(!runAck(62,makeCommand(62,weekdayEnabled?1:0)))return;any=true;}
-  if(jwe==JSON_OK){if(!runAck(63,makeCommand(63,weekendEnabled?1:0)))return;any=true;}
-  if(jwh==JSON_OK){
-    if(!runAck(64,makeCommand(64,weekendHour,weekendMinute)))return;any=true;
+  if(familyWrite){
+    // Merge omitted fields from the authoritative Nano readback and persist
+    // all five values with one validated UART command (no half-written policy).
+    String cmd=makeCommand(62,
+        jwd==JSON_OK?(weekdayEnabled?1:0):static_cast<long>(family[1]),
+        jwe==JSON_OK?(weekendEnabled?1:0):static_cast<long>(family[2]),
+        jwh==JSON_OK?weekendHour:static_cast<long>(family[3]),
+        jwm==JSON_OK?weekendMinute:static_cast<long>(family[4]));
+    cmd+=' ';cmd+=(jhold==JSON_OK?holdMinutes:static_cast<long>(family[5]));
+    if(!runAck(62,cmd))return;
+    any=true;
   }
-  if(jhold==JSON_OK){if(!runAck(65,makeCommand(65,holdMinutes)))return;any=true;}
 
   long v=0;
   JsonRead jr=jsonLong(body,"fade_minutes",1,120,v);
