@@ -2495,19 +2495,12 @@ void handleCompactCommand(uint16_t op,const uint16_t* a,uint8_t n){
       if(n!=1||a[0]>1)return uartErr(UE_RANGE);alarmCfg.enabled=a[0];saveAlarm();uartAck(op);return;
     case 61:
       if(n!=2||a[0]>23||a[1]>59)return uartErr(UE_RANGE);alarmCfg.hour=a[0];alarmCfg.minute=a[1];saveAlarm();uartAck(op);return;
-    case 62:
-      if(n!=1||a[0]>1)return uartErr(UE_RANGE);
-      familyAlarm.weekdaysEnabled=a[0];saveFamilyAlarm();uartAck(op);return;
-    case 63:
-      if(n!=1||a[0]>1)return uartErr(UE_RANGE);
-      familyAlarm.weekendsEnabled=a[0];saveFamilyAlarm();uartAck(op);return;
-    case 64:
-      if(n!=2||a[0]>23||a[1]>59)return uartErr(UE_RANGE);
-      familyAlarm.weekendHour=a[0];familyAlarm.weekendMinute=a[1];
-      saveFamilyAlarm();uartAck(op);return;
-    case 65:
-      if(n!=1||a[0]>120)return uartErr(UE_RANGE);
-      familyAlarm.holdMinutes=a[0];saveFamilyAlarm();uartAck(op);return;
+    case 62: // atomic family settings: weekdays, weekends, hour, minute, hold
+      if(n!=5||a[0]>1||a[1]>1||a[2]>23||a[3]>59||a[4]>120)
+        return uartErr(UE_RANGE);
+      familyAlarm.weekdaysEnabled=a[0];familyAlarm.weekendsEnabled=a[1];
+      familyAlarm.weekendHour=a[2];familyAlarm.weekendMinute=a[3];
+      familyAlarm.holdMinutes=a[4];saveFamilyAlarm();uartAck(op);return;
     case 71:stopDawn();uartAck(op);return;
     case 73:
       if(n!=1||!argRange(a[0],1,120))return uartErr(UE_RANGE);dawnCfg.fadeMinutes=a[0];uartAck(op);return;
