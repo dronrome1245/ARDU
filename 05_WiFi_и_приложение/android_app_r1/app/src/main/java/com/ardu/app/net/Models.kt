@@ -100,7 +100,13 @@ data class AlarmSettings(
     val recovered: Boolean,
     val kelvinSupported: Boolean = false,
     val startKelvin: Int? = null,
-    val endKelvin: Int? = null
+    val endKelvin: Int? = null,
+    val familyScheduleSupported: Boolean = false,
+    val weekdayEnabled: Boolean = true,
+    val weekendEnabled: Boolean = false,
+    val weekendHour: Int = 9,
+    val weekendMinute: Int = 0,
+    val holdMinutes: Int = 15
 )
 
 data class AmbientEffectSettings(
