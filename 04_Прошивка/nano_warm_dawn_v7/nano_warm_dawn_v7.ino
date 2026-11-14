@@ -1902,6 +1902,18 @@ bool recoverDawn(bool isCold){
 
 // -------------------- Alarm --------------------
 
+// Weekday of wake date: Monday=0. Works for DS3231 calendar years
+// 2000..2099, including leap years; avoids expensive 32-bit divisions on AVR.
+uint8_t wakeWeekday(const RtcTime& t){
+  static const uint8_t monthOffsets[] PROGMEM =
+      {0,3,3,6,1,4,6,2,5,0,3,5};
+  const uint8_t y=static_cast<uint8_t>(t.year-2000);
+  const uint8_t n=5U+y+static_cast<uint8_t>((y+3U)/4U)+
+      pgm_read_byte(monthOffsets+t.month-1)+t.day-1U+
+      ((t.month>2 && !(y%4))?1U:0U);
+  return n%7;
+}
+
 bool alarmTriggeredToday(const RtcTime& t){
   return alarmCfg.lastTriggerYear==t.year &&
          alarmCfg.lastTriggerMonth==t.month &&
@@ -1938,8 +1950,7 @@ void updateAlarm(){
         if(++wakeDate.month>12){wakeDate.month=1;++wakeDate.year;}
       }
     }
-    const uint8_t weekday=static_cast<uint8_t>(
-        (rtcSeconds2000(wakeDate)/86400UL+5UL)%7UL);
+    const uint8_t weekday=wakeWeekday(wakeDate);
     if((weekday>=5)!=(kind==1)||alarmTriggeredToday(wakeDate))continue;
     alarmCfg.lastTriggerYear=wakeDate.year;
     alarmCfg.lastTriggerMonth=wakeDate.month;
