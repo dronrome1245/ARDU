@@ -2140,6 +2140,139 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Family schedule requires Nano R7 + ESP V5. Hidden until readback confirms support. -->
+                <LinearLayout
+                    style="@style/ARDU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/ARDU.CardTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Расписание семьи" />
+
+                    <TextView
+                        android:id="@+id/alarmFamilySupportText"
+                        style="@style/ARDU.Muted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Проверка поддержки расписания…" />
+
+                    <LinearLayout
+                        android:id="@+id/alarmFamilyPanel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <Switch
+                            android:id="@+id/alarmWeekdaySwitch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:text="Школьные дни (Пн–Пт): время выше"
+                            android:textColor="@color/ardu_text" />
+
+                        <Switch
+                            android:id="@+id/alarmWeekendSwitch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:text="Выходные (Сб–Вс)"
+                            android:textColor="@color/ardu_text" />
+
+                        <TextView
+                            style="@style/ARDU.Muted"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Время пробуждения в выходные" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <EditText
+                                android:id="@+id/alarmWeekendHourInput"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:hint="09"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="22sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=":"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="22sp" />
+
+                            <EditText
+                                android:id="@+id/alarmWeekendMinuteInput"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:hint="00"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="22sp" />
+
+                            <Button
+                                android:id="@+id/alarmSaveWeekendTimeButton"
+                                style="@style/Widget.ARDU.Button.Primary"
+                                android:layout_width="78dp"
+                                android:layout_height="50dp"
+                                android:text="✓" />
+                        </LinearLayout>
+
+                        <TextView
+                            style="@style/ARDU.Muted"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="Выключить свет через N минут после рассвета (0 — не выключать)" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <EditText
+                                android:id="@+id/alarmHoldMinutesInput"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:hint="15"
+                                android:textColor="@color/ardu_text"
+                                android:textSize="22sp" />
+
+                            <Button
+                                android:id="@+id/alarmSaveHoldButton"
+                                style="@style/Widget.ARDU.Button.Primary"
+                                android:layout_width="104dp"
+                                android:layout_height="50dp"
+                                android:text="Сохранить"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
                 <!-- Actual dawn presets require Nano R5 + ESP V3: no UI-only HSV shortcut. -->
                 <LinearLayout
                     style="@style/ARDU.Card"
