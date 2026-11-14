@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 39
-        versionName = "0.22.16-family-schedule-rc1"
+        versionCode = 40
+        versionName = "0.22.17-ambient-simple-rest-rc1"
     }
 
     compileOptions {
