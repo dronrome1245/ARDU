@@ -495,20 +495,9 @@ class MainActivity : Activity() {
             showSection(target)
         }
 
-        val targetMode = when (target) {
-            lightPanel -> "light"
-            musicPanel -> "music"
-            ambientPanel -> "ambient"
-            nightPanel -> "night"
-            alarmPanel -> "off"
-            else -> null
-        }
-
-        if (targetMode == null || !deviceOnline || latestMode == targetMode) return
-
-        // All user mode writes share the same heartbeat exclusion and readback
-        // path as sliders/buttons. No parallel status probe during mode changes.
-        runDeviceAction("Переключение режима") { api.setMode(targetMode) }
+        // Navigation only displays controls. It must never change actual
+        // lighting: opening Alarm while a child sleeps must not turn NIGHT off.
+        // Modes are changed only by an explicit ON/OFF or scene action.
     }
 
     private fun bindNavigation() {
@@ -639,7 +628,7 @@ class MainActivity : Activity() {
             setScene(SceneTileView.Scene.WARM)
             setOnClickListener {
                 applyLightScene(
-                    "Кино", LightQuickScenes.CINEMA.kelvin, LightQuickScenes.CINEMA.brightness
+                    "Отдых", LightQuickScenes.CINEMA.kelvin, LightQuickScenes.CINEMA.brightness
                 )
             }
         }
