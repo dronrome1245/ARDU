@@ -250,6 +250,13 @@ class MainActivity : Activity() {
     private lateinit var alarmEnabledSwitch: Switch
     private lateinit var alarmHourInput: EditText
     private lateinit var alarmMinuteInput: EditText
+    private lateinit var alarmFamilyPanel: LinearLayout
+    private lateinit var alarmFamilySupportText: TextView
+    private lateinit var alarmWeekdaySwitch: Switch
+    private lateinit var alarmWeekendSwitch: Switch
+    private lateinit var alarmWeekendHourInput: EditText
+    private lateinit var alarmWeekendMinuteInput: EditText
+    private lateinit var alarmHoldMinutesInput: EditText
     private lateinit var alarmFadeText: TextView
     private lateinit var alarmFadeSeek: SmartSliderView
     private lateinit var alarmBrightnessText: TextView
@@ -457,6 +464,13 @@ class MainActivity : Activity() {
         alarmEnabledSwitch = findViewById(R.id.alarmEnabledSwitch)
         alarmHourInput = findViewById(R.id.alarmHourInput)
         alarmMinuteInput = findViewById(R.id.alarmMinuteInput)
+        alarmFamilyPanel = findViewById(R.id.alarmFamilyPanel)
+        alarmFamilySupportText = findViewById(R.id.alarmFamilySupportText)
+        alarmWeekdaySwitch = findViewById(R.id.alarmWeekdaySwitch)
+        alarmWeekendSwitch = findViewById(R.id.alarmWeekendSwitch)
+        alarmWeekendHourInput = findViewById(R.id.alarmWeekendHourInput)
+        alarmWeekendMinuteInput = findViewById(R.id.alarmWeekendMinuteInput)
+        alarmHoldMinutesInput = findViewById(R.id.alarmHoldMinutesInput)
         alarmFadeText = findViewById(R.id.alarmFadeText)
         alarmFadeSeek = findViewById(R.id.alarmFadeSeek)
         alarmBrightnessText = findViewById(R.id.alarmBrightnessText)
@@ -1373,6 +1387,45 @@ class MainActivity : Activity() {
                 runDeviceAction("Будильник") { api.updateAlarmSettings(enabled = checked) }
             }
         }
+        alarmWeekdaySwitch.setOnCheckedChangeListener { _, checked ->
+            if (!rendering && latestSettings?.alarm?.familyScheduleSupported == true) {
+                runDeviceAction("Будильник: школьные дни") {
+                    api.updateAlarmSettings(weekdayEnabled = checked)
+                }
+            }
+        }
+        alarmWeekendSwitch.setOnCheckedChangeListener { _, checked ->
+            if (!rendering && latestSettings?.alarm?.familyScheduleSupported == true) {
+                runDeviceAction("Будильник: выходные") {
+                    api.updateAlarmSettings(weekendEnabled = checked)
+                }
+            }
+        }
+        findViewById<Button>(R.id.alarmSaveWeekendTimeButton).setOnClickListener {
+            val hour = alarmWeekendHourInput.text.toString().toIntOrNull()
+            val minute = alarmWeekendMinuteInput.text.toString().toIntOrNull()
+            if (hour == null || minute == null || hour !in 0..23 || minute !in 0..59) {
+                setOperationStatus("Неверное время выходного дня", important = true)
+                return@setOnClickListener
+            }
+            if (latestSettings?.alarm?.familyScheduleSupported == true) {
+                runDeviceAction("Время пробуждения в выходные") {
+                    api.updateAlarmSettings(weekendHour = hour, weekendMinute = minute)
+                }
+            }
+        }
+        findViewById<Button>(R.id.alarmSaveHoldButton).setOnClickListener {
+            val minutes = alarmHoldMinutesInput.text.toString().toIntOrNull()
+            if (minutes == null || minutes !in 0..120) {
+                setOperationStatus("Время выключения: 0–120 минут", important = true)
+                return@setOnClickListener
+            }
+            if (latestSettings?.alarm?.familyScheduleSupported == true) {
+                runDeviceAction("Выключение после рассвета") {
+                    api.updateAlarmSettings(holdMinutes = minutes)
+                }
+            }
+        }
         for (preset in DawnPresets.all) {
             alarmPresetButtons.getValue(preset.id).setOnClickListener {
                 if (latestSettings?.alarm?.kelvinSupported != true) {
@@ -2210,6 +2263,18 @@ class MainActivity : Activity() {
         alarmEnabledSwitch.isChecked = a.enabled
         alarmHourInput.setText(a.hour.toString().padStart(2, '0'))
         alarmMinuteInput.setText(a.minute.toString().padStart(2, '0'))
+        alarmFamilyPanel.visibility =
+            if (a.familyScheduleSupported) View.VISIBLE else View.GONE
+        alarmFamilySupportText.text = if (a.familyScheduleSupported) {
+            "Пн–Пт: время выше · Сб–Вс: отдельное время"
+        } else {
+            "Для расписания по дням недели нужны Nano R7 и ESP V5"
+        }
+        alarmWeekdaySwitch.isChecked = a.weekdayEnabled
+        alarmWeekendSwitch.isChecked = a.weekendEnabled
+        alarmWeekendHourInput.setText(a.weekendHour.toString().padStart(2, '0'))
+        alarmWeekendMinuteInput.setText(a.weekendMinute.toString().padStart(2, '0'))
+        alarmHoldMinutesInput.setText(a.holdMinutes.toString())
         alarmFadeSeek.setValue(a.fadeMinutes)
         alarmBrightnessSeek.setValue(a.maxBrightness)
         val kelvinSupported = a.kelvinSupported &&
