@@ -185,7 +185,6 @@ class MainActivity : Activity() {
     private lateinit var ambientPresetButtons: Map<String, ImageButton>
     private lateinit var ambientPresetLabels: Map<String, TextView>
     private lateinit var ambientPresetExtraGrid: LinearLayout
-    private lateinit var ambientFavoritesRow: LinearLayout
     private lateinit var ambientPresetCapabilityText: TextView
     private lateinit var ambientPresetControls: LinearLayout
     private lateinit var ambientPresetStatusText: TextView
@@ -502,6 +501,7 @@ class MainActivity : Activity() {
     }
 
     private fun navigateToUserSection(target: LinearLayout) {
+        val previous = lastUserPanel
         lastUserPanel = target
 
         if (target === lightPanel) {
@@ -510,9 +510,16 @@ class MainActivity : Activity() {
             showSection(target)
         }
 
-        // Navigation only displays controls. It must never change actual
-        // lighting: opening Alarm while a child sleeps must not turn NIGHT off.
-        // Modes are changed only by an explicit ON/OFF or scene action.
+        // Owner-approved Ambient exception: re-entering the page starts with
+        // the background OFF. Never extinguish LIGHT, NIGHT, MUSIC or DAWN
+        // just because their page was left. Re-tapping an already-open Ambient
+        // tab must not interrupt a scene that was started on that same page.
+        if (target === ambientPanel && previous !== ambientPanel &&
+            latestMode == "ambient" && deviceOnline) {
+            runDeviceAction("Остановить фон при открытии раздела") {
+                api.setMode("off")
+            }
+        }
     }
 
     private fun bindNavigation() {
@@ -1056,19 +1063,18 @@ class MainActivity : Activity() {
         ambientServiceButton.setOnClickListener { openService() }
 
         ambientOnButton.setOnClickListener {
-            // A saved F01 legacy mode must not be reactivated through the
-            // new preset-only Ambient screen.
-            val selected = latestSettings?.ambientPresets?.selected
-            if (selected != null && selected in ArduApiClient.PRESET_IDS) {
-                runDeviceAction("Включение выбранной сцены") {
-                    api.selectAmbientPreset(selected)
-                }
-            } else {
-                setOperationStatus("Выберите одну из 12 атмосферных сцен", important = true)
+            // Every explicit ON starts the first scene, independent of which
+            // preset was persisted during the previous Ambient session.
+            runDeviceAction("Включить фон · Северное сияние") {
+                api.selectAmbientPreset("P01")
             }
         }
         ambientOffButton.setOnClickListener {
-            runDeviceAction("Выключение фона") { api.setMode("off") }
+            if (latestMode == "ambient") {
+                runDeviceAction("Выключение фона") { api.setMode("off") }
+            } else {
+                setOperationStatus("Фон уже выключен", important = false)
+            }
         }
 
         ambientPresetButtons = mapOf(
@@ -1085,14 +1091,10 @@ class MainActivity : Activity() {
         )
         ambientPresetButtons.forEach { (id, button) ->
             button.setOnClickListener { applyAmbientPreset(id) }
-            button.setOnLongClickListener { toggleAmbientFavorite(id); true }
         }
         ambientPresetLabels.forEach { (id, label) ->
             label.setOnClickListener { applyAmbientPreset(id) }
-            label.setOnLongClickListener { toggleAmbientFavorite(id); true }
         }
-        ambientFavoritesRow = findViewById(R.id.ambientFavoritesRow)
-        refreshAmbientFavorites()
         ambientPresetExtraGrid = findViewById(R.id.ambientPresetExtraGrid)
         ambientPresetCapabilityText = findViewById(R.id.ambientPresetCapabilityText)
         ambientPresetControls = findViewById(R.id.ambientPresetControls)
@@ -1135,7 +1137,6 @@ class MainActivity : Activity() {
                     setImageResource(ambientSceneImageResources.getValue(id))
                     contentDescription = ambientSceneNames.getValue(id)
                     setOnClickListener { applyAmbientPreset(id) }
-                    setOnLongClickListener { toggleAmbientFavorite(id); true }
                 }
                 tile.addView(image, LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, dp(76)
@@ -1148,7 +1149,6 @@ class MainActivity : Activity() {
                     maxLines = 2
                     minHeight = dp(32)
                     setOnClickListener { applyAmbientPreset(id) }
-                    setOnLongClickListener { toggleAmbientFavorite(id); true }
                 }
                 tile.addView(label, LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -1237,61 +1237,7 @@ class MainActivity : Activity() {
         runDeviceAction(label) { api.selectAmbientPreset(id) }
     }
 
-    // Favorites are a local UI convenience only. Selection and scene settings
-    // still come from Nano via readback; no local preference can override them.
-    private fun ambientFavoriteIds(): List<String> {
-        val saved = preferences().getString("ambient_favorites_v1", null)
-        val ids = (saved ?: "P05,P06,P11,P01").split(",")
-        return ids.filter { it in ambientSceneNames }.distinct().take(4)
-    }
-
-    private fun toggleAmbientFavorite(id: String) {
-        if (id !in ambientSceneNames) return
-        val ids = ambientFavoriteIds().toMutableList()
-        if (id in ids) ids.remove(id)
-        else {
-            if (ids.size >= 4) ids.removeAt(0)
-            ids.add(id)
-        }
-        preferences().edit().putString("ambient_favorites_v1", ids.joinToString(",")).apply()
-        refreshAmbientFavorites()
-        setOperationStatus(if (id in ids) "Сцена добавлена в избранное"
-                           else "Сцена удалена из избранного", important = false)
-    }
-
-    private fun refreshAmbientFavorites() {
-        ambientFavoritesRow.removeAllViews()
-        val ids = ambientFavoriteIds()
-        if (ids.isEmpty()) {
-            ambientFavoritesRow.addView(TextView(this).apply {
-                text = "Удерживайте карточку сцены, чтобы добавить её сюда"
-                textSize = 12f
-                setTextColor(getColor(R.color.ardu_text_secondary))
-            })
-            return
-        }
-        ids.forEach { id ->
-            val button = Button(this).apply {
-                text = ambientSceneNames.getValue(id)
-                isAllCaps = false
-                textSize = 11f
-                isEnabled = deviceOnline
-                setOnClickListener { applyAmbientPreset(id) }
-                setOnLongClickListener { toggleAmbientFavorite(id); true }
-                isSelected = latestSettings?.ambientPresets?.selected == id &&
-                    latestMode == "ambient"
-            }
-            ambientFavoritesRow.addView(button, LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-            ).apply {
-                marginStart = dp(2)
-                marginEnd = dp(2)
-            })
-        }
-    }
-
     private fun setAmbientPresetSelection(selectedId: String?) {
-        refreshAmbientFavorites()
         ambientPresetButtons.forEach { (id, button) ->
             button.isSelected = id == selectedId
         }
@@ -2182,11 +2128,10 @@ class MainActivity : Activity() {
         // F01 still exists for EEPROM/UART compatibility, but the Ambient
         // page now exclusively offers P01..P12; no hidden manual-color action.
         ambientEffectText.text = when {
-            selected != null ->
-                (ambientSceneNames[selected] ?: selected) +
-                    if (ambientActive) " • активно" else " • выключено"
-            ambientActive -> "Ручной режим из старых настроек • выберите пресет"
-            else -> "Выберите атмосферную сцену"
+            ambientActive && selected != null ->
+                (ambientSceneNames[selected] ?: selected) + " • активно"
+            ambientActive -> "Фон включён • выберите сцену"
+            else -> "Фон выключен"
         }
         setChoiceState(ambientOnButton, ambientActive)
         setChoiceState(ambientOffButton, !ambientActive)
@@ -2196,7 +2141,7 @@ class MainActivity : Activity() {
         }
         setAmbientPresetSelection(if (ambientActive) selected else null)
         ambientPresetCapabilityText.text = if (p.supported) {
-            "12 сцен доступны • параметры сохраняются в ARDU"
+            "Включить — первая сцена · нажатие на фото — любая сцена"
         } else {
             "Для атмосферных сцен нужны новые прошивки ESP и Nano"
         }
@@ -2206,7 +2151,8 @@ class MainActivity : Activity() {
         ambientExtraPresetLabels.values.forEach { it.isEnabled = p.supported }
 
         ambientManualPanel.visibility = View.GONE // F01 controls moved to Light page
-        ambientPresetControls.visibility = if (selected != null) View.VISIBLE else View.GONE
+        ambientPresetControls.visibility =
+            if (ambientActive && selected != null) View.VISIBLE else View.GONE
         if (selected != null) {
             val scene = p.scenes[selected]
             ambientPresetStatusText.text = ambientSceneNames[selected] ?: selected
