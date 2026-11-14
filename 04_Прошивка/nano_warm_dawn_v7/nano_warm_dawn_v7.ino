@@ -1934,7 +1934,7 @@ void updateAlarm(){
     (void)syncNightSchedule(now,true,false);
   }
 
-  if(!alarmCfg.enabled || (!familyAlarm.weekdaysEnabled && !familyAlarm.weekendsEnabled))return;
+  if(!alarmCfg.enabled)return;
   // Mon=0..Sun=6. January 1st 2000 was Saturday (index 5).
   // Check the weekday of the WAKE DATE, not the preceding fade-start date.
   for(uint8_t kind=0;kind<2;++kind){
