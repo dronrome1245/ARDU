@@ -59,7 +59,7 @@ class SceneTileView @JvmOverloads constructor(
         bitmap = decode(scene)
         contentDescription = when (scene) {
             Scene.EVENING -> "Сцена Вечер"
-            Scene.WARM -> "Сцена Кино"
+            Scene.WARM -> "Сцена Отдых"
             Scene.DAY -> "Сцена Гости"
             Scene.COOL -> "Сцена Чтение"
         }
@@ -87,7 +87,7 @@ class SceneTileView @JvmOverloads constructor(
         val src = centerCropSource(bitmap, width, height)
         canvas.drawBitmap(bitmap, src, RectF(0f, 0f, w, h), imagePaint)
 
-        // Evening = inviting golden lamp light; Cinema = dark blue theater.
+        // Evening = inviting golden lamp light; Rest = calm warm dim lighting.
         // Keep the existing real furniture photos, grade them independently.
         moodPaint.shader = when (scene) {
             Scene.EVENING -> LinearGradient(
@@ -97,7 +97,7 @@ class SceneTileView @JvmOverloads constructor(
             )
             Scene.WARM -> LinearGradient(
                 0f, 0f, w, h,
-                Color.argb(138, 7, 23, 60), Color.argb(104, 9, 15, 45),
+                Color.argb(85, 90, 53, 27), Color.argb(75, 53, 39, 29),
                 Shader.TileMode.CLAMP
             )
             else -> null
@@ -127,7 +127,7 @@ class SceneTileView @JvmOverloads constructor(
         subtitlePaint.textSize = dp(9.5f)
         val title = when (scene) {
             Scene.EVENING -> "Вечер"
-            Scene.WARM -> "Кино"
+            Scene.WARM -> "Отдых"
             Scene.DAY -> "Гости"
             Scene.COOL -> "Чтение"
         }
