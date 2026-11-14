@@ -538,3 +538,27 @@ ESP requires **both** Kelvin fields when either is present; each multiple of 20 
 - TCP endpoint используется стандартным AVRDUDE `-P net:<ESP_IP>:3280 -c arduino -p atmega328p -b 57600`; после disconnect ESP возвращает normal UART 115200.
 
 PowerShell helper: `tools/flash_nano_over_wifi.ps1`. Подробная электрическая схема/приёмка: `02_Архитектура_и_решения/NANO_REMOTE_FLASH.md`.
+
+
+## 12. Семейная автоматика будильника — D-128 / Nano R7, ESP V5 (кандидат)
+
+`GET /api/settings` в объекте `alarm` расширяется без изменения обязательных старых полей:
+
+```json
+{
+  "family_schedule_supported": true,
+  "weekday_enabled": true,
+  "weekend_enabled": false,
+  "weekend_hour": 9,
+  "weekend_minute": 0,
+  "hold_minutes": 15
+}
+```
+
+При старой Nano ответ содержит `family_schedule_supported:false`, а остальные пять полей могут отсутствовать. Android должен скрывать семейные настройки, пока нет подтверждения capability. Основное `hour/minute` остаётся временем пробуждения в будни; `weekend_hour/minute` задаётся парой. `hold_minutes` после законченного alarm-rассвета: 0 = не отключать, 1..120 = выключить через столько минут, без побочных эффектов для ручного рассвета.
+
+`POST /api/alarm/settings` принимает дополнительно `weekday_enabled` и `weekend_enabled` (bool), `weekend_hour` 0..23 вместе с `weekend_minute` 0..59, `hold_minutes` 0..120. ESP V5 до первой записи проверяет capabilities через Nano, на R6 возвращает HTTP 409 `FAMILY_SCHEDULE_REQUIRES_NANO_R7`. Для частичного POST ESP объединяет переданные поля с актуальным EEPROM readback Nano и отправляет одно атомарное UART действие `62 weekday_on weekend_on weekend_hour weekend_minute hold_minutes`. Связь и подтверждение Nano остаются обязательными; ESP не рассчитывает alarm сам и не хранит расписание.
+
+Night fade около 16 секунд реализован **локально в Nano R7**, существующий Night endpoint не меняется. Только переходы по явным Night ON/OFF и расписанию, без изменения выбранного вручную другого режима на schedule-OFF.
+
+**Gate:** source-кандидат; установка на реальные платы только после Nano Flash/memory PASS, ESP compile PASS, AVRDUDE write+verify и функциональной проверки по `04_Прошивка/FAMILY_R7_ACCEPTANCE.md`.
