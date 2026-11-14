@@ -56,7 +56,7 @@ constexpr int ALARM_BASE = 0;       // 0..9
 constexpr int DAWN_BASE = 16;       // 16..23
 constexpr int DAWN_RUNTIME_BASE = 32; // 32..45
 constexpr int NIGHT_BASE = 64;      // 64..76
-constexpr int FAMILY_ALARM_BASE = 10; // 10..15, free bytes before DAWN_BASE
+constexpr int FAMILY_ALARM_BASE = 80; // 80..88, isolated versioned policy block
 constexpr int LIGHT_BASE = 128;     // L01 R2/R3 compatible
 constexpr int CLAP_BASE = 192;      // threshold/timeout
 constexpr int CORE_BASE = 224;      // current mode + clap enable
@@ -68,7 +68,8 @@ constexpr uint8_t PRESET_VER = 1;
 constexpr uint16_t EXT_MAGIC = 0xA1D1;
 constexpr uint8_t EXT_VER = 1;
 
-constexpr uint8_t FAMILY_ALARM_MARK = 0xA7; // compact versioned block
+constexpr uint16_t FAMILY_ALARM_MAGIC = 0xA8D2;
+constexpr uint8_t FAMILY_ALARM_VER = 1;
 constexpr uint16_t ALARM_MAGIC = 0xA8D1;
 constexpr uint8_t ALARM_VER = 1;
 constexpr uint16_t DAWN_MAGIC = 0xDA01;
@@ -99,7 +100,7 @@ constexpr uint8_t DEFAULT_DAWN_END_STEP = (3600-DAWN_MIN_KELVIN)/DAWN_STEP_KELVI
 constexpr uint8_t DEFAULT_NIGHT_HUE = 24;
 constexpr uint8_t DEFAULT_NIGHT_SAT = 180;
 constexpr uint8_t DEFAULT_NIGHT_BR = 18;
-constexpr unsigned long NIGHT_FADE_MS = 15000UL;
+constexpr unsigned long NIGHT_FADE_MS = 16320UL;
 
 constexpr uint8_t DEFAULT_LIGHT_BR = 64;
 constexpr uint16_t DEFAULT_LIGHT_KELVIN = 4000;
@@ -757,26 +758,28 @@ void loadAlarm() {
 }
 
 void saveFamilyAlarm() {
-  uint8_t b[5]={
-    Cfg::FAMILY_ALARM_MARK,
-    static_cast<uint8_t>((familyAlarm.weekdaysEnabled?1:0)|
-                         (familyAlarm.weekendsEnabled?2:0)),
-    familyAlarm.weekendHour,familyAlarm.weekendMinute,familyAlarm.holdMinutes
-  };
-  for(uint8_t i=0;i<5;++i)EEPROM.update(Cfg::FAMILY_ALARM_BASE+i,b[i]);
-  EEPROM.update(Cfg::FAMILY_ALARM_BASE+5,checksum(b,5));
+  uint8_t b[8];
+  b[0]=Cfg::FAMILY_ALARM_MAGIC&0xFF; b[1]=Cfg::FAMILY_ALARM_MAGIC>>8;
+  b[2]=Cfg::FAMILY_ALARM_VER;
+  b[3]=familyAlarm.weekdaysEnabled?1:0;
+  b[4]=familyAlarm.weekendsEnabled?1:0;
+  b[5]=familyAlarm.weekendHour; b[6]=familyAlarm.weekendMinute;
+  b[7]=familyAlarm.holdMinutes;
+  for(uint8_t i=0;i<8;++i)EEPROM.update(Cfg::FAMILY_ALARM_BASE+i,b[i]);
+  EEPROM.update(Cfg::FAMILY_ALARM_BASE+8,checksum(b,8));
 }
 void loadFamilyAlarm() {
-  uint8_t b[5];
-  for(uint8_t i=0;i<5;++i)b[i]=EEPROM.read(Cfg::FAMILY_ALARM_BASE+i);
-  if(b[0]!=Cfg::FAMILY_ALARM_MARK||b[1]>3||b[2]>23||b[3]>59||b[4]>120||
-     EEPROM.read(Cfg::FAMILY_ALARM_BASE+5)!=checksum(b,5)){
+  uint8_t b[8];
+  for(uint8_t i=0;i<8;++i)b[i]=EEPROM.read(Cfg::FAMILY_ALARM_BASE+i);
+  const uint16_t magic=static_cast<uint16_t>(b[0])|(static_cast<uint16_t>(b[1])<<8);
+  if(magic!=Cfg::FAMILY_ALARM_MAGIC||b[2]!=Cfg::FAMILY_ALARM_VER||
+     b[3]>1||b[4]>1||b[5]>23||b[6]>59||b[7]>120||
+     EEPROM.read(Cfg::FAMILY_ALARM_BASE+8)!=checksum(b,8)){
     familyAlarm=FamilyAlarmSettings();return;
   }
-  familyAlarm.weekdaysEnabled=(b[1]&1)!=0;
-  familyAlarm.weekendsEnabled=(b[1]&2)!=0;
-  familyAlarm.weekendHour=b[2];familyAlarm.weekendMinute=b[3];
-  familyAlarm.holdMinutes=b[4];
+  familyAlarm.weekdaysEnabled=b[3]!=0;familyAlarm.weekendsEnabled=b[4]!=0;
+  familyAlarm.weekendHour=b[5];familyAlarm.weekendMinute=b[6];
+  familyAlarm.holdMinutes=b[7];
 }
 
 void saveDawnSettings() {
@@ -1324,8 +1327,10 @@ void updateNightFade() {
     else{requestedBrightness=nightFade.to;frameDirty=true;}
     return;
   }
-  requestedBrightness=lerp8(nightFade.from,nightFade.to,
-      static_cast<uint16_t>(dt),static_cast<uint16_t>(Cfg::NIGHT_FADE_MS));
+  // 64 ms quantization gives 256 smooth steps over 16.32 s.
+  // FastLED provides an efficient AVR 8-bit interpolation.
+  requestedBrightness=lerp8by8(nightFade.from,nightFade.to,
+      static_cast<uint8_t>(dt>>6));
   frameDirty=true;
 }
 
