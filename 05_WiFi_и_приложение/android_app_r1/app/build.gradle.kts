@@ -10,8 +10,8 @@ android {
         applicationId = "com.ardu.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 38
-        versionName = "0.22.15-warm-dawn-presets-rc1"
+        versionCode = 39
+        versionName = "0.22.16-family-schedule-rc1"
     }
 
     compileOptions {
