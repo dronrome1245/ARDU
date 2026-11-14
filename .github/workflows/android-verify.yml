@@ -182,6 +182,15 @@ jobs:
           assert "LightQuickScenes.CINEMA.percent" in preview
           assert "Scene.WARM -> LinearGradient(" in preview
           assert "Scene.EVENING -> LinearGradient(" in preview
+          # Four photographic quick scenes. New Rest is intentionally a
+          # different real interior photo, not a tinted Evening duplicate.
+          evening=(root/"res/drawable-nodpi/ardu_scene_evening.webp").read_bytes()
+          rest=(root/"res/drawable-nodpi/ardu_scene_warm.webp").read_bytes()
+          assert evening[:4]==b"RIFF" and evening[8:12]==b"WEBP"
+          assert rest[:4]==b"RIFF" and rest[8:12]==b"WEBP"
+          assert len(rest)>2000 and rest!=evening
+          assert 'Color.argb(18, 30, 45, 85)' in preview
+          assert 'Color.argb(30, 10, 25, 50)' in preview
           assert "background_brightness" not in bgpolicy, \
               "color policy should not fake independent background API fields"
           print("PASS: preset-only Ambient, full-width selected Music row above sliders")
@@ -322,10 +331,10 @@ jobs:
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
 
-      - name: Publish Android 0.22.16 family debug APK
+      - name: Publish Android 0.22.17 Ambient simple UX APK
         uses: actions/upload-artifact@v4
         with:
-          name: ardu-android-02216-family-schedule-debug-apk
+          name: ardu-android-02217-ambient-simple-rest-debug-apk
           path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
