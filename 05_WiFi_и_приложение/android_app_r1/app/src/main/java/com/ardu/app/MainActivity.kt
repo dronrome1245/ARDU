@@ -1483,6 +1483,7 @@ class MainActivity : Activity() {
             }
             preferences().edit().putString(PREF_ADDRESS, normalized).apply()
             api.setPreferredAddress(normalized)
+            rtcAutoSyncGate.onConnectionLost() // new target may have another RTC
             refreshDevice()
         }
 
@@ -1830,6 +1831,7 @@ class MainActivity : Activity() {
                 // This puts one POST between status and RTC readback.
                 val snapshot = readSnapshot(afterStatus = {
                     rtcSyncAttempt = syncRtcOnceAfterConnection()
+                    rtcSyncAttempt.attempted
                 })
                 val selectedAddress = api.selectedAddress()
                 if (!selectedAddress.isNullOrBlank() &&
@@ -1893,11 +1895,13 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun readSnapshot(afterStatus: (() -> Unit)? = null): Snapshot {
+    private fun readSnapshot(afterStatus: (() -> Boolean)? = null): Snapshot {
         // A valid /api/status proves Nano is reachable even if the long
         // /api/settings or /api/time exchange is interrupted on SoftAP.
-        val status = api.status()
-        afterStatus?.invoke()
+        val initialStatus = api.status()
+        // RTC write can enable time-based automation, so do not show a stale
+        // pre-sync mode/rtc_valid flag. Query Nano status again after POST.
+        val status = if (afterStatus?.invoke() == true) api.status() else initialStatus
         val direct = lastNetworkMode == "softap" ||
             api.selectedAddress() == "http://192.168.4.1"
         var settingsFresh = true
