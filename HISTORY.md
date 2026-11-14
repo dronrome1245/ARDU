@@ -2921,3 +2921,9 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - В Android 0.22.18 (code41) реализована отправка **локального времени телефона** через существующий `POST /api/time/sync` при первом подтверждённом подключении к ESP+Nano, каждом новом foreground-сеансе и после потери/восстановления связи. Состояние Nano/time перечитывается после sync для корректного UI.
 - Создан `RtcAutoSyncGate.kt`: не повторять POST на каждом heartbeat и при потерянном ACK; `RtcAutoSyncGateTest.kt` проверяет первое подключение, foreground-reconnect и отсутствие повторов. Если sync не подтверждён — важное сообщение без ложной маркировки успеха; ручная кнопка сохранена.
 - Программные файлы изменены в GitHub `main`; аппаратный тест Android 0.22.18 на реальной ARDU PENDING. ESP V4 и Nano R6 сохранены без изменений; физические причины потери RTC (питание/батарея) остаются неустановленными.
+
+
+## 2026-11-14 — Android 0.22.18 RTC auto-sync: CI PASS
+
+- [GitHub Actions Android Verify run 43633190043](https://github.com/dronrome1245/ARDU/actions/runs/43633190043) завершился **PASS**: static contracts D-130, `RtcAutoSyncGateTest` через `testDebugUnitTest`, `assembleDebug`, upload artifact [14128014886](https://github.com/dronrome1245/ARDU/actions/runs/43633190043/artifacts/14128014886) с именем `ardu-android-02218-rtc-auto-sync-debug-apk`.
+- Приложение можно `git pull → Run` на телефоне. Физическая проверка именно автоматического POST на установленной ESP V4/Nano R6 — **PENDING**, прежний RTC после ручного `/api/time/sync` выдавал `valid:true`, но это ещё не является тестом новой автоматизации.
