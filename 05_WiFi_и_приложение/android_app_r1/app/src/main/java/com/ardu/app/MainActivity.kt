@@ -46,6 +46,8 @@ class MainActivity : Activity() {
     private var heartbeatInFlight = false
     private var refreshInProgress = false
     private var commandInProgress = false
+    private val rtcAutoSyncGate = RtcAutoSyncGate()
+    private data class RtcSyncAttempt(val attempted: Boolean, val failure: String? = null)
     private var lastConnectionHealth = DeviceConnectionHealth.DISCONNECTED
     private val heartbeatRunnable = object : Runnable {
         override fun run() {
@@ -300,14 +302,17 @@ class MainActivity : Activity() {
         }
 
         showLightOverview()
-        refreshDevice()
     }
 
     override fun onStart() {
         super.onStart()
+        // Each foreground connection must set the DS3231 from phone local time,
+        // even if the RTC already reported valid. On reconnect do the same.
+        rtcAutoSyncGate.onForegroundStarted()
         heartbeatEnabled = true
         mainHandler.removeCallbacks(heartbeatRunnable)
         mainHandler.post(heartbeatRunnable)
+        refreshDevice()
     }
 
     override fun onStop() {
@@ -1609,6 +1614,9 @@ class MainActivity : Activity() {
 
 
     private fun showUnavailableDeviceState() {
+        // If we had an online device, the next confirmed connection must
+        // re-synchronize RTC. An offline heartbeat must never send a POST.
+        if (deviceOnline) rtcAutoSyncGate.onConnectionLost()
         deviceOnline = false
         latestMode = null
         latestSettings = null
@@ -1685,9 +1693,41 @@ class MainActivity : Activity() {
     }
 
     /**
+     * Called on the single worker only AFTER ESP ping + Nano status succeeded.
+     * A timed-out POST might still have been applied, so never replay it on the
+     * next five-second heartbeat. Manual RTC sync remains available in Service.
+     */
+    private fun syncRtcOnceAfterConnection(): RtcSyncAttempt {
+        if (!rtcAutoSyncGate.claimAfterNanoContact()) return RtcSyncAttempt(false)
+        return try {
+            api.syncTime() // Calendar.getInstance() is sampled just before POST.
+            RtcSyncAttempt(true)
+        } catch (error: Exception) {
+            RtcSyncAttempt(true, error.message ?: "ошибка связи с RTC")
+        }
+    }
+
+    private fun reportRtcSync(attempt: RtcSyncAttempt, snapshot: Snapshot?) {
+        if (!attempt.attempted) return
+        when {
+            attempt.failure != null -> setOperationStatus(
+                "RTC: автоматическая синхронизация не подтверждена: ${attempt.failure}",
+                important = true
+            )
+            snapshot?.timeFresh == true && snapshot.time.valid ->
+                setOperationStatus("Время ARDU синхронизировано с телефоном")
+            else -> setOperationStatus(
+                "RTC: команда синхронизации принята, но время не подтверждено",
+                important = true
+            )
+        }
+    }
+
+    /**
      * Checks the gateway AND actual Nano UART status while UI is foreground.
-     * A light GET never changes active light modes or saved settings.
-     * Single executor serializes these probes after any pending user write.
+     * A light GET does not change the active lighting mode. Once per connection
+     * we deliberately POST local phone time to RTC before refreshed readback.
+     * The single executor serializes this after pending user writes.
      */
     private fun checkDeviceHeartbeat() {
         if (heartbeatInFlight || refreshInProgress || commandInProgress) return
@@ -1703,8 +1743,10 @@ class MainActivity : Activity() {
                 espResponded = true
                 val status = api.status()
                 nanoResponded = true
-                // Full state readback only on reconnect or externally changed mode.
-                val snapshot = if (!alreadyOnline || oldMode != status.mode) {
+                val rtcSyncAttempt = syncRtcOnceAfterConnection()
+                // Read back time after every sync, even if mode didn't change.
+                val snapshot = if (!alreadyOnline || oldMode != status.mode ||
+                    rtcSyncAttempt.attempted) {
                     readSnapshot()
                 } else null
                 runOnUiThread {
@@ -1719,6 +1761,7 @@ class MainActivity : Activity() {
                         setDeviceControlsEnabled(true)
                     }
                     snapshot?.let(::renderSnapshot)
+                    reportRtcSync(rtcSyncAttempt, snapshot)
                     val partial = snapshot?.settingsFresh == false
                     val label = if (partial) {
                         "● Прямое подключение • настройки уточняются"
@@ -1782,7 +1825,12 @@ class MainActivity : Activity() {
                 lastEspFirmware = ping.firmware
                 lastEspRssi = ping.rssi
                 lastNetworkMode = ping.networkMode
-                val snapshot = readSnapshot()
+                var rtcSyncAttempt = RtcSyncAttempt(false)
+                // Sync only after Nano successfully answered /api/status.
+                // This puts one POST between status and RTC readback.
+                val snapshot = readSnapshot(afterStatus = {
+                    rtcSyncAttempt = syncRtcOnceAfterConnection()
+                })
                 val selectedAddress = api.selectedAddress()
                 if (!selectedAddress.isNullOrBlank() &&
                     selectedAddress != "http://192.168.4.1") {
@@ -1807,6 +1855,8 @@ class MainActivity : Activity() {
                             "Nano отвечает; временно недоступны свежие настройки. Повторите обновление.",
                             important = true
                         )
+                    } else {
+                        reportRtcSync(rtcSyncAttempt, snapshot)
                     }
                     refreshButton.isEnabled = true
                     lightRefreshButton.isEnabled = true
@@ -1843,10 +1893,11 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun readSnapshot(): Snapshot {
+    private fun readSnapshot(afterStatus: (() -> Unit)? = null): Snapshot {
         // A valid /api/status proves Nano is reachable even if the long
         // /api/settings or /api/time exchange is interrupted on SoftAP.
         val status = api.status()
+        afterStatus?.invoke()
         val direct = lastNetworkMode == "softap" ||
             api.selectedAddress() == "http://192.168.4.1"
         var settingsFresh = true
