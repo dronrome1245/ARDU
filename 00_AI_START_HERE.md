@@ -123,6 +123,9 @@ ARDU — проект двух синхронных круглых потоло�
 
 ## 11. Текущий следующий шаг
 
+**Обновление 2026-11-14 — D-128:** после подтверждённой 2026-11-07 Nano R6 Wi-Fi прошивки (полный write+verify) подготовлен семейный UX для детской: Android 0.22.16 [CI PASS](https://github.com/dronrome1245/ARDU/actions/runs/43593418689) и отдельная связка Nano R7/ESP V5 [source compile CI PASS](https://github.com/dronrome1245/ARDU/actions/runs/43595155594). Новая R7 занимает **30 712/30 720 байт flash** и имеет только 8 B запаса. **Не считать установленной:** физическая R6 остаётся основой до AVRDUDE write+verify R7. Следующий практический шаг при безопасном питании: ESP V5 OTA → Nano R7 verified Wi-Fi upload → приёмка Night/Alarm по `04_Прошивка/FAMILY_R7_ACCEPTANCE.md`. 44+44 электрический gate/Class II БП по-прежнему обязателен, до него монтаж на потолке не разрешён. Подробно см. `STATUS.md`.
+
+
 **Обновление 2026-10-17 / D-127 R3 DIAG:** Nano R6 теперь физически подтверждена по startup `ARDU1 7` после ESP-driven reset, но remote-programming hardware PASS всё ещё закрыт, потому что полный AVRDUDE verify нестабилен. R2 write достигает 100%; verify-only падал в разных точках до 48%, 64-byte page не помог. Следующий gate: OTA `ARDU_ESP_V4_NANO_REMOTE_R3_DIAG` → verify-only → `/api/system/nano-program/status` с UART overrun/RX-error и byte/queue counters. Не переписывать Nano до этого диагностического результата.
 
 
