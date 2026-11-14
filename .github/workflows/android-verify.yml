@@ -235,7 +235,11 @@ jobs:
           assert "if (!heartbeatEnabled || commandInProgress) return@runOnUiThread" in kotlin
           assert "commandInProgress = true" in kotlin
           assert "if (writeError == null) onAcknowledged?.invoke()" in kotlin
-          assert 'runDeviceAction("Переключение режима")' in kotlin
+          # Tabs are view-only. Explicit buttons and scenes are the only writes.
+          navigation=kotlin.split('private fun navigateToUserSection(',1)[1].split('private fun bindNavigation()',1)[0]
+          assert 'api.setMode(' not in navigation
+          assert 'runDeviceAction(' not in navigation
+          assert 'showSection(target)' in navigation
           assert "if (!isSelected) return" in glow
           assert "RadialGradient(" in glow and "LinearGradient(" in glow
           assert "glass capsule" not in glow.lower()
@@ -303,10 +307,10 @@ jobs:
       - name: Build debug APK
         run: bash ./gradlew --no-daemon assembleDebug
 
-      - name: Publish Android 0.22.15 debug APK
+      - name: Publish Android 0.22.16 family debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: ardu-android-02215-warm-dawn-presets-debug-apk
+          name: ardu-android-02216-family-schedule-debug-apk
           path: 05_WiFi_и_приложение/android_app_r1/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30

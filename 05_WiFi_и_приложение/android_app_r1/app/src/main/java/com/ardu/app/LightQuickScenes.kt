@@ -11,7 +11,7 @@ data class LightQuickScene(val kelvin: Int, val brightness: Int) {
 object LightQuickScenes {
     // Evening: comfortably lit warm room, not the barely lit cinema profile.
     val EVENING = LightQuickScene(kelvin = 2700, brightness = 115)
-    // Cinema: dim amber light that preserves a dark viewing atmosphere.
+    // Rest: dim warm amber light for winding down (legacy CINEMA identifier retained).
     val CINEMA = LightQuickScene(kelvin = 1800, brightness = 18)
     val GUESTS = LightQuickScene(kelvin = 3500, brightness = 178)
     val READING = LightQuickScene(kelvin = 4300, brightness = 230)

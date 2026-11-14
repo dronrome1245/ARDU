@@ -185,6 +185,7 @@ class MainActivity : Activity() {
     private lateinit var ambientPresetButtons: Map<String, ImageButton>
     private lateinit var ambientPresetLabels: Map<String, TextView>
     private lateinit var ambientPresetExtraGrid: LinearLayout
+    private lateinit var ambientFavoritesRow: LinearLayout
     private lateinit var ambientPresetCapabilityText: TextView
     private lateinit var ambientPresetControls: LinearLayout
     private lateinit var ambientPresetStatusText: TextView
@@ -249,6 +250,13 @@ class MainActivity : Activity() {
     private lateinit var alarmEnabledSwitch: Switch
     private lateinit var alarmHourInput: EditText
     private lateinit var alarmMinuteInput: EditText
+    private lateinit var alarmFamilyPanel: LinearLayout
+    private lateinit var alarmFamilySupportText: TextView
+    private lateinit var alarmWeekdaySwitch: Switch
+    private lateinit var alarmWeekendSwitch: Switch
+    private lateinit var alarmWeekendHourInput: EditText
+    private lateinit var alarmWeekendMinuteInput: EditText
+    private lateinit var alarmHoldMinutesInput: EditText
     private lateinit var alarmFadeText: TextView
     private lateinit var alarmFadeSeek: SmartSliderView
     private lateinit var alarmBrightnessText: TextView
@@ -456,6 +464,13 @@ class MainActivity : Activity() {
         alarmEnabledSwitch = findViewById(R.id.alarmEnabledSwitch)
         alarmHourInput = findViewById(R.id.alarmHourInput)
         alarmMinuteInput = findViewById(R.id.alarmMinuteInput)
+        alarmFamilyPanel = findViewById(R.id.alarmFamilyPanel)
+        alarmFamilySupportText = findViewById(R.id.alarmFamilySupportText)
+        alarmWeekdaySwitch = findViewById(R.id.alarmWeekdaySwitch)
+        alarmWeekendSwitch = findViewById(R.id.alarmWeekendSwitch)
+        alarmWeekendHourInput = findViewById(R.id.alarmWeekendHourInput)
+        alarmWeekendMinuteInput = findViewById(R.id.alarmWeekendMinuteInput)
+        alarmHoldMinutesInput = findViewById(R.id.alarmHoldMinutesInput)
         alarmFadeText = findViewById(R.id.alarmFadeText)
         alarmFadeSeek = findViewById(R.id.alarmFadeSeek)
         alarmBrightnessText = findViewById(R.id.alarmBrightnessText)
@@ -495,20 +510,9 @@ class MainActivity : Activity() {
             showSection(target)
         }
 
-        val targetMode = when (target) {
-            lightPanel -> "light"
-            musicPanel -> "music"
-            ambientPanel -> "ambient"
-            nightPanel -> "night"
-            alarmPanel -> "off"
-            else -> null
-        }
-
-        if (targetMode == null || !deviceOnline || latestMode == targetMode) return
-
-        // All user mode writes share the same heartbeat exclusion and readback
-        // path as sliders/buttons. No parallel status probe during mode changes.
-        runDeviceAction("Переключение режима") { api.setMode(targetMode) }
+        // Navigation only displays controls. It must never change actual
+        // lighting: opening Alarm while a child sleeps must not turn NIGHT off.
+        // Modes are changed only by an explicit ON/OFF or scene action.
     }
 
     private fun bindNavigation() {
@@ -639,7 +643,7 @@ class MainActivity : Activity() {
             setScene(SceneTileView.Scene.WARM)
             setOnClickListener {
                 applyLightScene(
-                    "Кино", LightQuickScenes.CINEMA.kelvin, LightQuickScenes.CINEMA.brightness
+                    "Отдых", LightQuickScenes.CINEMA.kelvin, LightQuickScenes.CINEMA.brightness
                 )
             }
         }
@@ -1081,10 +1085,14 @@ class MainActivity : Activity() {
         )
         ambientPresetButtons.forEach { (id, button) ->
             button.setOnClickListener { applyAmbientPreset(id) }
+            button.setOnLongClickListener { toggleAmbientFavorite(id); true }
         }
         ambientPresetLabels.forEach { (id, label) ->
             label.setOnClickListener { applyAmbientPreset(id) }
+            label.setOnLongClickListener { toggleAmbientFavorite(id); true }
         }
+        ambientFavoritesRow = findViewById(R.id.ambientFavoritesRow)
+        refreshAmbientFavorites()
         ambientPresetExtraGrid = findViewById(R.id.ambientPresetExtraGrid)
         ambientPresetCapabilityText = findViewById(R.id.ambientPresetCapabilityText)
         ambientPresetControls = findViewById(R.id.ambientPresetControls)
@@ -1127,6 +1135,7 @@ class MainActivity : Activity() {
                     setImageResource(ambientSceneImageResources.getValue(id))
                     contentDescription = ambientSceneNames.getValue(id)
                     setOnClickListener { applyAmbientPreset(id) }
+                    setOnLongClickListener { toggleAmbientFavorite(id); true }
                 }
                 tile.addView(image, LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, dp(76)
@@ -1139,6 +1148,7 @@ class MainActivity : Activity() {
                     maxLines = 2
                     minHeight = dp(32)
                     setOnClickListener { applyAmbientPreset(id) }
+                    setOnLongClickListener { toggleAmbientFavorite(id); true }
                 }
                 tile.addView(label, LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -1227,7 +1237,61 @@ class MainActivity : Activity() {
         runDeviceAction(label) { api.selectAmbientPreset(id) }
     }
 
+    // Favorites are a local UI convenience only. Selection and scene settings
+    // still come from Nano via readback; no local preference can override them.
+    private fun ambientFavoriteIds(): List<String> {
+        val saved = preferences().getString("ambient_favorites_v1", null)
+        val ids = (saved ?: "P05,P06,P11,P01").split(",")
+        return ids.filter { it in ambientSceneNames }.distinct().take(4)
+    }
+
+    private fun toggleAmbientFavorite(id: String) {
+        if (id !in ambientSceneNames) return
+        val ids = ambientFavoriteIds().toMutableList()
+        if (id in ids) ids.remove(id)
+        else {
+            if (ids.size >= 4) ids.removeAt(0)
+            ids.add(id)
+        }
+        preferences().edit().putString("ambient_favorites_v1", ids.joinToString(",")).apply()
+        refreshAmbientFavorites()
+        setOperationStatus(if (id in ids) "Сцена добавлена в избранное"
+                           else "Сцена удалена из избранного", important = false)
+    }
+
+    private fun refreshAmbientFavorites() {
+        ambientFavoritesRow.removeAllViews()
+        val ids = ambientFavoriteIds()
+        if (ids.isEmpty()) {
+            ambientFavoritesRow.addView(TextView(this).apply {
+                text = "Удерживайте карточку сцены, чтобы добавить её сюда"
+                textSize = 12f
+                setTextColor(getColor(R.color.ardu_text_secondary))
+            })
+            return
+        }
+        ids.forEach { id ->
+            val button = Button(this).apply {
+                text = ambientSceneNames.getValue(id)
+                isAllCaps = false
+                textSize = 11f
+                isEnabled = deviceOnline
+                setOnClickListener { applyAmbientPreset(id) }
+                setOnLongClickListener { toggleAmbientFavorite(id); true }
+                isSelected = latestSettings?.ambientPresets?.selected == id &&
+                    latestMode == "ambient"
+            }
+            ambientFavoritesRow.addView(button, LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+            ).apply {
+                marginStart = dp(2)
+                marginEnd = dp(2)
+            })
+        }
+    }
+
     private fun setAmbientPresetSelection(selectedId: String?) {
+        refreshAmbientFavorites()
         ambientPresetButtons.forEach { (id, button) ->
             button.isSelected = id == selectedId
         }
@@ -1321,6 +1385,45 @@ class MainActivity : Activity() {
                 )
             } else {
                 runDeviceAction("Будильник") { api.updateAlarmSettings(enabled = checked) }
+            }
+        }
+        alarmWeekdaySwitch.setOnCheckedChangeListener { _, checked ->
+            if (!rendering && latestSettings?.alarm?.familyScheduleSupported == true) {
+                runDeviceAction("Будильник: школьные дни") {
+                    api.updateAlarmSettings(weekdayEnabled = checked)
+                }
+            }
+        }
+        alarmWeekendSwitch.setOnCheckedChangeListener { _, checked ->
+            if (!rendering && latestSettings?.alarm?.familyScheduleSupported == true) {
+                runDeviceAction("Будильник: выходные") {
+                    api.updateAlarmSettings(weekendEnabled = checked)
+                }
+            }
+        }
+        findViewById<Button>(R.id.alarmSaveWeekendTimeButton).setOnClickListener {
+            val hour = alarmWeekendHourInput.text.toString().toIntOrNull()
+            val minute = alarmWeekendMinuteInput.text.toString().toIntOrNull()
+            if (hour == null || minute == null || hour !in 0..23 || minute !in 0..59) {
+                setOperationStatus("Неверное время выходного дня", important = true)
+                return@setOnClickListener
+            }
+            if (latestSettings?.alarm?.familyScheduleSupported == true) {
+                runDeviceAction("Время пробуждения в выходные") {
+                    api.updateAlarmSettings(weekendHour = hour, weekendMinute = minute)
+                }
+            }
+        }
+        findViewById<Button>(R.id.alarmSaveHoldButton).setOnClickListener {
+            val minutes = alarmHoldMinutesInput.text.toString().toIntOrNull()
+            if (minutes == null || minutes !in 0..120) {
+                setOperationStatus("Время выключения: 0–120 минут", important = true)
+                return@setOnClickListener
+            }
+            if (latestSettings?.alarm?.familyScheduleSupported == true) {
+                runDeviceAction("Выключение после рассвета") {
+                    api.updateAlarmSettings(holdMinutes = minutes)
+                }
             }
         }
         for (preset in DawnPresets.all) {
@@ -2160,6 +2263,18 @@ class MainActivity : Activity() {
         alarmEnabledSwitch.isChecked = a.enabled
         alarmHourInput.setText(a.hour.toString().padStart(2, '0'))
         alarmMinuteInput.setText(a.minute.toString().padStart(2, '0'))
+        alarmFamilyPanel.visibility =
+            if (a.familyScheduleSupported) View.VISIBLE else View.GONE
+        alarmFamilySupportText.text = if (a.familyScheduleSupported) {
+            "Пн–Пт: время выше · Сб–Вс: отдельное время"
+        } else {
+            "Для расписания по дням недели нужны Nano R7 и ESP V5"
+        }
+        alarmWeekdaySwitch.isChecked = a.weekdayEnabled
+        alarmWeekendSwitch.isChecked = a.weekendEnabled
+        alarmWeekendHourInput.setText(a.weekendHour.toString().padStart(2, '0'))
+        alarmWeekendMinuteInput.setText(a.weekendMinute.toString().padStart(2, '0'))
+        alarmHoldMinutesInput.setText(a.holdMinutes.toString())
         alarmFadeSeek.setValue(a.fadeMinutes)
         alarmBrightnessSeek.setValue(a.maxBrightness)
         val kelvinSupported = a.kelvinSupported &&

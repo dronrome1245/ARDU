@@ -3226,3 +3226,21 @@ android_02211_ambient_music_scenes_2026_10_10:
   next: "owner_git_pull_run_02211_verify_four_changes"
 
 # 2026-10-17 D-126: ESP V4 remote Nano programming source/CI ready; physical reset-stage + first remote write/verify pending.
+
+# Canonical project state is STATUS.md; legacy structured handoff snapshot.
+handoff_2026_11_14:
+  decision: "D-128 family-friendly UX"
+  android_source: "0.22.16-family-schedule-rc1"
+  android_ci: "PASS 43593418689"
+  nano_candidate: "nano_warm_dawn_v7"
+  nano_boot: "ARDU1 8"
+  nano_compile_ci: "PASS 43595155594"
+  nano_flash_bytes: 30712
+  nano_flash_limit_bytes: 30720
+  esp_candidate: "esp8266_family_v5"
+  esp_compile_ci: "PASS 43595155594"
+  hardware_r7_installed: false
+  next_test: "04_Прошивка/FAMILY_R7_ACCEPTANCE.md"
+  hardware_power_44x2_gate_pass: false
+  class_ii_ceiling_psu_confirmed: false
+  primary_truth: "STATUS.md"

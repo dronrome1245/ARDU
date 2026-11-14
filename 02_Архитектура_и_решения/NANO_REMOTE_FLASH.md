@@ -1,7 +1,7 @@
-# Удалённая прошивка Arduino Nano через ESP8266 — R1
+# Удалённая прошивка Arduino Nano через ESP8266 — R3 DIAG
 
 Дата: 2026-10-17  
-Статус: ESP V4 SOURCE/CI PASS + hardware RESET PASS; первый реальный Wi-Fi write+verify Nano R6 pending.
+Статус: **аппаратный Wi-Fi Nano upload PASS (2026-11-07)**: ESP V4 R3 DIAG, AVRDUDE write+byte-for-byte verify 29 378 B, post-session `/api/status` PASS. Night D-125 функционально ещё не принят.
 
 ## 1. Что реализовано
 
@@ -91,3 +91,24 @@ cd C:\ARDU
 Физические тесты R2 показали, что полный write устойчиво доходит до 100%, тогда как длинный Nano→ESP→TCP readback verify падает в непостоянной точке (около 1/7/22/48%). Отдельный verify-only исключил переход write→verify; 64-byte page test не устранил ошибку. R6 при этом физически запускается (`ARDU1 7`).
 
 R3 DIAG не ослабляет критерий PASS и не отключает verify. В `/api/system/nano-program/status` после сеанса сохраняются: `uart_overrun`, `uart_rx_error`, `tcp_to_uart_bytes`, `uart_to_tcp_bytes`, `max_uart_available`, `max_tcp_available`, `uart_rx_buffer_size`. Следующий тест — verify-only и немедленное чтение этих полей.
+
+## 2026-11-07 — безопасная проверка уже установленной Nano R6
+
+В `tools/flash_nano_over_wifi.ps1` добавлен `-VerifyOnly`: стандартный AVRDUDE сравнивает содержимое Nano с переданным R6 HEX через `flash:v`, **не выполняя запись**. Скрипт после завершения AVRDUDE (включая FAIL) запрашивает `/api/system/nano-program/status` и выводит latched `uart_overrun`, `uart_rx_error`, TCP/UART byte counters и максимальные очереди. После успешного verify он отдельно требует восстановления `/api/status`.
+
+```powershell
+cd C:\ARDU
+.\tools\flash_nano_over_wifi.ps1 `
+  -HexPath ".\04_Прошивка\nano_warm_dawn_v6\nano_warm_dawn_v6.ino.hex" `
+  -DeviceIp 192.168.0.4 -VerifyOnly
+```
+
+Это **следующий тест после OTA установки ESP `ARDU_ESP_V4_NANO_REMOTE_R3_DIAG`**, а не доказательство, что он уже выполнен. До получения диагностики R3 Nano не перезаписывать. Функциональный сценарий D-125 и критерии hardware PASS: `04_Прошивка/NIGHT_R6_WIFI_ACCEPTANCE.md`. Отсутствие ошибок при verify-only подтверждает путь чтения, но не полный write+verify нового обновления.
+
+## 2026-11-07 — R3 DIAG physical verify-only: чтение восстановлено, сравнение FAIL
+
+На устройстве реально установлена ESP `ARDU_ESP_V4_NANO_REMOTE_R3_DIAG`. Первый `-VerifyOnly` со вновь собранным R6 HEX прочитал 29378 B (AVRDUDE Reading 100% за 11.29 с) без потери STK500 sync. R3: `uart_overrun=false`, `uart_rx_error=false`, RX 512 B, TCP→UART 2129 B, UART→TCP 30398 B, max TCP=22, max UART=114. Дальнейший verify сообщил **flash verification mismatch** уже на `0x002e`; локальная сборка 29378 B отличается по размеру от ранее записанного HEX 29722 B. Неизвестно, были ли эти HEX побайтово идентичны; причины расхождения пока не установлены. Это успешный полный сеанс чтения, **не успешная верификация** прошивки. Поскольку PowerShell остановился исключением после AVRDUDE, восстановление `/api/status` нужно отдельно проверить. Запись Nano не выполнялась. Следующий шаг — статус/RTC и функциональные тесты Night, без перезаписи.
+
+## 2026-11-07 — D-127 / Nano remote flash hardware PASS
+
+Подтверждён успешный штатный вызов `tools/flash_nano_over_wifi.ps1` **без** `-VerifyOnly`: ESP V4 R3 DIAG, ATmega328P old bootloader, 57600 baud, AVRDUDE 8.0-arduino.1; `Writing 100%` за 13.92 с, `Reading 100%` за 12.47 с, **`29378 bytes of flash verified`**. UART `overrun=false`, `rx_error=false`, RX buffer=512, TCP→UART=33648, UART→TCP=31450, max TCP=133, max UART=102, `last_result=disconnected`, `active=false`. `/api/status` восстановлен, `mode=light`, `rtc_valid=true`, `current_limit_ma=3000`. **D-127 технический gate записи + verify + восстановления приложения выполнен.** Требуется отдельная приёмка поведения Night D-125; снятие Nano не потребовалось.

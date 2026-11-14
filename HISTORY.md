@@ -2819,3 +2819,81 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 - После полного power-cycle `/api/status` снова PASS: RTC valid, current limit 3000 mA, normal UART работает.
 - Reset-only через ESP GPIO4 дал сырую startup-строку `�ARDU1 7` и событие `V 9 1`; следовательно, записанная Nano R6/FW_REV7 фактически стартует на железе. Это не отменяет требование полного AVRDUDE verify для remote-programming hardware PASS.
 - Подготовлен ESP V4 R3 DIAG: latched UART overrun/RX-error, byte counters/max queue diagnostics и фильтрация residual UART строк в events.
+
+## 2026-11-07 — Night D-125: безопасный read-only gate для Nano R6 через Wi-Fi
+
+- Проверены актуальные `STATUS.md`, `DECISIONS.md`, `NANO_REMOTE_FLASH.md`, прошивка Nano R6 (`ARDU1 7`) и ESP V4 R3 DIAG; исходный алгоритм расписания D-125 уже реализован.
+- Изменён `tools/flash_nano_over_wifi.ps1`: добавлен `-VerifyOnly` с `avrdude -U flash:v`, вывод latched R3 UART/TCP диагностик даже после неуспешного AVRDUDE, и отдельная проверка восстановления `/api/status`. Обычный режим записи сохранил обязательный write+verify.
+- Добавлен `04_Прошивка/NIGHT_R6_WIFI_ACCEPTANCE.md`: последовательность установки R3 по OTA, read-only сравнение установленного R6 HEX и проверки семантики ручного Night, границ ON/OFF и приоритета DAWN.
+- Исходный Nano/ESP код в этой итерации не изменён. Операций OTA, readback или проверки устройства по локальной сети из GitHub-коннектора не выполнялось; hardware gate остаётся открытым.
+
+## 2026-11-07 — аппаратный тест R3 DIAG: Nano readback 100%, HEX mismatch
+
+- Подтверждено владельцем: `/api/ping` ESP `ARDU_ESP_V4_NANO_REMOTE_R3_DIAG`, сеть Station `192.168.0.4`, сервис Nano remote flash на TCP 3280.
+- Выполнен PowerShell `tools/flash_nano_over_wifi.ps1 -VerifyOnly` с HEX `04_Прошивка/nano_warm_dawn_v6/build/arduino.avr.nano/nano_warm_dawn_v6.ino.hex`, скомпилированным локально до 29378 байт. Использован штатный AVRDUDE `8.0-arduino.1`, `ATmega328P` signature `1E 95 0F`, 57600 baud.
+- AVRDUDE выполнил `Reading 100% 11.29 s` без прежней ошибки STK500 sync; ESP диагностировал `uart_overrun=false`, `uart_rx_error=false`, `uart_rx_buffer_size=512`, `tcp_to_uart_bytes=2129`, `uart_to_tcp_bytes=30398`, `max_tcp_available=22`, `max_uart_available=114`, `last_result=disconnected`, `active=false`.
+- **Строгий verify FAIL:** `flash verification mismatch`, первое видимое отличие на 0x002e (device 0x88, input 0xf5); сравниваемый HEX 29378 B, тогда как предыдущая запись R6 содержала 29722 B. Возможна разница компилятора/библиотек/сборки, но причины пока не подтверждены.
+- Не было команды `flash:w`: Nano НЕ перезаписывалась. Не объявлять физический full verify PASS или write+verify PASS. Из-за исключения скрипт не выполнил post-session `/api/status`, нужно проверить его отдельно; далее функциональный тест D-125.
+
+## 2026-11-07 — постпроверка Nano: HTTP восстановлен, RTC invalid
+
+- После аппаратного `-VerifyOnly` владелец запросил `/api/status`: `ok:true`, `nano_fw:ARDU_V2`, `mode:light`, `rtc_valid:false`, `current_limit_ma:3000`, `uptime_ms:214617`, статус Nano `D 2 1 0 0 70 500 3000 1 0 0 214617`.
+- Подтверждено: UART/HTTP приложение Nano работает после выхода из bootloader. Но DS3231 сейчас сообщает невалидное время (причина не установлена); Night schedule и Alarm запускать на время до выяснения нельзя. Следующий безвредный шаг — `/api/time` без записи настроек.
+
+## 2026-11-07 — RTC/Night diagnosis: `/api/time` invalid
+
+- Владелец выполнил `GET http://192.168.0.4/api/time`: `ok:true`, `valid:false`, `nano:"D 4 0"`.
+- Код Nano R6 `rtcValidNow()` допускает несколько причин: нет ACK DS3231, ошибка чтения status/time, некорректные значения даты или OSF=1 (флаг остановки осциллятора). HTTP ответ не различает причины.
+- Следующее действие: синхронизация даты/времени через существующий ESP API `/api/time/sync` с часов ПК, затем readback; если не удаётся, дальнейшая диагностика I2C/DS3231. Никакая перепрошивка в этом диагностическом шаге не выполнялась.
+
+## 2026-11-07 — RTC sync hardware PASS после `D 4 0`
+
+- Владелец вызвал `POST /api/time/sync` с локальным временем Windows: `ok:true`, `applied:true`.
+- `GET /api/time` сразу после записи вернул `ok:true`, `valid:true`, `date:2026-11-07`, `time:21:25:28`, Nano `D 4 1 2026 11 7 21 25 28`.
+- DS3231 доступна на чтение и запись, автоматические функции по времени снова можно испытывать. Первопричина прежнего `valid:false` и удержание хода при отключении питания пока не проверены.
+- Следующий шаг: прочитать сохранённые настройки `/api/settings` и тестировать Night D-125 без новой прошивки.
+
+## 2026-11-07 — первая полностью подтверждённая Wi-Fi прошивка Arduino Nano R6
+
+- Владелец выполнил `tools/flash_nano_over_wifi.ps1` **без** `-VerifyOnly` из Windows PowerShell; HEX `04_Прошивка/nano_warm_dawn_v6/build/arduino.avr.nano/nano_warm_dawn_v6.ino.hex` (29 378 байт); ESP R3 DIAG, TCP `192.168.0.4:3280`, STK500 v1 / 57600 бод / ATmega328P Old Bootloader.
+- AVRDUDE 8.0-arduino.1: `Writing 29378 bytes to flash`, `Writing 100% 13.92 s`; `Reading 100% 12.47 s`; **`29378 bytes of flash verified`**, штатное завершение (exit code 0).
+- ESP R3 diagnostics после сеанса: `last_result=disconnected`, `active=false`, `UART overrun=false`, `rx_error=false`, `RX buffer=512`, TCP→UART `33648 B`, UART→TCP `31450 B`, max available TCP=133, UART=102.
+- Скрипт вывел **`PASS: AVRDUDE write + byte-for-byte verify succeeded`**, затем **`PASS: Nano application responds. mode=light, rtc_valid=True, current_limit_ma=3000`**.
+- **АППАРАТНЫЙ PASS механизма удалённой загрузки Nano (D-127)**: запись + побайтовая проверка + восстановление приложения без снятия потолочной лампы. **Функциональные сценарии Night D-125 ещё не проверены**; они остаются отдельным gate.
+
+## 2026-11-07 — владелец подключил второе кольцо; нагрузочный тест ещё не выполнен
+
+- Владелец сообщил о физическом подключении второго 44-LED кольца ARDU.
+- Nano R6 уже содержит два выхода FastLED D6/D7 с общим буфером 44 LED на каждое кольцо, суммарный программный лимит 3000 mA; прошивка/Android для зеркальной работы не требуют изменения.
+- Нет подтверждения напряжения на кольце B, отсутствия мерцания, тока, нагрева, наличия развязки и безопасного Class II БП. Нельзя считать аппаратный gate 44+44 пройденным.
+- Следующая процедура: предварительно убедиться в корректности схемы и отсутствии короткого замыкания, установить через `/api/system/current-limit` 500 mA, проверить свечение обоих колец, напряжение дальнего B под нагрузкой и стабильность; только после подтверждения вернуть до 3000 mA.
+
+## 2026-11-07 — кольцо B подключено, но пока не светится
+
+- Владелец сообщил, что после подключения второго кольца B не светится, а первое A отключено. Поведение пока не локализовано.
+- В Nano R6 FastLED D6 и D7 являются независимыми выходами с зеркальным кадром (44 WS2812B на каждом); отсутствие кольца A не является объяснением отсутствия свечения B.
+- Следующая проверка без перепрошивки: принудительно включить L01 через `/api/light/settings` и подтвердить `/api/status`; затем, если B всё ещё не светится, измерить 5 В постоянного тока на B при безопасном доступе к низковольтной части, далее проверять GND/D7→DIN/resistor 220–470 Ω с полностью отключённым питанием.
+
+## 2026-11-07 — кольцо B заработало после исправления DATA→DIN
+
+- Пользователь ранее подтвердил 5 В непосредственно на ленте B; `/api/status` показывал `mode=light`, `current_limit_ma=500`, `rtc_valid=false` после недавнего перезапуска.
+- По фотографии идентифицировано подозрение на подключение сигнала со стороны DOUT; после переноса пользователь сообщил: «ты прав. поменял все горит». Свечение B подтверждено словами владельца.
+- Кольцо A в предыдущем тесте было физически отключено. Синхронная работа 44+44, нагрузочный тест, падение 5 В под нагрузкой, тепловые проверки и безопасный финальный Class II БП не подтверждены. К монтажу на потолке переходить только после закрытия этих gate; ESP/Nano/Android прошивки менять не нужно.
+
+
+## 2026-11-14 — D-128: программная реализация улучшенного семейного UX
+
+- В Android `android_app_r1` нижняя навигация больше не вызывает `api.setMode()`; явные контролы режимов сохранены. Пресет «Кино» показан как «Отдых», плитка стала теплее по цвету, Kelvin и brightness сохранены.
+- Для 12 фоновых сцен добавлена локальная панель четырёх избранных с удержанием для добавления/удаления. Фактический active preset продолжает перечитываться с Nano; локальный список не выдаётся за состояние лампы.
+- В Android `0.22.16-family-schedule-rc1` добавлены экраны и код парсинга расписания Пн–Пт/Сб–Вс, выходного времени и auto-off 0–120 мин. При отсутствии capability флагов новых firmware кнопки семейного расписания не показываются.
+- Созданы **отдельные source-кандидаты** Nano `nano_warm_dawn_v7` (boot `ARDU1 8`, семейный EEPROM блок, wake-date weekday logic, ручной/событийный Night fade, alarm-only hold timeout) и ESP `esp8266_family_v5` (HTTP JSON + UART family opcode62, строгая проверка версии Nano). Старые R6/ESP V4 оставлены неизменными.
+- Android Verify [43593418689](https://github.com/dronrome1245/ARDU/actions/runs/43593418689) **PASS** после замены устаревшего теста, требовавшего команду смены режима при открытии вкладки. ESP V5 compile PASS в Family R7 workflow. В первых запусках Nano R7 возникло переполнение flash; в отдельной кандидатной сборке идёт оптимизация. **До успешной CI memory-gate и физического Nano write+verify не объявлять новые Night/Alarm режимы установленными или аппаратно пройденными.**
+- Не вмешивались в питание, проводку или физическую лампу; совместный тест 44+44 и Class II PSU остаются обязательными.
+
+
+## 2026-11-14 — CI PASS семейного Nano R7 и ESP V5 после оптимизации flash
+
+- Первоначальная Nano R7 source не помещалась в flash, до 31 050 B. Оптимизированы календарный расчёт дня недели (8-bit с учётом високосных лет 2000..2099), плавное обновление яркости, хранение FamilyAlarm через EEPROM.get/put, сериализация только действующих атмосферных полей с сохранением 14-значного wire-format для старого ESP.
+- Окончательный результат GitHub Actions [ARDU Family R7 Candidates, run 43595155594](https://github.com/dronrome1245/ARDU/actions/runs/43595155594): **Nano compile/memory PASS 30 712/30 720 Flash, 1 076/2 048 global SRAM**; ESP V5 one-file (CI dummy credentials) compile PASS. В CI отдельно выдано предупреждение о **всего 8 байтах оставшегося flash**: последующие функции требуют сокращения прошивки.
+- Android [run 43593418689](https://github.com/dronrome1245/ARDU/actions/runs/43593418689) **PASS**: unit tests, debug APK `ardu-android-02216-family-schedule-debug-apk`; новые вкладки, фавориты, экран семейного будильника в коде.
+- Ни R7, ни ESP V5 этим действием физически не установлены. Не заявлять hardware PASS Night/Alarm, пока не пройдены AVRDUDE verify и полный протокол `04_Прошивка/FAMILY_R7_ACCEPTANCE.md`.

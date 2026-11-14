@@ -5,7 +5,10 @@ param(
     [string]$DeviceIp = "192.168.0.4",
     [string]$OtaPassword,
     [string]$AvrdudePath,
-    [string]$AvrdudeConfPath
+    [string]$AvrdudeConfPath,
+
+    # Read-only diagnostic mode: compare installed flash with a known HEX.
+    [switch]$VerifyOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -52,6 +55,9 @@ $ping = Invoke-RestMethod "http://$DeviceIp/api/ping" -TimeoutSec 5
 if (-not $ping.ok -or -not $ping.nano_remote_flash) {
     throw "ESP at $DeviceIp does not report nano_remote_flash=true"
 }
+if ($VerifyOnly -and $ping.fw -ne "ARDU_ESP_V4_NANO_REMOTE_R3_DIAG") {
+    Write-Warning "ESP fw=$($ping.fw): R3 diagnostics unavailable until its OTA update."
+}
 
 $payload = @{ password = $OtaPassword } | ConvertTo-Json -Compress
 $arm = Invoke-RestMethod -Uri "http://$DeviceIp/api/system/nano-program/arm" `
@@ -69,7 +75,14 @@ if (-not $arm.ok -or -not $arm.armed) {
 }
 
 $netPort = "net:$DeviceIp`:$($arm.port)"
-Write-Host "Programming Nano through $netPort at $($arm.baud) baud..."
+if ($VerifyOnly) {
+    Write-Host "VERIFY-ONLY: read Nano flash without writing; Nano will be reset."
+    $flashOp = "flash:v:$hex" + ":i"
+} else {
+    Write-Host "WRITE + VERIFY: Nano flash will be overwritten and Nano reset."
+    $flashOp = "flash:w:$hex" + ":i"
+}
+Write-Host "Bridge: $netPort at $($arm.baud) baud"
 Write-Host "HEX: $hex"
 
 $args = @(
@@ -80,16 +93,48 @@ $args = @(
     "-P", $netPort,
     "-b", "$($arm.baud)",
     "-D",
-    "-U", "flash:w:$hex`:i"
+    "-U", $flashOp
 )
 
 & $AvrdudePath @args
 $code = $LASTEXITCODE
-if ($code -ne 0) {
-    throw "AVRDUDE failed with exit code $code. The ESP reset bridge remains the recovery path; arm and retry."
+
+# Collect bridge diagnostics also on AVRDUDE failure. Failed verify is never
+# a PASS, even if the Nano application continues to boot.
+$diag = $null
+for ($attempt = 0; $attempt -lt 8; $attempt++) {
+    Start-Sleep -Milliseconds 350
+    try {
+        $diag = Invoke-RestMethod "http://$DeviceIp/api/system/nano-program/status" -TimeoutSec 3
+        if (-not $diag.active) { break }
+    } catch {
+        # Wait for ESP to restore HTTP service after programming mode.
+    }
+}
+if ($diag) {
+    Write-Host "Bridge last_result=$($diag.last_result); active=$($diag.active)"
+    if ($null -ne $diag.uart_overrun) {
+        Write-Host "UART overrun=$($diag.uart_overrun); rx_error=$($diag.uart_rx_error); RX buffer=$($diag.uart_rx_buffer_size)"
+        Write-Host "Bytes TCP->UART=$($diag.tcp_to_uart_bytes); UART->TCP=$($diag.uart_to_tcp_bytes)"
+        Write-Host "Max available TCP=$($diag.max_tcp_available); UART=$($diag.max_uart_available)"
+    } else {
+        Write-Warning "ESP does not expose R3 diagnostic counters yet."
+    }
+} else {
+    Write-Warning "Could not read bridge diagnostics after the session."
 }
 
-Write-Host "AVRDUDE write + verify completed. Waiting for ARDU UART to return..."
+if ($code -ne 0) {
+    throw "AVRDUDE failed (exit code $code). NO PASS: save its output and bridge diagnostics. Do not blindly repeat a write."
+}
+
+if ($VerifyOnly) {
+    Write-Host "PASS: byte-for-byte AVRDUDE verify succeeded; no flash write performed."
+} else {
+    Write-Host "PASS: AVRDUDE write + byte-for-byte verify succeeded."
+}
+
+# Confirm the application protocol is running after the bootloader session.
 $deadline = (Get-Date).AddSeconds(12)
 $status = $null
 while ((Get-Date) -lt $deadline) {
@@ -98,12 +143,12 @@ while ((Get-Date) -lt $deadline) {
         $status = Invoke-RestMethod "http://$DeviceIp/api/status" -TimeoutSec 3
         if ($status.ok) { break }
     } catch {
-        # Old Nano bootloader can take a few seconds to fall through after reset.
+        # Nano bootloader may take a moment to launch the application.
     }
 }
 
 if ($status -and $status.ok) {
-    Write-Host "PASS: Nano is responding again. mode=$($status.mode), rtc_valid=$($status.rtc_valid)"
+    Write-Host "PASS: Nano application responds. mode=$($status.mode), rtc_valid=$($status.rtc_valid), current_limit_ma=$($status.current_limit_ma)"
 } else {
-    Write-Warning "Programming verified, but /api/status did not return within 12 s. Check /api/system/nano-program/status and retry the Nano reset/program cycle if needed."
+    throw "AVRDUDE verified flash, but /api/status did not recover in 12 s. Application acceptance is NOT PASS."
 }
