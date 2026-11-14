@@ -355,8 +355,16 @@ class ArduApiClient(private val context: Context? = null) {
         endHue: Int? = null,
         startKelvin: Int? = null,
         endKelvin: Int? = null,
+        weekdayEnabled: Boolean? = null,
+        weekendEnabled: Boolean? = null,
+        weekendHour: Int? = null,
+        weekendMinute: Int? = null,
+        holdMinutes: Int? = null,
         persist: Boolean = true
     ) {
+        require((weekendHour == null) == (weekendMinute == null)) {
+            "Часы и минуты выходных должны передаваться вместе"
+        }
         // Warm endpoints are sent together: the Nano validates op78 atomically.
         require((startKelvin == null) == (endKelvin == null)) {
             "Обе температуры рассвета обязательны"
@@ -377,6 +385,11 @@ class ArduApiClient(private val context: Context? = null) {
         endHue?.let { json.put("end_hue", it) }
         startKelvin?.let { json.put("start_kelvin", it) }
         endKelvin?.let { json.put("end_kelvin", it) }
+        weekdayEnabled?.let { json.put("weekday_enabled", it) }
+        weekendEnabled?.let { json.put("weekend_enabled", it) }
+        weekendHour?.let { json.put("weekend_hour", it) }
+        weekendMinute?.let { json.put("weekend_minute", it) }
+        holdMinutes?.let { json.put("hold_minutes", it) }
         json.put("persist", persist)
         postApplied("/api/alarm/settings", json)
     }
@@ -608,7 +621,16 @@ class ArduApiClient(private val context: Context? = null) {
                 startKelvin = if (alarm.optBoolean("dawn_kelvin_supported"))
                     alarm.requiredInt("start_kelvin", 1800..4000) else null,
                 endKelvin = if (alarm.optBoolean("dawn_kelvin_supported"))
-                    alarm.requiredInt("end_kelvin", 1800..4000) else null
+                    alarm.requiredInt("end_kelvin", 1800..4000) else null,
+                familyScheduleSupported = alarm.optBoolean("family_schedule_supported"),
+                weekdayEnabled = alarm.optBoolean("weekday_enabled", true),
+                weekendEnabled = alarm.optBoolean("weekend_enabled", false),
+                weekendHour = if (alarm.optBoolean("family_schedule_supported"))
+                    alarm.requiredInt("weekend_hour", 0..23) else 9,
+                weekendMinute = if (alarm.optBoolean("family_schedule_supported"))
+                    alarm.requiredInt("weekend_minute", 0..59) else 0,
+                holdMinutes = if (alarm.optBoolean("family_schedule_supported"))
+                    alarm.requiredInt("hold_minutes", 0..120) else 15
             ),
             ambient = AmbientSettings(
                 effect = ambient.requiredString("effect"),
