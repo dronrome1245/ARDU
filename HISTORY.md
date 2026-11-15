@@ -2927,3 +2927,10 @@ Android v0.22.11/code34: скрыты F01/HSV/Auto card roots (legacy endpoints 
 
 - [GitHub Actions Android Verify run 43633190043](https://github.com/dronrome1245/ARDU/actions/runs/43633190043) завершился **PASS**: static contracts D-130, `RtcAutoSyncGateTest` через `testDebugUnitTest`, `assembleDebug`, upload artifact [14128014886](https://github.com/dronrome1245/ARDU/actions/runs/43633190043/artifacts/14128014886) с именем `ardu-android-02218-rtc-auto-sync-debug-apk`.
 - Приложение можно `git pull → Run` на телефоне. Физическая проверка именно автоматического POST на установленной ESP V4/Nano R6 — **PENDING**, прежний RTC после ручного `/api/time/sync` выдавал `valid:true`, но это ещё не является тестом новой автоматизации.
+
+
+## 2026-11-15 — D-130: пользователь подтвердил автосинхронизацию RTC с Android
+
+- После установки Android 0.22.18 и возвращения приложения в foreground пользователь ответил **«да»** на вопрос о появлении сообщения «Время ARDU синхронизировано с телефоном».
+- Представлен независимый HTTP readback: `GET http://192.168.0.4/api/time` → `{"ok":true,"valid":true,"date":"2026-11-15","time":"13:34:26","nano":"D 4 1 2026 11 15 13 34 26"}`. Последовательные предыдущие readback 13:18:42, 13:27:15 подтверждают ход RTC. Эта совокупность подтверждает интеграционную функциональность при запущенном телефоне (по ответам пользователя); отдельный сетевой захват POST отсутствует.
+- **Статус D-130: телефонный/интеграционный PASS по сообщению владельца**, автоматические тесты [Android CI PASS](https://github.com/dronrome1245/ARDU/actions/runs/43633190043). Никаких физических изменений ESP V4/Nano R6. Не подтверждены сохранение DS3231 при полном power-off и первопричина раннего `valid:false`.
